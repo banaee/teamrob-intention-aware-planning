@@ -4978,3 +4978,15 @@ To be renamed at the next regeneration of the baseline sets. Readers of the text
 test_tl4_overrides.py and tests/test_tviz_sim_run.py.
 Files: mesa_sim/sim_run.py
 Reference: design_records.md, "T-viz, the web-ui", 0.2
+
+**TODO-192: The orientation of fixed objects, stated in a layout file and dropped by the loader (recorded, T-viz 0.4, 6 Oct 2026)** open
+One layout file states an orientation per fixed object, `orientation_deg` (domains/kitting/layouts/env_layout_02.json,
+11 objects, 0 or -90), and one setup file per movable object (env_setup_02.json). The loader does not keep it
+(`mesa_sim/sim_model.py`, `SimObject` has no orientation) and no code reads it; the solara-ui's drawer does not either.
+So the web-ui's messages carry none (T-viz 0.4, Q7, Hadi, 6 October 2026: left out of stage 1a). Open, for the scene's
+look (a shelf's front, a figure facing a table): whether an orientation becomes a stated fact of a fixed object, kept by
+the loader and carried by the run description, with the layouts that lack it given one; or whether the per-domain
+visualisation configuration supplies it. Either is its own change before the scene needs it. The `slots` field of
+kitting's layouts (TODO-173, FW) is likewise in the files and unread.
+Files: mesa_sim/sim_model.py, webui/messages.py, domains/*/layouts/
+Reference: design_records.md, "T-viz, the web-ui", 0.4

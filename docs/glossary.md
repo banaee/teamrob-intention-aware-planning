@@ -1681,6 +1681,79 @@ framing; and the "workspace boundary", the edge of the space a fallback ray meet
 
 ---
 
+## 11. The web-ui (T-viz)
+
+Preferred by Hadi, 6 October 2026, in the T-viz status words (open, preferred, preferred, replaceable, proposed by cchat,
+verified, not verified), not ruled: a later design stage may change them. The entries come from the 0.1 report's
+proposals and from T-viz 0.4's plan. "Sim-run" (one simulation, from a built model at step 0 to its end) stays a word of
+the T-viz records with no entry here, as do start, preview, draft, active and passive object, scene appearance and shape
+kind; the glossary's **run**, **run file** and run options (§9) are unchanged. No use of "viewer" is renamed.
+→ `docs/handoffs/handoff_T-viz.md`, section 2; `docs/design_records.md`, "T-viz, the web-ui".
+
+**web-ui** — the framework's web user interface (**T-viz**, §8): its own page in the browser and a small Python server,
+without Solara; independent of every simulator and every domain (`webui/`; a simulator supplies its own piece, Mesa's
+`mesa_sim/webui_adapter.py`). Older records and code comments call a planned program of this kind "the viewer" (T-E,
+T-V track 1); they are not renamed. Preferred (Hadi, 6 October 2026).
+
+**solara-ui** — the existing Solara program, `solara run mesa_sim/run_mesa.py` (`mesa_sim/viz/`). A tentative name:
+Hadi said it with "maybe". The records and code comments that say "the viewer" for the present program mean the
+solara-ui (glossary §9, **run file**; `mesa_sim/run_mesa.py`; `mesa_sim/viz/run_file_panel.py`); they are not renamed.
+Archived from Hadi's acceptance of T-viz stage 1a on (preferred). Preferred, tentative (Hadi, 6 October 2026).
+
+**screen-user** — the person at the screen during a sim-run in the web-ui, who watches and presses the controls. Not the
+**author** (below), though one person may be both. Preferred (Hadi, 6 October 2026).
+
+**env-pane** — the region of the web-ui's page that shows the simulated environment (§10, **environment**), with its
+agents and objects that move; it may hold 2D or 3D graphics. Preferred (Hadi, 6 October 2026).
+
+**scene** — the picture inside the **env-pane**: the room, its objects and its agents at one tick. Used only where the
+region and its content must be told apart. Preferred (Hadi, 6 October 2026).
+
+**display place** — where the web-ui draws a movable object inside the footprint of the fixed object that holds it,
+derived on the page from the order in which the movable objects arrived there (the **tick update**, below; at the start
+the setup's order). A display convention, not a world fact: in the world a movable object in a container has exactly
+the container's position. Fixed while the object stays there; never written to the world, a log, a layout or a setup.
+Slots in containers are TODO-173, FW. Preferred (Hadi, 6 October 2026).
+→ `docs/handoffs/handoff_T-viz.md`, section 9; `webui/messages.py`, `FixedObjectContents`.
+
+**author** — the person who writes a scenario and the other artefacts of a run (§9: layouts, setups, scenarios, the
+human's script, a setup's or a scenario's timeline) before the run; the word as the records already use it ("the author
+writes the machine", "an authoring convention", "authored entry"). This entry describes that use and changes none.
+Preferred (Hadi, 6 October 2026).
+
+**catalogue** — the first of the web-ui's three messages: what can be chosen for a sim-run, before any model exists. Per
+domain its layouts (each with its title), setups and scenarios, each scenario with its two bindings (its setup, its
+reference layouts, §9) and its description; the run options, each declared by kind (a switch, one of a closed list of
+values, a level strictly between 0 and 1, a count with a minimum) with its default and its description; and the default
+choice of a sim-run. Read from the domain registry and the run file by the simulator's piece, never from the web-ui's
+code. A run option is identified by its name, a deliberate exception at the input boundary (`mesa_sim/webui_adapter.py`).
+Preferred (Hadi, 6 October 2026).
+→ `webui/messages.py`, `Catalogue`, `SimRunChoice`.
+
+**run description** — the second of the web-ui's messages: everything constant in one sim-run, sent when its model is
+built. The run's triple (layout, setup, scenario, with the domain); the screen-user's choice of the sim-run as stated
+and the run options in effect as the model applies them (an option another sets off shows here); and the world: the
+space, the areas, the fixed objects with their positions and sizes, the movable objects with their home containers and
+designated destinations, the agents (humans, robots), each human's script, and the timeline of context facts in force
+with its source. Stage 1b adds the robot's mind beside the world, in its own section. Preferred (Hadi, 6 October 2026).
+→ `webui/messages.py`, `RunDescription`.
+
+**tick update** — the third of the web-ui's messages: the complete changing state of a sim-run at the tick reached,
+after each step and at the start; not differences from the tick before. Its tick is the run log's number of the step
+executed (none at the start). The world: each agent's position and the direction of its most recent step that moved it
+(from its own positions, not a world fact the model holds); the fixed objects that hold movable objects at that tick,
+each with them in their order of arrival, and the movable objects carried, with their holders (every movable object in
+exactly one of the two); the object states and the timeline facts that hold; and what each human's executor is doing,
+from its record (the stack, the action in hand with its progress, the tick's transitions, the script's entries still
+open). It does not say which fixed objects are containers (§10): a container that holds nothing at the tick is absent
+from it. The order of arrival is the simulator's side's, so that a page reload keeps it; it is not a world fact, and the
+**display place** is derived from it on the page. At the sim-run's end the tick update carries why it ended and the
+entries still open. Stage 1b adds the robot's mind, 1c the plots, each in its own section. Preferred (Hadi, 6 October
+2026).
+→ `webui/messages.py`, `TickUpdate`.
+
+---
+
 ## Not in this glossary
 
 **trajectory** has no definition and gets none: inventing one is a design act. In the living

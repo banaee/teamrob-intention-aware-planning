@@ -593,7 +593,9 @@ Decisions
   ASKED FOR (Hadi, 6 October 2026): T-viz, the web-ui (`docs/handoffs/handoff_T-viz.md`; design_records.md, "T-viz, the
   web-ui"). Its stage 0 runs now, one step per session (0.1 recording done, 6 October 2026; 0.2 code structure done, 6 October
   2026: `mesa_sim/run_config.py` reads the run configuration and builds the model, `mesa_sim/sim_run.py` is one
-  sim-run with its log pair, every start uses both, the headless start imports no Solara); a later T-viz stage starts
+  sim-run with its log pair, every start uses both, the headless start imports no Solara; 0.4 messages done, 6 October
+  2026: `webui/` at the root, the message definitions and the interface a simulator's piece implements, independent of
+  every simulator and domain, and Mesa's piece `mesa_sim/webui_adapter.py`; glossary §11); a later T-viz stage starts
   only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").

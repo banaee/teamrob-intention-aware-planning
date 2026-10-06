@@ -1302,3 +1302,28 @@ Hadi's answers to the 0.1 report (6 October 2026, preferred; design_records.md, 
 - On what these answers contradict, and on the place of stage 1 in the order (preferred for now): "Put everything in
   FW, I decide later." The [FW] tags stay; no ruling is amended; the three contradictions and the place of stage 1
   (ccode's proposal) stay open, Hadi decides later (TODO-190).
+
+Stage 0.4, the messages (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 0.4; Hadi confirmed the plan,
+Q1 to Q9 each (a)). Section 8 is settled by 0.4 as follows; the body above is left as written.
+- 8.1: three messages, not two: a catalogue (7.3's catalogue request), a run description, a tick update with the
+  complete changing state. The screen-user's choice of a sim-run is `SimRunChoice`. Defined in `webui/messages.py`
+  (pydantic v2); the interface a simulator's piece implements is `webui/simulator.py`; Mesa's piece is
+  `mesa_sim/webui_adapter.py`.
+- 8.2: as proposed, and also the run options as stated and in effect, the movable objects' home containers and
+  designated destinations, each human's script and the timeline in force. The page receives the space's bounds; the
+  layout's `orientation_deg` is not carried (the loader drops it; TODO-192).
+- 8.3: no planned path in stage 1a (a question for 1b; 5.4's path is not in the model, as the note above says). A
+  movable object's place is given as the fixed objects that hold movable objects at the tick (`fixed_object_contents`,
+  not called containers: the glossary's container is a kind of fixed object) and the objects carried. "Run ended" is
+  the tick update's optional end, with its reason. Added: the object states, the timeline facts, and panel 4a's
+  source, each human's activity from the executor's record (the stack, the action in hand, the tick's transitions, the
+  open entries). The step number is the run log's number of the step executed, none at the start.
+- 8.4: the sim-run's identity is in every message after the catalogue (TODO-187). The order of arrival is supplied by
+  the simulator's side, kept per sim-run by the piece. One definition: done. Path: open for 1b. A carried object: given
+  by its holder. Facing: `last_motion`, the direction of the agent's most recent step that moved it, from its own
+  positions (not the robot's perception memory). "Tick" and "step": the glossary distinguishes neither; the messages say
+  tick, numbered as the run log numbers steps.
+- 7.4: the clock as proposed (the page requests each step; plain request and response). The requests are recorded in
+  the 0.4 entry; the server is not built.
+- 9: "display place" is a glossary entry (§11), with web-ui, solara-ui, screen-user, env-pane, scene, author, catalogue,
+  run description and tick update (Hadi approved them, 6 October 2026, preferred).

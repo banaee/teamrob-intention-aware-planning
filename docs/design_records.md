@@ -4635,3 +4635,117 @@ HOW THE EIGHT POINTS WERE CHECKED (B0 at 5d6eb50, after the records session's ff
    `start_sim_run`; `list_scenarios.py`'s copy of the domain map removed. Outside 0.2: `actual.py` (flag above).
 8. Callers of `run_mesa`: tests/kitting/test_tl1_artefacts.py and test_tl4_overrides.py use `resolve_triple`,
    `load_user_config` and `run_headless` from it unchanged and pass.
+
+0.4, THE MESSAGES, BUILT (ccode, 6 October 2026; the plan confirmed by Hadi the same day, Q1 to Q9 each answered (a),
+with six conditions). The messages between the web-ui and a simulator, and Mesa's piece that produces them; no server,
+no page, no transport.
+- What Hadi preferred for 0.4 (6 October 2026): the web-ui independent of the simulator (its page, its message
+  definitions and the part of its server that answers the page in a folder of its own; only the piece that reads one
+  simulator lives with that simulator) and of the domain (no domain name, object type or area id in its code or a
+  message definition); a sim-run in the web-ui ends at the configured steps (further steps refused) and at the tick
+  reached when the screen-user resets or changes a choice after the first step, its end lines written in both; every
+  change of a choice builds the model, the page shows the start, the choices lock after the first step; all run
+  options offered, the rules between them in the simulator's code, the page showing the values in effect the model
+  reports; stage 1a shows no planned path (a question for 1b) and the actual world (the scene, what the human is
+  doing), the robot's mind in 1b, plots in 1c. Taken from cchat's proposals (handoff, 7.4, 8.1 to 8.4): the page
+  requests each step; three messages (a catalogue, a run description, a tick update with the complete changing state);
+  each message names its sim-run (TODO-187); the order of arrival per container supplied by the simulator's side;
+  typed classes defined once in Python; plain request and response.
+- `webui/` (new, at the repo root): `messages.py`, the message definitions (pydantic v2, frozen, no extra field, strict;
+  their JSON Schema for the page's types later); `simulator.py`, the interface a simulator's piece implements
+  (`Simulator`: `catalogue()`, `build(choice, sim_run)`; `SimRunSide`: `description`, `state()`, `step()`,
+  `end(reason)`, `discard()`; `BuildFailed`). Only message types cross it; the server (later) holds the rules (which
+  sim-run is current, the end at the configured steps, the lock). Nothing in `webui/` imports `mesa`, `mesa_sim`,
+  `domains`, `shared`, `world`, `ros_sim` or `solara`; the start that hands Mesa's piece to the server will live in
+  `mesa_sim/`.
+- `mesa_sim/webui_adapter.py` (new): `MesaSimulator` (the catalogue from `DOMAIN_REGISTRY` and the run file, default
+  `configs/experiment.yaml`; the build of a `SimRun` from the choice) and `MesaSimRun` (per step its tick update, its end
+  and its discard). It only reads the model.
+- `mesa_sim/run_config.py`, two edits with no change of behaviour: `OPTION_DEFAULTS` (the fallbacks
+  `resolve_model_params` wrote inline) and `ONE_OF_OPTIONS` (the three strategies and their values, which
+  `run_configuration` checks in the same order), and the parser in its own function `user_args_parser()`, whose help
+  texts are the catalogue's descriptions of the run options.
+- `requirements.txt`: `pydantic==2.13.5` (Q2).
+THE MESSAGES (fields, terms and sources as in the plan; the definitions are `webui/messages.py`):
+- Catalogue: per domain its layouts (id, title: the file's `space.name`), setups, scenarios (id, setup, reference
+  layouts, description); the run options, each declared by kind, `SwitchOption`, `OneOfOption` (a closed list of
+  values), `LevelOption` (strictly between 0 and 1), `CountOption` (steps, at least 1), with its default (the run
+  file's value, else `OPTION_DEFAULTS`) and its description; the default choice of a sim-run (the run file's triple and
+  options).
+- `SimRunChoice` (condition 2: the screen-user's choice of a sim-run; the kind of run option with a closed list is
+  `OneOfOption`, its value `OneOfValue`): domain, layout, scenario, one value per declared run option.
+- Run description: the sim-run's id; the triple; the choice as stated; the run options in effect (the model's
+  attributes, the steps the configuration's); the world: the space (title, bounds), the areas, the fixed objects (id,
+  type, subtype, position after an override, size), the movable objects (id, type, subtype, size, home container,
+  designated destination), the humans, the robots, each human's script (its ordinary, repeatable and closing entries,
+  each entry's task and typed events, its dependence), the timeline of context facts in force with its source.
+- Tick update: the sim-run's id; the tick (Q1: the run log's number of the step executed, none at the start); the world:
+  per agent its position and `last_motion`, the unit direction of its most recent step that moved it, computed in the
+  piece from the agent's own positions (Q6, condition 3; the robot's perception memory of the human's last step is not
+  read); `fixed_object_contents` and `carried` (below); the object states that hold; the timeline facts in force (the
+  start's those of tick 0, as the robot's first observation has them); per human its `HumanActivity` (below); and, at
+  the end, why the sim-run ended (steps reached, reset, choice changed, server stopped) and the entries still open.
+- Refusals: `BuildFailure` (a choice that cannot be built) and `StepRefusal` (not current, ended, busy), for the server.
+- Sections: the run description and the tick update hold the world under `world`; 1b adds the robot's mind beside it,
+  1c the plots, each a new field with an empty default, so nothing 0.4 defines changes.
+CONTAINERS (condition 1). The glossary's container (§10) is a fixed object of the layout that holds movable objects (a
+shelf, a table, a bay, the truck), a kind of fixed object, not a state of one at a tick. The tick update does not use
+the word for a field: `fixed_object_contents` lists the fixed objects that hold movable objects at that tick, each with
+them in their order of arrival (at the start the setup's order; two arriving on one tick, the setup's order); `carried`
+the movable objects held by an agent; every movable object is in exactly one of the two. A misdelivery (a release lands
+on the nearest fixed object that is not movable, `mesa_sim/executor.py`) appears as such. Whether a page can know that
+a fixed object is a container while it is empty: in stage 1a it cannot in general. The domains declare no container
+types in code (the glossary's examples are prose), and the messages carry none. A page can know only the fixed objects
+the run description names as a movable object's home container or designated destination, which are containers by §9
+and §10; a container named by neither (a store no movable object starts in or is designated to) is known only once it
+holds one. Knowing every container would need the domain to declare its container types and the run description to
+carry them, open.
+THE HUMAN'S ACTIVITY (panel 4a; condition 6: the messages carry all of it, which part panel 4a shows is a page design
+matter of stage 1a). The world's side only: the human executor's record (`world/record.py`, `HumanAgent.record`) and its
+stack machine (`world/human_executor.py`, `HumanAgent.machine`), nothing of the robot. Per human and tick: the stack,
+top first (`truth_at`); the action in hand with its occurrence and its progress in ticks; the tick's typed transitions
+(entered, started with its trigger and where, resumed, left with its outcome, refused, unfired, still open); the
+script's entries still open (`open_entries`). Coverage and label A stay out: coverage is judged against the robot's task
+model.
+THE ORDER OF ARRIVAL AND THE LAST MOTION are kept by the piece per sim-run, so that a page reload keeps them; neither is
+a world fact, neither is written anywhere. A display place is derived on the page from the order of arrival.
+THE REQUESTS (for the server, not built): catalogue (no effect); choose (the current sim-run discarded if never stepped,
+no file, or ended with `choice_changed` and its end lines if stepped; then the build: the start and override lines held,
+no file yet; a failed build writes no log pair, Q4, and leaves no current sim-run); step (refused when not current,
+ended or busy; the first step opens the pair; the step that reaches the configured steps ends the sim-run in the same
+reply, `steps_reached`); reset (if stepped, ended with `reset` at the tick reached; then the same choice built again);
+current (the current run description and latest tick update, for a page reload; no effect); at the server's stop a
+stepped sim-run is ended with `server_stopped` (Q5).
+RUN OPTIONS BY NAME, A DELIBERATE EXCEPTION AT THE INPUT BOUNDARY (Q3, condition 4). BUILD DISCIPLINE refuses
+identification by string or key matching. Here the web-ui knows the run options only as the catalogue declares them,
+each identified by its name: with a fixed typed class of the nine options the web-ui would name Mesa's run options and
+change for a simulator with others, against its independence of the simulator. The name is matched once, in the piece
+(`MesaSimulator._configuration`): a value of another kind, a missing, repeated or undeclared option, or a count below its
+minimum is refused, and the mapping goes to `run_configuration`, which checks it as it checks a run file (whose own keys
+are the same names). Inside the piece the values in effect are read by an explicit table per option (`_EFFECTIVE`), held
+equal to the run options by a test.
+THE OTHER ANSWERS: Q2 pydantic v2, pinned; Q7 the orientation of fixed objects left out (TODO-192, open, for the scene's
+look; condition 5); Q8 the run file's overrides block is not part of a stage-1a choice (TODO-186), and the run
+description gets an overrides field when that is decided; Q9 the object states and the timeline facts are in the tick
+update.
+GLOSSARY (Hadi approved the entries, 6 October 2026, preferred in the T-viz status words): §11 "The web-ui (T-viz)", web-ui,
+solara-ui (tentative), screen-user, env-pane, scene, display place, author (the existing use described), catalogue, run
+description, tick update. No entry for sim-run, start, preview, draft, active and passive object, scene appearance or
+shape kind; "viewer" is renamed nowhere.
+HOW IT WAS CHECKED:
+1. The messages validate: for scenario_s01_01 (kitting, env_layout_01) and scenario_s03_02 (dock_loading,
+   env_layout_02) the catalogue, the run description, the start and the tick updates after each of the first 20 steps
+   and at the end, each written as JSON and read back against its definition, equal; every movable object in exactly
+   one fixed object or held; at the start the setup's order; an object that stays keeps its place in the order; an
+   agent that moved has its own step's direction as its last motion (tests/test_tviz_messages.py).
+2. `webui/` imports nothing forbidden: its imports read from the source of every module, and `webui` imported in a
+   subprocess that refuses `mesa`, `mesa_sim`, `mesa_fork`, `domains`, `shared`, `world`, `ros_sim` and `solara`.
+   Proposed by ccode and added: no domain name, object type or area id of the registered layouts and setups appears in
+   an identifier or string of `webui/`.
+3. Producing messages changes no sim-run: the log pair of the headless sim-run and of the same sim-run with a tick
+   update produced at every step, byte-identical, scenario_s01_01 for 300 steps and scenario_s03_02 for 800, to their
+   end. A choice that cannot be built (seven cases) raises `BuildFailed` and writes no file; a sim-run discarded
+   unstepped writes none.
+4. The test suite: 398 passed before, 416 after (18 new). The four maintained sets (48 logs and their `.rec`) rerun on
+   the change (`run_config`'s two edits) into a scratch folder: all 96 files byte-identical to the baselines on disk,
+   whose `.log` md5s are those of each README's latest section (checked on tb1a).
