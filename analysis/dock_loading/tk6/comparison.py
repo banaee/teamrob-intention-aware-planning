@@ -23,6 +23,7 @@ The statistics are kitting's:
 """
 import base64
 import csv
+import json
 import random
 import re
 import statistics as st
@@ -109,14 +110,14 @@ def three(ds, words=("earlier", "equal", "later")):
 def load():
     from domains.dock_loading.registry import domain_config
     rows = list(csv.DictReader(open(M / "results.csv")))
-    by = {}
+    by, byf = {}, {}                       # single_task; full_reorder (Hadi, 6 October 2026: the planning scripts only)
     for r in rows:
         r["done"] = r["completion"] != "unfinished"
         for k in ("hold_ticks", "near_encounters", "viol", "recede", "stand_passing", "stand_beside", "decisions"):
             r[k] = int(r[k])
         r["completion"] = int(r["completion"]) if r["done"] and r["completion"] not in ("None", "") else None
         r["sep_min"] = float(r["sep_min"]) if r["sep_min"] else None
-        by.setdefault(r["scenario"], {})[cond(r)] = r
+        (byf if r["strategy"] == "full_reorder" else by).setdefault(r["scenario"], {})[cond(r)] = r
     desc = {s: domain_config["scenarios"][s].description for s in by}
     base_of = {s: COPY.search(desc[s])[1] for s in by if COPY.search(desc[s])}
     dep = {s for s in by if next(a for a in domain_config["scenarios"][s].agents if a.agent_type == "human")
@@ -126,7 +127,17 @@ def load():
     tags = {}
     for t in csv.DictReader(open(M / "tags.csv")):
         tags.setdefault((t["scenario"], t["run"]), []).append(t)
-    return rows, by, plan, recog, base_of, dep, tags
+    return rows, by, byf, plan, recog, base_of, dep, tags
+
+
+def order(r):
+    """The robot's executed order of tasks in a run: its task per tick (robot.json), consecutive repeats merged."""
+    out = []
+    for a in json.load(open(M / r["scenario"] / r["run"] / "robot.json")):
+        if a["task"] is not None and (not out or out[-1] != a["task"]):
+            out.append(a["task"])
+    return [re.sub(r"\(\?pallet=(\w+)\)", r"(\1)", x).replace("deliver_pallet", "deliver").replace("load_return", "return")
+            for x in out]
 
 
 def run_tags(tags, by, s, c):
@@ -303,7 +314,9 @@ def tag_section(w, tags, by, base_of):
 
 
 def main():
-    rows, by, plan, recog, base_of, dep, tags = load()
+    rows, by, byf, plan, recog, base_of, dep, tags = load()
+    planf = sorted(s for s in byf if len(byf[s]) == 4)
+    finf = [s for s in planf if all(byf[s][c]["done"] for c in CONDS)]
     indep = [s for s in plan if s not in dep]
     finished = [s for s in plan if all(by[s][c]["done"] for c in CONDS)]
     rooms = sorted({by[s]["OFF"]["layout"] for s in plan})
@@ -320,10 +333,12 @@ def main():
     oracle_rows = [r for r in rows if r["oracle"] == "compared"]
     dis = sum(int(r["disagreements"]) for r in oracle_rows)
     ref = [r for r in rows if r["reference"] != "none"]
-    w(f"- {len(rows)} runs, `single_task`, assignment knowledge on, rooms {', '.join(rooms)}.")
+    w(f"- {len(rows)} runs ({sum(r['strategy'] == 'single_task' for r in rows)} `single_task`, {sum(r['strategy'] == 'full_reorder' for r in rows)} `full_reorder`), assignment knowledge on, rooms {', '.join(rooms)}.")
     w(f"- {len(plan)} planning scripts in the four conditions ({len(indep)} independent of the robot, {len(plan) - len(indep)} "
       f"that depend on it); {len(base_of)} copies with break_time, context knowledge on; {len(recog)} recognition "
-      "scenarios (the robot idle) with context knowledge off and on.")
+      "scenarios (the robot idle) with context knowledge off and on; under `full_reorder`, "
+      f"{len(planf)} planning scripts in the four conditions (Hadi, 6 October 2026). Every comparison of conditions "
+      "stays inside one strategy.")
     w(f"- The oracle compared on {len(oracle_rows)} runs: {dis} disagreements. The reference check (human-unaware "
       f"against the robot alone) on {len(ref)} runs: " + ", ".join(
           f"{v} {sum(r['reference'] == v for r in ref)}" for v in sorted({r['reference'] for r in ref})) + ".")
@@ -372,6 +387,7 @@ def main():
                                      for a, b, _, _ in STEPS])
     w(table(["room", "scripts"] + [t.split(":")[0] for _, _, t, _ in STEPS], pr))
     w("")
+    full_reorder_sections(w, by, byf, plan, planf, finished, finf)
     w("## Recognition: context knowledge off against on, with no timeline fact in force")
     w("")
     w("Per stretch of a task the robot has a hypothesis for, the same stretch in the two runs. The recognition set has "
@@ -409,15 +425,17 @@ def main():
     data = tag_section(w, tags, by, base_of)
     w("## Runs that do not finish")
     w("")
-    un = [(s, c) for s in sorted(by) for c in by[s] if not by[s][c]["done"] and s not in recog]
-    w("None." if not un else "; ".join(f"{s} ({LONG[c]})" for s, c in un) + ".")
+    un = [(s, c, st_) for st_, b in (("single_task", by), ("full_reorder", byf)) for s in sorted(b) for c in b[s]
+          if not b[s][c]["done"] and s not in recog]
+    w("None." if not un else "; ".join(f"{s} ({LONG[c]}, {st_})" for s, c, st_ in un) + ".")
     w("")
     w("## What these numbers do not show")
     w("")
     w("- Debugging, not the evaluation: the scripts and the windows are authored to make situations occur, not drawn "
       "from real work. The counts say how often something happened in this set.")
-    w("- One strategy (`single_task`), assignment knowledge on, a scripted human who does not react to the robot, full "
-      "observation, point agents at a fixed speed.")
+    w("- Two strategies for the planning scripts, `single_task` (every part) and `full_reorder` (the four conditions "
+      "only: no copies, no recognition set); `full_reorder` logs no per-candidate hold (TODO-141). Assignment knowledge "
+      "on, a scripted human who does not react to the robot, full observation, point agents at a fixed speed.")
     w("- Four rooms that share one hall; the room bootstrap over four rooms is coarse.")
     w("- In the scripts that depend on the robot the human's timing follows the robot's, so the conditions meet "
       "different human trajectories; the oracle does not run on them.")
@@ -441,6 +459,76 @@ def main():
         "padding: 4px 8px; text-align: left; vertical-align: top; } th { background: #f6f5f1; } img { max-width: 100%; }"
         "</style></head><body>\n" + html + "\n</body></html>\n")
     print(f"written: {HERE / 'COMPARISON.md'}, {HERE / 'comparison.html'}")
+
+
+def full_reorder_sections(w, by, byf, plan, planf, finished, finf):
+    S = {"single_task": (by, plan, finished), "full_reorder": (byf, planf, finf)}
+    both = [s for s in plan if s in planf]
+    fin2 = [s for s in both if all(by[s][c]["done"] and byf[s][c]["done"] for c in CONDS)]
+    w("## The four conditions under each strategy (the planning scripts)")
+    w("")
+    w(f"The {len(both)} planning scripts run under both strategies; completion over the {len(fin2)} finished in all eight "
+      "runs. Each column's condition is compared only with the same strategy's columns.")
+    w("")
+    head = ["measure"] + [f"{LONG[c]}, {st_}" for c in CONDS for st_ in S]
+    rows = [["completion, mean (ticks)"] + [num(mean([S[st_][0][s][c]["completion"] for s in fin2])) for c in CONDS for st_ in S]]
+    for key, label in (("viol", "violation ticks, total"), ("near_encounters", "ticks below min_separation, total"),
+                       ("hold_ticks", "held ticks, total"), ("decisions", "decisions, total")):
+        rows.append([label] + [sum(S[st_][0][s][c][key] for s in both) for c in CONDS for st_ in S])
+    rows.append(["scripts with a violation tick"] + [sum(S[st_][0][s][c]["viol"] > 0 for s in both) for c in CONDS for st_ in S])
+    w(table(head, rows))
+    w("")
+    w("## The three steps under full_reorder, paired per scenario")
+    w("")
+    w(f"Over the {len(planf)} planning scripts under `full_reorder` ({len(finf)} for completion); the same table under "
+      "`single_task` is above. Negative is earlier or fewer.")
+    w("")
+    w(table(STEP_HEAD, step_rows(byf, planf, finf)))
+    w("")
+    w("## full_reorder against single_task, per condition")
+    w("")
+    w("Per script, the `full_reorder` run against the `single_task` run of the same condition. Negative is earlier or "
+      "fewer under `full_reorder`.")
+    w("")
+    rr = []
+    for c in CONDS:
+        for key, label, sc in (("completion", "completion (ticks)", fin2), ("viol", "violation ticks", both),
+                               ("near_encounters", "ticks below min_separation", both), ("hold_ticks", "held ticks", both)):
+            ds = [byf[s][c][key] - by[s][c][key] for s in sc]
+            word = ("earlier", "equal", "later") if key == "completion" else ("fewer", "equal", "more")
+            rr.append([LONG[c], label, len(ds), three(ds, word), signed(mean(ds), 2),
+                       f"{sum(by[s][c][key] for s in sc)} → {sum(byf[s][c][key] for s in sc)}"])
+    w(table(["condition", "measure", "scripts", "per script: lower / equal / higher", "mean change",
+             "total: single_task → full_reorder"], rr))
+    w("")
+    w("## Where recognition changes the robot's order of tasks")
+    w("")
+    w("The robot's executed order of tasks (its task per tick, consecutive repeats merged; a task left and taken up "
+      "again appears twice) compared between conditions of one strategy. The intention-unaware robot plans against the "
+      "observed motion only; a different order in an intention-aware run is a change that recognition (the admissions, "
+      "or their absence) brought about.")
+    w("")
+    cmp_rows, lists = [], {}
+    for st_, (b, sc, _) in S.items():
+        for a, c in (("HU", "IU"), ("IU", "OFF"), ("OFF", "ON")):
+            ch = [s for s in sc if order(b[s][a]) != order(b[s][c])]
+            lists[(st_, a, c)] = ch
+            cmp_rows.append([st_, f"{LONG[a]} → {LONG[c]}", len(sc), len(ch),
+                             sum(order(b[s][a])[:1] != order(b[s][c])[:1] for s in sc)])
+    w(table(["strategy", "conditions", "scripts", "scripts whose order differs", "of them the first task differs"], cmp_rows))
+    w("")
+    for st_, (b, sc, _) in S.items():
+        for a, c in (("IU", "OFF"), ("OFF", "ON")):
+            ch = lists[(st_, a, c)]
+            if not ch:
+                w(f"- {st_}, {LONG[a]} → {LONG[c]}: no script.")
+                continue
+            w(f"- {st_}, {LONG[a]} → {LONG[c]}:")
+            for s in ch:
+                w(f"  - {s} ({b[s][a]['layout']}): {', '.join(order(b[s][a]))} → {', '.join(order(b[s][c]))}; "
+                  f"completion {b[s][a]['completion']} → {b[s][c]['completion']}, violation ticks {b[s][a]['viol']} → "
+                  f"{b[s][c]['viol']}")
+    w("")
 
 
 def figure(data):

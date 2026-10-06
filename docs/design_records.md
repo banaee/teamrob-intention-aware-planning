@@ -4009,6 +4009,13 @@ copies and no recognition set; the same form (run files by serial, strategy a co
 figure per run, the oracle's expectations committed before the runs, the human-unaware reference run per strategy);
 COMPARISON.md gains the three steps under `full_reorder` and a table of `full_reorder` against `single_task` per
 condition. TODO-141 applies (no per-candidate hold under `full_reorder`).
+STEP 6, FULL_REORDER, DONE (ccode, 6 October 2026; analysis/dock_loading/tk6/COMPARISON.md, its sections on the two
+strategies): 296 runs (run_569 to run_864), every run finished, 0 disagreements with the oracle on 248, the 496
+expectation files as committed, the reference check equal on 74. The single_task sections of COMPARISON.md are unchanged.
+A measured premise: under single_task an admission can change the robot's order too (context knowledge off → on: 3
+scripts that depend on the robot, scenario_s05_03, _04, _06); under full_reorder recognition changed the order in 1
+script (intention-unaware → off, scenario_s09_03) and context knowledge in 3 (scenario_s07_04 to _06); in no script the
+first task. Findings, none ruled: the comparison report.
 
 
 ## T-F part 1: the conditions human-unaware and intention-unaware

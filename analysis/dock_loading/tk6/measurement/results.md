@@ -570,3 +570,299 @@
 | run_566 | dock_loading | scenario_s06_18 | env_layout_04 | True | True | True | True | single_task | True | None | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 115.74 | compared | 0 | True | none |
 | run_567 | dock_loading | scenario_s06_19 | env_layout_04 | True | True | True | False | single_task | True | None | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 299.65 | none |  | True | none |
 | run_568 | dock_loading | scenario_s06_19 | env_layout_04 | True | True | True | True | single_task | True | None | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 299.65 | none |  | True | none |
+| run_569 | dock_loading | scenario_s08_01 | env_layout_03 | False | False | False | False | full_reorder | True | 125 | 127 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 331.36 | compared | 0 | True | equal |
+| run_570 | dock_loading | scenario_s08_01 | env_layout_03 | True | False | False | False | full_reorder | True | 125 | 127 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 331.36 | compared | 0 | True | none |
+| run_571 | dock_loading | scenario_s08_01 | env_layout_03 | True | True | True | False | full_reorder | True | 125 | 127 | 12 | 0 | 0 | 0 | 0 | 0 | 0 | 331.36 | compared | 0 | True | none |
+| run_572 | dock_loading | scenario_s08_01 | env_layout_03 | True | True | True | True | full_reorder | True | 125 | 127 | 9 | 0 | 0 | 0 | 0 | 0 | 0 | 331.36 | compared | 0 | True | none |
+| run_573 | dock_loading | scenario_s08_02 | env_layout_03 | False | False | False | False | full_reorder | True | 175 | 177 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 105.93 | compared | 0 | True | equal |
+| run_574 | dock_loading | scenario_s08_02 | env_layout_03 | True | False | False | False | full_reorder | True | 175 | 177 | 21 | 0 | 0 | 0 | 0 | 0 | 0 | 105.93 | compared | 0 | True | none |
+| run_575 | dock_loading | scenario_s08_02 | env_layout_03 | True | True | True | False | full_reorder | True | 175 | 177 | 20 | 0 | 0 | 0 | 0 | 0 | 0 | 105.93 | compared | 0 | True | none |
+| run_576 | dock_loading | scenario_s08_02 | env_layout_03 | True | True | True | True | full_reorder | True | 175 | 177 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 105.93 | compared | 0 | True | none |
+| run_577 | dock_loading | scenario_s08_03 | env_layout_03 | False | False | False | False | full_reorder | True | 175 | 177 | 4 | 0 | 8 | 2 | 2 | 0 | 4 | 15.20 | compared | 0 | True | equal |
+| run_578 | dock_loading | scenario_s08_03 | env_layout_03 | True | False | False | False | full_reorder | True | 268 | 270 | 19 | 93 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_579 | dock_loading | scenario_s08_03 | env_layout_03 | True | True | True | False | full_reorder | True | 332 | 334 | 15 | 157 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_580 | dock_loading | scenario_s08_03 | env_layout_03 | True | True | True | True | full_reorder | True | 332 | 334 | 12 | 157 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_581 | dock_loading | scenario_s08_04 | env_layout_03 | False | False | False | False | full_reorder | True | 64 | 66 | 2 | 0 | 70 | 2 | 0 | 3 | 65 | 10.77 | compared | 0 | True | equal |
+| run_582 | dock_loading | scenario_s08_04 | env_layout_03 | True | False | False | False | full_reorder | True | 157 | 159 | 12 | 93 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_583 | dock_loading | scenario_s08_04 | env_layout_03 | True | True | True | False | full_reorder | True | 221 | 223 | 12 | 157 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_584 | dock_loading | scenario_s08_04 | env_layout_03 | True | True | True | True | full_reorder | True | 221 | 223 | 9 | 157 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_585 | dock_loading | scenario_s08_05 | env_layout_03 | False | False | False | False | full_reorder | True | 175 | 177 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 87.47 | compared | 0 | True | equal |
+| run_586 | dock_loading | scenario_s08_05 | env_layout_03 | True | False | False | False | full_reorder | True | 175 | 177 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 87.47 | compared | 0 | True | none |
+| run_587 | dock_loading | scenario_s08_05 | env_layout_03 | True | True | True | False | full_reorder | True | 175 | 177 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 87.47 | compared | 0 | True | none |
+| run_588 | dock_loading | scenario_s08_05 | env_layout_03 | True | True | True | True | full_reorder | True | 175 | 177 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 87.47 | compared | 0 | True | none |
+| run_589 | dock_loading | scenario_s08_06 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 96.89 | compared | 0 | True | equal |
+| run_590 | dock_loading | scenario_s08_06 | env_layout_03 | True | False | False | False | full_reorder | True | 246 | 248 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 96.89 | compared | 0 | True | none |
+| run_591 | dock_loading | scenario_s08_06 | env_layout_03 | True | True | True | False | full_reorder | True | 253 | 255 | 20 | 7 | 0 | 0 | 0 | 0 | 0 | 96.89 | compared | 0 | True | none |
+| run_592 | dock_loading | scenario_s08_06 | env_layout_03 | True | True | True | True | full_reorder | True | 251 | 253 | 25 | 14 | 0 | 0 | 0 | 0 | 0 | 96.89 | compared | 0 | True | none |
+| run_593 | dock_loading | scenario_s08_07 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 98.09 | compared | 0 | True | equal |
+| run_594 | dock_loading | scenario_s08_07 | env_layout_03 | True | False | False | False | full_reorder | True | 246 | 248 | 31 | 0 | 0 | 0 | 0 | 0 | 0 | 98.09 | compared | 0 | True | none |
+| run_595 | dock_loading | scenario_s08_07 | env_layout_03 | True | True | True | False | full_reorder | True | 246 | 248 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 98.09 | compared | 0 | True | none |
+| run_596 | dock_loading | scenario_s08_07 | env_layout_03 | True | True | True | True | full_reorder | True | 246 | 248 | 27 | 0 | 0 | 0 | 0 | 0 | 0 | 98.09 | compared | 0 | True | none |
+| run_597 | dock_loading | scenario_s08_08 | env_layout_03 | False | False | False | False | full_reorder | True | 175 | 177 | 4 | 0 | 5 | 3 | 2 | 0 | 0 | 38.83 | compared | 0 | True | equal |
+| run_598 | dock_loading | scenario_s08_08 | env_layout_03 | True | False | False | False | full_reorder | True | 177 | 179 | 28 | 2 | 3 | 2 | 1 | 0 | 0 | 38.83 | compared | 0 | True | none |
+| run_599 | dock_loading | scenario_s08_08 | env_layout_03 | True | True | True | False | full_reorder | True | 177 | 179 | 21 | 2 | 3 | 2 | 1 | 0 | 0 | 38.83 | compared | 0 | True | none |
+| run_600 | dock_loading | scenario_s08_08 | env_layout_03 | True | True | True | True | full_reorder | True | 177 | 179 | 19 | 2 | 3 | 2 | 1 | 0 | 0 | 38.83 | compared | 0 | True | none |
+| run_601 | dock_loading | scenario_s08_09 | env_layout_03 | False | False | False | False | full_reorder | True | 125 | 127 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 297.35 | compared | 0 | True | equal |
+| run_602 | dock_loading | scenario_s08_09 | env_layout_03 | True | False | False | False | full_reorder | True | 125 | 127 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 297.35 | compared | 0 | True | none |
+| run_603 | dock_loading | scenario_s08_09 | env_layout_03 | True | True | True | False | full_reorder | True | 125 | 127 | 20 | 0 | 0 | 0 | 0 | 0 | 0 | 297.35 | compared | 0 | True | none |
+| run_604 | dock_loading | scenario_s08_09 | env_layout_03 | True | True | True | True | full_reorder | True | 125 | 127 | 17 | 0 | 0 | 0 | 0 | 0 | 0 | 297.35 | compared | 0 | True | none |
+| run_605 | dock_loading | scenario_s08_10 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 21 | 3 | 0 | 3 | 15 | 19.02 | compared | 0 | True | equal |
+| run_606 | dock_loading | scenario_s08_10 | env_layout_03 | True | False | False | False | full_reorder | True | 326 | 328 | 26 | 80 | 5 | 0 | 0 | 5 | 0 | 16.74 | compared | 0 | True | none |
+| run_607 | dock_loading | scenario_s08_10 | env_layout_03 | True | True | True | False | full_reorder | True | 326 | 328 | 23 | 80 | 5 | 0 | 0 | 5 | 0 | 16.74 | compared | 0 | True | none |
+| run_608 | dock_loading | scenario_s08_10 | env_layout_03 | True | True | True | True | full_reorder | True | 326 | 328 | 23 | 80 | 5 | 0 | 0 | 5 | 0 | 16.74 | compared | 0 | True | none |
+| run_609 | dock_loading | scenario_s09_01 | env_layout_04 | False | False | False | False | full_reorder | True | 57 | 59 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 284.19 | compared | 0 | True | equal |
+| run_610 | dock_loading | scenario_s09_01 | env_layout_04 | True | False | False | False | full_reorder | True | 57 | 59 | 13 | 0 | 0 | 0 | 0 | 0 | 0 | 284.19 | compared | 0 | True | none |
+| run_611 | dock_loading | scenario_s09_01 | env_layout_04 | True | True | True | False | full_reorder | True | 57 | 59 | 13 | 0 | 0 | 0 | 0 | 0 | 0 | 284.19 | compared | 0 | True | none |
+| run_612 | dock_loading | scenario_s09_01 | env_layout_04 | True | True | True | True | full_reorder | True | 57 | 59 | 10 | 0 | 0 | 0 | 0 | 0 | 0 | 284.19 | compared | 0 | True | none |
+| run_613 | dock_loading | scenario_s09_02 | env_layout_04 | False | False | False | False | full_reorder | True | 194 | 196 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 97.27 | compared | 0 | True | equal |
+| run_614 | dock_loading | scenario_s09_02 | env_layout_04 | True | False | False | False | full_reorder | True | 194 | 196 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 97.27 | compared | 0 | True | none |
+| run_615 | dock_loading | scenario_s09_02 | env_layout_04 | True | True | True | False | full_reorder | True | 194 | 196 | 23 | 0 | 0 | 0 | 0 | 0 | 0 | 97.27 | compared | 0 | True | none |
+| run_616 | dock_loading | scenario_s09_02 | env_layout_04 | True | True | True | True | full_reorder | True | 194 | 196 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 97.27 | compared | 0 | True | none |
+| run_617 | dock_loading | scenario_s09_03 | env_layout_04 | False | False | False | False | full_reorder | True | 194 | 196 | 4 | 0 | 10 | 3 | 3 | 0 | 4 | 10.99 | compared | 0 | True | equal |
+| run_618 | dock_loading | scenario_s09_03 | env_layout_04 | True | False | False | False | full_reorder | True | 284 | 286 | 20 | 90 | 4 | 0 | 0 | 4 | 0 | 33.80 | compared | 0 | True | none |
+| run_619 | dock_loading | scenario_s09_03 | env_layout_04 | True | True | True | False | full_reorder | True | 347 | 349 | 14 | 58 | 0 | 0 | 0 | 0 | 0 | 69.64 | compared | 0 | True | none |
+| run_620 | dock_loading | scenario_s09_03 | env_layout_04 | True | True | True | True | full_reorder | True | 347 | 349 | 11 | 58 | 0 | 0 | 0 | 0 | 0 | 69.64 | compared | 0 | True | none |
+| run_621 | dock_loading | scenario_s09_04 | env_layout_04 | False | False | False | False | full_reorder | True | 57 | 59 | 2 | 0 | 67 | 3 | 0 | 3 | 61 | 9.05 | compared | 0 | True | equal |
+| run_622 | dock_loading | scenario_s09_04 | env_layout_04 | True | False | False | False | full_reorder | True | 147 | 149 | 12 | 90 | 4 | 0 | 0 | 4 | 0 | 33.80 | compared | 0 | True | none |
+| run_623 | dock_loading | scenario_s09_04 | env_layout_04 | True | True | True | False | full_reorder | True | 211 | 213 | 12 | 154 | 4 | 0 | 0 | 4 | 0 | 33.80 | compared | 0 | True | none |
+| run_624 | dock_loading | scenario_s09_04 | env_layout_04 | True | True | True | True | full_reorder | True | 211 | 213 | 9 | 154 | 4 | 0 | 0 | 4 | 0 | 33.80 | compared | 0 | True | none |
+| run_625 | dock_loading | scenario_s09_05 | env_layout_04 | False | False | False | False | full_reorder | True | 194 | 196 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 91.05 | compared | 0 | True | equal |
+| run_626 | dock_loading | scenario_s09_05 | env_layout_04 | True | False | False | False | full_reorder | True | 194 | 196 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 91.05 | compared | 0 | True | none |
+| run_627 | dock_loading | scenario_s09_05 | env_layout_04 | True | True | True | False | full_reorder | True | 194 | 196 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 91.05 | compared | 0 | True | none |
+| run_628 | dock_loading | scenario_s09_05 | env_layout_04 | True | True | True | True | full_reorder | True | 194 | 196 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 91.05 | compared | 0 | True | none |
+| run_629 | dock_loading | scenario_s09_06 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 4 | 3 | 1 | 0 | 0 | 15.95 | compared | 0 | True | equal |
+| run_630 | dock_loading | scenario_s09_06 | env_layout_04 | True | False | False | False | full_reorder | True | 272 | 274 | 30 | 7 | 5 | 0 | 1 | 4 | 0 | 35.20 | compared | 0 | True | none |
+| run_631 | dock_loading | scenario_s09_06 | env_layout_04 | True | True | True | False | full_reorder | True | 268 | 270 | 26 | 5 | 4 | 2 | 2 | 0 | 0 | 9.37 | compared | 0 | True | none |
+| run_632 | dock_loading | scenario_s09_06 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 28 | 0 | 4 | 3 | 1 | 0 | 0 | 15.95 | compared | 0 | True | none |
+| run_633 | dock_loading | scenario_s09_07 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 95.28 | compared | 0 | True | equal |
+| run_634 | dock_loading | scenario_s09_07 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 95.28 | compared | 0 | True | none |
+| run_635 | dock_loading | scenario_s09_07 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 24 | 0 | 0 | 0 | 0 | 0 | 0 | 95.28 | compared | 0 | True | none |
+| run_636 | dock_loading | scenario_s09_07 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 95.28 | compared | 0 | True | none |
+| run_637 | dock_loading | scenario_s09_08 | env_layout_04 | False | False | False | False | full_reorder | True | 194 | 196 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 289.42 | compared | 0 | True | equal |
+| run_638 | dock_loading | scenario_s09_08 | env_layout_04 | True | False | False | False | full_reorder | True | 194 | 196 | 30 | 0 | 0 | 0 | 0 | 0 | 0 | 289.42 | compared | 0 | True | none |
+| run_639 | dock_loading | scenario_s09_08 | env_layout_04 | True | True | True | False | full_reorder | True | 194 | 196 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 289.42 | compared | 0 | True | none |
+| run_640 | dock_loading | scenario_s09_08 | env_layout_04 | True | True | True | True | full_reorder | True | 194 | 196 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 289.42 | compared | 0 | True | none |
+| run_641 | dock_loading | scenario_s09_09 | env_layout_04 | False | False | False | False | full_reorder | True | 128 | 130 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 241.74 | compared | 0 | True | equal |
+| run_642 | dock_loading | scenario_s09_09 | env_layout_04 | True | False | False | False | full_reorder | True | 128 | 130 | 17 | 0 | 0 | 0 | 0 | 0 | 0 | 241.74 | compared | 0 | True | none |
+| run_643 | dock_loading | scenario_s09_09 | env_layout_04 | True | True | True | False | full_reorder | True | 128 | 130 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 241.74 | compared | 0 | True | none |
+| run_644 | dock_loading | scenario_s09_09 | env_layout_04 | True | True | True | True | full_reorder | True | 128 | 130 | 11 | 0 | 0 | 0 | 0 | 0 | 0 | 241.74 | compared | 0 | True | none |
+| run_645 | dock_loading | scenario_s09_10 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 128.83 | compared | 0 | True | equal |
+| run_646 | dock_loading | scenario_s09_10 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 33 | 0 | 0 | 0 | 0 | 0 | 0 | 128.83 | compared | 0 | True | none |
+| run_647 | dock_loading | scenario_s09_10 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 30 | 0 | 0 | 0 | 0 | 0 | 0 | 128.83 | compared | 0 | True | none |
+| run_648 | dock_loading | scenario_s09_10 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 32 | 0 | 0 | 0 | 0 | 0 | 0 | 128.83 | compared | 0 | True | none |
+| run_649 | dock_loading | scenario_s10_01 | env_layout_02 | False | False | False | False | full_reorder | True | 125 | 127 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 326.11 | compared | 0 | True | equal |
+| run_650 | dock_loading | scenario_s10_01 | env_layout_02 | True | False | False | False | full_reorder | True | 125 | 127 | 16 | 0 | 0 | 0 | 0 | 0 | 0 | 326.11 | compared | 0 | True | none |
+| run_651 | dock_loading | scenario_s10_01 | env_layout_02 | True | True | True | False | full_reorder | True | 125 | 127 | 17 | 0 | 0 | 0 | 0 | 0 | 0 | 326.11 | compared | 0 | True | none |
+| run_652 | dock_loading | scenario_s10_01 | env_layout_02 | True | True | True | True | full_reorder | True | 125 | 127 | 13 | 0 | 0 | 0 | 0 | 0 | 0 | 326.11 | compared | 0 | True | none |
+| run_653 | dock_loading | scenario_s10_02 | env_layout_02 | False | False | False | False | full_reorder | True | 182 | 184 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 171.31 | compared | 0 | True | equal |
+| run_654 | dock_loading | scenario_s10_02 | env_layout_02 | True | False | False | False | full_reorder | True | 182 | 184 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 171.31 | compared | 0 | True | none |
+| run_655 | dock_loading | scenario_s10_02 | env_layout_02 | True | True | True | False | full_reorder | True | 182 | 184 | 23 | 0 | 0 | 0 | 0 | 0 | 0 | 171.31 | compared | 0 | True | none |
+| run_656 | dock_loading | scenario_s10_02 | env_layout_02 | True | True | True | True | full_reorder | True | 182 | 184 | 18 | 0 | 0 | 0 | 0 | 0 | 0 | 171.31 | compared | 0 | True | none |
+| run_657 | dock_loading | scenario_s10_03 | env_layout_02 | False | False | False | False | full_reorder | True | 182 | 184 | 4 | 0 | 8 | 2 | 2 | 0 | 4 | 15.20 | compared | 0 | True | equal |
+| run_658 | dock_loading | scenario_s10_03 | env_layout_02 | True | False | False | False | full_reorder | True | 275 | 277 | 20 | 93 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_659 | dock_loading | scenario_s10_03 | env_layout_02 | True | True | True | False | full_reorder | True | 339 | 341 | 15 | 157 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_660 | dock_loading | scenario_s10_03 | env_layout_02 | True | True | True | True | full_reorder | True | 339 | 341 | 12 | 157 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_661 | dock_loading | scenario_s10_04 | env_layout_02 | False | False | False | False | full_reorder | True | 64 | 66 | 2 | 0 | 70 | 2 | 0 | 3 | 65 | 10.77 | compared | 0 | True | equal |
+| run_662 | dock_loading | scenario_s10_04 | env_layout_02 | True | False | False | False | full_reorder | True | 157 | 159 | 12 | 93 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_663 | dock_loading | scenario_s10_04 | env_layout_02 | True | True | True | False | full_reorder | True | 221 | 223 | 12 | 157 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_664 | dock_loading | scenario_s10_04 | env_layout_02 | True | True | True | True | full_reorder | True | 221 | 223 | 9 | 157 | 5 | 0 | 0 | 5 | 0 | 21.96 | compared | 0 | True | none |
+| run_665 | dock_loading | scenario_s10_05 | env_layout_02 | False | False | False | False | full_reorder | True | 182 | 184 | 4 | 0 | 0 | 0 | 0 | 0 | 0 | 91.07 | compared | 0 | True | equal |
+| run_666 | dock_loading | scenario_s10_05 | env_layout_02 | True | False | False | False | full_reorder | True | 182 | 184 | 20 | 0 | 0 | 0 | 0 | 0 | 0 | 91.07 | compared | 0 | True | none |
+| run_667 | dock_loading | scenario_s10_05 | env_layout_02 | True | True | True | False | full_reorder | True | 182 | 184 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 91.07 | compared | 0 | True | none |
+| run_668 | dock_loading | scenario_s10_05 | env_layout_02 | True | True | True | True | full_reorder | True | 182 | 184 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 91.07 | compared | 0 | True | none |
+| run_669 | dock_loading | scenario_s10_06 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 165.00 | compared | 0 | True | equal |
+| run_670 | dock_loading | scenario_s10_06 | env_layout_02 | True | False | False | False | full_reorder | True | 252 | 254 | 24 | 0 | 0 | 0 | 0 | 0 | 0 | 165.00 | compared | 0 | True | none |
+| run_671 | dock_loading | scenario_s10_06 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 254 | 21 | 0 | 0 | 0 | 0 | 0 | 0 | 165.00 | compared | 0 | True | none |
+| run_672 | dock_loading | scenario_s10_06 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 254 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 165.00 | compared | 0 | True | none |
+| run_673 | dock_loading | scenario_s10_07 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 164.24 | compared | 0 | True | equal |
+| run_674 | dock_loading | scenario_s10_07 | env_layout_02 | True | False | False | False | full_reorder | True | 252 | 254 | 31 | 0 | 0 | 0 | 0 | 0 | 0 | 164.24 | compared | 0 | True | none |
+| run_675 | dock_loading | scenario_s10_07 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 254 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 164.24 | compared | 0 | True | none |
+| run_676 | dock_loading | scenario_s10_07 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 254 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 164.24 | compared | 0 | True | none |
+| run_677 | dock_loading | scenario_s10_08 | env_layout_02 | False | False | False | False | full_reorder | True | 182 | 184 | 4 | 0 | 10 | 0 | 0 | 7 | 3 | 5.32 | compared | 0 | True | equal |
+| run_678 | dock_loading | scenario_s10_08 | env_layout_02 | True | False | False | False | full_reorder | True | 182 | 184 | 22 | 0 | 10 | 0 | 0 | 7 | 3 | 5.32 | compared | 0 | True | none |
+| run_679 | dock_loading | scenario_s10_08 | env_layout_02 | True | True | True | False | full_reorder | True | 182 | 184 | 16 | 0 | 10 | 0 | 0 | 7 | 3 | 5.32 | compared | 0 | True | none |
+| run_680 | dock_loading | scenario_s10_08 | env_layout_02 | True | True | True | True | full_reorder | True | 182 | 184 | 17 | 0 | 10 | 0 | 0 | 7 | 3 | 5.32 | compared | 0 | True | none |
+| run_681 | dock_loading | scenario_s10_09 | env_layout_02 | False | False | False | False | full_reorder | True | 125 | 127 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 293.77 | compared | 0 | True | equal |
+| run_682 | dock_loading | scenario_s10_09 | env_layout_02 | True | False | False | False | full_reorder | True | 125 | 127 | 20 | 0 | 0 | 0 | 0 | 0 | 0 | 293.77 | compared | 0 | True | none |
+| run_683 | dock_loading | scenario_s10_09 | env_layout_02 | True | True | True | False | full_reorder | True | 125 | 127 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 293.77 | compared | 0 | True | none |
+| run_684 | dock_loading | scenario_s10_09 | env_layout_02 | True | True | True | True | full_reorder | True | 125 | 127 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 293.77 | compared | 0 | True | none |
+| run_685 | dock_loading | scenario_s10_10 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 72 | 2 | 0 | 4 | 66 | 1.60 | compared | 0 | True | equal |
+| run_686 | dock_loading | scenario_s10_10 | env_layout_02 | True | False | False | False | full_reorder | True | 346 | 348 | 32 | 94 | 6 | 0 | 0 | 6 | 0 | 12.35 | compared | 0 | True | none |
+| run_687 | dock_loading | scenario_s10_10 | env_layout_02 | True | True | True | False | full_reorder | True | 410 | 412 | 30 | 158 | 6 | 0 | 0 | 6 | 0 | 12.35 | compared | 0 | True | none |
+| run_688 | dock_loading | scenario_s10_10 | env_layout_02 | True | True | True | True | full_reorder | True | 410 | 412 | 28 | 158 | 6 | 0 | 0 | 6 | 0 | 12.35 | compared | 0 | True | none |
+| run_689 | dock_loading | scenario_s10_11 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 165.80 | compared | 0 | True | equal |
+| run_690 | dock_loading | scenario_s10_11 | env_layout_02 | True | False | False | False | full_reorder | True | 252 | 254 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 165.80 | compared | 0 | True | none |
+| run_691 | dock_loading | scenario_s10_11 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 254 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 165.80 | compared | 0 | True | none |
+| run_692 | dock_loading | scenario_s10_11 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 254 | 27 | 0 | 0 | 0 | 0 | 0 | 0 | 165.80 | compared | 0 | True | none |
+| run_693 | dock_loading | scenario_s10_12 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 7 | 2 | 1 | 1 | 3 | 20.22 | compared | 0 | True | equal |
+| run_694 | dock_loading | scenario_s10_12 | env_layout_02 | True | False | False | False | full_reorder | True | 260 | 262 | 33 | 8 | 1 | 0 | 0 | 1 | 0 | 49.24 | compared | 0 | True | none |
+| run_695 | dock_loading | scenario_s10_12 | env_layout_02 | True | True | True | False | full_reorder | True | 258 | 260 | 34 | 6 | 2 | 1 | 1 | 0 | 0 | 41.26 | compared | 0 | True | none |
+| run_696 | dock_loading | scenario_s10_12 | env_layout_02 | True | True | True | True | full_reorder | True | 260 | 262 | 28 | 8 | 0 | 0 | 0 | 0 | 0 | 57.05 | compared | 0 | True | none |
+| run_697 | dock_loading | scenario_s10_13 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | equal |
+| run_698 | dock_loading | scenario_s10_13 | env_layout_02 | True | False | False | False | full_reorder | True | 252 | 252 | 35 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_699 | dock_loading | scenario_s10_13 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 252 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_700 | dock_loading | scenario_s10_13 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 252 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_701 | dock_loading | scenario_s10_14 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 161.39 | compared | 0 | True | equal |
+| run_702 | dock_loading | scenario_s10_14 | env_layout_02 | True | False | False | False | full_reorder | True | 252 | 254 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 161.39 | compared | 0 | True | none |
+| run_703 | dock_loading | scenario_s10_14 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 254 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 161.39 | compared | 0 | True | none |
+| run_704 | dock_loading | scenario_s10_14 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 254 | 36 | 0 | 0 | 0 | 0 | 0 | 0 | 161.39 | compared | 0 | True | none |
+| run_705 | dock_loading | scenario_s10_15 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 75.58 | compared | 0 | True | equal |
+| run_706 | dock_loading | scenario_s10_15 | env_layout_02 | True | False | False | False | full_reorder | True | 252 | 253 | 36 | 0 | 0 | 0 | 0 | 0 | 0 | 75.58 | compared | 0 | True | none |
+| run_707 | dock_loading | scenario_s10_15 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 253 | 27 | 0 | 0 | 0 | 0 | 0 | 0 | 75.58 | compared | 0 | True | none |
+| run_708 | dock_loading | scenario_s10_15 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 253 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 75.58 | compared | 0 | True | none |
+| run_709 | dock_loading | scenario_s10_16 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 162.43 | compared | 0 | True | equal |
+| run_710 | dock_loading | scenario_s10_16 | env_layout_02 | True | False | False | False | full_reorder | True | 252 | 254 | 31 | 0 | 0 | 0 | 0 | 0 | 0 | 162.43 | compared | 0 | True | none |
+| run_711 | dock_loading | scenario_s10_16 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 254 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 162.43 | compared | 0 | True | none |
+| run_712 | dock_loading | scenario_s10_16 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 254 | 37 | 0 | 0 | 0 | 0 | 0 | 0 | 162.43 | compared | 0 | True | none |
+| run_713 | dock_loading | scenario_s10_17 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 2 | 1 | 1 | 0 | 0 | 35.18 | compared | 0 | True | equal |
+| run_714 | dock_loading | scenario_s10_17 | env_layout_02 | True | False | False | False | full_reorder | True | 256 | 258 | 27 | 4 | 2 | 1 | 1 | 0 | 0 | 46.30 | compared | 0 | True | none |
+| run_715 | dock_loading | scenario_s10_17 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 254 | 26 | 0 | 2 | 1 | 1 | 0 | 0 | 35.18 | compared | 0 | True | none |
+| run_716 | dock_loading | scenario_s10_17 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 254 | 26 | 0 | 2 | 1 | 1 | 0 | 0 | 35.18 | compared | 0 | True | none |
+| run_717 | dock_loading | scenario_s10_18 | env_layout_02 | False | False | False | False | full_reorder | True | 252 | 254 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 167.97 | compared | 0 | True | equal |
+| run_718 | dock_loading | scenario_s10_18 | env_layout_02 | True | False | False | False | full_reorder | True | 252 | 254 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 167.97 | compared | 0 | True | none |
+| run_719 | dock_loading | scenario_s10_18 | env_layout_02 | True | True | True | False | full_reorder | True | 252 | 254 | 24 | 0 | 0 | 0 | 0 | 0 | 0 | 167.97 | compared | 0 | True | none |
+| run_720 | dock_loading | scenario_s10_18 | env_layout_02 | True | True | True | True | full_reorder | True | 252 | 254 | 19 | 0 | 0 | 0 | 0 | 0 | 0 | 167.97 | compared | 0 | True | none |
+| run_721 | dock_loading | scenario_s08_11 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 51.77 | compared | 0 | True | equal |
+| run_722 | dock_loading | scenario_s08_11 | env_layout_03 | True | False | False | False | full_reorder | True | 246 | 248 | 24 | 0 | 0 | 0 | 0 | 0 | 0 | 51.77 | compared | 0 | True | none |
+| run_723 | dock_loading | scenario_s08_11 | env_layout_03 | True | True | True | False | full_reorder | True | 254 | 256 | 21 | 8 | 0 | 0 | 0 | 0 | 0 | 51.77 | compared | 0 | True | none |
+| run_724 | dock_loading | scenario_s08_11 | env_layout_03 | True | True | True | True | full_reorder | True | 254 | 256 | 21 | 8 | 0 | 0 | 0 | 0 | 0 | 51.77 | compared | 0 | True | none |
+| run_725 | dock_loading | scenario_s08_12 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 8 | 2 | 2 | 2 | 2 | 15.87 | compared | 0 | True | equal |
+| run_726 | dock_loading | scenario_s08_12 | env_layout_03 | True | False | False | False | full_reorder | True | 256 | 258 | 32 | 10 | 4 | 0 | 1 | 3 | 0 | 38.65 | compared | 0 | True | none |
+| run_727 | dock_loading | scenario_s08_12 | env_layout_03 | True | True | True | False | full_reorder | True | 254 | 256 | 30 | 8 | 3 | 2 | 1 | 0 | 0 | 31.50 | compared | 0 | True | none |
+| run_728 | dock_loading | scenario_s08_12 | env_layout_03 | True | True | True | True | full_reorder | True | 258 | 258 | 25 | 12 | 0 | 0 | 0 | 0 | 0 | 50.04 | compared | 0 | True | none |
+| run_729 | dock_loading | scenario_s08_13 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | equal |
+| run_730 | dock_loading | scenario_s08_13 | env_layout_03 | True | False | False | False | full_reorder | True | 246 | 248 | 35 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_731 | dock_loading | scenario_s08_13 | env_layout_03 | True | True | True | False | full_reorder | True | 246 | 248 | 24 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_732 | dock_loading | scenario_s08_13 | env_layout_03 | True | True | True | True | full_reorder | True | 246 | 248 | 21 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_733 | dock_loading | scenario_s08_14 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 51.77 | compared | 0 | True | equal |
+| run_734 | dock_loading | scenario_s08_14 | env_layout_03 | True | False | False | False | full_reorder | True | 246 | 248 | 30 | 0 | 0 | 0 | 0 | 0 | 0 | 51.77 | compared | 0 | True | none |
+| run_735 | dock_loading | scenario_s08_14 | env_layout_03 | True | True | True | False | full_reorder | True | 246 | 248 | 23 | 0 | 0 | 0 | 0 | 0 | 0 | 51.77 | compared | 0 | True | none |
+| run_736 | dock_loading | scenario_s08_14 | env_layout_03 | True | True | True | True | full_reorder | True | 246 | 248 | 33 | 0 | 0 | 0 | 0 | 0 | 0 | 51.77 | compared | 0 | True | none |
+| run_737 | dock_loading | scenario_s08_15 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 98.08 | compared | 0 | True | equal |
+| run_738 | dock_loading | scenario_s08_15 | env_layout_03 | True | False | False | False | full_reorder | True | 246 | 248 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 98.08 | compared | 0 | True | none |
+| run_739 | dock_loading | scenario_s08_15 | env_layout_03 | True | True | True | False | full_reorder | True | 250 | 252 | 22 | 4 | 0 | 0 | 0 | 0 | 0 | 98.08 | compared | 0 | True | none |
+| run_740 | dock_loading | scenario_s08_15 | env_layout_03 | True | True | True | True | full_reorder | True | 246 | 246 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 98.08 | compared | 0 | True | none |
+| run_741 | dock_loading | scenario_s08_16 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 3 | 2 | 1 | 0 | 0 | 39.72 | compared | 0 | True | equal |
+| run_742 | dock_loading | scenario_s08_16 | env_layout_03 | True | False | False | False | full_reorder | True | 250 | 252 | 33 | 4 | 0 | 0 | 0 | 0 | 0 | 52.91 | compared | 0 | True | none |
+| run_743 | dock_loading | scenario_s08_16 | env_layout_03 | True | True | True | False | full_reorder | True | 250 | 252 | 24 | 4 | 0 | 0 | 0 | 0 | 0 | 52.91 | compared | 0 | True | none |
+| run_744 | dock_loading | scenario_s08_16 | env_layout_03 | True | True | True | True | full_reorder | True | 250 | 252 | 29 | 4 | 0 | 0 | 0 | 0 | 0 | 52.91 | compared | 0 | True | none |
+| run_745 | dock_loading | scenario_s08_17 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 4 | 2 | 1 | 1 | 0 | 1.56 | compared | 0 | True | equal |
+| run_746 | dock_loading | scenario_s08_17 | env_layout_03 | True | False | False | False | full_reorder | True | 246 | 248 | 25 | 0 | 4 | 2 | 1 | 1 | 0 | 1.56 | compared | 0 | True | none |
+| run_747 | dock_loading | scenario_s08_17 | env_layout_03 | True | True | True | False | full_reorder | True | 246 | 248 | 26 | 0 | 4 | 2 | 1 | 1 | 0 | 1.56 | compared | 0 | True | none |
+| run_748 | dock_loading | scenario_s08_17 | env_layout_03 | True | True | True | True | full_reorder | True | 250 | 252 | 25 | 4 | 4 | 0 | 1 | 3 | 0 | 11.93 | compared | 0 | True | none |
+| run_749 | dock_loading | scenario_s08_18 | env_layout_03 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 10 | 4 | 5 | 1 | 0 | 40.77 | compared | 0 | True | equal |
+| run_750 | dock_loading | scenario_s08_18 | env_layout_03 | True | False | False | False | full_reorder | True | 246 | 248 | 28 | 0 | 10 | 4 | 5 | 1 | 0 | 40.77 | compared | 0 | True | none |
+| run_751 | dock_loading | scenario_s08_18 | env_layout_03 | True | True | True | False | full_reorder | True | 246 | 248 | 26 | 0 | 10 | 4 | 5 | 1 | 0 | 40.77 | compared | 0 | True | none |
+| run_752 | dock_loading | scenario_s08_18 | env_layout_03 | True | True | True | True | full_reorder | True | 246 | 248 | 21 | 0 | 10 | 4 | 5 | 1 | 0 | 40.77 | compared | 0 | True | none |
+| run_753 | dock_loading | scenario_s09_11 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 93.23 | compared | 0 | True | equal |
+| run_754 | dock_loading | scenario_s09_11 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 93.23 | compared | 0 | True | none |
+| run_755 | dock_loading | scenario_s09_11 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 24 | 0 | 0 | 0 | 0 | 0 | 0 | 93.23 | compared | 0 | True | none |
+| run_756 | dock_loading | scenario_s09_11 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 93.23 | compared | 0 | True | none |
+| run_757 | dock_loading | scenario_s09_12 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 70.09 | compared | 0 | True | equal |
+| run_758 | dock_loading | scenario_s09_12 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 30 | 0 | 0 | 0 | 0 | 0 | 0 | 70.09 | compared | 0 | True | none |
+| run_759 | dock_loading | scenario_s09_12 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 30 | 0 | 0 | 0 | 0 | 0 | 0 | 70.09 | compared | 0 | True | none |
+| run_760 | dock_loading | scenario_s09_12 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 70.09 | compared | 0 | True | none |
+| run_761 | dock_loading | scenario_s09_13 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 98.64 | compared | 0 | True | equal |
+| run_762 | dock_loading | scenario_s09_13 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 98.64 | compared | 0 | True | none |
+| run_763 | dock_loading | scenario_s09_13 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 98.64 | compared | 0 | True | none |
+| run_764 | dock_loading | scenario_s09_13 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 98.64 | compared | 0 | True | none |
+| run_765 | dock_loading | scenario_s09_14 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 89.40 | compared | 0 | True | equal |
+| run_766 | dock_loading | scenario_s09_14 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 89.40 | compared | 0 | True | none |
+| run_767 | dock_loading | scenario_s09_14 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 89.40 | compared | 0 | True | none |
+| run_768 | dock_loading | scenario_s09_14 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 34 | 0 | 0 | 0 | 0 | 0 | 0 | 89.40 | compared | 0 | True | none |
+| run_769 | dock_loading | scenario_s09_15 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 185.56 | compared | 0 | True | equal |
+| run_770 | dock_loading | scenario_s09_15 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 37 | 0 | 0 | 0 | 0 | 0 | 0 | 185.56 | compared | 0 | True | none |
+| run_771 | dock_loading | scenario_s09_15 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 185.56 | compared | 0 | True | none |
+| run_772 | dock_loading | scenario_s09_15 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 31 | 0 | 0 | 0 | 0 | 0 | 0 | 185.56 | compared | 0 | True | none |
+| run_773 | dock_loading | scenario_s09_16 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 85.22 | compared | 0 | True | equal |
+| run_774 | dock_loading | scenario_s09_16 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 30 | 0 | 0 | 0 | 0 | 0 | 0 | 85.22 | compared | 0 | True | none |
+| run_775 | dock_loading | scenario_s09_16 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 85.22 | compared | 0 | True | none |
+| run_776 | dock_loading | scenario_s09_16 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 32 | 0 | 0 | 0 | 0 | 0 | 0 | 85.22 | compared | 0 | True | none |
+| run_777 | dock_loading | scenario_s09_17 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 83.72 | compared | 0 | True | equal |
+| run_778 | dock_loading | scenario_s09_17 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 24 | 0 | 0 | 0 | 0 | 0 | 0 | 83.72 | compared | 0 | True | none |
+| run_779 | dock_loading | scenario_s09_17 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 21 | 0 | 0 | 0 | 0 | 0 | 0 | 83.72 | compared | 0 | True | none |
+| run_780 | dock_loading | scenario_s09_17 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 83.72 | compared | 0 | True | none |
+| run_781 | dock_loading | scenario_s09_18 | env_layout_04 | False | False | False | False | full_reorder | True | 265 | 267 | 5 | 0 | 4 | 3 | 1 | 0 | 0 | 16.11 | compared | 0 | True | equal |
+| run_782 | dock_loading | scenario_s09_18 | env_layout_04 | True | False | False | False | full_reorder | True | 265 | 267 | 26 | 0 | 4 | 3 | 1 | 0 | 0 | 16.11 | compared | 0 | True | none |
+| run_783 | dock_loading | scenario_s09_18 | env_layout_04 | True | True | True | False | full_reorder | True | 265 | 267 | 23 | 0 | 4 | 3 | 1 | 0 | 0 | 16.11 | compared | 0 | True | none |
+| run_784 | dock_loading | scenario_s09_18 | env_layout_04 | True | True | True | True | full_reorder | True | 265 | 267 | 22 | 0 | 4 | 3 | 1 | 0 | 0 | 16.11 | compared | 0 | True | none |
+| run_785 | dock_loading | scenario_s11_01 | env_layout_05 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 93.36 | compared | 0 | True | equal |
+| run_786 | dock_loading | scenario_s11_01 | env_layout_05 | True | False | False | False | full_reorder | True | 246 | 248 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 93.36 | compared | 0 | True | none |
+| run_787 | dock_loading | scenario_s11_01 | env_layout_05 | True | True | True | False | full_reorder | True | 246 | 248 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 93.36 | compared | 0 | True | none |
+| run_788 | dock_loading | scenario_s11_01 | env_layout_05 | True | True | True | True | full_reorder | True | 246 | 248 | 24 | 0 | 0 | 0 | 0 | 0 | 0 | 93.36 | compared | 0 | True | none |
+| run_789 | dock_loading | scenario_s11_02 | env_layout_05 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 8 | 2 | 2 | 2 | 2 | 15.87 | compared | 0 | True | equal |
+| run_790 | dock_loading | scenario_s11_02 | env_layout_05 | True | False | False | False | full_reorder | True | 256 | 258 | 32 | 10 | 4 | 0 | 1 | 3 | 0 | 38.65 | compared | 0 | True | none |
+| run_791 | dock_loading | scenario_s11_02 | env_layout_05 | True | True | True | False | full_reorder | True | 254 | 256 | 33 | 8 | 3 | 2 | 1 | 0 | 0 | 31.50 | compared | 0 | True | none |
+| run_792 | dock_loading | scenario_s11_02 | env_layout_05 | True | True | True | True | full_reorder | True | 258 | 260 | 27 | 12 | 0 | 0 | 0 | 0 | 0 | 50.04 | compared | 0 | True | none |
+| run_793 | dock_loading | scenario_s11_03 | env_layout_05 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | equal |
+| run_794 | dock_loading | scenario_s11_03 | env_layout_05 | True | False | False | False | full_reorder | True | 246 | 248 | 35 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_795 | dock_loading | scenario_s11_03 | env_layout_05 | True | True | True | False | full_reorder | True | 246 | 248 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_796 | dock_loading | scenario_s11_03 | env_layout_05 | True | True | True | True | full_reorder | True | 246 | 248 | 23 | 0 | 0 | 0 | 0 | 0 | 0 | 77.52 | compared | 0 | True | none |
+| run_797 | dock_loading | scenario_s11_04 | env_layout_05 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 99.74 | compared | 0 | True | equal |
+| run_798 | dock_loading | scenario_s11_04 | env_layout_05 | True | False | False | False | full_reorder | True | 246 | 248 | 27 | 0 | 0 | 0 | 0 | 0 | 0 | 99.74 | compared | 0 | True | none |
+| run_799 | dock_loading | scenario_s11_04 | env_layout_05 | True | True | True | False | full_reorder | True | 246 | 248 | 32 | 0 | 0 | 0 | 0 | 0 | 0 | 99.74 | compared | 0 | True | none |
+| run_800 | dock_loading | scenario_s11_04 | env_layout_05 | True | True | True | True | full_reorder | True | 246 | 248 | 33 | 0 | 0 | 0 | 0 | 0 | 0 | 99.74 | compared | 0 | True | none |
+| run_801 | dock_loading | scenario_s11_05 | env_layout_05 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 98.04 | compared | 0 | True | equal |
+| run_802 | dock_loading | scenario_s11_05 | env_layout_05 | True | False | False | False | full_reorder | True | 246 | 248 | 26 | 0 | 0 | 0 | 0 | 0 | 0 | 98.04 | compared | 0 | True | none |
+| run_803 | dock_loading | scenario_s11_05 | env_layout_05 | True | True | True | False | full_reorder | True | 246 | 248 | 27 | 0 | 0 | 0 | 0 | 0 | 0 | 98.04 | compared | 0 | True | none |
+| run_804 | dock_loading | scenario_s11_05 | env_layout_05 | True | True | True | True | full_reorder | True | 246 | 248 | 25 | 0 | 0 | 0 | 0 | 0 | 0 | 98.04 | compared | 0 | True | none |
+| run_805 | dock_loading | scenario_s11_06 | env_layout_05 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 99.37 | compared | 0 | True | equal |
+| run_806 | dock_loading | scenario_s11_06 | env_layout_05 | True | False | False | False | full_reorder | True | 246 | 248 | 32 | 0 | 0 | 0 | 0 | 0 | 0 | 99.37 | compared | 0 | True | none |
+| run_807 | dock_loading | scenario_s11_06 | env_layout_05 | True | True | True | False | full_reorder | True | 246 | 248 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 99.37 | compared | 0 | True | none |
+| run_808 | dock_loading | scenario_s11_06 | env_layout_05 | True | True | True | True | full_reorder | True | 246 | 248 | 34 | 0 | 0 | 0 | 0 | 0 | 0 | 99.37 | compared | 0 | True | none |
+| run_809 | dock_loading | scenario_s11_07 | env_layout_05 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 68.76 | compared | 0 | True | equal |
+| run_810 | dock_loading | scenario_s11_07 | env_layout_05 | True | False | False | False | full_reorder | True | 246 | 248 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 68.76 | compared | 0 | True | none |
+| run_811 | dock_loading | scenario_s11_07 | env_layout_05 | True | True | True | False | full_reorder | True | 246 | 248 | 29 | 0 | 0 | 0 | 0 | 0 | 0 | 68.76 | compared | 0 | True | none |
+| run_812 | dock_loading | scenario_s11_07 | env_layout_05 | True | True | True | True | full_reorder | True | 246 | 248 | 31 | 0 | 0 | 0 | 0 | 0 | 0 | 68.76 | compared | 0 | True | none |
+| run_813 | dock_loading | scenario_s11_08 | env_layout_05 | False | False | False | False | full_reorder | True | 246 | 248 | 5 | 0 | 0 | 0 | 0 | 0 | 0 | 79.35 | compared | 0 | True | equal |
+| run_814 | dock_loading | scenario_s11_08 | env_layout_05 | True | False | False | False | full_reorder | True | 246 | 248 | 28 | 0 | 0 | 0 | 0 | 0 | 0 | 79.35 | compared | 0 | True | none |
+| run_815 | dock_loading | scenario_s11_08 | env_layout_05 | True | True | True | False | full_reorder | True | 246 | 248 | 27 | 0 | 0 | 0 | 0 | 0 | 0 | 79.35 | compared | 0 | True | none |
+| run_816 | dock_loading | scenario_s11_08 | env_layout_05 | True | True | True | True | full_reorder | True | 246 | 248 | 22 | 0 | 0 | 0 | 0 | 0 | 0 | 79.35 | compared | 0 | True | none |
+| run_817 | dock_loading | scenario_s03_02 | env_layout_02 | False | False | False | False | full_reorder | True | 125 | 127 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 213.13 | none |  | False | equal |
+| run_818 | dock_loading | scenario_s03_02 | env_layout_02 | True | False | False | False | full_reorder | True | 125 | 127 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 213.13 | none |  | False | none |
+| run_819 | dock_loading | scenario_s03_02 | env_layout_02 | True | True | True | False | full_reorder | True | 125 | 127 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 213.13 | none |  | False | none |
+| run_820 | dock_loading | scenario_s03_02 | env_layout_02 | True | True | True | True | full_reorder | True | 125 | 127 | 13 | 0 | 0 | 0 | 0 | 0 | 0 | 213.13 | none |  | False | none |
+| run_821 | dock_loading | scenario_s03_03 | env_layout_02 | False | False | False | False | full_reorder | True | 289 | 291 | 5 | 0 | 10 | 0 | 0 | 7 | 3 | 1.22 | none |  | False | equal |
+| run_822 | dock_loading | scenario_s03_03 | env_layout_02 | True | False | False | False | full_reorder | True | 289 | 291 | 34 | 0 | 10 | 0 | 0 | 7 | 3 | 1.22 | none |  | False | none |
+| run_823 | dock_loading | scenario_s03_03 | env_layout_02 | True | True | True | False | full_reorder | True | 289 | 291 | 27 | 0 | 10 | 0 | 0 | 7 | 3 | 1.22 | none |  | False | none |
+| run_824 | dock_loading | scenario_s03_03 | env_layout_02 | True | True | True | True | full_reorder | True | 289 | 291 | 24 | 0 | 10 | 0 | 0 | 7 | 3 | 1.22 | none |  | False | none |
+| run_825 | dock_loading | scenario_s05_02 | env_layout_03 | False | False | False | False | full_reorder | True | 125 | 127 | 3 | 0 | 0 | 0 | 0 | 0 | 0 | 213.13 | none |  | False | equal |
+| run_826 | dock_loading | scenario_s05_02 | env_layout_03 | True | False | False | False | full_reorder | True | 125 | 127 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 213.13 | none |  | False | none |
+| run_827 | dock_loading | scenario_s05_02 | env_layout_03 | True | True | True | False | full_reorder | True | 125 | 127 | 15 | 0 | 0 | 0 | 0 | 0 | 0 | 213.13 | none |  | False | none |
+| run_828 | dock_loading | scenario_s05_02 | env_layout_03 | True | True | True | True | full_reorder | True | 125 | 127 | 13 | 0 | 0 | 0 | 0 | 0 | 0 | 213.13 | none |  | False | none |
+| run_829 | dock_loading | scenario_s05_03 | env_layout_03 | False | False | False | False | full_reorder | True | 274 | 276 | 5 | 0 | 9 | 0 | 0 | 6 | 3 | 10.17 | none |  | False | equal |
+| run_830 | dock_loading | scenario_s05_03 | env_layout_03 | True | False | False | False | full_reorder | True | 274 | 276 | 32 | 0 | 9 | 0 | 0 | 6 | 3 | 10.17 | none |  | False | none |
+| run_831 | dock_loading | scenario_s05_03 | env_layout_03 | True | True | True | False | full_reorder | True | 274 | 276 | 29 | 0 | 9 | 0 | 0 | 6 | 3 | 10.17 | none |  | False | none |
+| run_832 | dock_loading | scenario_s05_03 | env_layout_03 | True | True | True | True | full_reorder | True | 274 | 276 | 26 | 0 | 9 | 0 | 0 | 6 | 3 | 10.17 | none |  | False | none |
+| run_833 | dock_loading | scenario_s05_04 | env_layout_03 | False | False | False | False | full_reorder | True | 383 | 385 | 7 | 0 | 10 | 0 | 0 | 7 | 3 | 0.67 | none |  | False | equal |
+| run_834 | dock_loading | scenario_s05_04 | env_layout_03 | True | False | False | False | full_reorder | True | 383 | 385 | 47 | 0 | 10 | 0 | 0 | 7 | 3 | 0.67 | none |  | False | none |
+| run_835 | dock_loading | scenario_s05_04 | env_layout_03 | True | True | True | False | full_reorder | True | 383 | 385 | 43 | 0 | 10 | 0 | 0 | 7 | 3 | 0.67 | none |  | False | none |
+| run_836 | dock_loading | scenario_s05_04 | env_layout_03 | True | True | True | True | full_reorder | True | 383 | 385 | 39 | 0 | 10 | 0 | 0 | 7 | 3 | 0.67 | none |  | False | none |
+| run_837 | dock_loading | scenario_s05_05 | env_layout_03 | False | False | False | False | full_reorder | True | 383 | 385 | 7 | 0 | 9 | 0 | 0 | 6 | 3 | 17.95 | none |  | False | equal |
+| run_838 | dock_loading | scenario_s05_05 | env_layout_03 | True | False | False | False | full_reorder | True | 383 | 385 | 49 | 0 | 9 | 0 | 0 | 6 | 3 | 17.95 | none |  | False | none |
+| run_839 | dock_loading | scenario_s05_05 | env_layout_03 | True | True | True | False | full_reorder | True | 383 | 385 | 41 | 0 | 9 | 0 | 0 | 6 | 3 | 17.95 | none |  | False | none |
+| run_840 | dock_loading | scenario_s05_05 | env_layout_03 | True | True | True | True | full_reorder | True | 383 | 383 | 37 | 0 | 9 | 0 | 0 | 6 | 3 | 17.95 | none |  | False | none |
+| run_841 | dock_loading | scenario_s05_06 | env_layout_03 | False | False | False | False | full_reorder | True | 383 | 385 | 7 | 0 | 19 | 0 | 0 | 15 | 4 | 1.78 | none |  | False | equal |
+| run_842 | dock_loading | scenario_s05_06 | env_layout_03 | True | False | False | False | full_reorder | True | 383 | 385 | 47 | 0 | 19 | 0 | 0 | 15 | 4 | 1.78 | none |  | False | none |
+| run_843 | dock_loading | scenario_s05_06 | env_layout_03 | True | True | True | False | full_reorder | True | 383 | 385 | 43 | 0 | 19 | 0 | 0 | 15 | 4 | 1.78 | none |  | False | none |
+| run_844 | dock_loading | scenario_s05_06 | env_layout_03 | True | True | True | True | full_reorder | True | 383 | 385 | 39 | 0 | 19 | 0 | 0 | 15 | 4 | 1.78 | none |  | False | none |
+| run_845 | dock_loading | scenario_s07_02 | env_layout_04 | False | False | False | False | full_reorder | True | 128 | 130 | 3 | 0 | 9 | 0 | 0 | 6 | 3 | 8.11 | none |  | False | equal |
+| run_846 | dock_loading | scenario_s07_02 | env_layout_04 | True | False | False | False | full_reorder | True | 128 | 130 | 8 | 0 | 9 | 0 | 0 | 6 | 3 | 8.11 | none |  | False | none |
+| run_847 | dock_loading | scenario_s07_02 | env_layout_04 | True | True | True | False | full_reorder | True | 128 | 130 | 8 | 0 | 9 | 0 | 0 | 6 | 3 | 8.11 | none |  | False | none |
+| run_848 | dock_loading | scenario_s07_02 | env_layout_04 | True | True | True | True | full_reorder | True | 128 | 129 | 8 | 0 | 9 | 0 | 0 | 6 | 3 | 8.11 | none |  | False | none |
+| run_849 | dock_loading | scenario_s07_03 | env_layout_04 | False | False | False | False | full_reorder | True | 285 | 287 | 5 | 0 | 9 | 0 | 0 | 6 | 3 | 8.11 | none |  | False | equal |
+| run_850 | dock_loading | scenario_s07_03 | env_layout_04 | True | False | False | False | full_reorder | True | 285 | 287 | 29 | 0 | 9 | 0 | 0 | 6 | 3 | 8.11 | none |  | False | none |
+| run_851 | dock_loading | scenario_s07_03 | env_layout_04 | True | True | True | False | full_reorder | True | 285 | 287 | 30 | 0 | 9 | 0 | 0 | 6 | 3 | 8.11 | none |  | False | none |
+| run_852 | dock_loading | scenario_s07_03 | env_layout_04 | True | True | True | True | full_reorder | True | 285 | 286 | 27 | 0 | 9 | 0 | 0 | 6 | 3 | 8.11 | none |  | False | none |
+| run_853 | dock_loading | scenario_s07_04 | env_layout_04 | False | False | False | False | full_reorder | True | 422 | 424 | 7 | 0 | 12 | 3 | 2 | 4 | 3 | 13.83 | none |  | False | equal |
+| run_854 | dock_loading | scenario_s07_04 | env_layout_04 | True | False | False | False | full_reorder | True | 433 | 435 | 42 | 11 | 17 | 0 | 4 | 10 | 3 | 13.83 | none |  | False | none |
+| run_855 | dock_loading | scenario_s07_04 | env_layout_04 | True | True | True | False | full_reorder | True | 432 | 434 | 43 | 11 | 16 | 1 | 3 | 9 | 3 | 13.83 | none |  | False | none |
+| run_856 | dock_loading | scenario_s07_04 | env_layout_04 | True | True | True | True | full_reorder | True | 434 | 436 | 38 | 0 | 7 | 0 | 0 | 4 | 3 | 13.80 | none |  | False | none |
+| run_857 | dock_loading | scenario_s07_05 | env_layout_04 | False | False | False | False | full_reorder | True | 422 | 424 | 7 | 0 | 13 | 3 | 2 | 5 | 3 | 17.36 | none |  | False | equal |
+| run_858 | dock_loading | scenario_s07_05 | env_layout_04 | True | False | False | False | full_reorder | True | 433 | 435 | 44 | 11 | 18 | 0 | 4 | 11 | 3 | 17.36 | none |  | False | none |
+| run_859 | dock_loading | scenario_s07_05 | env_layout_04 | True | True | True | False | full_reorder | True | 432 | 434 | 40 | 11 | 17 | 1 | 3 | 10 | 3 | 17.36 | none |  | False | none |
+| run_860 | dock_loading | scenario_s07_05 | env_layout_04 | True | True | True | True | full_reorder | True | 434 | 434 | 35 | 0 | 8 | 0 | 0 | 5 | 3 | 17.38 | none |  | False | none |
+| run_861 | dock_loading | scenario_s07_06 | env_layout_04 | False | False | False | False | full_reorder | True | 422 | 424 | 7 | 0 | 18 | 3 | 2 | 9 | 4 | 13.75 | none |  | False | equal |
+| run_862 | dock_loading | scenario_s07_06 | env_layout_04 | True | False | False | False | full_reorder | True | 433 | 435 | 42 | 11 | 23 | 0 | 4 | 15 | 4 | 13.75 | none |  | False | none |
+| run_863 | dock_loading | scenario_s07_06 | env_layout_04 | True | True | True | False | full_reorder | True | 432 | 434 | 43 | 11 | 22 | 1 | 3 | 14 | 4 | 13.75 | none |  | False | none |
+| run_864 | dock_loading | scenario_s07_06 | env_layout_04 | True | True | True | True | full_reorder | True | 434 | 436 | 38 | 0 | 13 | 0 | 0 | 9 | 4 | 13.71 | none |  | False | none |

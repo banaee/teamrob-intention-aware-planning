@@ -4,10 +4,10 @@ T-K part 1, step 6 (Hadi, 6 October 2026; design_records.md, "T-K", STEP 6). Deb
 
 ## What was run
 
-- 568 runs, `single_task`, assignment knowledge on, rooms env_layout_02, env_layout_03, env_layout_04, env_layout_05.
-- 74 planning scripts in the four conditions (62 independent of the robot, 12 that depend on it); 164 copies with break_time, context knowledge on; 54 recognition scenarios (the robot idle) with context knowledge off and on.
-- The oracle compared on 478 runs: 0 disagreements. The reference check (human-unaware against the robot alone) on 74 runs: equal 74.
-- Settings as stated in every run: 568 of 568.
+- 864 runs (568 `single_task`, 296 `full_reorder`), assignment knowledge on, rooms env_layout_02, env_layout_03, env_layout_04, env_layout_05.
+- 74 planning scripts in the four conditions (62 independent of the robot, 12 that depend on it); 164 copies with break_time, context knowledge on; 54 recognition scenarios (the robot idle) with context knowledge off and on; under `full_reorder`, 74 planning scripts in the four conditions (Hadi, 6 October 2026). Every comparison of conditions stays inside one strategy.
+- The oracle compared on 726 runs: 0 disagreements. The reference check (human-unaware against the robot alone) on 148 runs: equal 148.
+- Settings as stated in every run: 864 of 864.
 
 ## The four conditions side by side (the planning scripts)
 
@@ -61,6 +61,86 @@ Per room, the mean change per script (completion; violation ticks):
 | env_layout_03 | 23 | +2.83; -0.43 | +3.00; +0.09 | -0.09; -0.04 |
 | env_layout_04 | 23 | +5.96; -0.65 | +2.22; +0.39 | +1.61; -0.04 |
 | env_layout_05 | 8 | +0.00; +0.00 | +0.00; +0.00 | +0.00; +0.00 |
+
+## The four conditions under each strategy (the planning scripts)
+
+The 74 planning scripts run under both strategies; completion over the 74 finished in all eight runs. Each column's condition is compared only with the same strategy's columns.
+
+| measure | human-unaware, single_task | human-unaware, full_reorder | intention-unaware, single_task | intention-unaware, full_reorder | intention-aware, context knowledge off, single_task | intention-aware, context knowledge off, full_reorder | intention-aware, context knowledge on, single_task | intention-aware, context knowledge on, full_reorder |
+|---|---|---|---|---|---|---|---|---|
+| completion, mean (ticks) | 260.3 | 230.8 | 265.7 | 241.6 | 269.1 | 247.7 | 269.6 | 247.8 |
+| violation ticks, total | 35 | 52 | 5 | 12 | 17 | 22 | 17 | 13 |
+| ticks below min_separation, total | 330 | 509 | 109 | 219 | 115 | 210 | 143 | 175 |
+| held ticks, total | 0 | 0 | 419 | 804 | 677 | 1163 | 739 | 1142 |
+| decisions, total | 342 | 342 | 2130 | 2000 | 1898 | 1807 | 1855 | 1765 |
+| scripts with a violation tick | 18 | 21 | 3 | 5 | 10 | 12 | 10 | 5 |
+
+## The three steps under full_reorder, paired per scenario
+
+Over the 74 planning scripts under `full_reorder` (74 for completion); the same table under `single_task` is above. Negative is earlier or fewer.
+
+| step | measure | scenarios | per scenario: lower / equal / higher | mean change | median change | 95% interval of the mean (rooms resampled) | rooms with mean change < 0 / = 0 / > 0 | Wilcoxon p (indication only) |
+|---|---|---|---|---|---|---|---|---|
+| Step 1 | completion (ticks) | 74 | 0 earlier / 56 equal / 18 later | +10.86 | +0.0 | +6.64 to +13.35 | 0 / 0 / 4 | < 0.001 |
+| Step 1 | violation ticks | 74 | 17 fewer / 57 equal / 0 more | -0.54 | +0.0 | -0.72 to -0.36 | 4 / 0 / 0 | < 0.001 |
+| Step 1 | ticks below min_separation | 74 | 13 fewer / 57 equal / 4 more | -3.92 | +0.0 | -6.18 to -1.84 | 4 / 0 / 0 | 0.021 |
+| Step 1 | held ticks | 74 | 0 fewer / 56 equal / 18 more | +10.86 | +0.0 | +6.64 to +13.35 | 0 / 0 / 4 | < 0.001 |
+| Step 2 | completion (ticks) | 74 | 8 earlier / 56 equal / 10 later | +6.07 | +0.0 | +2.96 to +8.18 | 1 / 0 / 3 | 0.034 |
+| Step 2 | violation ticks | 74 | 0 fewer / 67 equal / 7 more | +0.14 | +0.0 | +0.07 to +0.23 | 0 / 0 / 4 | 0.016 |
+| Step 2 | ticks below min_separation | 74 | 7 fewer / 66 equal / 1 more | -0.12 | +0.0 | -0.29 to +0.02 | 3 / 0 / 1 | 0.062 |
+| Step 2 | held ticks | 74 | 6 fewer / 59 equal / 9 more | +4.85 | +0.0 | +0.90 to +8.18 | 1 / 0 / 3 | 0.042 |
+| Step 3a | completion (ticks) | 74 | 3 earlier / 64 equal / 7 later | +0.15 | +0.0 | +0.09 to +0.32 | 0 / 0 / 4 | 0.375 |
+| Step 3a | violation ticks | 74 | 7 fewer / 66 equal / 1 more | -0.12 | +0.0 | -0.19 to -0.07 | 4 / 0 / 0 | 0.047 |
+| Step 3a | ticks below min_separation | 74 | 6 fewer / 68 equal / 0 more | -0.47 | +0.0 | -0.97 to -0.12 | 4 / 0 / 0 | 0.031 |
+| Step 3a | held ticks | 74 | 5 fewer / 64 equal / 5 more | -0.28 | +0.0 | -1.26 to +0.48 | 1 / 0 / 3 | 0.381 |
+
+## full_reorder against single_task, per condition
+
+Per script, the `full_reorder` run against the `single_task` run of the same condition. Negative is earlier or fewer under `full_reorder`.
+
+| condition | measure | scripts | per script: lower / equal / higher | mean change | total: single_task → full_reorder |
+|---|---|---|---|---|---|
+| human-unaware | completion (ticks) | 74 | 58 earlier / 16 equal / 0 later | -29.53 | 19261 → 17076 |
+| human-unaware | violation ticks | 74 | 9 fewer / 50 equal / 15 more | +0.23 | 35 → 52 |
+| human-unaware | ticks below min_separation | 74 | 7 fewer / 49 equal / 18 more | +2.42 | 330 → 509 |
+| human-unaware | held ticks | 74 | 0 fewer / 74 equal / 0 more | +0.00 | 0 → 0 |
+| intention-unaware | completion (ticks) | 74 | 54 earlier / 16 equal / 4 later | -24.04 | 19659 → 17880 |
+| intention-unaware | violation ticks | 74 | 1 fewer / 69 equal / 4 more | +0.09 | 5 → 12 |
+| intention-unaware | ticks below min_separation | 74 | 4 fewer / 53 equal / 17 more | +1.49 | 109 → 219 |
+| intention-unaware | held ticks | 74 | 6 fewer / 55 equal / 13 more | +5.20 | 419 → 804 |
+| intention-aware, context knowledge off | completion (ticks) | 74 | 54 earlier / 16 equal / 4 later | -21.38 | 19911 → 18329 |
+| intention-aware, context knowledge off | violation ticks | 74 | 5 fewer / 62 equal / 7 more | +0.07 | 17 → 22 |
+| intention-aware, context knowledge off | ticks below min_separation | 74 | 5 fewer / 53 equal / 16 more | +1.28 | 115 → 210 |
+| intention-aware, context knowledge off | held ticks | 74 | 6 fewer / 53 equal / 15 more | +6.57 | 677 → 1163 |
+| intention-aware, context knowledge on | completion (ticks) | 74 | 53 earlier / 17 equal / 4 later | -21.73 | 19948 → 18340 |
+| intention-aware, context knowledge on | violation ticks | 74 | 9 fewer / 61 equal / 4 more | -0.05 | 17 → 13 |
+| intention-aware, context knowledge on | ticks below min_separation | 74 | 9 fewer / 54 equal / 11 more | +0.43 | 143 → 175 |
+| intention-aware, context knowledge on | held ticks | 74 | 11 fewer / 52 equal / 11 more | +5.45 | 739 → 1142 |
+
+## Where recognition changes the robot's order of tasks
+
+The robot's executed order of tasks (its task per tick, consecutive repeats merged; a task left and taken up again appears twice) compared between conditions of one strategy. The intention-unaware robot plans against the observed motion only; a different order in an intention-aware run is a change that recognition (the admissions, or their absence) brought about.
+
+| strategy | conditions | scripts | scripts whose order differs | of them the first task differs |
+|---|---|---|---|---|
+| single_task | human-unaware → intention-unaware | 74 | 4 | 0 |
+| single_task | intention-unaware → intention-aware, context knowledge off | 74 | 0 | 0 |
+| single_task | intention-aware, context knowledge off → intention-aware, context knowledge on | 74 | 3 | 0 |
+| full_reorder | human-unaware → intention-unaware | 74 | 0 | 0 |
+| full_reorder | intention-unaware → intention-aware, context knowledge off | 74 | 1 | 0 |
+| full_reorder | intention-aware, context knowledge off → intention-aware, context knowledge on | 74 | 3 | 0 |
+
+- single_task, intention-unaware → intention-aware, context knowledge off: no script.
+- single_task, intention-aware, context knowledge off → intention-aware, context knowledge on:
+  - scenario_s05_03 (env_layout_03): deliver(pallet_2), return(pallet_4), deliver(pallet_0), return(pallet_4), deliver(pallet_1) → deliver(pallet_2), deliver(pallet_0), return(pallet_4), deliver(pallet_1); completion 276 → 274, violation ticks 0 → 0
+  - scenario_s05_04 (env_layout_03): deliver(pallet_2), deliver(pallet_3), return(pallet_4), deliver(pallet_0), return(pallet_4), deliver(pallet_1), return(pallet_5) → deliver(pallet_2), deliver(pallet_3), deliver(pallet_0), return(pallet_4), deliver(pallet_1), return(pallet_5); completion 428 → 426, violation ticks 0 → 0
+  - scenario_s05_06 (env_layout_03): deliver(pallet_2), deliver(pallet_3), return(pallet_4), deliver(pallet_0), return(pallet_4), deliver(pallet_1), return(pallet_5) → deliver(pallet_2), deliver(pallet_3), deliver(pallet_0), return(pallet_4), deliver(pallet_1), return(pallet_5); completion 428 → 426, violation ticks 0 → 1
+- full_reorder, intention-unaware → intention-aware, context knowledge off:
+  - scenario_s09_03 (env_layout_04): deliver(pallet_4), return(pallet_6), deliver(pallet_5) → deliver(pallet_4), deliver(pallet_5), return(pallet_6), deliver(pallet_4); completion 284 → 347, violation ticks 0 → 0
+- full_reorder, intention-aware, context knowledge off → intention-aware, context knowledge on:
+  - scenario_s07_04 (env_layout_04): deliver(pallet_0), return(pallet_4), deliver(pallet_1), return(pallet_5), deliver(pallet_2), deliver(pallet_3) → deliver(pallet_0), deliver(pallet_2), return(pallet_4), deliver(pallet_1), deliver(pallet_2), return(pallet_5), deliver(pallet_2), deliver(pallet_3); completion 432 → 434, violation ticks 1 → 0
+  - scenario_s07_05 (env_layout_04): deliver(pallet_0), return(pallet_4), deliver(pallet_1), return(pallet_5), deliver(pallet_2), deliver(pallet_3) → deliver(pallet_0), deliver(pallet_2), return(pallet_4), deliver(pallet_1), deliver(pallet_2), return(pallet_5), deliver(pallet_2), deliver(pallet_3); completion 432 → 434, violation ticks 1 → 0
+  - scenario_s07_06 (env_layout_04): deliver(pallet_0), return(pallet_4), deliver(pallet_1), return(pallet_5), deliver(pallet_2), deliver(pallet_3) → deliver(pallet_0), deliver(pallet_2), return(pallet_4), deliver(pallet_1), deliver(pallet_2), return(pallet_5), deliver(pallet_2), deliver(pallet_3); completion 432 → 434, violation ticks 1 → 0
 
 ## Recognition: context knowledge off against on, with no timeline fact in force
 
@@ -130,7 +210,7 @@ None.
 ## What these numbers do not show
 
 - Debugging, not the evaluation: the scripts and the windows are authored to make situations occur, not drawn from real work. The counts say how often something happened in this set.
-- One strategy (`single_task`), assignment knowledge on, a scripted human who does not react to the robot, full observation, point agents at a fixed speed.
+- Two strategies for the planning scripts, `single_task` (every part) and `full_reorder` (the four conditions only: no copies, no recognition set); `full_reorder` logs no per-candidate hold (TODO-141). Assignment knowledge on, a scripted human who does not react to the robot, full observation, point agents at a fixed speed.
 - Four rooms that share one hall; the room bootstrap over four rooms is coarse.
 - In the scripts that depend on the robot the human's timing follows the robot's, so the conditions meet different human trajectories; the oracle does not run on them.
 - The tag is provisional for a fact that lowers a task (TODO-185).
