@@ -20,20 +20,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 sys.path.insert(0, str(Path(__file__).parent))   # makes mesa_fork importable directly
 
 from mesa_sim.sim_model import SimModel
-from domains.kitting.registry import domain_config as kitting_config
-from domains.dock_loading.registry import domain_config as dock_config
+from mesa_sim.run_config import DOMAIN_REGISTRY
 from world.composition import scenario_composition
-
-# Every domain, as run_mesa.py's DOMAIN_REGISTRY names them (not imported from
-# there: importing run_mesa opens a run's log files).
-DOMAINS = {
-    "kitting":      kitting_config,
-    "dock_loading": dock_config,
-}
 
 
 def main():
-    for domain_name, domain_config in DOMAINS.items():
+    for domain_name, domain_config in DOMAIN_REGISTRY.items():
         list_domain(domain_name, domain_config)
 
 

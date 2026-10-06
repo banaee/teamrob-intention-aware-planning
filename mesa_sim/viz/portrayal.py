@@ -16,7 +16,7 @@ WHAT THIS MODULE DOES NOT DO:
     - Does NOT hardcode factory-specific logic
 
 USED BY:
-    - mesa_sim/run_mesa.py  → passed to SolaraViz as agent_portrayal
+    - mesa_sim/viz/solara_page.py  → passed to SolaraViz as agent_portrayal
 """
 
 from mesa_sim.mesa_fork import agent

@@ -2,10 +2,10 @@
 mesa_sim/run_mesa.py
 
 PURPOSE:
-    Entry point for the Mesa simulation.
+    Entry point for the Mesa simulation: the starts.
     Supports two modes:
         1. Headless — runs N steps, no visualization (for testing/experiments)
-        2. Visualization — Solara + Plotly interactive interface
+        2. Visualization — the solara-ui, Solara + Plotly interactive interface
 
 USAGE:
     # Headless (default, uses configs/experiment.yaml):
@@ -27,16 +27,15 @@ USAGE:
     solara run mesa_sim/run_mesa.py -- --domain dock_loading
 
 WHAT THIS MODULE DOES:
-    - Loads configs/experiment.yaml as default run configuration
-    - Accepts CLI args to override individual fields (domain, scenario, steps, the two knowledge switches, etc.);
-      an unknown flag or yaml key, or a value of the wrong kind, stops the run
-    - Reads the run file's overrides block and --override (mesa_sim/overrides.py),
-      prints each on the start line's block, and hands them to the loader
-    - Looks up domain registry to resolve string names to Python objects
-    - Instantiates SimModel with chosen domain + scenario
-    - Either runs headless loop or launches SolaraViz
+    - Headless: reads the run configuration from configs/experiment.yaml (or the run file
+      --run names) and the flags, starts one sim-run of it, steps it N times and ends it
+    - Under solara: imports the solara-ui's page (mesa_sim/viz/solara_page.py), which solara
+      finds here; a headless start imports no Solara and nothing of mesa_sim/viz/
+    - Re-exports the names of mesa_sim/run_config.py its callers used before T-viz 0.2
 
 WHAT THIS MODULE DOES NOT DO:
+    - No reading or building logic — mesa_sim/run_config.py (one definition for every start)
+    - No log set-up or run-level line — mesa_sim/sim_run.py (the log pair is a sim-run's)
     - No simulation logic — all in sim_model.py and sim_agents.py
     - No visualization logic — that belongs in mesa_sim/viz/
 
@@ -44,425 +43,45 @@ ROS EQUIVALENT:
     ros_sim/run_ros.py — same experiment.yaml, different simulator instantiation.
 """
 
-import argparse
-import logging
 import sys
-import yaml
-import numpy as np
 from pathlib import Path
 
 # Ensure project root is on path when run directly
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # makes mesa_fork importable directly
-sys.path.insert(0, str(Path(__file__).parent))  
+sys.path.insert(0, str(Path(__file__).parent))
 
-from mesa_sim.sim_model import SimModel
-from mesa_sim.overrides import run_overrides
-
-from domains.kitting.registry import domain_config as kitting_config
-from domains.dock_loading.registry import domain_config as dock_config
-
-# ============================================================================
-# Logging setup
-# ============================================================================
-import logging
-from datetime import datetime
-from pathlib import Path
-Path("logs").mkdir(exist_ok=True)
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-log_filename = f"logs/run_{timestamp}.log"
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(message)s",
-    handlers=[
-        logging.FileHandler(log_filename, mode="w"),
-        logging.StreamHandler(),  # still prints to terminal
-    ]
+from mesa_sim.run_config import (  # noqa: F401 — re-exported for the callers of this module
+    BOOL_OPTIONS, COST_STRATEGIES, DOMAIN_REGISTRY, EXPERIMENT_CONFIG_PATH, GATE_STRATEGIES, RUN_OPTIONS,
+    STRATEGIES, UNDER_SOLARA, build_model, load_experiment, load_user_config, parse_user_args,
+    resolve_model_params, resolve_triple, run_configuration,
 )
-# The human executor's record (T-H2): its own stream, one `[rec]` line per tick,
-# in a file beside the run log (logs/run_<timestamp>.rec), never in the run log.
-rec_filename = f"logs/run_{timestamp}.rec"
-_rec_logger = logging.getLogger("rec")
-_rec_logger.propagate = False
-_rec_handler = logging.FileHandler(rec_filename, mode="w")
-_rec_handler.setFormatter(logging.Formatter("%(message)s"))
-_rec_logger.addHandler(_rec_handler)
+from mesa_sim.sim_run import start_sim_run
 
-
-# =============================================================================
-# Domain registry
-# Maps domain name strings (from experiment.yaml or CLI) to Python objects.
-# Add one entry here when adding a new domain.
-# =============================================================================
-
-
-DOMAIN_REGISTRY = {
-    "kitting":      kitting_config,
-    "dock_loading": dock_config,
-}
-
-
-# =============================================================================
-# Experiment config loader
-# =============================================================================
-
-EXPERIMENT_CONFIG_PATH = "configs/experiment.yaml"
-
-STRATEGIES = ("single_task", "full_reorder")
-GATE_STRATEGIES = ("none", "b2a", "b2b")
-COST_STRATEGIES = ("realized", "plain")
-BOOL_OPTIONS = ("human_aware", "intention_aware", "assignment_knowledge", "context_knowledge", "separation_stop")
-
-def load_experiment(run_path: str, flags: dict, cli_overrides=()) -> dict:
-    """
-    Load the run file (configs/experiment.yaml, or the yaml --run names) and
-    apply the CLI flags. Flags take precedence over file values.
-    `flags` holds one entry per CLI flag (None when not given); the flags
-    are the run options, so a yaml key that is not one of them is an error
-    rather than a field nothing reads. File values are checked like the flags
-    are: a strategy outside its choices, or a switch that is not a yaml
-    boolean (`"false"` is a string, and bool("false") is True), stops the run.
-    The run file's overrides block and the --override texts are read into the
-    run's overrides (overrides.run_overrides): config["overrides"], a tuple,
-    empty when there are none.
-    """
-    with open(run_path, "r") as f:
-        config = yaml.safe_load(f)
-    # "setup" may be named by the run file; there is no --setup flag (T-L,
-    # ruling c: one setup per scenario), so it is not a flag. "overrides" is the
-    # run file's overrides block (T-L stage 4); --override adds to it.
-    allowed = set(flags) | {"setup", "overrides"}
-    unknown = sorted(set(config) - allowed)
-    if unknown:
-        raise ValueError(
-            f"{run_path}: unknown keys {unknown}. "
-            f"Run options: {sorted(allowed)}"
-        )
-    config.update({k: v for k, v in flags.items() if v is not None})
-    config["overrides"] = run_overrides(config.get("overrides"), cli_overrides)
-    for key, choices in (("strategy", STRATEGIES), ("gate_strategy", GATE_STRATEGIES),
-                         ("cost_strategy", COST_STRATEGIES)):
-        if key in config and config[key] not in choices:
-            raise ValueError(f"{key}={config[key]!r}: expected one of {list(choices)}")
-    for key in BOOL_OPTIONS:
-        if key in config and not isinstance(config[key], bool):
-            raise ValueError(f"{key}={config[key]!r}: expected true or false")
-    # The adequacy test's level (T-D E5): a probability strictly between 0 and 1.
-    if "test_level" in config:
-        level = config["test_level"]
-        if isinstance(level, bool) or not isinstance(level, (int, float)) or not 0.0 < level < 1.0:
-            raise ValueError(f"test_level={level!r}: expected a number strictly between 0 and 1")
-    return config
-
-
-# =============================================================================
-# CLI argument parser
-# =============================================================================
-
-def _bool_arg(value: str) -> bool:
-    """argparse type for the true/false override flags. Needed because bool('false')
-    is True — argparse would otherwise accept any string as True."""
-    if value.lower() in ("true", "1", "yes"):
-        return True
-    if value.lower() in ("false", "0", "no"):
-        return False
-    raise argparse.ArgumentTypeError(f"expected true/false, got '{value}'")
-
-
-# `solara run mesa_sim/run_mesa.py -- --domain ...`: solara's own arguments come
-# first in sys.argv, this script's follow the '--'.
-_UNDER_SOLARA = "solara" in Path(sys.argv[0]).parts
-
-
-def _script_argv() -> list:
-    """The command-line arguments meant for this script: everything after the
-    script name headless (a bare '--' dropped), only what follows '--' under
-    solara (nothing when there is none)."""
-    argv = sys.argv[1:]
-    if _UNDER_SOLARA:
-        return argv[argv.index("--") + 1:] if "--" in argv else []
-    return [a for a in argv if a != "--"]
-
-
-def parse_user_args():
-    """Strict: an unknown or misspelled flag exits with an error, so a run never
-    falls back silently to the yaml value of the option it meant to set."""
-    parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
-    parser.add_argument("--run",         type=str,  default=EXPERIMENT_CONFIG_PATH, help="The run file (default: configs/experiment.yaml)")
-    parser.add_argument("--override",    type=str,  action="append", default=[], metavar="PATH=VALUE",
-                        help="Override one fact of the run's artefacts (repeatable): scenario.<agent>.start_position=x,y | "
-                             "layout.<object>.position=x,y | setup.<object>.initial_container=<id>")
-    parser.add_argument("--domain",      type=str,  default=None, help="Domain name override (e.g. kitting, dock_loading)")
-    parser.add_argument("--layout", type=str, default=None, help="Layout selection (default: the scenario's first reference layout)")
-    parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_s02_02)")
-    parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
-    parser.add_argument("--human_aware", type=_bool_arg, default=None, help="Human-aware override: true/false (off: the human-unaware robot, no observed human; sets intention_aware, both knowledge options and separation_stop off; T-F part 1)")
-    parser.add_argument("--intention_aware", type=_bool_arg, default=None, help="Intention-aware override: true/false (off: the intention-unaware robot, the recognizer computes nothing and the gate admits nothing; sets both knowledge options off; T-F part 1)")
-    parser.add_argument("--assignment_knowledge", type=_bool_arg, default=None, help="Assignment knowledge override: true/false (the robot knows the observed human's assigned tasks)")
-    parser.add_argument("--context_knowledge", type=_bool_arg, default=None, help="Context knowledge override: true/false (the recognizer's prior from the declared context knowledge, T-K part 1; off: the equal prior)")
-    parser.add_argument("--strategy", type=str, default=None, choices=STRATEGIES, help="MetaPlanner B3 strategy override")
-    parser.add_argument("--gate_strategy", type=str, default=None, choices=GATE_STRATEGIES, help="MetaPlanner B2 gate strategy override")
-    parser.add_argument("--cost_strategy", type=str, default=None, choices=COST_STRATEGIES, help="MetaPlanner B3 cost strategy override")
-    parser.add_argument("--separation_stop", type=_bool_arg, default=None, help="Execution-time separation stop override: true/false")
-    parser.add_argument("--test_level", type=float, default=None, help="The recognizer's adequacy test level alpha, per derived phase (T-D E5)")
-    return parser.parse_args(_script_argv())
-
-
-def load_user_config() -> dict:
-    """The run configuration: the run file the CLI names, every flag given overriding it,
-    its overrides block and every --override read into config["overrides"]."""
-    user_args = parse_user_args()
-    flags = {k: v for k, v in vars(user_args).items() if k not in ("run", "override")}
-    return load_experiment(user_args.run, flags, user_args.override)
-
-
-
-# =============================================================================
-# Model factory — shared by headless and Solara
-# =============================================================================
-def resolve_triple(user_config: dict):
-    '''
-    Resolves the run's triple (T-L, glossary §9): the scenario from the
-    domain's registry, the setup the scenario declares, and the layout — the
-    one the run names, or the scenario's first reference layout when it names
-    none. Every reference layout and the scenario's setup must be registered;
-    a given layout must be registered but need not be a reference layout; a
-    setup named by the run file must equal the scenario's.
-    Returns (domain, layout_id, setup_id, scenario).
-    '''
-    # --------- domain ---------
-    domain_name = user_config["domain"]
-    if domain_name not in DOMAIN_REGISTRY:
-        raise ValueError(
-            f"Unknown domain '{domain_name}'. "
-            f"Available: {list(DOMAIN_REGISTRY.keys())}"
-        )
-    domain = DOMAIN_REGISTRY[domain_name]
-
-    # --------- scenario ---------
-    scenario_id = user_config["scenario"]
-    if scenario_id not in domain["scenarios"]:
-        raise ValueError(
-            f"Unknown scenario '{scenario_id}' for domain '{domain_name}'. "
-            f"Available: {list(domain['scenarios'].keys())}"
-        )
-    scenario = domain["scenarios"][scenario_id]
-
-    # --------- what the scenario declares is registered ---------
-    for ref in scenario.reference_layouts:
-        if ref not in domain["layouts"]:
-            raise ValueError(
-                f"scenario '{scenario_id}': reference layout '{ref}' is not a "
-                f"registered layout of domain '{domain_name}'. "
-                f"Available: {list(domain['layouts'].keys())}"
-            )
-    if scenario.setup not in domain["setups"]:
-        raise ValueError(
-            f"scenario '{scenario_id}': setup '{scenario.setup}' is not a "
-            f"registered setup of domain '{domain_name}'. "
-            f"Available: {list(domain['setups'].keys())}"
-        )
-
-    # --------- setup: the run file may name it; it must be the scenario's ---------
-    named_setup = user_config.get("setup")
-    if named_setup is not None and named_setup != scenario.setup:
-        raise ValueError(
-            f"setup '{named_setup}': scenario '{scenario_id}' declares setup "
-            f"'{scenario.setup}'; a run file's setup must equal the scenario's "
-            f"(one setup per scenario, T-L)"
-        )
-
-    # --------- layout: selection, or the first reference layout ---------
-    layout_id = user_config.get("layout")
-    if layout_id is None:
-        layout_id = scenario.reference_layouts[0]
-    elif layout_id not in domain["layouts"]:
-        raise ValueError(
-            f"Unknown layout '{layout_id}' for domain '{domain_name}'. "
-            f"Available: {list(domain['layouts'].keys())}"
-        )
-
-    return domain, layout_id, scenario.setup, scenario
-
-
-def resolve_model_params(user_config: dict) -> dict:
-    '''
-    Resolves user config to the run's triple (resolve_triple) and returns
-    SimModel's keyword arguments. Used by both the headless factory and the
-    Solara page, so a name the registry does not have fails the same way on both.
-    '''
-    domain, layout_id, setup_id, scenario = resolve_triple(user_config)
-
-    return {
-        "scenario":         scenario,
-        "register_fn":      domain["register_fn"],
-        "task_model_schemas": domain["task_model"],
-        "state_declarations": domain["states"],
-        "timeline_declarations": domain["timeline_facts"],
-        "declared_context":   domain["context_knowledge"],
-        "layout_path":      domain["layouts"][layout_id],
-        "setup_path":       domain["setups"][setup_id],
-        "human_aware":      bool(user_config.get("human_aware", True)),       # both on by default (T-F part 1, R3);
-        "intention_aware":  bool(user_config.get("intention_aware", True)),   # SimModel applies the override (R5)
-        "assignment_knowledge": bool(user_config.get("assignment_knowledge", True)),   # both on by default (AM3, AM9)
-        "context_knowledge":  bool(user_config.get("context_knowledge", True)),
-        "strategy":         user_config.get("strategy", "single_task"),
-        "gate_strategy":    user_config.get("gate_strategy", "none"),
-        "cost_strategy":    user_config.get("cost_strategy", "realized"),
-        "separation_stop":  bool(user_config.get("separation_stop", False)),
-        "test_level":       float(user_config.get("test_level", 0.05)),
-        "overrides":        tuple(user_config.get("overrides", ())),
-    }
-
-
-def _make_domain_model() -> SimModel:
-    '''Parses the CLI, loads experiment.yaml, and instantiates SimModel from the resolved config.'''
-    return SimModel(**resolve_model_params(load_user_config()))
 
 # =============================================================================
 # Headless runner
 # =============================================================================
 
-def _min_separation_over_tick(r0, r1, h0, h1) -> float:
-    """
-    The minimum robot–human distance over one tick when the robot moves in a
-    straight line from r0 to r1 and the human from h0 to h1, simultaneously.
-    The difference D(t) = (r0 − h0) + t ((r1 − h1) − (r0 − h0)) is affine in
-    t ∈ [0, 1], so |D| is minimised at the clamped projection of the origin
-    onto that segment — closed form, no sampling. A measure (TODO-79), not a
-    behaviour: nothing reads it back.
-    """
-    dx0, dy0 = r0[0] - h0[0], r0[1] - h0[1]
-    ex, ey = (r1[0] - h1[0]) - dx0, (r1[1] - h1[1]) - dy0
-    ee = ex * ex + ey * ey
-    t = 0.0 if ee == 0.0 else min(1.0, max(0.0, -(dx0 * ex + dy0 * ey) / ee))
-    return float(np.hypot(dx0 + t * ex, dy0 + t * ey))
-
-
 def run_headless():
-    config = load_user_config()
-
-    n_steps = config["steps"]
-    # The triple is the run's identity (T-L): the start line names the
-    # RESOLVED layout, setup and scenario ids.
-    _, layout_id, setup_id, scenario = resolve_triple(config)
-    logging.info(f"[run_mesa] Starting headless run — "
-          f"domain={config['domain']} layout={layout_id} setup={setup_id} scenario={scenario.id} steps={n_steps}")
-    # Each override on the start line's block (T-L stage 4, ruling 7), in the
-    # --override form, so the world the mind saw is reconstructible from the log.
-    for override in config["overrides"]:
-        logging.info(f"[run_mesa] override {override.line()}")
-
-    model = _make_domain_model()
-
-    # Positions at the end of the previous tick, for the continuous minimum of
-    # the [sep] measure below (TODO-79); the initial positions before step 0.
-    prev_pos = {
-        (rid, hid): (tuple(map(float, robot.pos)), tuple(map(float, human.pos)))
-        for rid, robot in model.robots.items() for hid, human in model.humans.items()
-    }
-
-    for step in range(n_steps):
-        model.step()
-    
-    # -----------------------
-    # logging  
-    # -------------------
-        if step % 1 == 0: # keep logging every 2 steps to avoid log bloat
-            for aid, human in model.humans.items():
-                logging.info(f"  step: {step}: [{aid}] task={human.current_task} "
-                      f"action={human.current_action} "
-                      f"micro={human.current_microaction} "
-                      f"pos={np.round(human.pos, 2)}")
-            for aid, robot in model.robots.items():
-                logging.info(f"  step: {step}: [{aid}] task={robot.current_task} "
-                      f"action={robot.current_action} "
-                      f"micro={robot.current_microaction} "
-                      f"pos={np.round(robot.pos, 2)}")
-            # Actual robot–human separation (T9): a measure only, so later tasks
-            # can report how often and by how much execution falls below
-            # min_separation. Nothing here reacts to this number; Mesa's
-            # execution-time layer is the executor's separation stop (C, a run
-            # option, default off), which reads the human's actual position
-            # itself. `dist` samples the end-of-tick
-            # positions; `min` (T10, TODO-79) is the continuous minimum over the
-            # tick with both agents moving in a straight line from their
-            # previous positions to these — the motion model realization
-            # assumes — so a close pass between two samples is read at its
-            # minimum, not at the nearer sample.
-            for rid, robot in model.robots.items():
-                for hid, human in model.humans.items():
-                    r1 = tuple(map(float, robot.pos)); h1 = tuple(map(float, human.pos))
-                    r0, h0 = prev_pos[(rid, hid)]
-                    sep = float(np.hypot(r1[0] - h1[0], r1[1] - h1[1]))
-                    logging.info(f"[sep] step={step} {rid}-{hid} dist={sep:.2f} "
-                                 f"min={_min_separation_over_tick(r0, r1, h0, h1):.2f}")
-                    prev_pos[(rid, hid)] = (r1, h1)
-
-    # The run's end (T-G A3): a human whose script depends on the robot states
-    # the entries still open; an independent script writes nothing.
-    for human in model.humans.values():
-        human.end_run(int(model.schedule.steps))
-
-    logging.info("[run_mesa] Headless run complete.")
-    
-    return model
+    """One sim-run of the command line's run configuration, stepped `steps` times and
+    ended; a start that fails still writes its log pair (sim_run.start_sim_run)."""
+    sim_run = start_sim_run(load_user_config)
+    for _ in range(sim_run.config["steps"]):
+        sim_run.step()
+    sim_run.end()
+    return sim_run.model
 
 
 # =============================================================================
 # Solara visualization entry point
 # =============================================================================
 
-# NOTE: solara cannot be wrapped in a run_solara() function 
-# because it needs to be at the top level, module load time to properly register the page.
-
-import solara
-from mesa_sim.viz.space_drawer import space_drawer
-from mesa_sim.viz.portrayal import agent_portrayal
-from mesa_sim.viz.run_file_panel import RunFilePanel
-from mesa_sim.mesa_fork.visualization import SolaraViz
-
-
-@solara.component
-def Page():
-    """
-    The viewer (T-L stage 4, ruling 7): the run file it is started from, read
-    again on every reload, with its triple and overrides shown and the three
-    override kinds editable (RunFilePanel), which writes them into that run
-    file and reloads. SolaraViz keeps its parameters in its own state, so a
-    reload remounts it under a new key: a fresh model on the new run.
-    """
-    reload_count = solara.use_reactive(0)
-    user_args = parse_user_args()
-    config = solara.use_memo(load_user_config, dependencies=[reload_count.value])
-    model_params = resolve_model_params(config)
-    _, layout_id, setup_id, scenario = resolve_triple(config)
-
-    def reload():
-        reload_count.value += 1
-
-    with solara.Sidebar():
-        RunFilePanel(
-            run_path=user_args.run,
-            domain=config["domain"],
-            layout_id=layout_id,
-            setup_id=setup_id,
-            scenario=scenario,
-            model_params=model_params,
-            overrides=config["overrides"],
-            cli_overrides=user_args.override,
-            on_reload=reload,
-        )
-    SolaraViz(
-        model_class=SimModel,
-        model_params=model_params,
-        space_drawer=space_drawer,
-        agent_portrayal=agent_portrayal,
-        name="TeamRob Simulation",
-        play_interval=5,
-    ).key(f"run-{reload_count.value}")
-
+# Solara needs the page at the top level of the module it runs, at load time;
+# it is imported under solara only, so a headless start never loads Solara.
+if UNDER_SOLARA:
+    from mesa_sim.viz.solara_page import Page  # noqa: F401
 
 
 # =============================================================================
@@ -470,5 +89,5 @@ def Page():
 # =============================================================================
 
 if __name__ == "__main__":
-    if not _UNDER_SOLARA:
+    if not UNDER_SOLARA:
         run_headless()

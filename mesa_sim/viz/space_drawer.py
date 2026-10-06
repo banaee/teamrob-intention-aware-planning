@@ -23,7 +23,7 @@ GEOMETRY:
     Plotly axes are set to match the model's ContinuousSpace bounds.
 
 USED BY:
-    - mesa_sim/run_mesa.py → passed to SolaraViz as space_drawer
+    - mesa_sim/viz/solara_page.py → passed to SolaraViz as space_drawer
 """
 
 import solara

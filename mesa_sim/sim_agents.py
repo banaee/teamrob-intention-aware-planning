@@ -67,7 +67,7 @@ if TYPE_CHECKING:
 OBSERVATION_OFFSET = 1.0
 
 # The human executor's record stream (T-H2): one `[rec]` line per tick, its own
-# logger so that mesa_sim/run_mesa.py can send it to a file beside the run log.
+# logger so that mesa_sim/sim_run.py can send it to a file beside the run log.
 _REC = logging.getLogger("rec")
 
 # Mesa ticks the HUMAN's body spends completing a task: none. Its body runs
