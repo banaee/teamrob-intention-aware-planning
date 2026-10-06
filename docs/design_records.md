@@ -4857,3 +4857,41 @@ Hadi's review of the picture is open; nothing below is preferred until he says s
   - An area's `label` in the layout (kitting's "southwest_storage") is not carried; the page shows the area's id.
   - The layout's `space.name`, the env-pane's title, is stale in older layouts (env_layout_02 is titled "Kitting Domain
     Layout 1"); a layout file question, not a message one.
+
+STAGE 0 CLOSED (Hadi's answers on the trial, 6 October 2026, preferred, not ruled; recorded by ccode the same day,
+records only, no code changed). T-viz stage 0 is done: 0.1 recording, 0.2 code structure, 0.4 the messages, 0.3 the
+style trial. Next within T-viz: stage 1a, when Hadi asks for it; the place of T-viz stage 1 in the order of the tasks
+stays open (TODO-190, point 4).
+- HADI'S ANSWERS ON THE TRIAL:
+  - The trial's look is accepted "for now and for stage 0". It is the starting point of stage 1a, not a final design.
+  - The technology of the trial is the web-ui's technology: React, TypeScript, Vite, three.js through React Three Fiber
+    and drei. uPlot is planned for the plots of stage 1c. No UI kit.
+  - The 0.3 report's questions: (1) how the scene appearance reaches the page is settled in stage 1a; (2) the tilted
+    view at 35° and the view from above stay as presets, and in stage 1a the screen-user can change the camera freely
+    during a sim-run, rotating, tilting, zooming and moving it (TODO-195); (3) an object's state may change its shape (an
+    empty pallet, an open gate), with minimal effort, in stage 1a (TODO-194); (4) a figure turns at once to its last
+    direction of movement, with no rotate action in the world, and before its first move it faces a default, as a
+    display convention; (5) labels show the ids; (6) no dark mode in stage 1, recorded for stage 2 or 3 (TODO-193).
+- HADI'S OTHER PREFERENCES SINCE THE HANDOFF, checked against the records:
+  - No single "mother" start command now; the README states the command of each start. The question of one command with
+    subcommands returns in stage 1a, when the web-ui's start command is defined (TODO-196). Not recorded before; added.
+  - The web-ui is independent of the simulator and lives at the repository's root; only one piece per simulator lives
+    with that simulator. Recorded in 0.4 ("What Hadi preferred for 0.4"); Hadi's reason, added here: a later simulator or
+    ROS may replace Mesa, and the web-ui stands above any one of them.
+  - Stage 1a shows no planned path; whether and which paths the scene shows is a question for stage 1b. Recorded in 0.4;
+    TODO-197 added. The item "Preferred, replaceable: an agent's path is a straight line now" under PREFERRED BY HADI
+    above is superseded in part: the model holds no path per agent (0.1, fact 3), and stage 1a shows none.
+  - Everything of stages 2 and 3 stays [FW] until Hadi draws the V1 border for the web-ui. Recorded (HADI'S ANSWERS,
+    TODO-190); unchanged.
+- MEASURED for the state after stage 0 (ccode, 6 October 2026): the catalogue is 645 KB as JSON, 40 KB compressed
+  (`MesaSimulator().catalogue()`, the run file `configs/experiment.yaml`), mostly the descriptions of 1019 scenarios (721
+  in kitting, 298 in dock_loading). The log pair's handlers sit on the root logger at the INFO level
+  (`mesa_sim/sim_run.py`, `RunLog`), so any library logger that propagates to the root logger, a web server's for
+  example, writes into the open sim-run's log; stage 1a's server must keep such lines out (open how).
+- THE RECORDS OF THE CLOSE: `docs/handoffs/handoff_T-viz.md` gained the section "State after stage 0" at its top (what
+  exists in the code, what Hadi prefers now, what stage 1a starts from, what is still open with the stage of each); its
+  body is corrected where stage 0 showed it wrong, each passage kept and a dated line with its reason beside it
+  (among them T-E and T-V, `planned_path`, the logging at import, the places of "viewer"); its correction note is
+  shortened to a pointer. The roadmap's T-viz bullet, CLAUDE.md's status block and the README (the commands of the
+  starts and the trial page) are updated; TODO-193 to TODO-197 are added. The solara-ui is not marked archived: that
+  begins when Hadi accepts stage 1a. "Viewer" is renamed nowhere.

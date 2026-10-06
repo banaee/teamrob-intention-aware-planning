@@ -4990,3 +4990,43 @@ visualisation configuration supplies it. Either is its own change before the sce
 kitting's layouts (TODO-173, FW) is likewise in the files and unread.
 Files: mesa_sim/sim_model.py, webui/messages.py, domains/*/layouts/
 Reference: design_records.md, "T-viz, the web-ui", 0.4
+
+**TODO-193: Dark mode of the web-ui (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open [FW]; stage 2 or 3
+Hadi, 6 October 2026 (preferred): no dark mode in stage 1; it is recorded for stage 2 or 3, which are [FW] until Hadi
+draws the V1 border for the web-ui (TODO-190). The theme file holds every colour of the page and the scene in one place
+(`webui/page/src/theme.ts`), so a dark mode is a second set of its values.
+Files: webui/page/src/theme.ts
+Reference: docs/handoffs/handoff_T-viz.md, "State after stage 0" and 10.7; design_records.md, "T-viz, the web-ui",
+STAGE 0 CLOSED
+
+**TODO-194: An object's state changes its shape in the scene (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open; stage 1a
+Hadi, 6 October 2026 (preferred): an object's state may change its shape, for example an empty pallet or an open gate,
+with minimal effort, in stage 1a. The tick update carries the object states that hold (`ObjectState`); the scene
+appearance (`webui/appearance.py`) maps an object type to a form and does not yet map a state to anything. Found in
+0.3: an empty pallet is drawn as a full one, and the gate's `is_open` is not drawn. Open for stage 1a: how the
+appearance data names a state and its effect on the form, without a domain word in the page's code.
+Files: webui/appearance.py, webui/page/src/env-pane/forms.tsx, domains/*/appearance.json
+Reference: design_records.md, "T-viz, the web-ui", 0.3 and STAGE 0 CLOSED
+
+**TODO-195: The free camera of the env-pane (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open; stage 1a
+Hadi, 6 October 2026 (preferred): the tilted view at 35° and the view from above stay as presets, and in stage 1a the
+screen-user can change the camera freely during a sim-run: rotate, tilt, zoom and move. Open for stage 1a: the controls,
+and how they sit beside the two presets. The trial's camera is `webui/page/src/env-pane/camera.tsx` (an orthographic
+camera framed on the space).
+Files: webui/page/src/env-pane/camera.tsx
+Reference: docs/handoffs/handoff_T-viz.md, 10.6 item 5 and 10.8; design_records.md, "T-viz, the web-ui", STAGE 0 CLOSED
+
+**TODO-196: One start command with subcommands (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open; stage 1a
+Hadi, 6 October 2026 (preferred): no single "mother" start command now; each start (headless, the solara-ui, the trial
+page of 0.3) has its own command, which the README states. The question of one command with subcommands returns in
+stage 1a, when the web-ui's start command is defined.
+Files: mesa_sim/run_mesa.py, README.md
+Reference: docs/handoffs/handoff_T-viz.md, 7.3; design_records.md, "T-viz, the web-ui", STAGE 0 CLOSED
+
+**TODO-197: Paths in the scene (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open; stage 1b
+Hadi, 6 October 2026 (preferred; at 0.4 and at the close of stage 0): stage 1a shows no planned path; whether and which
+paths the scene shows is a question for stage 1b. Verified in 0.1: no module writes `agent.planned_path`, and the model
+holds no path per agent. The handoff's 8.4 raises whether a path is world content or mind content; it is open. The
+handoff's "a straight line now, replaced later" (6.2) is superseded in part.
+Files: webui/messages.py, mesa_sim/webui_adapter.py
+Reference: docs/handoffs/handoff_T-viz.md, 5.4, 6.2, 8.4; design_records.md, "T-viz, the web-ui", 0.1 (fact 3), 0.4

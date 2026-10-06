@@ -409,6 +409,8 @@ paragraph, not in the alphabet.
   T-viz stages 0 and 1 are in V1; stages 2 and 3 are after V1, [FW], the default until Hadi draws the V1 border inside
   the web-ui. In the present order: T-viz stage 0 runs now (asked for); "T-V" reads "T-viz stage 1", in T-V's place
   (after T-F, before track 3b), proposed by ccode, since the answers move T-V's content, not its place.
+- DONE (6 October 2026; design_records.md, "T-viz, the web-ui", STAGE 0 CLOSED): T-viz stage 0 is closed. Next within
+  T-viz: stage 1a, when Hadi asks for it. The place of T-viz stage 1 in this order stays open (TODO-190, point 4).
 
 V1 AND FW (Hadi, 1 October 2026, amended by Hadi 3 October 2026 for T-K; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
@@ -839,12 +841,22 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     0.3 the trial of the style (one real layout drawn without motion; the choice of page framework and drawing library for the needs of all stages; reviewed by Hadi); 0.4 the
     messages between server and page (open, parked; proposed contents in the handoff, section 8). Order proposed by
     cchat: 0.1, 0.2, 0.4, 0.3.
+    DONE (6 October 2026; design_records.md, "T-viz, the web-ui", 0.4, 0.3 and STAGE 0 CLOSED): 0.4 the messages
+    built (`webui/messages.py`, `webui/simulator.py`, Mesa's piece `mesa_sim/webui_adapter.py`); 0.3 the style trial
+    built (`webui/page/`, the env-pane drawn from saved messages), its look accepted by Hadi "for now and for stage 0",
+    its technology the web-ui's (React, TypeScript, Vite, three.js through React Three Fiber and drei; uPlot planned for
+    1c; no UI kit; preferred). Stage 0 is closed. Next within T-viz: stage 1a, when Hadi asks for it, from the
+    handoff's section "State after stage 0".
   - Stage 1, the first web-ui: 1a a sim-run in the browser (predefined layouts, setups and scenarios only; all run
     options as toggles and selectors; every change builds the model and the env-pane shows step 0, preferred; play,
     pause, step, reset; the env-pane's first version in the style direction, minimal 3D; panel 4a, the human and the
     actual world; on Hadi's acceptance of 1a the solara-ui becomes archived, preferred); 1b the robot's mind (panel 4b,
     its contents decided later); 1c plots over ticks, growing during the sim-run, with the timeline of context facts
     where one exists (panel 4c).
+    AMENDED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 0.4 and STAGE 0 CLOSED): 1a shows
+    no planned path (paths in the scene: 1b, TODO-197); in 1a the camera keeps two presets and moves freely
+    (TODO-195), an object's state may change its shape (TODO-194), and the web-ui's start command is defined, with the
+    question of one command with subcommands (TODO-196); no dark mode in stage 1 (TODO-193, stage 2 or 3).
   - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
     editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
     each saved as a new artefact; 2.4 sim-runs side by side.
