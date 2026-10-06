@@ -152,15 +152,20 @@ def test_a_sim_run_through_the_server_writes_the_headless_log_pair(server, new_f
     state = _choose(web, catalogue.default_choice)
     assert (state.description.run.domain, state.description.run.scenario) == (domain, scenario)
     ref = m.SimRunRef(sim_run=state.description.sim_run)
+    updates = [state.tick]
     for k in range(steps):
         status, body = web.post("step", ref)
         assert status == 200, body
         update = m.TickUpdate.model_validate_json(body)
         assert update.tick == k
         assert (update.end is None) == (k < steps - 1)
+        updates.append(update)
     assert update.end.reason == m.EndReason.STEPS_REACHED
     status, body = web.post("step", ref)
     assert status == 409 and m.StepRefusal.model_validate_json(body).reason == m.StepRefusalReason.ENDED
+    # current answers with every tick update the sim-run gave, the start's first (T-viz 1a (iii), M3)
+    history = m.Current.model_validate_json(web.get("current")[1]).state
+    assert history.description == state.description and list(history.ticks) == updates
     web.stop()
     assert _pair(sorted(set(new_files()) - known)) == headless
 
@@ -200,7 +205,7 @@ def test_the_server_answers_current_and_refuses_what_it_cannot_do(server, new_fi
     assert status == 422 and m.BuildFailure.model_validate_json(body).message
     state = _choose(web, catalogue.default_choice)
     current = m.Current.model_validate_json(web.get("current")[1]).state
-    assert current == state
+    assert current.description == state.description and current.ticks == (state.tick,)
     assert web.post("step", m.SimRunRef(sim_run="sim-run-0"))[0] == 409
     web.stop()
     assert new_files() == []      # a sim-run never stepped writes no file, at a choice or at the server's stop

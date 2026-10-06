@@ -13,6 +13,13 @@ THE SHAPE VOCABULARY:
     drawn without a change to the web-ui's code. A new form is web-ui code. No form has a front: the messages carry no
     orientation (TODO-192).
 
+LOOKS BY STATE (T-viz 1a, increment (iii); TODO-194):
+    An object type's entry may list looks by state, in order: when a listed state holds for the object at the tick (the
+    tick update's object states), its look replaces the type's; when several hold, the first in the list. A look by
+    state is a look of the same vocabulary, so the page compares two names of data and gains no domain word. Every
+    state an appearance names is checked by the simulator's piece against the domain's declared states, for the
+    entry's object type, when its catalogue is made: a misspelt state stops the start instead of never being drawn.
+
 PRESENCE:
     A property of the look, declared per object type in the appearance data: background (drawn as lines and pale
     faces) or active (an object the agents' activities use, drawn with a representative form and a tone). It is not a
@@ -46,6 +53,7 @@ class MovableShape(str, Enum):
     """The forms of a movable object."""
     CRATE = "crate"            # a box with a lid line
     SKID = "skid"              # a low slatted platform
+    LOADED_SKID = "loaded_skid"    # a skid with a closed load on it (T-viz 1a (iii))
 
 
 class Figure(str, Enum):
@@ -71,6 +79,28 @@ class MovableLook(Message):
     height: float
 
 
+class FixedStateLook(Message):
+    """The look of a fixed object while `state` holds for it."""
+    state: str
+    look: FixedLook
+
+
+class FixedTypeLook(FixedLook):
+    """A fixed object type's look, and its looks by state in order (the first whose state holds is drawn)."""
+    states: tuple[FixedStateLook, ...] = ()
+
+
+class MovableStateLook(Message):
+    """The look of a movable object while `state` holds for it."""
+    state: str
+    look: MovableLook
+
+
+class MovableTypeLook(MovableLook):
+    """A movable object type's look, and its looks by state in order (the first whose state holds is drawn)."""
+    states: tuple[MovableStateLook, ...] = ()
+
+
 class FigureLook(Message):
     figure: Figure
     height: float
@@ -82,8 +112,8 @@ DEFAULT_MOVABLE = MovableLook(shape=MovableShape.CRATE, height=20.0)
 
 class Appearance(Message):
     """A domain's scene appearance: per object type its look; the agents' figures. Every field has a default."""
-    fixed: dict[str, FixedLook] = {}
-    movable: dict[str, MovableLook] = {}
+    fixed: dict[str, FixedTypeLook] = {}
+    movable: dict[str, MovableTypeLook] = {}
     default_fixed: FixedLook = DEFAULT_FIXED
     default_movable: MovableLook = DEFAULT_MOVABLE
     human: FigureLook = FigureLook(figure=Figure.PERSON, height=150.0)

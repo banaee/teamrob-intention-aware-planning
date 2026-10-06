@@ -16,12 +16,12 @@ from pathlib import Path
 from pydantic.json_schema import models_json_schema
 
 from webui.appearance import Appearance
-from webui.messages import (BuildFailure, Catalogue, Current, LayoutView, RunDescription, SimRunChoice, SimRunRef,
-                            SimRunState, StepRefusal, TickUpdate, ViewChoice, ViewRefusal)
+from webui.messages import (BuildFailure, Catalogue, Current, LayoutView, RunDescription, SimRunChoice, SimRunHistory,
+                            SimRunRef, SimRunState, StepRefusal, TickUpdate, ViewChoice, ViewRefusal)
 
 OUT = Path(__file__).parent / "page" / "src" / "gen" / "messages.schema.json"
-PAGE_TYPES = (Catalogue, SimRunChoice, RunDescription, TickUpdate, Appearance, SimRunRef, SimRunState, Current,
-              BuildFailure, StepRefusal, ViewChoice, LayoutView, ViewRefusal)
+PAGE_TYPES = (Catalogue, SimRunChoice, RunDescription, TickUpdate, Appearance, SimRunRef, SimRunState, SimRunHistory,
+              Current, BuildFailure, StepRefusal, ViewChoice, LayoutView, ViewRefusal)
 
 
 def _for_the_page(schema: dict) -> dict:

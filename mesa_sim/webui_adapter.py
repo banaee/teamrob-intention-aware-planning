@@ -150,12 +150,29 @@ def _setup_entry(setup_id: str, path: str) -> msg.SetupEntry:
 
 def appearance(domain: str) -> Appearance:
     """The domain's scene appearance, domains/<domain>/appearance.json, validated against webui/appearance.py; the
-    defaults when the domain has no file. Not a world fact: the simulation never reads it."""
+    defaults when the domain has no file. Not a world fact: the simulation never reads it. Every state a look by state
+    names is a state the domain declares for the entry's object type (T-viz 1a (iii)); else ValueError."""
     path = ROOT / "domains" / domain / "appearance.json"
-    return Appearance.model_validate_json(path.read_text()) if path.is_file() else Appearance()
+    look = Appearance.model_validate_json(path.read_text()) if path.is_file() else Appearance()
+    check_looks_by_state(look, DOMAIN_REGISTRY[domain]["states"], f"{path.relative_to(ROOT)}")
+    return look
 
 
-def _domain_entry(name: str, domain: dict) -> msg.DomainEntry:
+def check_looks_by_state(look: Appearance, states, where: str) -> None:
+    """Every state a look by state names is one of `states` (the domain's declarations) for the entry's object type;
+    else ValueError naming `where`, the entry and the declared states."""
+    declared = {d.name: d for d in states}
+    for object_type, entry in list(look.fixed.items()) + list(look.movable.items()):
+        for by_state in entry.states:
+            declaration = declared.get(by_state.state)
+            if declaration is None or declaration.object_type != object_type:
+                raise ValueError(
+                    f"{where}: the look of '{object_type}' names the state '{by_state.state}', which is not declared "
+                    f"for type '{object_type}' (declared: "
+                    f"{sorted((d.name, d.object_type) for d in declared.values() if d.object_type is not None)})")
+
+
+def _domain_entry(name: str, domain: dict, look: Appearance) -> msg.DomainEntry:
     return msg.DomainEntry(
         name=name,
         layouts=tuple(_layout_entry(lid, path) for lid, path in domain["layouts"].items()),
@@ -163,7 +180,7 @@ def _domain_entry(name: str, domain: dict) -> msg.DomainEntry:
         scenarios=tuple(msg.ScenarioEntry(id=s.id, setup=s.setup, reference_layouts=tuple(s.reference_layouts),
                                           description=s.description)
                         for s in domain["scenarios"].values()),
-        appearance=appearance(name),
+        appearance=look,
     )
 
 
@@ -176,6 +193,8 @@ class MesaSimulator:
     def __init__(self, config: Optional[dict] = None, step_limit: Optional[int] = None):
         self._run_file_config = load_experiment(EXPERIMENT_CONFIG_PATH, {}) if config is None else config
         self._declarations = _declarations(self._run_file_config, step_limit)
+        # Each domain's scene appearance, checked once, at the start (ValueError: a state no type of it declares)
+        self._appearances = {name: appearance(name) for name in DOMAIN_REGISTRY}
 
     def catalogue(self) -> msg.Catalogue:
         config = self._run_file_config
@@ -184,7 +203,8 @@ class MesaSimulator:
             domain=config["domain"], layout=layout_id, scenario=scenario.id,
             options=tuple(_value(d, d.default) for d in self._declarations))
         return msg.Catalogue(
-            domains=tuple(_domain_entry(name, domain) for name, domain in DOMAIN_REGISTRY.items()),
+            domains=tuple(_domain_entry(name, domain, self._appearances[name])
+                          for name, domain in DOMAIN_REGISTRY.items()),
             run_options=self._declarations,
             default_choice=default_choice,
         )

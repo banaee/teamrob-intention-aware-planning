@@ -34,7 +34,7 @@ THE REQUESTS (JSON, plain request and response, on 127.0.0.1 only):
     POST /api/step        SimRunRef    -> TickUpdate, or 409 StepRefusal
     POST /api/reset       SimRunRef    -> SimRunState, or 409 StepRefusal
     POST /api/view        ViewChoice   -> LayoutView, or 422 BuildFailure, or 409 ViewRefusal
-    GET  /api/current     Current (the current sim-run with its latest tick update, or the current view, or neither)
+    GET  /api/current     Current (the current sim-run with every tick update it gave, or the current view, or neither)
     The built page is served at /, when the start names its folder.
 
 THE TERMINAL:
@@ -80,13 +80,15 @@ def _terminal() -> None:
 
 
 class _Current:
-    """The current sim-run: its side, the steps done, whether it has ended, its step limit (None: none)."""
+    """The current sim-run: its side, the steps done, whether it has ended, its step limit (None: none), and every tick
+    update it gave, the start's first (T-viz 1a (iii): `current` answers with them all)."""
 
     def __init__(self, side: SimRunSide, limit: Optional[int]):
         self.side = side
         self.steps_done = 0
         self.ended = False
         self.limit = limit
+        self.ticks: list = [side.state()]
 
 
 def _limit(description: msg.RunDescription) -> Optional[int]:
@@ -175,9 +177,10 @@ class WebUiServer:
         update = current.side.step()
         current.steps_done += 1
         if current.limit is not None and current.steps_done >= current.limit:
-            update = current.side.end(msg.EndReason.STEPS_REACHED)
+            update = current.side.end(msg.EndReason.STEPS_REACHED)     # the same tick, with its end
             current.ended = True
             log.info("%s ended at tick %s (steps_reached)", ref.sim_run, update.tick)
+        current.ticks.append(update)
         return update
 
     def _on_worker_reset(self, ref: msg.SimRunRef) -> Union[msg.SimRunState, msg.StepRefusal]:
@@ -191,8 +194,9 @@ class WebUiServer:
     def _on_worker_current(self) -> msg.Current:
         if self._current is None:
             return msg.Current(state=None, view=self._view)
-        side = self._current.side
-        return msg.Current(state=msg.SimRunState(description=side.description, tick=side.state()), view=None)
+        current = self._current
+        return msg.Current(state=msg.SimRunHistory(description=current.side.description, ticks=tuple(current.ticks)),
+                           view=None)
 
     def _on_worker_stop(self) -> None:
         self._on_worker_leave(msg.EndReason.SERVER_STOPPED)

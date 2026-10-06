@@ -628,14 +628,23 @@ class SimRunRef(Message):
 
 class SimRunState(Message):
     """A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before
-    the first step). The answer to choose, reset and current."""
+    the first step). The answer to choose and reset."""
     description: RunDescription
     tick: TickUpdate
 
 
+class SimRunHistory(Message):
+    """A sim-run with every tick update it has given, in order: the start's first, then one per step (the last
+    carrying the end when it has ended). The page derives from the sequence what a single tick does not hold (the
+    display places, T-viz 1a (iii)), so that a reload keeps the picture."""
+    description: RunDescription
+    ticks: tuple[TickUpdate, ...]
+
+
 class Current(Message):
-    """The answer to current: the current sim-run, or the current view, or neither (both None). At most one is set."""
-    state: Optional[SimRunState]
+    """The answer to current: the current sim-run with its tick updates, or the current view, or neither (both
+    None). At most one is set."""
+    state: Optional[SimRunHistory]
     view: Optional[LayoutView]
 
 

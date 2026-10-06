@@ -16,6 +16,8 @@ WHAT THE START CHECKS:
       one.
     - A run file or flags that state an override, or a layout outside the scenario's reference layouts, stop the start:
       the page's choice cannot show either (T-viz 0.4, Q8; P2). Both stay possible headless.
+    - A step limit below one, or a scene appearance naming a state its domain does not declare for the object type,
+      stops the start with a message.
     - The built page (webui/page/dist) must exist and be newer than the page's sources; else the start stops, naming
       the command that builds it.
 
@@ -63,7 +65,11 @@ def read_start(argv: list):
     if "steps" in config:
         print("[run_webui] the run file's steps (%s) is not used: the web-ui has no step limit unless --steps or the "
               "page sets one" % config["steps"], file=sys.stderr)
-    return MesaSimulator(config, step_limit=args.steps), args.port
+    try:
+        simulator = MesaSimulator(config, step_limit=args.steps)
+    except ValueError as e:      # a step limit below its minimum; a look by a state the domain does not declare
+        raise SystemExit("[run_webui] %s" % e)
+    return simulator, args.port
 
 
 def page_ready() -> None:

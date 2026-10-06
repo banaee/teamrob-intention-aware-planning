@@ -10,6 +10,8 @@ the catalogue's offer. docs/handoffs/plan_T-viz_1a.md, section 2 (ii) and M2.
   contents and the object states. The view of the layout alone equals its layout part.
 - A view writes no file; a layout or a setup that is not registered is refused with BuildFailed.
 - The catalogue carries the notes of the layout and setup files.
+- Increment (iii): every state a domain's appearance names is a state the domain declares for the entry's type; a look
+  that names another stops the start.
 """
 
 import json
@@ -20,8 +22,9 @@ import pytest
 
 from mesa_sim.run_config import DOMAIN_REGISTRY
 from mesa_sim.sim_run import LOG_DIR
-from mesa_sim.webui_adapter import MesaSimulator
+from mesa_sim.webui_adapter import MesaSimulator, appearance, check_looks_by_state
 from webui import messages as m
+from webui.appearance import Appearance
 from webui.simulator import BuildFailed
 
 ROOT = Path(__file__).parent.parent
@@ -86,3 +89,19 @@ def test_the_catalogue_carries_the_notes_of_layouts_and_setups(simulator):
             assert layout.notes == space.get("notes")
         for setup in entry.setups:
             assert setup.notes == json.loads((ROOT / domain["setups"][setup.id]).read_text()).get("notes")
+
+
+def test_a_look_by_state_names_a_state_its_domain_declares_for_the_type():
+    for domain in DOMAIN_REGISTRY:
+        appearance(domain)      # the domains' own files pass
+    states = DOMAIN_REGISTRY["dock_loading"]["states"]
+    named = next(d for d in states if d.object_type is not None)
+    good = {"movable": {named.object_type: {"shape": "skid", "height": 14,
+                                            "states": [{"state": named.name, "look": {"shape": "crate", "height": 9}}]}}}
+    check_looks_by_state(Appearance.model_validate_json(json.dumps(good)), states, "made up")
+    for kind, entry in (("movable", {named.object_type: {"shape": "skid", "height": 14, "states": [
+                            {"state": named.name + "_misspelt", "look": {"shape": "crate", "height": 9}}]}}),
+                        ("movable", {"other_type": {"shape": "skid", "height": 14, "states": [
+                            {"state": named.name, "look": {"shape": "crate", "height": 9}}]}})):
+        with pytest.raises(ValueError):
+            check_looks_by_state(Appearance.model_validate_json(json.dumps({kind: entry})), states, "made up")
