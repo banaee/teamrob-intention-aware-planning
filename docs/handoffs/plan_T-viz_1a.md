@@ -10,6 +10,10 @@ after stage 0".
 Every build session of 1a reads this file first, then the handoff's "State after stage 0". One increment per session;
 ccode pauses after each increment for Hadi's review in the browser.
 
+Progress: increment (i) BUILT (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, INCREMENT (i),
+BUILT, with its checks and its deviations from this plan); Hadi's review of it open. Increments (ii) to (iv) not
+started.
+
 ---
 
 ## 0. Hadi's preferences this plan follows (6 October 2026)

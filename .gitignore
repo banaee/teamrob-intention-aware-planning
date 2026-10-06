@@ -72,3 +72,5 @@ docs/handoffs/tviz_refs/
 
 # T-viz 0.3: the style trial's screenshots (webui/page: npm run shots), kept on disk, untracked (Hadi, 6 October 2026, Q3)
 docs/handoffs/tviz_trial/
+# T-viz 1a: the screenshots of each increment (webui/page: npm run shots), kept on disk, untracked as 0.3's
+docs/handoffs/tviz_1a/

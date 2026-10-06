@@ -125,19 +125,24 @@ solara run mesa_sim/run_mesa.py
 solara run mesa_sim/run_mesa.py -- --domain kitting --scenario scenario_s01_01   # the start's own flags after --
 ```
 
-### The web-ui's page (T-viz): the trial of stage 0.3
+### The web-ui (T-viz)
 
-The env-pane of the coming web-ui, drawing the start of a sim-run from saved messages, tilted or from above. No server
-yet. It needs Node.js 22.12 or later; every dependency is pinned (`webui/page/package.json` and its lock file).
+The framework's own page in the browser and a small Python server (stage 1a, increment (i)): choose a sim-run, then
+play, pause, step and reset it, and watch the env-pane. The page is built once with Node.js 22.12 or later (every
+dependency pinned in `webui/page/package.json` and its lock file), and again after a change of the page's sources; the
+start stops and says so when the built page is missing or older than its sources.
 
 ```bash
-cd webui/page && npm ci && cd ../..                                     # once, and after a change of package.json
-PYTHONHASHSEED=0 python -m mesa_sim.webui_export                       # the samples (the trial's two sim-runs)
-PYTHONHASHSEED=0 python -m mesa_sim.webui_export --domain kitting --scenario scenario_s01_01   # another sim-run
-cd webui/page && npm run dev                                            # the page, http://localhost:5173
+cd webui/page && npm ci && npm run build && cd ../..                    # once, and after a change of the page
+PYTHONHASHSEED=0 python mesa_sim/run_webui.py                           # then open http://127.0.0.1:8000/
+PYTHONHASHSEED=0 python mesa_sim/run_webui.py --domain dock_loading --scenario scenario_s08_01 --steps 300 --port 8001
 ```
 
-More in `webui/page/README.md`; the state of the web-ui's work in `docs/handoffs/handoff_T-viz.md`, "State after stage 0".
+The start takes the headless start's run file and flags, and `--port`. It opens on the run file's sim-run at its start.
+The web-ui has no step limit unless `--steps` (or, from increment (ii), the page) sets one; the run file's `steps` is
+not used. A sim-run's log pair is the one the same sim-run writes headless; Ctrl+C stops the server and ends a stepped
+sim-run. More in `webui/page/README.md`; the state of the web-ui's work in `docs/handoffs/handoff_T-viz.md`, "State after
+stage 0", and the plan of stage 1a in `docs/handoffs/plan_T-viz_1a.md`.
 
 ### Layout drawings
 
@@ -189,11 +194,12 @@ teamrob-intention-aware-planning/
 │   ├── run_config.py               # The run configuration (run file, flags) and the model built from it
 │   ├── sim_run.py                  # One sim-run: the model stepped, its log pair and run-level lines
 │   ├── run_mesa.py                 # Entry point: the headless start and the solara-ui's start
+│   ├── run_webui.py                # Entry point: the web-ui's start
 │   ├── webui_adapter.py            # Mesa's piece for the web-ui: the messages from a sim-run
-│   ├── webui_export.py             # A sim-run's messages written as files for the web-ui's page (stage 0.3)
+│   ├── webui_export.py             # A sim-run's messages written as files (stage 0.3; the page no longer reads them)
 │   └── mesa_configs.yaml           # Mesa-specific settings
 │
-├── webui/                       # The web-ui (T-viz): messages, the simulator interface, the scene appearance, the page
+├── webui/                       # The web-ui (T-viz): messages, the simulator interface, the scene appearance, the server, the page
 │   └── page/                       # The page: React, TypeScript, Vite, three.js through React Three Fiber
 │
 ├── ros_sim/                     # ROS embodiment (planned)

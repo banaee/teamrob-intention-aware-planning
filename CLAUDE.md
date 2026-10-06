@@ -57,10 +57,13 @@ Relevant (read as needed):
 - `mesa_sim/webui_adapter.py`: Mesa's piece for the web-ui: the catalogue, the run description and the tick updates of
   a sim-run, read from the model only (T-viz 0.4)
 - `mesa_sim/webui_export.py`: a sim-run's run description, start tick update and scene appearance written as files for
-  the web-ui's page, until stage 1a's server (T-viz 0.3)
+  the web-ui's page (T-viz 0.3); since 1a's increment (i) the page no longer reads them
+- `mesa_sim/run_webui.py`: the web-ui's start: the headless start's run file and flags, and `--port`; Mesa's piece
+  handed to the web-ui's server (T-viz 1a)
 - `webui/`: the web-ui, independent of every simulator and domain: the messages (`messages.py`), the interface a
   simulator's piece implements (`simulator.py`), the scene appearance (`appearance.py`), the page's schema
-  (`schema.py`), and the page (`page/`: React, TypeScript, Vite, three.js; `node_modules/` is not read)
+  (`schema.py`), the server (`server.py`, T-viz 1a), and the page (`page/`: React, TypeScript, Vite, three.js;
+  `node_modules/` and `dist/` are not read)
 - `domains/kitting/`: the active domain (`domains/kitting/script.py`: the call forms a scenario is written in, T-H3).
   T-L stage 2: `layouts/` and `setups/` hold the layout and setup files (setups under their final ids
   `env_setup_NN`; env_setup3 and env_setup5 merged into env_setup_01 and env_setup_03; layouts under `env_layout_KK`
@@ -611,7 +614,9 @@ Decisions
   `webui/appearance.py` with `domains/<domain>/appearance.json`, the theme `webui/page/src/theme.ts`; its look accepted by
   Hadi "for now and for stage 0", its technology the web-ui's: React, TypeScript, Vite, three.js through React Three
   Fiber and drei, uPlot planned for 1c, no UI kit). A new T-viz session reads the handoff's section "State after stage
-  0" first. Next within T-viz: stage 1a; a later T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
+  0" first. Stage 1a is under way (6 October 2026): its plan `docs/handoffs/plan_T-viz_1a.md`, increment (i) built
+  (the server `webui/server.py`, the start `mesa_sim/run_webui.py`, the page's frame), Hadi's review of it open; a later
+  T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
@@ -747,6 +752,8 @@ PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --domain kitting --layout env_layou
 PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run my_run.yaml --override layout.shelf_2.position=-300,-300
 # visualization
 solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout_03 --scenario scenario_s03_01
+# the web-ui (T-viz 1a): the page built once (cd webui/page && npm ci && npm run build), then http://127.0.0.1:8000/
+PYTHONHASHSEED=0 python mesa_sim/run_webui.py --domain kitting --scenario scenario_s01_01
 ```
 
 Logs go to `logs/run_<timestamp>.log`, with the `.rec` stream beside it: one pair per sim-run, not per process (T-viz

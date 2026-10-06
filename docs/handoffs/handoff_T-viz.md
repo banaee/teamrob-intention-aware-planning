@@ -62,6 +62,19 @@ cd webui/page && npm run dev
 
 There is no single start command with subcommands. Each start has its own command, and the README states them.
 
+Stage 1a, increment (i), built (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, INCREMENT (i),
+BUILT): the web-ui's server `webui/server.py` (Starlette and uvicorn) and its start `mesa_sim/run_webui.py` (the
+headless start's run file and flags, and `--port`); the page served built, its frame for the whole of stage 1, a
+minimal choice, the control bar, the env-pane moving tick by tick, play pausing by itself where all agents have
+finished; a web-ui sim-run's log pair equals the headless one. The trial page's samples are no longer read. The start:
+
+```bash
+cd webui/page && npm ci && npm run build && cd ../..         # once, and after a change of the page
+PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python mesa_sim/run_webui.py    # http://127.0.0.1:8000/
+```
+
+Next: Hadi's review of increment (i), then increment (ii).
+
 ### What Hadi prefers now
 
 In the status words of section 1.1. None of these is ruled; each can change in a later stage.
@@ -205,7 +218,7 @@ until Hadi says "I prefer".
 4. One start command with subcommands, or a command per start (TODO-196). ANSWERED FOR NOW (Hadi, 6 October 2026,
    preferred): one command per start; the web-ui's is a file in `mesa_sim/`. It returns when a second simulator exists.
 5. The server's library and its transport details. Stage 1a. Proposed in the plan: Starlette with uvicorn, plain
-   request and response.
+   request and response. BUILT in increment (i) as proposed; Hadi's review open.
 6. The selection's search or filtering over 1019 scenarios, and whether the catalogue is sent whole or in parts.
    PREFERRED (Hadi, 6 October 2026): the order domain, layout, setup, scenario, and a plain text filter over the
    scenarios' ids and descriptions. Proposed in the plan: the catalogue sent whole, compressed.
@@ -213,7 +226,8 @@ until Hadi says "I prefer".
 8. What panel 4a shows of the human's activity. PREFERRED (Hadi, 6 October 2026): the action in hand with its progress
    and its task, the stack, the last few switches and resumptions with their ticks; Hadi adjusts it after he sees it.
 9. How the server keeps third-party log lines out of a sim-run's log. Stage 1a. Proposed in the plan: a web-ui
-   sim-run's log pair takes only the lines of the thread that steps it.
+   sim-run's log pair takes only the lines of the thread that steps it. BUILT in increment (i) as proposed; Hadi's
+   review open.
 10. The geometry of display places when an object leaves (a freed place) and when more objects arrive than fit
     (section 9). Stage 1a. Proposed in the plan.
 11. Whether agents get a size, and areas their label, in the messages. Stage 1a, in its message round. Proposed in the

@@ -5022,3 +5022,84 @@ WHAT THE ANSWERS MEET IN THE CODE AND IN 0.4 (ccode, 6 October 2026; worked out 
 - Item 4: no conflict with the code or with 0.4. The page tells a stepped sim-run from the tick updates `current`
   returns (the plan's M3). Two tabs on one server share the current sim-run (TODO-187): a second tab opened while one
   is stepped shows it, whatever its address says.
+
+1a, INCREMENT (i), BUILT (ccode, 6 October 2026; `docs/handoffs/plan_T-viz_1a.md`, section 2 (i), as amended at
+a7ffcb0; every item proposed by ccode unless marked preferred; Hadi's review at the pause after it is open). The server,
+the start, the page's frame, a minimal choice, the moving env-pane; nothing of increments (ii) to (iv).
+- `webui/server.py` (new): the web-ui's server on Starlette and uvicorn (both already installed; uvicorn pinned in
+  `requirements.txt`, starlette moved to the web-ui's block). Its rules: one current sim-run; a choice ends a stepped
+  one (`choice_changed`) or discards an unstepped one; the step limit, when set, ends the sim-run in the answer of the
+  step that reaches it (`steps_reached`), and a later step is refused (`ended`); a reset ends or discards the current
+  one and builds the same choice again; a second step while one runs is refused (`busy`); at its stop (Ctrl+C) a stepped
+  sim-run is ended (`server_stopped`). Every call into the simulator's side runs on one worker thread. The requests:
+  GET catalogue, POST choose, POST step, POST reset, GET current (the current sim-run with its latest tick update, as in
+  0.4; every tick update is (iii)'s M3); answers over 1000 bytes compressed; 127.0.0.1 only; the built page served at /.
+  It imports no simulator and names no domain word.
+- `mesa_sim/run_webui.py` (new): the web-ui's start (P6): the headless start's parser, as strict, plus `--port`;
+  `--steps` the default step limit, the run file's steps not used and said so on the terminal (P11); a run with an
+  override, or a layout outside the scenario's reference layouts, stops the start; the built page (`webui/page/dist`)
+  missing or older than its sources stops the start, naming the build command.
+- `mesa_sim/sim_run.py`: `RunLog(echo, own_thread_only)`, both as before by default (headless and the solara-ui
+  unchanged); a web-ui sim-run's pair takes only the lines logged on the thread that created it and does not echo
+  (section 4, item 9); `SimRun` writes `steps=none` on the start line for a sim-run without a step limit (item 11).
+- `mesa_sim/webui_adapter.py`: `MesaSimulator(config, step_limit)` (the start's run configuration and default limit;
+  by default the run file configs/experiment.yaml and no limit); the catalogue's per-domain `appearance` (item 1;
+  `appearance()` moved here from `mesa_sim/webui_export.py`); the step limit as `LimitOption` and `LimitValue`, value
+  None for no limit (M8); `finished_at` (M7) from `HumanStackMachine.all_closed()` with an empty stack for every human
+  and `RobotAgent.finished` for every robot.
+- `webui/messages.py`: `CountOption` and `CountValue` became `LimitOption` and `LimitValue`; `DomainEntry.appearance`;
+  `RunTick` (`finished_at`) as the tick update's section `run`; the server's bodies and answers `SimRunRef`,
+  `SimRunState`, `Current`; the base class `Message` moved to `webui/message_base.py` (item 1's change of form).
+  `webui/simulator.py`: the one-thread contract. `webui/schema.py`: the new answers among the page's types.
+- The page: `src/App.tsx` (the frame of section 5 and the play loop), `src/api.ts` (the requests; `src/data.ts`, the
+  samples' reader, removed), `src/frame/SelectionPanel.tsx` (five columns; in (i) the domain and a scenario from the
+  domain's whole list, the layout and the setup the scenario binds, the run options as stated and in effect, read
+  only), `src/frame/ControlBar.tsx` (reset, step, play and pause, the speed 1 to 20 ticks per second or as fast as the
+  server answers, default 5; the tick and the steps done, of the limit with a bar when one is set; "All agents have
+  finished at tick N"; the end and its reason), `src/env-pane/Scene.tsx` (what is constant drawn once per sim-run; each
+  agent drawn in a group that glides to the tick's position over the tick's display time during play, at once when
+  paused or stepped), `src/env-pane/EnvPane.tsx` (the control bar at its foot), `src/styles.css`, `vite.config.ts` (the
+  dev server passes /api/ to port 8000), `scripts/shots.mjs` (rewritten to drive a running web-ui). Panel 4a is its
+  titled place, filled in (iv); 4b a rail, 4c a strip, each with its title.
+- README: the web-ui's start replaces the trial page's commands; `webui/page/README.md` rewritten. `.gitignore`:
+  `docs/handoffs/tviz_1a/`.
+THE CHECKS (each run on the change; B0 the baselines on disk and dock_loading's three runs taken before the change):
+1. Test 1, in both domains (`tests/test_tviz_server.py`): the server as its own process, driven over HTTP to its step
+   limit (scenario_s01_01, 300 steps; scenario_s03_02, 800), writes a log pair byte-identical to the headless start's
+   with the same flags; a step after the limit is refused. A sim-run without a limit reset at tick 37 equals the
+   headless run of 37 steps but for `steps=none` on the start line. Passed.
+2. The thread filter's test: a line logged on another thread stays out of a web-ui pair, the pair's own thread's lines
+   go in. Passed. Also read: the 20 log pairs the web-ui wrote during this session's browser checks hold no line of the
+   server or a library.
+3. The point where all agents have finished: a test on tb1a's eight sim-runs (assignment knowledge on) and a one-off
+   check on all 48 of the four maintained sets, each built and stepped through the piece: `finished_at` equals the
+   point read from the log pair (the robot's empty-pool tick, or the human's first tick with the stack empty for good,
+   whichever is later), None before it; 46 of 48 reach it (scenario_s02_01 reaches it at 455, after its 450 steps); and
+   the piece's own log pair of each of the 48 is byte-identical to its baseline.
+4. Headless byte-identical: the four maintained sets (48 logs and their `.rec`) and dock_loading's scenario_s03_02,
+   s05_02, s07_02 (800 steps), rerun into a scratch folder: 102 files, 0 differ.
+5. The test suite: 418 passed before, 432 after (14 new).
+6. The solara-ui: `solara run` serves per domain (HTTP 200); its sim-run, built from the command line's configuration
+   as under solara, steps three times in each domain, each into its own log pair.
+7. The page: `npm run build` (the type check and the bundle) passes; the bundle is 1.30 MB, 370 kB compressed, the same
+   warning on its size as in 0.3.
+8. Screenshots in Google Chrome (`npm run shots`, `docs/handoffs/tviz_1a/`, untracked): kitting scenario_s02_01 and
+   dock_loading scenario_s08_01, each chosen in the page; a moment after 60 steps, tilted and from above, at 1440 and
+   1920 wide; play as fast as possible from the start, pausing by itself where all agents have finished (kitting at
+   455, dock_loading at 127); an end at a step limit of 40; and the run options with `--human_aware false`, the three
+   options it sets off marked "off in effect". The server's stop by Ctrl+C ended a stepped sim-run (`server_stopped`).
+DEVIATIONS FROM THE PLAN, each with its reason:
+- Test 1 starts the server with the start's own reading of the command line (`run_webui.read_start`) and `serve` without
+  the page, in its own process, not `mesa_sim/run_webui.py` itself: the start's page check would make the test depend on
+  a build of the page with Node.js. The start's checks are tested in process.
+- The point of P12 is tested on tb1a's eight sim-runs in the test suite and on all 48 in a one-off check whose result
+  is above: the 48 take minutes and are a check of the build, not of every later change.
+- A reset of a sim-run that is not the current one is refused with `StepRefusal` (`not_current`), the refusal 0.4
+  defined for steps; no reset refusal of its own.
+- Item 1's check that every state an appearance names is a state the domain declares is not built: the appearance
+  names no state before item 2 (iii).
+- The `--steps` flag's help text, which is also the step limit's description in the catalogue, now names both uses
+  (the headless start's `--help` changes, no log).
+FLAGS (outside (i), not done): `mesa_sim/webui_export.py` and the samples under `webui/page/public/samples/` are no
+longer read by the page; whether they are removed is Hadi's. In the tilted view an agent at a kitting table is partly
+hidden under the table's top (the handoff's 10.6, item 5), seen in the screenshots; a question for the review.
