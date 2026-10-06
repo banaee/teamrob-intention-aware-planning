@@ -16,6 +16,11 @@ export function actionText(action: ActionRef): string {
   return `${action.action}(${action.bindings.map((b) => b.value).join(", ")})`;
 }
 
+/** A task as panel 4a writes it: its schema's name and its bindings' values, as an action is written (P31). */
+export function taskText(task: TaskRef): string {
+  return `${task.task}(${task.bindings.map((b) => b.value).join(", ")})`;
+}
+
 /** One task of the stack, top first: the top is in progress, a task below it is suspended. */
 export interface StackLine {
   task: TaskRef;

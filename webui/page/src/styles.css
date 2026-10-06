@@ -194,7 +194,7 @@ button:disabled { cursor: default; opacity: 0.45; }
 .main-row {
   flex: 1 1 0;
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr) 36px;     /* panel 4a: 300 to 400 px (P18) */
+  grid-template-columns: 360px minmax(0, 1fr) 36px;     /* panel 4a: 300 to 400 px (P18) */
   gap: var(--space-md);
   min-height: 0;
 }
@@ -256,6 +256,41 @@ button:disabled { cursor: default; opacity: 0.45; }
 .human-changes li { display: flex; gap: var(--space-sm); padding: 3px 0; color: var(--color-inkSoft); }
 .human-changes li + li { border-top: var(--line-frame) dotted var(--color-lineFaint); }
 .human-tick { flex: none; color: var(--color-inkFaint); }
+.human-heading small { margin-left: var(--space-xs); font-weight: var(--weight-regular); text-transform: none; letter-spacing: 0; color: var(--color-inkFaint); }
+.human-note { margin: 0 0 var(--space-xs); font-size: var(--type-xs); color: var(--color-inkFaint); line-height: 1.4; }
+
+/* Panel 4a's script: one line per entry, an event indented under its entry; the state by colour. */
+.script { max-height: 220px; overflow-y: auto; margin: 0; padding: 0; list-style: none; font-size: var(--type-xs); line-height: 1.4; }
+.script-line { display: flex; gap: var(--space-sm); padding: 2px 0; }
+.script-line.is-event { padding-left: var(--space-lg); }
+.script-dot { flex: none; width: 7px; height: 7px; margin-top: 4px; border-radius: 50%; background: var(--line-color, var(--color-stateOpen)); }
+.script-line.is-event .script-dot { border-radius: 1px; }
+.script-text { min-width: 0; }
+.script-part { color: var(--color-inkFaint); }
+.script-state { color: var(--line-color, var(--color-stateOpen)); }
+.script-mark { color: var(--color-stateProgress); }
+.script-line.is-current { background: var(--color-page); border-radius: 4px; }
+.state-open, .state-pending { --line-color: var(--color-stateOpen); }
+.state-in-progress { --line-color: var(--color-stateProgress); }
+.state-suspended { --line-color: var(--color-stateSuspended); }
+.state-completed, .state-fired { --line-color: var(--color-stateCompleted); }
+.state-abandoned { --line-color: var(--color-stateAbandoned); }
+.state-infeasible, .state-unfired { --line-color: var(--color-stateInfeasible); }
+.state-infeasible .human-task, .state-unfired .human-task { text-decoration: line-through; }
+
+/* The tag per task, in plain words, one colour per value. */
+.tag { display: inline-block; padding: 0 5px; border-radius: var(--radius-pill); font-size: var(--type-xs); white-space: nowrap; border: var(--line-frame) solid currentColor; }
+.tag-in-accord { color: var(--color-tagAccord); }
+.tag-not-in-accord { color: var(--color-tagNotAccord); }
+.tag-no-fact { color: var(--color-tagNoFact); }
+
+/* (D) The world's context. */
+.context-facts { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin: 0; }
+.context-fact { padding: 0 6px; border-radius: var(--radius-pill); background: var(--color-page); font-family: var(--font-mono); font-size: var(--type-xs); }
+.context-states { margin: 0; font-size: var(--type-xs); }
+.context-states div { display: flex; gap: var(--space-sm); padding: 1px 0; }
+.context-states dt { flex: none; font-family: var(--font-mono); color: var(--color-inkSoft); }
+.context-states dd { margin: 0; font-family: var(--font-mono); color: var(--color-ink); overflow-wrap: anywhere; }
 
 .rail, .strip {
   display: flex;

@@ -329,7 +329,7 @@ export function App() {
 
       <div className="main-row">
         <HumanPanel humans={run?.description.world.humans.map((h) => h.id) ?? []}
-                    ticks={run?.built ? run.ticks : null} />
+                    scripts={run?.description.world.scripts ?? []} ticks={run?.built ? run.ticks : null} />
         {shown && room && moment && appearance ? (
           <EnvPane layout={shownLayout!} room={room} moment={moment} book={book} appearance={appearance} view={view}
                    free={free} onView={(v) => { setView(v); setFree(false); }} onFree={() => setFree(true)}

@@ -41,6 +41,16 @@ export const theme = {
     vest: "#F2D024",          // the person's work safety vest: safety yellow (a trial, T-viz 1a)
     vestLight: "#F8E57A",
     vestDark: "#C9A90F",
+    // Panel 4a (T-viz 1a (iv)): a script line's state, and the tag per task. One colour per value.
+    stateOpen: "#9097AB",
+    stateProgress: "#D9653B",   // the human's colour: what the human is doing
+    stateSuspended: "#B7862A",
+    stateCompleted: "#3E8C63",
+    stateAbandoned: "#9A4A6E",
+    stateInfeasible: "#7A8094",
+    tagAccord: "#2F7F86",
+    tagNotAccord: "#B5652A",
+    tagNoFact: "#9097AB",
   },
   opacity: {
     shadow: 0.10,
