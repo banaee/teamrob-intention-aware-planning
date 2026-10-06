@@ -46,6 +46,7 @@ export const theme = {
     shadow: 0.10,
     agentRing: 0.12,
     barrierFace: 0.35,
+    counterTop: 0.4,          // a counter's top, see-through so that an agent at it is not hidden (T-viz 1a (iii))
   },
   line: {                     // px
     object: 1.3,

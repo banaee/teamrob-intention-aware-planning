@@ -5,7 +5,9 @@
 //
 // Per sim-run (domain, scenario): the view of its layout and of its layout with its setup, opened from the address and
 // chosen in the page (increment (ii)); its start chosen in the page; a run option switched off and on again, the
-// options it sets off marked; a moment after some steps (tilted and from above); play at full speed until it pauses
+// options it sets off marked; a moment after some steps made in the page, and the same moment after a reload, the two
+// screenshots compared pixel for pixel (increment (iii): the display places folded over every tick update); the
+// camera moved freely, neither preset pressed; the moment from above; play at full speed until it pauses
 // where all agents have finished; and an end at a step limit; at 1440 x 900, and the moment after some steps also at
 // 1920 x 1080. Each file is named <domain>_<n>_<state>_<width>.png.
 //
@@ -13,7 +15,7 @@
 // a bookmark reopens its choice at its start; an address that cannot be opened says why and opens the default choice;
 // with a stepped current sim-run the page shows it whatever the address says, and rewrites the address to it.
 
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
@@ -63,6 +65,7 @@ async function shot(page, name) {
   const file = resolve(values.out, `${name}_${page.viewportSize().width}.png`);
   await page.screenshot({ path: file });
   console.log(`[shots] ${file}`);
+  return file;
 }
 
 const catalogue = await api("catalogue");
@@ -100,12 +103,38 @@ for (const [domain, scenario] of runs) {
   await row.getByRole("button").click();
   await page.locator(".option-effect").first().waitFor({ state: "detached" });
 
-  // 2. A moment after some steps, read again from the server (a reload shows the current sim-run).
+  // 2. A moment after some steps made in the page; then the page reloaded, which receives every tick update from the
+  // server: the two pictures must be equal.
   const { state } = await api("current");
-  for (let k = 0; k < STEPS; k++) await api("step", { sim_run: state.description.sim_run });
+  for (let k = 0; k < STEPS; k++) {
+    await page.getByRole("button", { name: "Step", exact: true }).click();
+    await page.waitForFunction((n) => document.querySelector(".control-tick")?.textContent?.startsWith(`tick ${n}`), k);
+  }
+  await page.mouse.move(0, 0);                                         // no hover or focus on the Step button
+  await page.evaluate(() => document.activeElement?.blur());
+  await settle(page);
+  const stepped = await shot(page, `${domain}_2_tick${STEPS - 1}_stepped`);
   await page.reload({ waitUntil: "load" });
   await settle(page);
-  await shot(page, `${domain}_2_tick${STEPS - 1}`);
+  const reloaded = await shot(page, `${domain}_2_tick${STEPS - 1}`);
+  if (!readFileSync(stepped).equals(readFileSync(reloaded))) throw new Error(`${domain}: the reload changed the picture`);
+  console.log(`[shots] ${domain}: the picture after a reload equals the picture before it`);
+  // The camera moved freely: turned, tilted, zoomed and moved; neither preset pressed.
+  const canvas = await page.locator(".env-pane canvas").boundingBox();
+  const cx = canvas.x + canvas.width / 2;
+  const cy = canvas.y + canvas.height / 2;
+  await page.mouse.move(cx, cy);
+  await page.mouse.down();
+  await page.mouse.move(cx - 220, cy - 60, { steps: 12 });
+  await page.mouse.up();
+  await page.mouse.wheel(0, -300);
+  await page.mouse.move(cx, cy);
+  await page.mouse.down({ button: "right" });
+  await page.mouse.move(cx + 80, cy + 40, { steps: 6 });
+  await page.mouse.up({ button: "right" });
+  await page.waitForTimeout(400);
+  if (await page.locator(".segmented button[aria-pressed='true']").count() !== 0) throw new Error("a preset still pressed");
+  await shot(page, `${domain}_3_tick${STEPS - 1}_free`);
   await page.getByRole("button", { name: "From above" }).click();
   await page.waitForTimeout(600);
   await shot(page, `${domain}_3_tick${STEPS - 1}_above`);
@@ -117,12 +146,12 @@ for (const [domain, scenario] of runs) {
 
   // 4. Play at full speed from the start until it pauses where all agents have finished.
   await page.getByRole("button", { name: "Tilted" }).click();
-  await page.getByRole("button", { name: /Reset/ }).click();
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
   await page.waitForFunction(() => document.querySelector(".control-tick")?.textContent?.startsWith("start"));
   await page.getByLabel("Speed").selectOption("0");
-  await page.getByRole("button", { name: /Play/ }).click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await page.getByText("All agents have finished", { exact: false }).waitFor({ timeout: 180000 });
-  await page.getByRole("button", { name: /Play/ }).waitFor();
+  await page.getByRole("button", { name: "Play", exact: true }).waitFor();
   await page.waitForTimeout(600);
   await shot(page, `${domain}_4_finished`);
 

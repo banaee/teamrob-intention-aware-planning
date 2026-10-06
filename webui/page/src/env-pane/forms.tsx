@@ -70,7 +70,8 @@ function Rack({ f, paint }: { f: Footing; paint: Paint }) {
   );
 }
 
-/** A top on four legs. */
+/** A top on four legs. The top is see-through, its outline kept, so that an agent at it is not hidden (Hadi, 6
+ * October 2026, P21). */
 function Counter({ f, paint }: { f: Footing; paint: Paint }) {
   const top = 5;
   return (
@@ -78,7 +79,8 @@ function Counter({ f, paint }: { f: Footing; paint: Paint }) {
       {corners(f, 6).map(([x, y], i) => (
         <Block key={i} x={x} y={y} sx={POST} sy={POST} h={f.h - top} paint={stroke(paint)} />
       ))}
-      <Block x={f.x} y={f.y} sx={f.sx} sy={f.sy} h={top} base={f.h - top} paint={paint} />
+      <Block x={f.x} y={f.y} sx={f.sx} sy={f.sy} h={top} base={f.h - top}
+             paint={{ ...paint, opacity: theme.opacity.counterTop }} />
     </group>
   );
 }
@@ -211,20 +213,41 @@ export function MovableForm({ shape, x, y, sx, sy, h, base, paint }: {
           <Block x={x} y={y} sx={sx * 1.04} sy={sy * 1.04} h={h * 0.18} base={base + h * 0.82} paint={paint} />
         </group>
       );
-    case "skid": {
-      const deck = Math.max(h * 0.3, 2.5);
-      const runner = Math.min(sx, sy) * 0.14;
-      const across = sx <= sy;   // runners along the longer side
+    case "skid":
+      return <Skid x={x} y={y} sx={sx} sy={sy} h={h} base={base} paint={paint} />;
+    case "loaded_skid": {
+      // A skid of the low skid's height, and a closed load on it with a lid line, a little inside the skid's edges.
+      const skid = Math.min(LOW_SKID, h * 0.5);
+      const load = h - skid;
       return (
         <group>
-          {[-1, 0, 1].map((s) => (
-            <Block key={s} x={across ? x + s * (sx / 2 - runner / 2) : x} y={across ? y : y + s * (sy / 2 - runner / 2)}
-                   sx={across ? runner : sx} sy={across ? sy : runner} h={h - deck} base={base} paint={paint} />
-          ))}
-          <Block x={x} y={y} sx={sx} sy={sy} h={deck} base={base + h - deck} paint={paint} />
+          <Skid x={x} y={y} sx={sx} sy={sy} h={skid} base={base} paint={paint} />
+          <Block x={x} y={y} sx={sx * 0.9} sy={sy * 0.9} h={load * 0.88} base={base + skid} paint={paint} />
+          <Block x={x} y={y} sx={sx * 0.92} sy={sy * 0.92} h={load * 0.12} base={base + skid + load * 0.88}
+                 paint={paint} />
         </group>
       );
     }
   }
+}
+
+const LOW_SKID = 14;      // the height of a loaded skid's skid, in the layout's unit
+
+/** A low slatted platform: three runners and a deck. */
+function Skid({ x, y, sx, sy, h, base, paint }: {
+  x: number; y: number; sx: number; sy: number; h: number; base: number; paint: Paint;
+}) {
+  const deck = Math.max(h * 0.3, 2.5);
+  const runner = Math.min(sx, sy) * 0.14;
+  const across = sx <= sy;   // runners along the longer side
+  return (
+    <group>
+      {[-1, 0, 1].map((s) => (
+        <Block key={s} x={across ? x + s * (sx / 2 - runner / 2) : x} y={across ? y : y + s * (sy / 2 - runner / 2)}
+               sx={across ? runner : sx} sy={across ? sy : runner} h={h - deck} base={base} paint={paint} />
+      ))}
+      <Block x={x} y={y} sx={sx} sy={sy} h={deck} base={base + h - deck} paint={paint} />
+    </group>
+  );
 }
 

@@ -18,6 +18,11 @@
  * sim-run is shown whatever the address says; otherwise the address's choice is opened, or with none the catalogue's
  * default choice (P9); an address that cannot be opened says why and opens the default choice.
  *
+ * The page holds a sim-run as the sequence of its tick updates (T-viz 1a (iii)): the display places are folded over it
+ * (src/env-pane/places.ts), so that a reload, which receives the whole sequence from `current`, keeps the picture.
+ * The camera is the screen-user's own: moved freely it stays through the ticks, a reset and a change of scenario on
+ * the same layout, and returns to the last preset when the layout changes.
+ *
  * The page holds no simulation logic and no rule between run options: it asks the server (src/api.ts) and draws the
  * answers. Play requests one step after another; it pauses by itself on the tick at which all agents have finished
  * (the tick update's `run.finished_at`), and step and play go on from there.
@@ -31,25 +36,30 @@ import { ControlBar, type Speed } from "./frame/ControlBar";
 import { isOffered, offeredSetups, type Selection } from "./frame/selection";
 import { SelectionPanel } from "./frame/SelectionPanel";
 import type {
-  BuildFailure, Catalogue, LayoutView, ScenarioEntry, SimRunChoice, SimRunState, TickUpdate,
+  BuildFailure, Catalogue, LayoutView, RunDescription, ScenarioEntry, SimRunChoice, SimRunHistory, SimRunState,
+  TickUpdate,
 } from "./gen/messages";
 import type { View } from "./env-pane/camera";
 import { EnvPane } from "./env-pane/EnvPane";
+import { EMPTY_BOOK, nextBook, type PlaceBook } from "./env-pane/places";
 import type { Moment, Room } from "./env-pane/Scene";
 
 const DEFAULT_SPEED: Speed = 5;
 
-/** What the env-pane shows: a sim-run (`built` false when the server holds none for it: its choice failed after it
- * was shown), a view of a layout or of a layout and a setup, or nothing. */
+/** What the env-pane shows: a sim-run with every tick update it gave, the start's first (`built` false when the
+ * server holds none for it: its choice failed after it was shown), a view of a layout or of a layout and a setup, or
+ * nothing. */
 type Shown =
-  | { kind: "run"; state: SimRunState; built: boolean }
+  | { kind: "run"; description: RunDescription; ticks: TickUpdate[]; built: boolean }
   | { kind: "view"; view: LayoutView }
   | null;
 
-function selectionOf(state: SimRunState): Selection {
-  const run = state.description.run;
+function selectionOf(description: RunDescription): Selection {
+  const run = description.run;
   return { domain: run.domain, layout: run.layout, setup: run.setup, scenario: run.scenario };
 }
+
+const last = (ticks: readonly TickUpdate[]) => ticks[ticks.length - 1];
 
 export function App() {
   const [catalogue, setCatalogue] = useState<Catalogue | null>(null);
@@ -58,6 +68,7 @@ export function App() {
   const [options, setOptions] = useState<RunOptionValue[]>([]);
   const [ready, setReady] = useState(false);        // the address is written only once the page has read it
   const [view, setView] = useState<View>("tilted");
+  const [free, setFree] = useState(false);
   const [speed, setSpeed] = useState<Speed>(DEFAULT_SPEED);
   const [playing, setPlaying] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -67,10 +78,11 @@ export function App() {
   const speedRef = useRef<Speed>(DEFAULT_SPEED);
   speedRef.current = speed;
 
-  const showRun = useCallback((state: SimRunState) => {
-    setShown({ kind: "run", state, built: true });
-    setSelection(selectionOf(state));
-    setOptions([...state.description.stated.options]);
+  const showRun = useCallback((run: SimRunState | SimRunHistory) => {
+    const ticks = "ticks" in run ? [...run.ticks] : [run.tick];
+    setShown({ kind: "run", description: run.description, ticks, built: true });
+    setSelection(selectionOf(run.description));
+    setOptions([...run.description.stated.options]);
   }, []);
 
   /** Builds a choice; its BuildFailure's message, or null when built. */
@@ -118,7 +130,7 @@ export function App() {
       try {
         const [c, current] = await Promise.all([api.catalogue(), api.current()]);
         setCatalogue(c);
-        if (current.state !== null && current.state.tick.tick !== null) {
+        if (current.state !== null && last(current.state.ticks).tick !== null) {
           showRun(current.state);
           setSelectionOpen(false);
           return;
@@ -201,8 +213,8 @@ export function App() {
   const run = shown?.kind === "run" ? shown : null;
 
   const applyTick = useCallback((tick: TickUpdate) => {
-    setShown((s) => (s?.kind === "run" && s.state.description.sim_run === tick.sim_run
-      ? { ...s, state: { ...s.state, tick } } : s));
+    setShown((s) => (s?.kind === "run" && s.description.sim_run === tick.sim_run
+      ? { ...s, ticks: [...s.ticks, tick] } : s));
   }, []);
 
   /** One step; null when the server refused it. */
@@ -220,14 +232,14 @@ export function App() {
   const onStep = useCallback(async () => {
     if (!run) return;
     setBusy(true);
-    try { await stepOnce(run.state.description.sim_run); } finally { setBusy(false); }
+    try { await stepOnce(run.description.sim_run); } finally { setBusy(false); }
   }, [run, stepOnce]);
 
   const onPause = useCallback(() => { playingRef.current = false; setPlaying(false); }, []);
 
   const onPlay = useCallback(async () => {
     if (!run || playingRef.current) return;
-    const simRun = run.state.description.sim_run;
+    const simRun = run.description.sim_run;
     playingRef.current = true;
     setPlaying(true);
     while (playingRef.current) {
@@ -249,7 +261,7 @@ export function App() {
     setPlaying(false);
     setBusy(true);
     try {
-      const answer = await api.reset(run.state.description.sim_run);
+      const answer = await api.reset(run.description.sim_run);
       if (answer.ok) { showRun(answer.value); setSelectionOpen(true); setMessage(null); }
       else setMessage(`Reset refused: ${answer.refusal.reason}`);
     } finally {
@@ -257,17 +269,17 @@ export function App() {
     }
   }, [run, showRun]);
 
-  const locked = run !== null && run.state.tick.tick !== null;
+  const tickNow = run === null ? null : last(run.ticks);
+  const locked = tickNow !== null && tickNow.tick !== null;
   const domain = catalogue?.domains.find((d) => d.name === selection?.domain) ?? null;
   const shownDomain = shown === null ? null
-    : shown.kind === "run" ? shown.state.description.run.domain : shown.view.domain;
+    : shown.kind === "run" ? shown.description.run.domain : shown.view.domain;
   const appearance = catalogue?.domains.find((d) => d.name === shownDomain)?.appearance ?? null;
-  const limitValue = run?.state.description.effective.find((v) => v.kind === "limit");
+  const limitValue = run?.description.effective.find((v) => v.kind === "limit");
   const limit = limitValue?.kind === "limit" ? limitValue.value : null;
   const glideMs = playing && speed !== 0 ? 1000 / speed : 0;
 
-  const description = run?.state.description ?? null;
-  const tickNow = run?.state.tick ?? null;
+  const description = run?.description ?? null;
   const layoutView = shown?.kind === "view" ? shown.view : null;
   const room = useMemo<Room | null>(() => {
     if (description !== null) return { key: description.sim_run, ...description.world };
@@ -283,6 +295,26 @@ export function App() {
     return { humans: [], robots: [], carried: [], fixed_object_contents: setup?.fixed_object_contents ?? [],
              object_states: setup?.object_states ?? [] };
   }, [tickNow, layoutView]);
+  // The place book folded over the tick updates, one new tick at a time; anew for another sim-run or view.
+  const bookCache = useRef<{ key: string; folded: number; book: PlaceBook } | null>(null);
+  const book = useMemo<PlaceBook>(() => {
+    if (room === null) return EMPTY_BOOK;
+    const sequence = run !== null ? run.ticks.map((u) => u.world.fixed_object_contents)
+      : [moment?.fixed_object_contents ?? []];
+    let cache = bookCache.current;
+    if (cache === null || cache.key !== room.key || cache.folded > sequence.length) {
+      cache = { key: room.key, folded: 0, book: EMPTY_BOOK };
+    }
+    for (let i = cache.folded; i < sequence.length; i++) cache.book = nextBook(cache.book, sequence[i]);
+    cache.folded = sequence.length;
+    bookCache.current = cache;
+    return cache.book;
+  }, [room, run, moment]);
+
+  // The camera returns to the last preset when the layout changes.
+  const shownLayout = shown === null ? null : shown.kind === "run" ? shown.description.run.layout : shown.view.layout;
+  useEffect(() => setFree(false), [shownLayout]);
+
   const idle = shown?.kind === "run" ? "Not built: change the choice"
     : shown?.kind === "view" && shown.view.setup !== null ? "No sim-run: choose a scenario"
     : "No sim-run: choose a setup, then a scenario";
@@ -303,7 +335,7 @@ export function App() {
 
       {selectionOpen && catalogue && domain && (
         <SelectionPanel catalogue={catalogue} domain={domain} selection={selection} options={options}
-                        effective={run?.built ? run.state.description.effective : null}
+                        effective={run?.built ? run.description.effective : null}
                         locked={locked || busy || playing} onDomain={onDomain} onLayout={onLayout}
                         onSetup={onSetup} onScenario={onScenario} onOption={onOption} />
       )}
@@ -315,9 +347,10 @@ export function App() {
           <p className="panel-later">The action in hand, the stack, the last switches and resumptions: increment (iv).</p>
         </aside>
         {shown && room && moment && appearance ? (
-          <EnvPane layout={shown.kind === "run" ? shown.state.description.run.layout : shown.view.layout}
-                   room={room} moment={moment} appearance={appearance} view={view} onView={setView} glideMs={glideMs}
-                   controls={<ControlBar tick={run?.built ? run.state.tick : null} idle={idle} limit={limit}
+          <EnvPane layout={shownLayout!} room={room} moment={moment} book={book} appearance={appearance} view={view}
+                   free={free} onView={(v) => { setView(v); setFree(false); }} onFree={() => setFree(true)}
+                   glideMs={glideMs}
+                   controls={<ControlBar tick={run?.built ? tickNow : null} idle={idle} limit={limit}
                                          playing={playing} busy={busy} speed={speed} onSpeed={setSpeed}
                                          onPlay={onPlay} onPause={onPause} onStep={onStep} onReset={onReset} />} />
         ) : (

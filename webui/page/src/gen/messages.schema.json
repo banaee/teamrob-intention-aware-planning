@@ -131,7 +131,7 @@
         },
         "fixed": {
           "additionalProperties": {
-            "$ref": "#/$defs/FixedLook"
+            "$ref": "#/$defs/FixedTypeLook"
           },
           "type": "object"
         },
@@ -140,7 +140,7 @@
         },
         "movable": {
           "additionalProperties": {
-            "$ref": "#/$defs/MovableLook"
+            "$ref": "#/$defs/MovableTypeLook"
           },
           "type": "object"
         },
@@ -366,12 +366,12 @@
     },
     "Current": {
       "additionalProperties": false,
-      "description": "The answer to current: the current sim-run, or the current view, or neither (both None). At most one is set.",
+      "description": "The answer to current: the current sim-run with its tick updates, or the current view, or neither (both\nNone). At most one is set.",
       "properties": {
         "state": {
           "anyOf": [
             {
-              "$ref": "#/$defs/SimRunState"
+              "$ref": "#/$defs/SimRunHistory"
             },
             {
               "type": "null"
@@ -736,6 +736,53 @@
         "movable_objects"
       ],
       "title": "FixedObjectContents",
+      "type": "object"
+    },
+    "FixedStateLook": {
+      "additionalProperties": false,
+      "description": "The look of a fixed object while `state` holds for it.",
+      "properties": {
+        "look": {
+          "$ref": "#/$defs/FixedLook"
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "look",
+        "state"
+      ],
+      "title": "FixedStateLook",
+      "type": "object"
+    },
+    "FixedTypeLook": {
+      "additionalProperties": false,
+      "description": "A fixed object type's look, and its looks by state in order (the first whose state holds is drawn).",
+      "properties": {
+        "height": {
+          "type": "number"
+        },
+        "presence": {
+          "$ref": "#/$defs/Presence"
+        },
+        "shape": {
+          "$ref": "#/$defs/ShapeKind"
+        },
+        "states": {
+          "items": {
+            "$ref": "#/$defs/FixedStateLook"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "height",
+        "presence",
+        "shape",
+        "states"
+      ],
+      "title": "FixedTypeLook",
       "type": "object"
     },
     "HumanActivity": {
@@ -1142,10 +1189,54 @@
       "description": "The forms of a movable object.",
       "enum": [
         "crate",
-        "skid"
+        "skid",
+        "loaded_skid"
       ],
       "title": "MovableShape",
       "type": "string"
+    },
+    "MovableStateLook": {
+      "additionalProperties": false,
+      "description": "The look of a movable object while `state` holds for it.",
+      "properties": {
+        "look": {
+          "$ref": "#/$defs/MovableLook"
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "look",
+        "state"
+      ],
+      "title": "MovableStateLook",
+      "type": "object"
+    },
+    "MovableTypeLook": {
+      "additionalProperties": false,
+      "description": "A movable object type's look, and its looks by state in order (the first whose state holds is drawn).",
+      "properties": {
+        "height": {
+          "type": "number"
+        },
+        "shape": {
+          "$ref": "#/$defs/MovableShape"
+        },
+        "states": {
+          "items": {
+            "$ref": "#/$defs/MovableStateLook"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "height",
+        "shape",
+        "states"
+      ],
+      "title": "MovableTypeLook",
+      "type": "object"
     },
     "NowTrigger": {
       "additionalProperties": false,
@@ -1652,6 +1743,27 @@
       "title": "SimRunChoice",
       "type": "object"
     },
+    "SimRunHistory": {
+      "additionalProperties": false,
+      "description": "A sim-run with every tick update it has given, in order: the start's first, then one per step (the last\ncarrying the end when it has ended). The page derives from the sequence what a single tick does not hold (the\ndisplay places, T-viz 1a (iii)), so that a reload keeps the picture.",
+      "properties": {
+        "description": {
+          "$ref": "#/$defs/RunDescription"
+        },
+        "ticks": {
+          "items": {
+            "$ref": "#/$defs/TickUpdate"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "description",
+        "ticks"
+      ],
+      "title": "SimRunHistory",
+      "type": "object"
+    },
     "SimRunRef": {
       "additionalProperties": false,
       "description": "The body of a request on one sim-run (step, reset).",
@@ -1668,7 +1780,7 @@
     },
     "SimRunState": {
       "additionalProperties": false,
-      "description": "A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before\nthe first step). The answer to choose, reset and current.",
+      "description": "A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before\nthe first step). The answer to choose and reset.",
       "properties": {
         "description": {
           "$ref": "#/$defs/RunDescription"

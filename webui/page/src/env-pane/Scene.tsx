@@ -5,7 +5,12 @@
  * background objects as lines and pale faces; the active objects with a representative form and a warm tone; the
  * agents as figures in their semantic colours. The movable objects are solid ink: what can change stands out.
  *
- * What is constant is drawn once per sim-run; a tick moves the existing shapes. An agent moves smoothly from its last
+ * A movable object in a fixed object is drawn at its display place (src/env-pane/places.ts), from the place book the
+ * page keeps over the sequence of tick updates (`book`). An object's look follows the states that hold for it (its
+ * look by state, src/env-pane/look.ts).
+ *
+ * What is constant is drawn once per sim-run (the fixed objects again when an object state changes); a tick moves the
+ * existing shapes. An agent moves smoothly from its last
  * position to the tick's over `glideMs` (during play), or is put there at once (`glideMs` 0: paused, or a step), so
  * that a paused scene shows exactly the tick's positions. It turns at once to its last motion.
  *
@@ -23,7 +28,8 @@ import type {
   AgentTick, Appearance, Area, Bounds, Carried, FixedObject, FixedObjectContents, MovableObject, ObjectState, Space,
 } from "../gen/messages";
 import { theme } from "../theme";
-import { displayPlaces } from "./displayPlaces";
+import { heldBy, statesHeld } from "./look";
+import { type Place, type PlaceBook, placeGrid, slotOf } from "./places";
 import { carryHeight, carryOffset, FigureForm } from "./figures";
 import { FixedForm, MovableForm, restHeight } from "./forms";
 import { fixedLook, movableLook } from "./look";
@@ -60,12 +66,15 @@ export interface Moment {
   object_states: readonly ObjectState[];
 }
 
-export function Scene({ room, moment, appearance, glideMs }: {
-  room: Room; moment: Moment; appearance: Appearance; glideMs: number;
+export function Scene({ room, moment, book, appearance, glideMs }: {
+  room: Room; moment: Moment; book: PlaceBook; appearance: Appearance; glideMs: number;
 }) {
   const world = room;
   const fixedById = useMemo(() => new Map(world.fixed_objects.map((f) => [f.id, f])), [world]);
   const movableById = useMemo(() => new Map(world.movable_objects.map((o) => [o.id, o])), [world]);
+  // The object states as a key, so that the fixed objects are drawn again only when one changes.
+  const statesKey = JSON.stringify(moment.object_states);
+  const held = useMemo(() => statesHeld(moment.object_states), [statesKey]);
   const constant = useMemo(() => (
     <group>
       <Floor bounds={world.space.bounds} />
@@ -73,9 +82,30 @@ export function Scene({ room, moment, appearance, glideMs }: {
         <AreaMark key={area.id} id={area.id} bounds={area.bounds} space={world.space.bounds}
                   occupied={world.fixed_objects} />
       ))}
-      {world.fixed_objects.map((f) => <Fixed key={f.id} f={f} appearance={appearance} bounds={world.space.bounds} />)}
+      {world.fixed_objects.map((f) => (
+        <Fixed key={f.id} f={f} appearance={appearance} held={heldBy(held, f.id)} bounds={world.space.bounds} />
+      ))}
     </group>
-  ), [world, appearance]);
+  ), [world, appearance, held]);
+
+  // The run's largest movable extents, the grid of each fixed object (fixed for the sim-run), and the height of one
+  // layer of objects: the tallest look a movable object of the run may take.
+  const largest = useMemo(() => ({
+    x: Math.max(1, ...world.movable_objects.map((o) => o.size.x)),
+    y: Math.max(1, ...world.movable_objects.map((o) => o.size.y)),
+  }), [world]);
+  const grids = useMemo(() => new Map<string, Place[]>(), [world, largest]);
+  const gridOf = (f: FixedObject) => {
+    if (!grids.has(f.id)) {
+      grids.set(f.id, placeGrid({ x: f.position.x, y: f.position.y, sx: f.size.x, sy: f.size.y }, largest));
+    }
+    return grids.get(f.id)!;
+  };
+  const layerHeight = useMemo(() => Math.max(0, ...world.movable_objects.flatMap((o) => {
+    const entry = appearance.movable[o.type];
+    return entry === undefined ? [appearance.default_movable.height]
+      : [entry.height, ...entry.states.map((s) => s.look.height)];
+  })), [world, appearance]);
 
   return (
     <group>
@@ -84,16 +114,16 @@ export function Scene({ room, moment, appearance, glideMs }: {
       {moment.fixed_object_contents.flatMap((contents) => {
         const holder = fixedById.get(contents.fixed_object);
         if (!holder) return [];
-        const holderLook = fixedLook(appearance, holder.type);
-        const objects = contents.movable_objects.map((id) => movableById.get(id)!);
-        const places = displayPlaces(
-          { x: holder.position.x, y: holder.position.y, sx: holder.size.x, sy: holder.size.y },
-          objects.map((o) => o.size));
+        const holderLook = fixedLook(appearance, holder.type, heldBy(held, holder.id));
+        const grid = gridOf(holder);
+        const numbers = book.get(holder.id);
         const base = restHeight(holderLook.shape, holderLook.height);
-        return objects.map((o, i) => {
-          const look = movableLook(appearance, o.type);
-          return <MovableForm key={o.id} shape={look.shape} x={places[i].x} y={places[i].y} sx={o.size.x}
-                              sy={o.size.y} h={look.height} base={base} paint={paints.movable} />;
+        return contents.movable_objects.map((id, i) => {
+          const o = movableById.get(id)!;
+          const look = movableLook(appearance, o.type, heldBy(held, o.id));
+          const slot = slotOf(grid, numbers?.get(id) ?? i);
+          return <MovableForm key={o.id} shape={look.shape} x={slot.x} y={slot.y} sx={o.size.x} sy={o.size.y}
+                              h={look.height} base={base + slot.layer * layerHeight} paint={paints.movable} />;
         });
       })}
 
@@ -108,7 +138,7 @@ export function Scene({ room, moment, appearance, glideMs }: {
             <Gliding key={`${room.key} ${a.id}`} x={a.position.x} y={a.position.y} glideMs={glideMs}>
               <FigureForm figure={figure.figure} h={figure.height} stance={stance} paint={paint} />
               {carried.map((o) => {
-                const look = movableLook(appearance, o.type);
+                const look = movableLook(appearance, o.type, heldBy(held, o.id));
                 return <MovableForm key={o.id} shape={look.shape} x={hold.x} y={hold.y}
                                     sx={o.size.x} sy={o.size.y} h={look.height}
                                     base={carryHeight(figure.figure, figure.height)} paint={paints.movable} />;
@@ -216,8 +246,10 @@ function areaLabelPlace(id: string, size: number, inner: Bounds, space: Bounds, 
   return candidates.find(free) ?? { x: cx, y: cy };
 }
 
-function Fixed({ f, appearance, bounds }: { f: FixedObject; appearance: Appearance; bounds: Bounds }) {
-  const look = fixedLook(appearance, f.type);
+function Fixed({ f, appearance, held, bounds }: {
+  f: FixedObject; appearance: Appearance; held: ReadonlySet<string>; bounds: Bounds;
+}) {
+  const look = fixedLook(appearance, f.type, held);
   const paint = look.presence === "active" ? paints.active : paints.background;
   const offset = Math.min(SHADOW_SHARE * look.height, SHADOW_MAX);
   const footing = { x: f.position.x, y: f.position.y, sx: f.size.x, sy: f.size.y, h: look.height };

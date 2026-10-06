@@ -2,7 +2,8 @@
  * The env-pane (glossary §11): the region of the page that shows the simulated environment. A header with the layout's
  * id (not its title, which is stale in older layouts: Hadi, 6 October 2026, P20) and the two views (tilted, from above:
  * the same scene, the camera moved); the scene of the current sim-run at its latest tick, or of a view of a layout and
- * a setup; and, at its foot, the control bar the page passes in (it acts on what the env-pane shows).
+ * a setup; and, at its foot, the control bar the page passes in (it acts on what the env-pane shows). While the camera
+ * is moved freely (`free`) neither preset shows pressed; a preset puts it back.
  */
 
 import { Canvas, useThree } from "@react-three/fiber";
@@ -11,15 +12,19 @@ import { type ReactNode, useLayoutEffect, useMemo } from "react";
 import type { Appearance } from "../gen/messages";
 import { FramingCamera, type View } from "./camera";
 import { setPixelRatio } from "./material";
+import type { PlaceBook } from "./places";
 import { type Moment, type Room, Scene } from "./Scene";
 
-export function EnvPane({ layout, room, moment, appearance, view, onView, glideMs, controls }: {
+export function EnvPane({ layout, room, moment, book, appearance, view, free, onView, onFree, glideMs, controls }: {
   layout: string;
   room: Room;
   moment: Moment;
+  book: PlaceBook;
   appearance: Appearance;
   view: View;
+  free: boolean;
   onView: (view: View) => void;
+  onFree: () => void;
   glideMs: number;
   controls: ReactNode;
 }) {
@@ -34,7 +39,7 @@ export function EnvPane({ layout, room, moment, appearance, view, onView, glideM
         </div>
         <div className="segmented" role="group" aria-label="View">
           {(["tilted", "top"] as const).map((v) => (
-            <button key={v} type="button" aria-pressed={view === v} onClick={() => onView(v)}>
+            <button key={v} type="button" aria-pressed={!free && view === v} onClick={() => onView(v)}>
               {v === "tilted" ? "Tilted" : "From above"}
             </button>
           ))}
@@ -43,8 +48,8 @@ export function EnvPane({ layout, room, moment, appearance, view, onView, glideM
       <div className="env-pane-scene">
         <Canvas orthographic flat dpr={[1, 2]} gl={{ antialias: true, preserveDrawingBuffer: true }}>
           <PixelRatio />
-          <FramingCamera view={view} bounds={room.space.bounds} height={tallest} />
-          <Scene room={room} moment={moment} appearance={appearance} glideMs={glideMs} />
+          <FramingCamera view={view} free={free} onFree={onFree} bounds={room.space.bounds} height={tallest} />
+          <Scene room={room} moment={moment} book={book} appearance={appearance} glideMs={glideMs} />
         </Canvas>
       </div>
       {controls}

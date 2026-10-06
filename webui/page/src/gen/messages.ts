@@ -24,7 +24,7 @@ export type ShapeKind =
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "MovableShape".
  */
-export type MovableShape = "crate" | "skid";
+export type MovableShape = "crate" | "skid" | "loaded_skid";
 /**
  * The figures of the agents.
  *
@@ -167,11 +167,11 @@ export interface Appearance {
   default_fixed: FixedLook;
   default_movable: MovableLook;
   fixed: {
-    [k: string]: FixedLook;
+    [k: string]: FixedTypeLook;
   };
   human: FigureLook;
   movable: {
-    [k: string]: MovableLook;
+    [k: string]: MovableTypeLook;
   };
   robot: FigureLook;
 }
@@ -193,12 +193,55 @@ export interface MovableLook {
   shape: MovableShape;
 }
 /**
+ * A fixed object type's look, and its looks by state in order (the first whose state holds is drawn).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "FixedTypeLook".
+ */
+export interface FixedTypeLook {
+  height: number;
+  presence: Presence;
+  shape: ShapeKind;
+  states: FixedStateLook[];
+}
+/**
+ * The look of a fixed object while `state` holds for it.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "FixedStateLook".
+ */
+export interface FixedStateLook {
+  look: FixedLook;
+  state: string;
+}
+/**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "FigureLook".
  */
 export interface FigureLook {
   figure: Figure;
   height: number;
+}
+/**
+ * A movable object type's look, and its looks by state in order (the first whose state holds is drawn).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "MovableTypeLook".
+ */
+export interface MovableTypeLook {
+  height: number;
+  shape: MovableShape;
+  states: MovableStateLook[];
+}
+/**
+ * The look of a movable object while `state` holds for it.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "MovableStateLook".
+ */
+export interface MovableStateLook {
+  look: MovableLook;
+  state: string;
 }
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
@@ -429,25 +472,27 @@ export interface LimitOption {
   name: string;
 }
 /**
- * The answer to current: the current sim-run, or the current view, or neither (both None). At most one is set.
+ * The answer to current: the current sim-run with its tick updates, or the current view, or neither (both
+ * None). At most one is set.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "Current".
  */
 export interface Current {
-  state: SimRunState | null;
+  state: SimRunHistory | null;
   view: LayoutView | null;
 }
 /**
- * A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before
- * the first step). The answer to choose, reset and current.
+ * A sim-run with every tick update it has given, in order: the start's first, then one per step (the last
+ * carrying the end when it has ended). The page derives from the sequence what a single tick does not hold (the
+ * display places, T-viz 1a (iii)), so that a reload keeps the picture.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "SimRunState".
+ * via the `definition` "SimRunHistory".
  */
-export interface SimRunState {
+export interface SimRunHistory {
   description: RunDescription;
-  tick: TickUpdate;
+  ticks: TickUpdate[];
 }
 /**
  * Everything constant in one sim-run, sent when its model is built: the triple, the run options as the
@@ -845,6 +890,17 @@ export interface SetupView {
  */
 export interface SimRunRef {
   sim_run: string;
+}
+/**
+ * A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before
+ * the first step). The answer to choose and reset.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "SimRunState".
+ */
+export interface SimRunState {
+  description: RunDescription;
+  tick: TickUpdate;
 }
 /**
  * A step or a reset refused: the sim-run is not the current one, it has ended (a step only), or a step of it is
