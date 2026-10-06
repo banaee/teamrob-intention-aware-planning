@@ -1,0 +1,48 @@
+{
+  "env_objects": [
+    {
+      "id": "item_2",
+      "type": "item",
+      "initial_container": "shelf_2",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5 (env_layout_18): the human's one delivery, the state of step 4's last delivery."
+    },
+    {
+      "id": "item_4",
+      "type": "item",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5 (env_layout_18): the human's one delivery, the state of step 4's last delivery."
+    },
+    {
+      "id": "item_5",
+      "type": "item",
+      "initial_container": "shelf_5",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5: a robot item, carried along the south wall past the human's turn point at shelf_4."
+    },
+    {
+      "id": "item_6",
+      "type": "item",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ],
+      "notes": "T-K part 1, step 5: a robot item, carried along the east wall past the human's point at the coffee machine."
+    }
+  ]
+}
