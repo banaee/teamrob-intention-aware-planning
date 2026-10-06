@@ -5154,3 +5154,20 @@ marked preferred; Hadi's review at the pause after (iii) is open; the session's 
 - Deviations: vitest came in (ii), not (iii), for the selection rule and the address (15 page-side tests in all,
   written before the change of mode, kept); the deletion of `webui_export.py` landed in 0038743 with the view's
   commit; a refusal's message is shown in at most three lines (the unknown-scenario message lists every scenario).
+
+1a, HADI'S REVIEW OF INCREMENTS (ii) AND (iii) (Hadi, 6 October 2026, preferred; recorded by ccode the same day). The
+plan is amended to match (P25 corrected, P26).
+1. The mode of checks, corrected: the message on the mode went further than Hadi meant. Tested: the flow, the functions
+   and the logic of the web-ui (the server's rules, which setups and scenarios a layout offers, the lock after the first
+   step, the same log pair as headless, display places kept, the messages). Not tested: details of appearance and how
+   good the page looks (no screenshot sets, no second window size, no rounds of visual refinement). Page-side tests of
+   logic are written, not deferred; logic of (ii) and (iii) without a test gets one now. Unchanged: one look in a real
+   browser per new feature; headless byte-identical when simulator code changes; short record entries.
+2. The 15 page tests stay.
+3. `tests/test_tl2_discovery.py` updated for scenario_s31_01 (722 scenarios, setups to env_setup_31; f0 below).
+4. A choice that cannot be built keeps the env-pane's last picture, the controls disabled, the error in at most three
+   lines: kept.
+5. The address carries every run option: kept.
+6. The see-through table top keeps its opacity (0.4) for now.
+7. dock_loading's four layout notes rewritten, shorter, the purpose first, every fact kept (cchat's assumption, not
+   confirmed by Hadi: these four only; whether other layouts' notes are rewritten is open). Headless byte-identical.

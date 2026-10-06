@@ -90,6 +90,12 @@ OF CHECKS FOR THE REST OF STAGE 1):
   size (fix what is broken, do not refine the look). Dropped or deferred: screenshot sets, the second window size,
   saved screenshot folders; visual comparison and refinement (to (v)); page-side unit tests (deferred); the solara-ui
   check per increment (once, before Hadi's acceptance of 1a); long record entries.
+  CORRECTED (Hadi, 6 October 2026, preferred; design_records.md, 1a, HADI'S REVIEW OF INCREMENTS (ii) AND (iii)): the
+  message went further than meant. Tested: the flow, the functions and the logic of the web-ui, page-side included
+  (written, not deferred; logic of (ii) and (iii) without a test gets one). Not tested: details of appearance and how
+  good the page looks (no screenshot sets, no second window size, no visual refinement rounds). The rest of P25 stands.
+- P26. Kept at the review of (ii) and (iii): the page's behaviour on a choice that cannot be built; the address with
+  every run option; the table top's opacity for now; the 15 page tests. dock_loading's four layout notes rewritten.
 
 ---
 
@@ -601,8 +607,8 @@ Test 2: a domain the web-ui has never seen is drawn without a change to the web-
 AMENDED (Hadi, 6 October 2026, P25), from (iii) on: the list below is reduced to headless byte-identity where
 `mesa_sim/`, `shared/`, `world/` or `domains/` changes; the test suite once per increment; the page's build and type
 check; one look in a browser per new feature at one window size; the domain-word scan stays (it is in the suite). The
-screenshot sets and the second size, the saved folder, page-side unit tests and the solara-ui per increment are
-dropped or deferred (the solara-ui once before Hadi's acceptance of 1a).
+screenshot sets and the second size, the saved folder and the solara-ui per increment are dropped (the solara-ui once
+before Hadi's acceptance of 1a). CORRECTED (P25): page-side tests of logic are written in every increment.
 
 - Headless byte-identical where `mesa_sim/` changes ((i): `sim_run.py`; (ii): the loader's move): the four maintained
   sets (48 logs and their `.rec`) and dock_loading's scenario_s03_02, s05_02, s07_02, rerun into a scratch folder and
