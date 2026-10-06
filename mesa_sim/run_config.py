@@ -64,6 +64,21 @@ BOOL_OPTIONS = ("human_aware", "intention_aware", "assignment_knowledge", "conte
 # same name (parse_user_args; tests/test_tviz_sim_run.py holds the two lists equal).
 RUN_OPTIONS = ("domain", "layout", "scenario", "steps", "human_aware", "intention_aware", "assignment_knowledge",
                "context_knowledge", "strategy", "gate_strategy", "cost_strategy", "separation_stop", "test_level")
+# The run options with a closed list of values, each with its list (checked in run_configuration).
+ONE_OF_OPTIONS = {"strategy": STRATEGIES, "gate_strategy": GATE_STRATEGIES, "cost_strategy": COST_STRATEGIES}
+# The value a run option takes when the run configuration does not state it (resolve_model_params); `steps` has none,
+# a run configuration states it.
+OPTION_DEFAULTS = {
+    "human_aware": True,            # both on by default (T-F part 1, R3); SimModel applies the override (R5)
+    "intention_aware": True,
+    "assignment_knowledge": True,   # both on by default (AM3, AM9)
+    "context_knowledge": True,
+    "strategy": "single_task",
+    "gate_strategy": "none",
+    "cost_strategy": "realized",
+    "separation_stop": False,
+    "test_level": 0.05,
+}
 
 
 def run_configuration(config: dict, source: str, flags: dict = None, cli_overrides=()) -> dict:
@@ -92,8 +107,7 @@ def run_configuration(config: dict, source: str, flags: dict = None, cli_overrid
         )
     config.update({k: v for k, v in (flags or {}).items() if v is not None})
     config["overrides"] = run_overrides(config.get("overrides"), cli_overrides)
-    for key, choices in (("strategy", STRATEGIES), ("gate_strategy", GATE_STRATEGIES),
-                         ("cost_strategy", COST_STRATEGIES)):
+    for key, choices in ONE_OF_OPTIONS.items():
         if key in config and config[key] not in choices:
             raise ValueError(f"{key}={config[key]!r}: expected one of {list(choices)}")
     for key in BOOL_OPTIONS:
@@ -147,10 +161,9 @@ def script_argv() -> list:
     return [a for a in argv if a != "--"]
 
 
-def parse_user_args(argv: list = None):
-    """Strict: an unknown or misspelled flag exits with an error, so a run never
-    falls back silently to the yaml value of the option it meant to set.
-    `argv` defaults to the command line's (script_argv)."""
+def user_args_parser() -> argparse.ArgumentParser:
+    """The parser of the flags (parse_user_args); its help texts are also the run options'
+    descriptions in the web-ui's catalogue (mesa_sim/webui_adapter.py)."""
     parser = argparse.ArgumentParser(description="Run TeamRob Mesa simulation")
     parser.add_argument("--run",         type=str,  default=EXPERIMENT_CONFIG_PATH, help="The run file (default: configs/experiment.yaml)")
     parser.add_argument("--override",    type=str,  action="append", default=[], metavar="PATH=VALUE",
@@ -169,7 +182,14 @@ def parse_user_args(argv: list = None):
     parser.add_argument("--cost_strategy", type=str, default=None, choices=COST_STRATEGIES, help="MetaPlanner B3 cost strategy override")
     parser.add_argument("--separation_stop", type=_bool_arg, default=None, help="Execution-time separation stop override: true/false")
     parser.add_argument("--test_level", type=float, default=None, help="The recognizer's adequacy test level alpha, per derived phase (T-D E5)")
-    return parser.parse_args(script_argv() if argv is None else argv)
+    return parser
+
+
+def parse_user_args(argv: list = None):
+    """Strict: an unknown or misspelled flag exits with an error, so a run never
+    falls back silently to the yaml value of the option it meant to set.
+    `argv` defaults to the command line's (script_argv)."""
+    return user_args_parser().parse_args(script_argv() if argv is None else argv)
 
 
 def load_user_config(argv: list = None) -> dict:
@@ -267,15 +287,15 @@ def resolve_model_params(user_config: dict) -> dict:
         "declared_context":   domain["context_knowledge"],
         "layout_path":      domain["layouts"][layout_id],
         "setup_path":       domain["setups"][setup_id],
-        "human_aware":      bool(user_config.get("human_aware", True)),       # both on by default (T-F part 1, R3);
-        "intention_aware":  bool(user_config.get("intention_aware", True)),   # SimModel applies the override (R5)
-        "assignment_knowledge": bool(user_config.get("assignment_knowledge", True)),   # both on by default (AM3, AM9)
-        "context_knowledge":  bool(user_config.get("context_knowledge", True)),
-        "strategy":         user_config.get("strategy", "single_task"),
-        "gate_strategy":    user_config.get("gate_strategy", "none"),
-        "cost_strategy":    user_config.get("cost_strategy", "realized"),
-        "separation_stop":  bool(user_config.get("separation_stop", False)),
-        "test_level":       float(user_config.get("test_level", 0.05)),
+        "human_aware":      bool(user_config.get("human_aware", OPTION_DEFAULTS["human_aware"])),
+        "intention_aware":  bool(user_config.get("intention_aware", OPTION_DEFAULTS["intention_aware"])),
+        "assignment_knowledge": bool(user_config.get("assignment_knowledge", OPTION_DEFAULTS["assignment_knowledge"])),
+        "context_knowledge":  bool(user_config.get("context_knowledge", OPTION_DEFAULTS["context_knowledge"])),
+        "strategy":         user_config.get("strategy", OPTION_DEFAULTS["strategy"]),
+        "gate_strategy":    user_config.get("gate_strategy", OPTION_DEFAULTS["gate_strategy"]),
+        "cost_strategy":    user_config.get("cost_strategy", OPTION_DEFAULTS["cost_strategy"]),
+        "separation_stop":  bool(user_config.get("separation_stop", OPTION_DEFAULTS["separation_stop"])),
+        "test_level":       float(user_config.get("test_level", OPTION_DEFAULTS["test_level"])),
         "overrides":        tuple(user_config.get("overrides", ())),
     }
 
