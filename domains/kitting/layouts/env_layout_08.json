@@ -4,7 +4,7 @@
     "height": 1000,
     "name": "Kitting Domain Layout 8",
     "units": "cm",
-    "notes": "Two kitting tables, for B3.B (T-B1b). env_layout_02's room and shelf positions."
+    "notes": "Two kitting tables in one room, for the robot's choice of the order of its tasks (B3.B, T-B1b; scenario_s06_01 and scenario_s06_02): env_layout_02's room and shelf positions."
   },
   "areas": [
     {

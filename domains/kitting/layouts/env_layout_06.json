@@ -4,7 +4,7 @@
     "height": 900,
     "name": "Kitting Domain Layout 5",
     "units": "cm",
-    "notes": "env_layout_03 plus one coffee machine, coffee_machine_0, for the end-state variant of scenario_s03_01 (scenario_s03_06, F47/F47b): after its last delivery the human walks to the machine for a coffee break and stays there instead of idling at the kitting table, so the robot's last table deliveries are not refused by the separation stop. The machine lies due east of the table (bearing 0 deg), >= 51 deg off every shelf bearing from the table (shelf_2 -51, shelf_7 -59, shelf_3 -107, shelf_4 -121, shelf_6 -128). Unlike env_layout_03 the hypothesis space carries coffee_break(coffee_machine_0) (foreseeable, both priors). Everything else is env_layout_03 byte for byte."
+    "notes": "env_layout_03 with a coffee machine, for the end-state variant of scenario_s03_01 (scenario_s03_06): after its last delivery the human takes a coffee break at the machine instead of idling at the kitting table, so the robot's last deliveries are not refused by the separation stop. coffee_machine_0 lies due east of the table (bearing 0 deg), at least 51 deg off every shelf's bearing from the table (shelf_2 -51, shelf_7 -59, shelf_3 -107, shelf_4 -121, shelf_6 -128); so coffee_break(coffee_machine_0) is a foreseeable hypothesis, with assignment knowledge on and off. Everything else is env_layout_03 byte for byte. Made for F47 and F47b."
   },
   "areas": [
     {

@@ -3,7 +3,8 @@
     "width": 2000,
     "height": 1000,
     "name": "Kitting Domain Layout 1",
-    "units": "cm"
+    "units": "cm",
+    "notes": "The regression room with a coffee machine and an A/C switch: the human takes a coffee break and switches the A/C on between deliveries (scenario_s02_01, a regression fixture). A wide hall: the kitting table on the north side, shelves along the west, east and south walls, coffee_machine_0 and ac_switch_0 in the south-west, the exit landmark corner_SE."
   },
   "areas": [
     {

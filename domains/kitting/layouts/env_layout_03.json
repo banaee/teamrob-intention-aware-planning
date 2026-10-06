@@ -4,7 +4,7 @@
     "height": 900,
     "name": "Kitting Domain Layout 2",
     "units": "cm",
-    "notes": "Phase 4C B2/B3 fixture layout. Built for sustained interference: the robot's cheapest task (shelf_4) and the human's first task (shelf_3) have near-equal approach + carry totals, so both carry walks converge into the kitting table with a small arrival gap. Measured behaviour and limits: see scenario_s03_01 description. No obstacles, no foreseeable tasks."
+    "notes": "Sustained interference at the kitting table: the robot's cheapest task (shelf_4) and the human's first (shelf_3) have nearly equal approach and carry, so both carry walks reach the table with a small gap (scenario_s03_01, a regression fixture; its description gives the measured behaviour and limits). No obstacles, no foreseeable tasks. Made as Phase 4C's B2/B3 fixture."
   },
   "areas": [
     { "id": "zone_NW", "bounds": { "x_min": -600, "x_max": 0, "y_min": 0, "y_max": 450 }, "label": "northwest_work" },

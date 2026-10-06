@@ -4,7 +4,7 @@
     "height": 1400,
     "name": "Kitting Domain Layout 13",
     "units": "cm",
-    "notes": "The meta-planner test-bed's room without the coffee machine (MPB part (v), cell A4, the cause boundary; analysis/mpb/coverage.md, authoring.md part (v)). env_layout_12 with coffee_machine_0 removed and nothing else changed. Created because the mechanism requires the absence of the coffee_break hypothesis: at an episode boundary the belief resets to the prior and the leader is the first live hypothesis in the recognizer's order (by repr), where coffee_break(...) precedes every deliver_item(...); with the machine present the recorded delivery can never remain the leader at a reset. Not because the room is inconvenient (Hadi, 29 September 2026)."
+    "notes": "env_layout_12 without the coffee machine, nothing else changed: the MPB's case with no coffee_break hypothesis (part (v), cell A4, the cause boundary; analysis/kitting/mpb/coverage.md, authoring.md part (v)). Why, at its making (29 September 2026): at an episode boundary the belief resets to the prior and the leader is the first live hypothesis in the recognizer's order (by repr), where coffee_break(...) precedes every deliver_item(...); with the machine present the recorded delivery can never stay the leader at a reset. Not because the room is inconvenient (Hadi, 29 September 2026)."
   },
   "areas": [
     {

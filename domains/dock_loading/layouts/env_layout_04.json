@@ -4,7 +4,7 @@
     "height": 1480,
     "name": "Dock Loading Domain Layout 04 (T-G stage 1)",
     "units": "cm",
-    "notes": "T-G stage 1 room (design_decisions.md, \"T-G: the second domain's rulings\", B14): both delivery bays west, the empties east; the coffee machine west, near the gate. Origin at the hall's centre, y up; the space x ±600, y ±740 holds every fixed object (truck y -740 to -440, office to y 415)."
+    "notes": "A room of dock_loading's first tests (T-G stage 1, for the IRB and the MPB; design_decisions.md, \"T-G: the second domain's rulings\", B14): both delivery bays west, the empties east; the coffee machine west, near the gate. Origin at the hall's centre, y up; the space x ±600, y ±740 holds every fixed object (truck y -740 to -440, office to y 415)."
   },
   "areas": [
     {

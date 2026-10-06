@@ -4,7 +4,7 @@
     "height": 1000,
     "name": "Kitting Domain Layout 20",
     "units": "cm",
-    "notes": "env_layout_09 with one coffee machine added (T-K part 1, step 5e; Hadi, 5 October 2026): every other object at its place, no A/C switch. env_layout_09's own note: Two kitting tables against opposite walls (kitting_table_0 on the north wall, kitting_table_1 on the south wall): the realistic-placement variant of env_layout_08, where both tables stand in open floor. Storage along the side walls. T-B1b follow-up; scenario_s07_01 opens it, and it is not a measured fixture."
+    "notes": "Two kitting tables on opposite walls and a coffee machine: env_layout_09 with one coffee machine added, every other object at its place, no A/C switch (T-K part 1, step 5e; Hadi, 5 October 2026). env_layout_09: kitting_table_0 on the north wall, kitting_table_1 on the south wall, both in open floor, storage along the side walls; the realistic variant of env_layout_08 (a T-B1b follow-up), opened by scenario_s07_01, not a measured fixture."
   },
   "areas": [
     {

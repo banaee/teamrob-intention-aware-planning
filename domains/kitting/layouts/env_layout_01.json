@@ -4,7 +4,7 @@
     "height": 800,
     "name": "Kitting Domain Layout 0",
     "units": "cm",
-    "notes": "Minimal layout for Phase 4 IR and AP development. Symmetric placement guarantees that the paths intersect near center (Scenario 0.1) and KT convergence conflict (Scenario 0.2). No obstacles, no foreseeable tasks."
+    "notes": "The smallest kitting room, symmetric: the two agents' paths cross near the centre and both converge on the kitting table (scenario_s01_01, a regression fixture). No obstacles, no foreseeable tasks. Made for Phase 4's development of the recognizer and the planner."
   },
   "areas": [
     {
