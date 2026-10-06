@@ -1093,6 +1093,18 @@ reachable, but nothing outside `sim_agents.py` reads either flag — confirmed b
 Harmless, but wasteful and makes log tails uninformative. Fix belongs in the run loop
 (`run_mesa.py` / `SimModel.step()`), not in the agents.
 NOTE (IRB.1r, 27 Sept 2026): the cognitive-loop ruling (design_decisions.md, "The cognitive loop does not end with the task pool") does not touch this item.
+HADI'S IDEA, NOT DECIDED (Hadi, 6 October 2026, at the plan of T-viz 1a): every start stops when no agent has anything
+left scheduled or scripted. The web-ui of 1a only pauses play at that point and goes on when asked (design_records.md,
+"T-viz, the web-ui", 1a, HADI'S ANSWERS ON THE PLAN, item 6). Three facts recorded with the idea:
+- The maintained baseline logs run past that point, so a stop there would change them. Measured by ccode (6 October
+  2026, the 48 logs on disk of the four maintained sets; the point as MPB-5 names it, the robot's `[meta] ... all tasks
+  complete` line and the human's last tick with a non-empty stack in the `.rec`): 46 of 48 run past it, by 5 to 116
+  ticks. The two of scenario_s02_01 (450 steps, prior off and on) end at tick 449 with the human 86 of 91 ticks into the
+  closing walk to corner_SE, five ticks before the point; a stop there would leave them unchanged.
+- Some sim-runs never reach the point: a stand to the run's end, or a script that depends on the robot with an entry
+  that never becomes applicable (TODO-184). So headless keeps its step limit.
+- The robot's recognition continues after its pool is empty (the cognitive-loop ruling above), and the test-beds read a
+  margin after the point (MPB-5's 30 ticks, from the IRB's E5).
 Files: mesa_sim/run_mesa.py, mesa_sim/sim_model.py
 Reference: Phase 4C scenario_s01_01 validation, September 2026
 

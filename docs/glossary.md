@@ -967,6 +967,37 @@ is of the human's decisions, not of the body.
 COLLISION: the **decision record** (§4) is the meta-planner's one field; "the design record" is the documents. Write
 "the executor's record" where either could be read.
 
+The four entries below describe the words as the code and the records already use them; they change none. Added for
+the web-ui's panel 4a (Hadi, 6 October 2026, preferred, T-viz 1a; design_records.md, "T-viz, the web-ui", 1a, HADI'S
+ANSWERS ON THE PLAN).
+
+**action in hand** — the action the human executor is executing at a tick: the action at the cursor of the task on top
+of the **stack**, or the action whose completion is being acknowledged on that tick; none when the stack is empty or
+the human waits. It is reported with its occurrence (its index among the equal actions of the task's expansion) and its
+**progress**. The task it belongs to is the top of the stack; a task below the top is suspended (**outcome**).
+→ `world/record.py`, `Snapshot.action`; `webui/messages.py`, `ActionInHand`; the `[rec]` stream's `action=`.
+
+**progress** — of the **action in hand**: the ticks of it executed out of the ticks it takes, as the executor's record
+states them per tick (`done` of `total`; 0 of 0 when the human has no action). A walk's total is its number of steps,
+a stand's its duration in ticks. Unrelated to the robot's executor and to a task's completion.
+→ `world/record.py`, `Snapshot.done`, `Snapshot.total`; the `[rec]` stream's `progress=`.
+
+**switch** — an applied `Start` decision on the human executor's **stack**: authored (`at`, `during`) or injected
+(`inject`), on a task or on the empty stack. The task on top, if any, is suspended and the started task runs. A `Drop`
+is not a switch (it is `Left(ABANDONED)`), nor is a script entry taken onto the empty stack (`Entered`). The record's
+query `switches` returns them, each a `Started` transition with its tick, its event trigger and where it cut the task
+below it (after an action, at the task's beginning, or inside an action).
+COLLISION: a "switch" run option is one that is on or off (the catalogue's `SwitchOption`, §11); the A/C switch is an
+object (`ac_switch`) and `switch_on` an action (§6, **wait_at / stand**). Write "a switch of the stack" where either
+could be read.
+→ `world/queries.py`, `switches`; `world/record.py`, `Started`.
+
+**resumption** — the human executor's return to a suspended task when the task above it leaves the **stack**: the
+`Resumed` transition, returned by the record's query `resumptions`. The executor first completes the cut action with
+what remains of it, then re-expands the task in the resulting state (**stack**); a resumption with nothing left to do
+is completed (**outcome**).
+→ `world/queries.py`, `resumptions`; `world/record.py`, `Resumed`.
+
 **deviation** (T-H) — a node of the human's realised plan tree that the robot's tree does not contain, at one of two
 levels: the task schema is absent, or the binding is absent (the **coverage** value). Supersedes the 24 September
 meaning (any departure from the work order, label A): a switch to a `PersonalTask` in the task model is not a

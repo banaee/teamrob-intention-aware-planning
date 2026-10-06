@@ -101,7 +101,7 @@ Preferred for stage 1a (Hadi, 6 October 2026, given with the task of 1a's plan; 
   scenario's reference layouts stays possible headless.
 - With a layout chosen and the triple not complete, the env-pane shows the layout alone (space, areas, fixed objects,
   no model), read through the same loader as the model. Every change that completes a triple builds the model (7.5
-  changes accordingly).
+  changes accordingly). With a setup chosen as well, its objects are shown too (below, Q1 (b)).
 - The scenario list shows each scenario's description beside its id, with a plain text filter over both. The
   structured filter by composition (TODO-110) is stage 2, [FW].
 - Panel 4a shows the action in hand with its progress and its task, the human executor's stack, and the last few
@@ -110,12 +110,34 @@ Preferred for stage 1a (Hadi, 6 October 2026, given with the task of 1a's plan; 
   as the headless start, so the page can open with a sim-run already chosen. `webui/` stays at the root and imports no
   simulator. TODO-196 is answered for now; it returns when a second simulator exists.
 
+Preferred as answers on 1a's plan (Hadi, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, HADI'S ANSWERS ON
+THE PLAN, with the reason of each; the plan's P7 to P16):
+
+- With a layout and a setup chosen and no scenario, the env-pane shows the layout with the setup's movable objects in
+  their home containers and the setup's object states, no agents.
+- dock_loading's four layout files have their key `space.note` renamed `notes`, in increment (ii).
+- Started without a run file, the page opens on the default run file's sim-run at its start.
+- The page's choice is mirrored in the address, and the server's state wins: if a stepped sim-run is current, the page
+  shows it and ignores the address; otherwise it requests the address's choice. For a bookmark per scenario in a
+  demonstration and a link embedded in web-based slides (a later task, no name yet). The link is not a run file
+  (TODO-189), reopens a choice at its start, not at a tick, and one server holds one current sim-run (TODO-187).
+- The web-ui has no step limit by default (0.4's "ends at the configured steps" changed): a limit only with `--steps`
+  at the start or a number entered in the page; without one a sim-run ends by reset, by a change of choice or at the
+  server's stop. The run file's `steps` is not used by the web-ui.
+- Play pauses by itself where the human's script has ended and the robot's pool is empty (MPB-5's point), and the page
+  states that all agents have finished. The sim-run is not ended; step and play go on.
+- The run options stay as set when the layout, the setup or the scenario changes.
+- "Action in hand", "progress", "switch" and "resumption" have glossary entries (§6), describing the existing use;
+  "suspended" stays the word for the task below the top of the stack.
+- Every other proposal of the plan stays proposed by ccode; Hadi reviews each at the pause after its increment.
+
 ### What stage 1a starts from
 
 Stage 1a is the first sim-run in the browser. Its plan, written by ccode on 6 October 2026 for Hadi's review, is
 `docs/handoffs/plan_T-viz_1a.md`: four increments, the message round of 1a, ccode's proposals on the open items below,
-the page layout of stage 1, the two tests and three questions to Hadi. Every build session of 1a reads it first. Its
-content, as section 12.1 lists it, adjusted by what was decided or found since:
+the page layout of stage 1, the two tests. Hadi answered its three questions and added his preferences the same day;
+the plan is amended to match. Every build session of 1a reads it first. Its content, as section 12.1 lists it, adjusted
+by what was decided or found since:
 
 - The selection of a layout, a setup and a scenario, predefined only. The selection must handle 1019 scenarios (721 in
   kitting, 298 in dock_loading), so it needs search or filtering. The selection follows the scenario's bindings: its one
@@ -128,7 +150,8 @@ content, as section 12.1 lists it, adjusted by what was decided or found since:
   PREFERRED (Hadi, 6 October 2026, for 1a): every change that completes a triple builds the model; with a layout chosen
   and the triple not complete, the env-pane shows the layout alone (above, "Preferred for stage 1a").
 - The server answers the requests recorded in 0.4: catalogue, choose, step, reset and current. It ends a sim-run at the
-  configured steps, at a reset, at a change of the choice after the first step, and at its own stop. A sim-run started
+  configured steps, at a reset, at a change of the choice after the first step, and at its own stop (CHANGED, Hadi, 6
+  October 2026: no step limit by default; at a limit only when one is set, above). A sim-run started
   from the web-ui writes the same log pair as the same sim-run started headless. The server must keep third-party log
   lines out of a sim-run's log: the log pair's handlers sit on the root logger at the INFO level, so any library logger
   that propagates to the root logger, a web server's for example, would write into the open sim-run's log.
@@ -216,7 +239,12 @@ until Hadi says "I prefer".
 24. The text of the two "headless" run-level lines (TODO-191). At the next regeneration of the maintained baseline sets.
 25. The three questions of 1a's plan (its section 10): what the env-pane shows with a layout and a setup and no
     scenario; the key of dock_loading's layout notes (`space.note` against kitting's `space.notes`); what the page opens
-    on when started without a run file. Hadi, before increment (i).
+    on when started without a run file. ANSWERED (Hadi, 6 October 2026, preferred): Q1 (b), Q2 (a), Q3 (a).
+26. Whether every start stops when no agent has anything left scheduled or scripted (Hadi's idea, TODO-33, with three
+    facts). Not decided; 1a only pauses play there. No stage.
+27. The place of the point where all agents have finished in the tick update (the plan's M7: a third section `run`),
+    and the step limit's form in the messages and on the start line (the plan's M8 and section 4, item 11). Stage 1a,
+    proposed in the plan.
 
 ---
 
@@ -817,6 +845,8 @@ looks at a room before its setups): every change that completes a triple builds 
 triple not complete, the env-pane shows the layout alone (space, areas, fixed objects, no model), read through the same
 loader as the model, so that a layout's picture cannot differ from a sim-run's on it. This is a small part of
 alternative C, for the layout only. design_records.md, "T-viz, the web-ui", 1a, HADI'S PREFERENCES, item 3.
+PREFERRED (Hadi, 6 October 2026, the plan's Q1 (b)): with a setup chosen as well, the env-pane also shows the setup's
+movable objects in their home containers and its object states at the start, still no model and no agents.
 
 ### 7.6 Where state lives (cchat's answer to Hadi's question on session state)
 

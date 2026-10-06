@@ -4651,6 +4651,11 @@ no page, no transport.
   requests each step; three messages (a catalogue, a run description, a tick update with the complete changing state);
   each message names its sim-run (TODO-187); the order of arrival per container supplied by the simulator's side;
   typed classes defined once in Python; plain request and response.
+  CHANGED (Hadi, 6 October 2026, preferred, at the plan of 1a; reason: a stopping point is needed for headless, not for
+  a screen-user who can stop): the web-ui has no step limit by default; a sim-run ends at a limit only when one is set
+  (`--steps` at the web-ui's start, or a number entered in the page), and otherwise by reset, by a change of choice or
+  at the server's stop. Also changed: every change that completes a triple builds the model (a layout, or a layout and
+  a setup, is shown without a model). Below, 1a, HADI'S PREFERENCES, item 3, and 1a, HADI'S ANSWERS ON THE PLAN.
 - `webui/` (new, at the repo root): `messages.py`, the message definitions (pydantic v2, frozen, no extra field, strict;
   their JSON Schema for the page's types later); `simulator.py`, the interface a simulator's piece implements
   (`Simulator`: `catalogue()`, `build(choice, sim_run)`; `SimRunSide`: `description`, `state()`, `step()`,
@@ -4956,3 +4961,64 @@ VERIFIED for the plan (at e5de942; the plan's section 1 has the detail):
 - The terms of panel 4a: "action in hand", "switch", "resumption" and "progress" have no glossary entry of their own
   (the entry **record** names the queries `switches` and `resumptions` and "the action and its progress"); **stack**,
   **record** and **outcome** have entries. The plan uses "suspended" (an outcome) for item 5's "interrupted ones".
+
+1a, HADI'S ANSWERS ON THE PLAN (Hadi, 6 October 2026, preferred; recorded by ccode the same day, records and the plan
+only, no code changed). `docs/handoffs/plan_T-viz_1a.md` is amended to match (its P7 to P16). Every other proposal of
+the plan stays proposed by ccode; Hadi reviews each at the pause after its increment.
+1. Q1 (b). With a layout and a setup chosen and no scenario, the env-pane shows the layout with the setup's movable
+   objects in their home containers and the setup's object states, no agents. Reason (the plan's): what distinguishes
+   two setups of one room is which objects lie where. The setup's part of the loader moves into a function as the
+   layout's does.
+2. Q2 (a). The key `space.note` of dock_loading's four layout files is renamed `notes`, in increment (ii).
+   Reason (ccode's reading; Hadi stated none): one key for the notes of every layout; nothing reads it, no sim-run changes.
+3. Q3 (a). Started without a run file, the page opens on the default run file's sim-run at its start. Reason (the
+   plan's): one rule for every start, as the headless start runs the default run file, and the page is never empty.
+4. The page's choice mirrored in the address is kept, with one rule: the server's state wins. If a stepped sim-run is
+   current, the page shows it and ignores the address; otherwise the page requests the address's choice. Reasons: a
+   bookmark per scenario for a demonstration; a link that can be embedded in web-based slides, a later task Hadi will
+   open (no name and no letter yet). Limits: the link is not a run file (TODO-189); it reopens a choice at its start,
+   not at a tick; one server holds one current sim-run (TODO-187).
+5. The web-ui has no step limit by default. This changes 0.4's preference "a sim-run in the web-ui ends at the
+   configured steps" (0.4's dated line above). Reason: the solara-ui runs without an end; a stopping point is needed for
+   headless, not for a screen-user who can stop. Proposed by cchat and worked out in the plan (its M8 and section 4,
+   item 11): the web-ui does not use the run file's `steps`; a limit applies only with `--steps` at the start or a
+   number entered in the page; the steps option becomes optional in the messages; without a limit a sim-run ends by
+   reset, by a change of choice or at the server's stop; test 1 states its steps; the control bar shows the steps done
+   without a bar when there is no limit.
+6. Play pauses by itself at the tick where the human's script has ended and the robot's pool is empty (the point MPB-5
+   names); the page states that all agents have finished. The sim-run is not ended; step and play continue to work. A
+   sim-run that never reaches the point is not paused. Reason (ccode's reading; Hadi stated none): the screen-user
+   sees where the work ends without the sim-run ending there. The value's place proposed in the plan (M7): a third section `run` of the tick update, beside
+   `world`, holding `finished_at`.
+7. TODO-33 gets Hadi's idea, not decided: every start stops when no agent has anything left scheduled or scripted;
+   with three facts (TODO-33). The first, "every maintained baseline log runs past that point", was measured: 46 of 48
+   run past it; the two logs of scenario_s02_01 end five ticks before it, the human still on its closing walk.
+8. The run options stay as set when the layout, the setup or the scenario changes. Reason (ccode's
+   reading; Hadi stated none): a screen-user comparing scenarios under one set of options does not set them again.
+9. Panel 4a's words "action in hand", "progress", "switch" and "resumption" get glossary entries describing their
+   existing use, as "author" did in 0.4; ccode words them, Hadi does not review them (glossary §6, after **record**).
+   "Suspended" stays the word for the task below the top of the stack.
+10. Test 2's limit is stated in the plan: a copy of dock_loading under a new name shows that a domain without its own
+    look is drawn; it does not show new object types or area ids, which the code scan covers.
+cchat's note on the display places (visual design, ccode's to decide): the plan placed a container's objects from its
+north-west corner, so a container with one object no longer showed it centred, as the trial Hadi accepted did.
+DECIDED BY CCODE (proposed, in the plan's section 4, item 10): the places are taken from the centre outward, numbered by
+their distance from the footprint's centre, so a lone object sits in the middle while no place moves; where the grid
+has an even count along an axis, a lone object sits half a place off the centre.
+WHAT THE ANSWERS MEET IN THE CODE AND IN 0.4 (ccode, 6 October 2026; worked out in the plan, nothing built):
+- Item 5 against 0.4: `steps` is declared as a `CountOption` (minimum 1) whose default is the run file's, and the
+  catalogue refuses a run file that states none (`mesa_sim/webui_adapter.py`, `_declarations`); a `SimRunChoice` must
+  give every declared option a value. Proposed: `CountOption` and `CountValue`, used only for steps, become
+  `LimitOption` and `LimitValue`, whose value may be none.
+- Item 5 against the code: `SimRun` reads `config["steps"]` for the start line's `steps=` field, which has no value
+  without a limit. Proposed: `steps=none` for a web-ui sim-run without a limit; headless and a sim-run with a limit
+  write the number as now. Such a log pair differs from every headless pair in that field only.
+- Item 5, a consequence: without a limit a sim-run's tick updates grow with it (about 1.3 KB per tick; 13 MB at 10 000
+  ticks), all held by the server for `current` and by the page. Noted, no limit set.
+- Item 6 against 0.4: the tick update holds the world only, and the point is not a world fact: the robot's pool is the
+  robot's side (`RobotAgent.finished`, set on the tick of its `[meta] ... all tasks complete` line, the declared tick,
+  TODO-127; the tick the test-beds read as MPB-5's point). The human's script has ended when every ordinary and
+  closing entry is closed and the stack is empty (`HumanStackMachine.all_closed()`). Hence the plan's third section.
+- Item 4: no conflict with the code or with 0.4. The page tells a stepped sim-run from the tick updates `current`
+  returns (the plan's M3). Two tabs on one server share the current sim-run (TODO-187): a second tab opened while one
+  is stepped shows it, whatever its address says.
