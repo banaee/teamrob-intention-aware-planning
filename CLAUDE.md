@@ -67,12 +67,19 @@ Relevant (read as needed):
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
 - The record of planning and building (the records split, 2 October 2026): `docs/design_records.md`, one heading per
-  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-K, T-F part 1). A session reads its own task's heading. In
+  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-K, T-F part 1, T-viz). A session reads its own task's heading. In
   `design_decisions.md` an index line `→ RECORD [<id>]` stands where a moved block was; `design_records.md` heads the
   block with the entry's title and the same id, so a citation by title and label resolves.
 - `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
   human behaviour model"; glossary §6 and §7). Read it in every T-H session. `docs/terminology_revision.md` §8 states
   what T-H changed in the 24 Sept terms.
+- `docs/handoffs/handoff_T-viz.md`: T-viz, the web-ui (the design chat of 4 to 6 October 2026; design_records.md,
+  "T-viz, the web-ui"; roadmap.md, the T-viz bullet; TODO-186 to TODO-189; reference images in
+  `docs/handoffs/tviz_refs/`). Read it in full in every T-viz session. T-viz records use its status words (open,
+  preferred, preferred, replaceable, proposed by cchat, verified, not verified), never "ruling" or "ruled"; "sim-run"
+  is a word of the T-viz records only. "The viewer" in older records and in code means the solara-ui (a tentative
+  name for the existing program, `solara run mesa_sim/run_mesa.py`) or T-V's planned viewer; nothing is renamed without
+  Hadi's word.
 - `analysis/`, sorted by domain (the sort, 1 October 2026; `analysis/README.md`): `analysis/instruments/` holds the
   test-beds' code both domains run (`run.sh <domain>`), `analysis/kitting/` every earlier analysis with kitting's run
   sets, expectations and reports, `analysis/dock_loading/` dock_loading's; the run files under `configs/<domain>/`, the
@@ -581,6 +588,10 @@ Decisions
   started unasked: T-F (part 1 closed, part 2 parked), T-V, the T-D tail, T-K part 2 and T-S, i.e. Phase 5
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
   strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
+  ASKED FOR (Hadi, 6 October 2026): T-viz, the web-ui (`docs/handoffs/handoff_T-viz.md`; design_records.md, "T-viz, the
+  web-ui"). Its stage 0 runs now, one step per session (0.1 recording done, 6 October 2026); a later T-viz stage starts
+  only when Hadi asks for it. T-V's own items (what track 1 shows, track 2's live-event mechanism) stay not to be
+  started unasked; how T-viz and T-V join is open.
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
   cost) exist. `full_reorder` (B3.B) is built (`_replan_orderings()`, T-B2b / T-B2c): orderings are ranked
   on their realized cost, `realize()` running one minimal-shift search per entry (T-B Q2), and the hold sent
@@ -893,7 +904,8 @@ across that commit without it.
   T-F evaluation (Phase 5); T-G the second domain in Mesa (dock_loading; 4D and ROS left it on 30 Sept 2026); T-V
   viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-K context knowledge (part 1 crisp
   context knowledge, between T-G's stage 1 and stage 2; part 2 degrees of context facts, R5, after track 3b); T-S
-  ROS/PRIEST (Phase 6). Task
+  ROS/PRIEST (Phase 6); T-viz the web-ui (asked for 6 October 2026; stages 0 to 3, a name not a letter; the solara-ui
+  is the existing Solara program). Task
   prompts and reports use these names; the order is the roadmap's, not the alphabet's.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.

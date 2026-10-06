@@ -4337,3 +4337,178 @@ result table byte-identical, every earlier line of COMPARISON.md unchanged. Not 
 conditions that observe the human, as under single_task (TODO-184). A measured premise: under single_task recognition
 changed the robot's order in 3 scenarios (intention-unaware → context knowledge off) and context knowledge in 1;
 under full_reorder in 1 and 3. Findings, none ruled: the report.
+
+## T-viz, the web-ui
+
+WHAT IT IS (Hadi and the design chat, 4 to 6 October 2026; recorded by ccode, 6 October 2026, T-viz 0.1). A web user
+interface for the framework, the web-ui: its own page in the browser and a small Python server, without Solara. The
+source is `docs/handoffs/handoff_T-viz.md` (written in the design chat, placed in the repo by Hadi, 069282b), which every
+T-viz session reads first; it holds the course of the discussion, Hadi's taste and references (section 10, the images
+in `docs/handoffs/tviz_refs/`), the proposed architecture and messages, and the open questions. This heading records
+the status of each item and the steps done; it does not repeat the handoff.
+
+THE STATUS WORDS. T-viz records do not use "ruling" or "ruled" (Hadi, so that its choices stay changeable in later
+design stages): open (not chosen; every item until Hadi says otherwise), preferred (Hadi said so; the default for now),
+preferred, replaceable (a default defined from the start as exchangeable for a named later alternative), proposed by
+cchat (a recommendation of the design chat, treated as open), verified and not verified (facts). Proposals of ccode are
+marked "proposed by ccode" and are open. "sim-run" (one simulation, from a built model at step 0 to its end) is a word
+of the T-viz records only; the glossary's run, run file and run options are unchanged.
+
+PREFERRED BY HADI (handoff, 6.1 to 6.3, 7.2, 7.5, 12.4):
+- The framework gets a web-ui, its own page with a small Python server, without Solara; it is domain-independent (the
+  same for kitting and dock_loading); the scene is drawn by a JavaScript drawer, not Plotly, a tick moving existing
+  shapes.
+- Run options are fixed for a sim-run: editing happens before the model is built, nothing is edited while a sim-run is
+  in progress (within stages 0 to 2). The time of a sim-run is its number of ticks.
+- The technologies are chosen for the full target, not for the first increment; only stage 1's visual design may be a
+  simple first round; the backend is not provisional. The work is incremental.
+- The reading of the run configuration and the building of the `SimModel` move into a module of their own (0.2).
+- The visual design is ccode's, within Hadi's described taste (handoff, section 10: sketch J the reference style, the
+  background and static objects toward the line drawing of sketch A; a tilted view with height, "minimal 3d"; agents a
+  bit illustrative; active objects given more presence); a per-domain visualisation configuration read only by the
+  web-ui, its form and place ccode's.
+- What the env-pane shows before the first step: alternative B, every change of a choice or a toggle builds the model
+  and the env-pane shows its step 0; the choices lock after the first step, reset unlocks them. Its condition, a build
+  of about a second or less, is measured (fact 5 below): met.
+- Stage 1 split into 1a, 1b, 1c; the toggles cover all run options; sim-runs side by side belong to stage 2.
+- Preferred, replaceable: an agent's path is a straight line now, another path method later (see fact 3 below).
+- The solara-ui stays in the repo as archived (not updated with core and model changes, not guaranteed to run, not
+  deleted); the archived status begins when Hadi accepts stage 1a; until then it is kept working.
+Everything else in the handoff is open or proposed by cchat (collected in its section 15).
+
+THE STAGES: `docs/roadmap.md`, "The plan from T-A", the T-viz bullet (stages 0 to 3 and the unassigned items); the
+open questions of stages 2 and 3 and the unassigned items are TODO-186 to TODO-189. Hadi did not explicitly confirm the
+consolidated list of the handoff's 12.1; he raised no objection to it.
+
+RELATIONS (ccode's reading of the records, 6 October 2026; how the records join T-viz and T-V is open, for Hadi):
+- T-E (the demonstration's viewer) is not an open task: superseded by T-V track 1 on 30 September 2026 (roadmap.md,
+  "T-E — Demonstration", its SUPERSEDED line; glossary §8, **T-E**; `docs/handoffs/handoff_T-D_onward.md`, the header
+  that marks its order as history). Its list (belief, admitted projection, decision, hold, refusal, the script's events)
+  lives on in T-V track 1.
+- T-V track 1, "the viewer for pre-loaded scripts" (demonstration only, nothing enters the mind), has the content that
+  T-viz's panels 4b and 4c (stages 1b and 1c) show, on the program T-viz builds. T-V track 2 (Phase 7: live events
+  through `inject`, the export as a script, the replay rule) has its page's side in T-viz's stage 3 (proposed by cchat);
+  the mechanism stays T-V's. Proposed by ccode: T-V keeps what is shown and the live-event mechanism, T-viz is the
+  program; T-V track 1 is carried out on the web-ui as T-viz's stage 1, so that the two never hold two copies of one
+  item. T-V's place in the order (after T-F) and T-viz's (taken now) differ; the order block states only that T-viz is
+  taken now.
+- T-L's run-file panel (`mesa_sim/viz/run_file_panel.py`) is the solara-ui's built form of T-L ruling 7 ("The viewer
+  reads and edits the same file"): it shows the run file, edits the three override kinds and writes them into the run
+  file. The web-ui has no run-file panel; whether it offers the override kinds in stage 1 or 2 is open (TODO-186);
+  saving the page's choice as a run file is unassigned (TODO-189). `mesa_sim/overrides.py` holds the reusable logic.
+- TODO-110 (selection by composition or scenario coverage, not built): "the viewer" it names would be the web-ui's
+  selection panel; it is among stage 2's open questions (TODO-186). `mesa_sim/list_scenarios.py` is its one reader
+  over the registry today; the web-ui's catalogue of what the registry holds (handoff, 7.3, proposed by cchat) would be
+  a second reader of the same registry.
+
+0.1, RECORDING, DONE (ccode, 6 October 2026; no code changed). THE VERIFICATIONS of the handoff's 16.2, read at
+069282b (line numbers at that commit):
+1. T-E: superseded by T-V track 1 (roadmap.md 600 to 605; glossary.md 1373 to 1374; handoff_T-D_onward.md 10 to 12),
+   not an open task. CLAUDE.md 292 to 293 and 892 say the same.
+2. The dependencies between run options: `SimModel.__init__` applies them (mesa_sim/sim_model.py 136 to 149):
+   `intention_aware = intention_aware and human_aware`, the two knowledge options `and intention_aware`, the separation
+   stop `and human_aware`; the options set off are logged as `[run_mesa] options <cause>=off sets off: ...` (265 to 266).
+   The model exposes the effective values as attributes: `human_aware`, `intention_aware`, `assignment_knowledge`,
+   `context_knowledge`, `separation_stop`, `strategy`, `gate_strategy`, `cost_strategy`, `test_level` (136 to 170). The
+   stated values are not kept. No refusal at load, as Hadi said.
+3. `planned_path`: no module writes it, for the human or the robot. Its only reader is the drawer, behind a `hasattr`
+   guard (mesa_sim/viz/space_drawer.py 223 to 228); `git log -S planned_path -- mesa_sim` finds only the drawer's own
+   commit (6881369). The solara-ui draws no planned path today. What the model holds that a path could be copied from
+   (the executor's current walk target, the meta-planner's projected segments, the human executor's current `MoveTo`)
+   is for 0.4.
+4. Heading: no agent holds a heading or facing. The robot's mind keeps `_previous_human_direction`, the unit direction
+   of the observed human's last step (mesa_sim/sim_agents.py 420, 680 to 690), a perception fact of the robot, not the
+   human's facing.
+5. The time to build a `SimModel` (`SimModel(**resolve_model_params(...))`, the layout and setup read, the agents
+   spawned, the load-time replay `check_script` included; PYTHONHASHSEED=0, measured over every registered scenario on
+   its first reference layout, one build each): kitting 721 scenarios, 0.002 to 0.068 s, median 0.003 s; dock_loading
+   298 scenarios, 0.001 to 0.005 s, median 0.003 s. The one-time import of `mesa_sim/run_mesa.py` takes about 1.7 s.
+   Alternative B's condition holds by two orders of magnitude.
+6. The roadmap's Phase 2.2 line "Live agent positions, task progress, belief state display" (roadmap.md 49) does not
+   match the code: no file under mesa_sim/viz/ or mesa_sim/mesa_fork/visualization/ shows task progress or a belief
+   (TODO-180's check of 4 October 2026 found the same for `confidence` and `distribution`). Left for the records
+   cleaning.
+7. A headless run is stopped by an import fault in the Solara modules: `import solara` and the viz imports are at module
+   level (mesa_sim/run_mesa.py 420 to 424), before `run_headless()` is called (473). Checked: with `solara` made
+   unimportable (`sys.modules['solara'] = None`), `mesa_sim/run_mesa.py --steps 1` stops with `ModuleNotFoundError` at
+   line 420.
+8. The glossary has no entry for "tick", "step", "author" or "viewer" (nor for "run options"; the words are used
+   throughout). It does not distinguish "tick" and "step"; the code uses both (Mesa's `step()`, one tick per step).
+9. No automatic pause at a cognitive event exists: the fork's `ModelController` (mesa_sim/mesa_fork/visualization/
+   solara_viz.py 255 to 320) has step, play, pause and reset only; nothing in mesa_sim/viz/ or run_mesa.py pauses on an
+   event. The two triggers that earlier design named, `theta_crossed` and `task_committed`, no longer exist (D2, D3).
+10. Shared changing state outside the model object (reading only; the decisive two-model check belongs to stage 2):
+    no global random source is used (no `random.*` or `np.random.*` call in shared/, world/, mesa_sim/ or domains/; the
+    fork draws a seed from Python's global `random` when none is given, mesa_sim/mesa_fork/model.py 55 to 60, and no
+    framework code reads `model.random`); domain registration returns a new `Tree` per build (domains/kitting/registry.py
+    19 to 24); no mutation of the registry's scenario objects was found (overrides use `dataclasses.replace`,
+    mesa_sim/overrides.py 220 to 223); one module-level cache, `_mesa_config_cache` (mesa_sim/action_decomposer.py 314 to
+    323), holds the constant `mesa_configs.yaml`. Shared: the logging set-up. The run log and the `.rec` stream are one
+    file pair per process, opened at import of mesa_sim/run_mesa.py (69 to 89); two models in one process write into the
+    same pair.
+11. The vendored Mesa fork is 3.0.0a1 (`mesa_sim/mesa_fork/__init__.py` 27). Python 3.10.12; solara 1.57.3, starlette
+    0.48.0, reacton 1.9.1, plotly 5.23.0 (requirements.txt 13 to 16).
+12. What a sim-run writes, and from where:
+    - `logs/run_<timestamp>.log` (the root logger, also echoed to the terminal) and `logs/run_<timestamp>.rec` (the
+      logger `rec`), both relative to the working directory and opened at import of mesa_sim/run_mesa.py (69 to 89),
+      once per process. The layout and setup paths in the registry are also relative to the repository root.
+    - Written by the model and its agents: the `[run_mesa] timeline` and `[run_mesa] options` lines
+      (mesa_sim/sim_model.py 263 to 266), the `[run]` header (mesa_sim/sim_agents.py 393), `[coverage]`,
+      `[scenario-coverage]`, `[IR...]`, `[meta...]`, `[hold]`, `[stop]`, `[human]` and the `[rec]` stream
+      (sim_agents.py 71).
+    - Written by `run_headless()` only (mesa_sim/run_mesa.py 343 to 411): the start line `[run_mesa] Starting headless
+      run — ...`, the `[run_mesa] override` lines, the per-step agent lines, `[sep]`, the run's end (`end_run`: the
+      still-open entries of a robot-dependent script, a `[human]` line and a `[rec] end` line) and `[run_mesa] Headless
+      run complete.`. The solara-ui writes none of these.
+    - No run file is written by a sim-run. Only the solara-ui's run-file panel writes one (`write_overrides`,
+      mesa_sim/overrides.py 234 to 256). No figure is written by a sim-run (`analysis/instruments/mpb/figure_of_log.py`
+      draws it from the log).
+THE DIFFERENCES between the handoff and the repo (the repo wins; a dated correction note stands at the end of the
+handoff):
+- Reference images: the handoff places them in `docs/handoffs/tviz_refs/`; commit 069282b holds them in
+  `docs/handoffs/`; Hadi's working tree has them moved to `tviz_refs/`, not committed at this step. The handoff (10.3)
+  says the folder should stay out of version control if the repository is public; the repository is public and
+  069282b, with the thirteen third-party images, is pushed. For Hadi.
+- 4.4 lists T-E as a task and names T-V for track 2 only; T-E is superseded and T-V track 1 is the existing record of
+  the viewer as a task (fact 1).
+- 5.4, 8.4 and 12.1: "the model already holds a path per agent (`agent.planned_path`) ... Today that path is a straight
+  line": no module writes `planned_path`; the solara-ui draws none (fact 3).
+- 4.1: "Play stops when `model.running` is false": true of the fork, but no framework code sets `running`, which the
+  fork initialises to True (mesa_sim/mesa_fork/model.py 72); the solara-ui's play does not stop at a run's end.
+- 4.4: Phase 7's deviation "applied at the next action boundary": superseded in part by T-H (25 September 2026): events
+  may cut mid-action (`DuringAction`) (design_decisions.md, the entry's SUPERSEDED IN PART line).
+- 4.2 lists the reading (A), the building (B) and two uses (C); it does not list the logging set-up at module level,
+  nor that the start line, the override lines, `[sep]`, the per-step lines and the run's end are written by the
+  headless loop and not by the model (fact 12). "The same logs" for the web-ui (12.3) depends on this; it bears on 0.2.
+- 2.2: "viewer" is verified "in three places"; the repo has about 110 occurrences meaning a program (below).
+- 13.4: the earlier chat's pause events `theta_crossed` and `task_committed` no longer exist (fact 9).
+- 4.3: the drawer's dock_loading object colours also do not match the layouts' types (TODO-171, `delivery_area` and
+  `empty_bay` against `delivery_bay` and `empty_pallet_bay`); kitting's area ids (`zone_NW` ...) still match.
+THE WORD "VIEWER" FOR THE PROGRAM (item 5 of the task; nothing renamed; line numbers at 069282b; "reviewer" excluded:
+handoff_G_X_onward.md 51, 74, 77; handoff_T-G_onward.md 32; handoff_T-G_stage1_MPB_onward.md 27;
+handoff_T-G_stage1_onward.md 24):
+- The present Solara program (the solara-ui): CLAUDE.md 439, 503, 702, 742, 745, 861; README of
+  analysis/kitting/tb1b_two_tables 6; docs/artefacts_user_guide.md 111, 114; design_decisions.md 3870, 5017;
+  design_records.md 556, 568, 574, 575 (twice), 1805, 2762, 3042, 4073; glossary.md 1529; roadmap.md 569, 573;
+  TODOS_AND_DEFERRED.md 4459, 4462, 4477, 4824, 4827, 4828; handoffs: continue_T-F_part1_measurement.md 98,
+  handoff_T-D_onward.md 61, handoff_T-F_part1.md 36, plan_T-F_part1.md 26, 39, plan_T-G_stage1.md 25, 54,
+  plan_T-K_part1.md 360, 487, 489, 490, T-G_forward_inputs.md 509, 529. Code and data: mesa_sim/run_mesa.py 430 (the
+  `Page` docstring); mesa_sim/viz/run_file_panel.py 5, 6; mesa_sim/overrides.py 24, 234; requirements.txt 9;
+  tests/kitting/test_tl4_overrides.py 7, 157, 159 (159 is a test function's name,
+  `test_the_viewers_write_keeps_the_run_files_comments`); domains/kitting/scenarios/scenarios_s06.py 156, 163;
+  domains/kitting/layouts/env_layout_18.json 7 (its description).
+- A planned program (T-E, T-V, Phase 7, a selector, later work): CLAUDE.md 292, 293, 582, 892 (twice), 894;
+  design_decisions.md 3375, 3379, 3605, 3715, 3764, 4896, 5002, 5419; design_records.md 167, 1622; glossary.md 539, 931,
+  1017, 1093, 1373, 1374, 1383, 1384; roadmap.md 381, 600, 605, 803, 804, 1055, 1058; TODOS_AND_DEFERRED.md 3628, 3633,
+  4165, 4789; handoffs: handoff_G_X_onward.md 99, handoff_T-D_onward.md 11, 364, handoff_T-G_onward.md 56,
+  handoff_T-H.md 49, phase7_interactive_deviations.md 11, 13, 16, 17, 24, 52, 62, 64, 65, 83, 104, 111,
+  T-G_forward_inputs.md 775, 1108. Code: world/composition.py 32.
+Whether any of these is renamed is open (handoff, 2.2).
+GLOSSARY ENTRIES PROPOSED BY CCODE (not in the glossary; Hadi decides which are added): the 0.1 report of 6 October
+2026 lists them (web-ui, solara-ui, screen-user, env-pane, scene, display place, author, and a §8 entry T-viz; no entry
+proposed now for sim-run, start, preview, draft, run description, tick update, active and passive object, scene
+appearance, shape kind, each with its reason).
+FLAGS, outside T-viz's scope, not fixed: the solara-ui's hardcoded agent ids `robot_0` and `human_0`
+(mesa_sim/mesa_fork/visualization/solara_viz.py 215 to 216); the drawer's per-domain colour tables (TODO-171); the
+roadmap's Phase 2.2 line (fact 6); the README's "Mesa visualization (Solara) | Running" (README.md 190), to change when
+the solara-ui becomes archived; `model.running` never set (above).

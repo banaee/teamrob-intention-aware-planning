@@ -400,6 +400,9 @@ paragraph, not in the alphabet.
 - CLOSED (Hadi, 5 October 2026; design_records.md, "T-F part 1", THE CLOSE): T-F part 1 built and measured
   (analysis/kitting/tf1/REPORT.md, COMPARISON.md); T-F part 2 parked (its notes: docs/handoffs/handoff_T-F_part1.md).
   Next: T-G's next stage with T-K part 1's steps on dock_loading.
+- ADDED (6 October 2026; design_records.md, "T-viz, the web-ui"; `docs/handoffs/handoff_T-viz.md`): T-viz, the web-ui,
+  asked for by Hadi (the design chat of 4 to 6 October 2026); its stage 0 starts now (0.1 recording, 6 October 2026).
+  Its place in the order above, and how it joins T-V (whose track 1 is the viewer), are open (the T-viz bullet below).
 
 V1 AND FW (Hadi, 1 October 2026, amended by Hadi 3 October 2026 for T-K; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
@@ -811,6 +814,36 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
     its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
     fact, if wanted, is designed here as the same entry point as the live user's click.
+- **T-viz — The web-ui** (asked for by Hadi, design chat of 4 to 6 October 2026; `docs/handoffs/handoff_T-viz.md`, read
+  in every T-viz session; design_records.md, "T-viz, the web-ui"). A web user interface for the framework: its own page
+  in the browser and a small Python server, without Solara; domain-independent; a sim-run's run options fixed before
+  the model is built (all preferred by Hadi). T-viz records use the handoff's status words (open, preferred, preferred,
+  replaceable, proposed by cchat, verified, not verified), not "ruling" or "ruled", so that its choices stay changeable
+  in later design stages. Every item is open until Hadi marks it preferred.
+  - Stage 0, foundation: 0.1 recording (done, 6 October 2026); 0.2 code structure (reading the run configuration and
+    building the `SimModel` move out of `mesa_sim/run_mesa.py` into a module of their own, which the headless start,
+    the solara-ui and the web-ui import; preferred by Hadi); 0.3 the trial of the style (one real layout drawn without
+    motion; the choice of page framework and drawing library for the needs of all stages; reviewed by Hadi); 0.4 the
+    messages between server and page (open, parked; proposed contents in the handoff, section 8). Order proposed by
+    cchat: 0.1, 0.2, 0.4, 0.3.
+  - Stage 1, the first web-ui: 1a a sim-run in the browser (predefined layouts, setups and scenarios only; all run
+    options as toggles and selectors; every change builds the model and the env-pane shows step 0, preferred; play,
+    pause, step, reset; the env-pane's first version in the style direction, minimal 3D; panel 4a, the human and the
+    actual world; on Hadi's acceptance of 1a the solara-ui becomes archived, preferred); 1b the robot's mind (panel 4b,
+    its contents decided later); 1c plots over ticks, growing during the sim-run, with the timeline of context facts
+    where one exists (panel 4c).
+  - Stage 2, editing and comparison (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1 editing
+    layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts), each saved
+    as a new artefact; 2.4 sim-runs side by side.
+  - Stage 3, changes during a sim-run (open questions recorded, TODO-188): 3.1 events, interruptions and deviations of
+    the human's script.
+  - Unassigned (TODO-189): inspecting an object during a pause; an automatic pause at an event of the robot's
+    cognition; moving back along the ticks; replay without Mesa; saving the page's choice as a run file.
+  - Relations (design_records.md, "T-viz, the web-ui", RELATIONS): T-E is superseded by T-V track 1 (30 September
+    2026) and is not an open task; T-V track 1 (the viewer for pre-loaded scripts) has the content that T-viz's stages
+    1b and 1c show; T-viz's stage 3 would be the page's side of T-V track 2 (Phase 7), the mechanism staying T-V's
+    (proposed by cchat); how the records join T-viz and T-V is open. T-L's run-file panel is the solara-ui's form of
+    T-L ruling 7; the web-ui has none yet. TODO-110 (selection by composition) bears on the selection panel.
 - **T-K — Context knowledge** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-K: context knowledge in the
   recognizer's belief"; design_records.md, "T-K"; `docs/handoffs/T-G_forward_inputs.md`, section 5). Context knowledge
   as a whole, framework-wide: it concerns kitting and dock_loading alike. Three parts.

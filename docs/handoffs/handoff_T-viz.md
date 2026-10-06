@@ -1256,3 +1256,33 @@ Recording only. No code changes.
 - The earlier chat "Mesa fork and Solara compatibility" (29 September 2026) held the first comparison of options A
   and B. Hadi deleted it. Its content is in 5.1.
 - The slots discussion: TODO-173. Section 9 holds its input.
+
+---
+
+## Correction note (ccode, 6 October 2026, T-viz 0.1)
+
+The body above is left as written. Where it and the repo differ, the repo wins. Read at commit 069282b; the detail,
+with files and lines, is in `docs/design_records.md`, "T-viz, the web-ui", 0.1.
+
+- Sections 4, 10.3, 17: at 069282b the reference images and `sketch_A_and_J.svg` are committed in `docs/handoffs/`, not
+  in `docs/handoffs/tviz_refs/`; Hadi's working tree moves them there (not committed at 0.1). The repository is public
+  and 069282b is pushed, so the third-party images are in version control, against 10.3's condition.
+- 4.4: T-E is not an open task. It was superseded by T-V track 1 on 30 September 2026. T-V track 1 ("the viewer for
+  pre-loaded scripts") is the existing record of the viewer as a task; the handoff names T-V for track 2 only.
+- 5.4, 8.4, 12.1 ("planned paths"): no module writes `agent.planned_path`. The drawer reads it behind a `hasattr` guard
+  and draws nothing; the model holds no path per agent under that name. "Today that path is a straight line" does not
+  hold. Where a path can be copied from is a question for 0.4.
+- 8.4 (facing): no agent holds a heading. The robot's mind keeps the observed human's last step direction (a
+  perception fact), not a facing.
+- 4.1: no framework code sets `model.running`, which the fork initialises to True, so the solara-ui's play does not
+  stop at a run's end.
+- 4.4: Phase 7's deviation "applied at the next action boundary" is superseded in part by T-H. Events may cut
+  mid-action (`DuringAction`).
+- 4.2 and 7.2: besides A, B and C, `mesa_sim/run_mesa.py` opens the run log and the `.rec` stream at import, once per
+  process. The start line, the override lines, the per-step agent lines, `[sep]` and the run's end (`end_run`) are
+  written by `run_headless()`, not by the model, so the solara-ui writes none of them.
+- 2.2: "viewer" for the program occurs about 110 times in the records and code, not in three places only.
+- 13.4: the earlier chat's pause events `theta_crossed` and `task_committed` no longer exist (D2, D3). No pause on a
+  cognitive event was built.
+- 7.5's condition is measured: a `SimModel` builds in 1 to 6 ms (one outlier of 68 ms) over all 1019 registered
+  scenarios, after a one-time import of about 1.7 s.

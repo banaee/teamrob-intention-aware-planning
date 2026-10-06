@@ -3635,6 +3635,9 @@ Reference: design_decisions.md, "T-H: the human behaviour model", as built (T-H 
 POINTER (T-L, 26 September 2026): selection runs after T-L, over the declared (layout, scenario) pairs, never the
 product of artefacts; the run file and its overrides are ruling 7 of design_decisions.md, "Layouts, setups and
 scenarios: the three artefacts of a run".
+POINTER (6 October 2026): the program that would read the selector is now planned as the web-ui (T-viz); its stage 1a
+selection panel follows the scenario's declared setup and reference layouts; selection by composition is among its
+stage 2's open questions (TODO-186). design_records.md, "T-viz, the web-ui".
 
 **TODO-111: ros_sim's layout readers move to T-L's sources when ros_sim resumes (recorded, T-L, 26 Sept 2026)**
 [OPEN; ros_sim paused]
@@ -4757,6 +4760,11 @@ which slot is empty or full. The existing `slots` field on kitting shelves is ke
 entries before design work starts. Not designed.
 Files: domains/kitting/layouts/ (the `slots` field of shelves), domains/dock_loading/layouts/, domains/*/setups/
 Reference: docs/glossary.md, §10 **container**; design_decisions.md, "T-G: the second domain's rulings", B9
+DEFERRED (Hadi, 6 October 2026, the slots discussion; its text verbatim in docs/handoffs/handoff_T-viz.md, section 9):
+slots in containers are deferred to the framework's next version. In the current version the web-ui alone spreads the
+movable objects of one container across that container's footprint (a display place, never written to the world, a
+log or a file); the world does not change. Whether "the framework's next version" makes this item [FW] is Hadi's to
+tag. The display side is T-viz's (design_records.md, "T-viz, the web-ui").
 
 **TODO-174: "door" names two things (recorded, layout tool, 3 Oct 2026)** open
 "door" is a type in dock_loading (`office_door`, size [100, 10]) and the id of a landmark in kitting (size [80, 20]).
@@ -4827,6 +4835,8 @@ distribution keeps the floor and the pin scaling, so the leader's value in `dist
 `confidence`. The viewer is not checked for which value it shows as the confidence. ccode's check (4 Oct 2026): no file
 under mesa_sim/viz/ reads `confidence` or `distribution` today, so the viewer shows no recognizer value now; the item
 applies when it does (T-V track 1).
+POINTER (6 October 2026): the first program to show a recognizer value is planned as the web-ui's panel 4b (T-viz stage
+1b; design_records.md, "T-viz, the web-ui"); the item applies there.
 Files: mesa_sim/viz/
 Reference: design_records.md, "T-K", THE CROSS-CHECK, RULED, AM58; docs/handoffs/plan_T-K_part1.md, section 11, X2
 
@@ -4870,3 +4880,59 @@ that raise a task (break_time raises coffee_break; room_warm raises ac_activatio
 suppressing condition: the human just had a break, the A/C is on), what "in accord" and "not in accord" mean is not
 decided.
 Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM36 (the three levels)
+
+**TODO-186: T-viz stage 2, editing: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open; decided when the stage is reached
+In T-viz records the status words are the handoff's (open, preferred, proposed by cchat), not "ruled". Hadi's words:
+stage 2 allows editing of layouts (scene arrangement, add or remove objects), setups (placements) and scenarios
+(scripted human behaviour, the timeline of context facts), each saved as a new artefact. The questions, all open:
+- The three override kinds (`mesa_sim/overrides.py`, offered today by the solara-ui's run-file panel): whether the web-ui
+  offers them in stage 1 or stage 2.
+- Scripts have no typed textual form: scenarios are Python literals (`ScenarioConfig`), layouts and setups JSON.
+  Editing a script in a page needs a structured form of scripts that the page can show, change and write back, a core
+  design matter. Proposed by cchat: stage 2 begins with layouts and setups, scripts after that core step.
+- The draft (the chosen artefacts plus the edits, held in the server's memory) and its saving as new artefacts with
+  their own serial ids (a change worth keeping is a new artefact).
+- A preview without a model while a draft does not load (alternative C of the handoff's 7.5).
+- Validation: the page shows the loader's error when a draft fails.
+- The existing layout tool (`scripts/layout_tool.py`, `scripts/README.md`): its relation to stage 2.1.
+- Selection by composition and coverage for the selection panel (TODO-110).
+Files: mesa_sim/overrides.py, shared/types.py (ScenarioConfig), scripts/layout_tool.py
+Reference: docs/handoffs/handoff_T-viz.md, sections 7.5, 7.6, 13.1; design_records.md, "T-viz, the web-ui"
+
+**TODO-187: T-viz stage 2, sim-runs side by side: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open; decided when the stage is reached
+Hadi's idea: two env-panes on the same triple, for example one with `intention_aware` on and one off, the two sim-runs
+fully isolated. Three ways (a mode of one server with two `SimModel`s stepped together; two tabs on one server; two
+starts in two windows) and their trade-offs: the handoff, 13.2. Proposed by cchat: the mode, since a comparison is
+meaningful at equal ticks. Open: what may differ between the two sides; what happens when one sim-run ends earlier;
+the page layout with two env-panes. Isolation in one process: read in 0.1 (design_records.md, "T-viz, the web-ui",
+THE VERIFICATIONS, fact 10): no global random source in use and no registry changed by the load; the run log and the
+`.rec` stream are process-wide (one file pair per process, set up at import of `mesa_sim/run_mesa.py`), so two models
+in one process would write into one log. The decisive check (proposed by cchat): step two models alternately in one
+process and compare each one's log with the same sim-run executed alone and headless. A limit: the side-by-side view
+demonstrates; evaluation numbers come from headless sim-runs.
+Files: mesa_sim/run_mesa.py (the logging set-up), mesa_sim/sim_model.py
+Reference: docs/handoffs/handoff_T-viz.md, sections 5.10, 13.2; design_records.md, "T-viz, the web-ui"
+
+**TODO-188: T-viz stage 3, changes during a sim-run: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open; decided when the stage is reached
+Hadi's words: stage 3 allows interactive changes during a sim-run, such as adding events, interruptions and deviations
+to the human's scripted behaviour. Hadi placed the change of the human's behaviour during a sim-run in T-V track 2
+(Phase 7). Proposed by cchat, not answered: stage 3 is the page's side of T-V track 2; the mechanism (the human
+executor's injection path `inject`, the replay rule, the event log) stays T-V's. The server already holds the model, so
+an "inject" request would be an addition. Within stages 0 to 2 nothing is edited while a sim-run is in progress
+(preferred).
+Files: world/human_executor.py (`inject`)
+Reference: docs/handoffs/handoff_T-viz.md, sections 5.8, 13.3; docs/handoffs/phase7_interactive_deviations.md;
+design_decisions.md, "A run-time deviation is the same operation as a load-time edit (Phase 7, recorded)"
+
+**TODO-189: T-viz, items with no stage (recorded, T-viz 0.1, 6 Oct 2026)** open
+Raised in the design chat of 4 to 6 October 2026, no stage assigned:
+- Clicking an object or an agent during a pause to inspect it.
+- An automatic pause at an event of the robot's cognition. Not built in the solara-ui (0.1, fact 9); the design of an
+  earlier chat named `theta_crossed` and `task_committed`, two triggers that no longer exist (D2, D3): the event list
+  would be today's triggers (`no_current_task`, `recognition_changed`, `projection_expired`) or other events.
+- Moving back along the ticks for display, from the tick updates the page keeps.
+- Replay of a finished sim-run without Mesa, from the tick updates written to a file.
+- Saving the page's choice as a run file, so that a sim-run configured in the page repeats headless (proposed by
+  cchat).
+Hadi's global freeze button: with the clock proposed by cchat (the page requests each step) it is the pause.
+Reference: docs/handoffs/handoff_T-viz.md, sections 7.3, 7.4, 8.5, 13.4
