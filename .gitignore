@@ -65,3 +65,7 @@ analysis/**/diff.md
 analysis/**/summary.md
 analysis/**/properties.md
 analysis/**/measures.md
+
+# T-viz reference images: third-party pictures, inspiration only, kept on disk and out of version control
+# (docs/handoffs/handoff_T-viz.md, 10.3; Hadi, 6 October 2026)
+docs/handoffs/tviz_refs/
