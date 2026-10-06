@@ -61,9 +61,9 @@ def tick(r, k):
     return "never" if r[k] is None else f"{r[k]} ({r[k] - r['a']})"
 
 
-def main(on_root, name, theta, offs):
+def main(on_root, name, theta, offs, domain="kitting"):
     on_root, offs = Path(on_root), [Path(p) for p in offs]
-    S.SCHEMAS.update({s.name: s for s in importlib.import_module("domains.kitting.registry").domain_config["task_model"]})
+    S.SCHEMAS.update({s.name: s for s in importlib.import_module(f"domains.{domain}.registry").domain_config["task_model"]})
     cases = []
     for d in sorted(p for p in on_root.iterdir() if p.is_dir() and (p / name).exists()):
         o = off_dir_of(d, offs, name)
@@ -105,4 +105,7 @@ def main(on_root, name, theta, offs):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2], float(sys.argv[3]), sys.argv[4:])
+    args, domain = sys.argv[1:], "kitting"
+    if "--domain" in args:                 # T-K part 1, step 6: the run's domain (kitting by default)
+        i = args.index("--domain"); domain = args[i + 1]; args = args[:i] + args[i + 2:]
+    main(args[0], args[1], float(args[2]), args[3:], domain)

@@ -147,9 +147,9 @@ def wrong_admissions(d, name):
     return traj["scenario"], out
 
 
-def main(root, name, theta):
+def main(root, name, theta, domain="kitting"):
     root = Path(root)
-    S.SCHEMAS.update({s.name: s for s in importlib.import_module("domains.kitting.registry").domain_config["task_model"]})
+    S.SCHEMAS.update({s.name: s for s in importlib.import_module(f"domains.{domain}.registry").domain_config["task_model"]})
     print(f"From `{name}`, θ = {theta:g}. Ticks inclusive; delay from the stretch's first tick in brackets.\n")
     print("| scenario | true hypothesis | ticks | first ≥ θ | admitted | after admission (not clearing for it) | other admissions | state at start (levels) | A/C belief at arrival |")
     print("|---|---|---|---|---|---|---|---|---|")
@@ -172,4 +172,7 @@ def main(root, name, theta):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2], float(sys.argv[3]))
+    args, domain = sys.argv[1:], "kitting"
+    if "--domain" in args:                 # T-K part 1, step 6: the run's domain (kitting by default)
+        i = args.index("--domain"); domain = args[i + 1]; args = args[:i] + args[i + 2:]
+    main(args[0], args[1], float(args[2]), domain)

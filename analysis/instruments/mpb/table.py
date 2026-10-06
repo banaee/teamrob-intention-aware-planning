@@ -17,7 +17,8 @@ Columns:
   standing; analysis/instruments/common/separation.py), sep_min (the continuous minimum);
 - oracle: compared | none (no table derivable: a script that depends on the robot, or assignment knowledge off in the
   intention-aware run, MPB-6); disagreements (the count, empty without the oracle); objects_separate; reference
-  (human-unaware only: equal | differ, a finding (objects shared) | none).
+  (human-unaware only: equal | differ, a finding (objects shared) | none; for a script that depends on the robot, from
+  reference_check.py, T-K part 1, step 6).
 """
 import csv
 import json
@@ -42,6 +43,8 @@ def row(d: Path, root: Path):
     if s["condition"] == "human-unaware" and (d / "reference.json").exists() and diff is not None:
         moved = [x for x in diff["disagreements"] if x[1] == "position (the reference run)"]
         reference = "differ, a finding (objects shared)" if diff.get("finding") else ("differ" if moved else "equal")
+    elif s["condition"] == "human-unaware" and (d / "reference_check.json").exists():   # a script on the robot (step 6)
+        reference = "differ" if json.load(open(d / "reference_check.json"))["disagreements"] else "equal"
     h = s["header"]
     return dict(run=d.name, domain=s["domain"], scenario=s["scenario"], layout=s["layout"],
                 human_aware=h["human_aware"], intention_aware=h["intention_aware"],

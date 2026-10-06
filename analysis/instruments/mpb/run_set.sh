@@ -7,8 +7,9 @@
 # the run file's, printed in the run's [run] header and written as columns of <out_root>/results.csv (table.py).
 # Per run file: the safety cap (the domain's horizon.py, MPB-5) as the run's steps; the run; the trajectory and its
 # check; the in-process actual (actual.py); the settings (conditions.py: R5's reading of the run file against the
-# header, the condition, whether the objects are separate); human-unaware with an independent script, the reference
-# run (reference.py); the oracle's table, the chain and the comparison where a table is derivable before the run (an
+# header, the condition, whether the objects are separate); human-unaware, the reference run (reference.py), and with a
+# script that depends on the robot its check (reference_check.py; T-K part 1, step 6, point 2); the oracle's table, the
+# chain and the comparison where a table is derivable before the run (an
 # independent script, and in the intention-aware run assignment knowledge on, MPB-6); the measures with no declared
 # property (measures.py); the run's one figure (plot.py, N); the separation counts. Last, table.py over the out_root.
 # run.sh stays the runner of the maintained outputs (their names and folders unchanged). PYTHONHASHSEED=0. Sequential:
@@ -46,9 +47,11 @@ e = s['effective']; print(s['condition'], s['dependence'], s['objects_separate']
     PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN $steps $OUT/trajectory.json $LOG 2>&1 | grep -v '^\[' || true
   fi
   PYTHONHASHSEED=0 $PY $D/actual.py $RUN $steps $LOG $last $OUT 2>&1 | grep -v -e '^\[' -e '^  step' || true
-  if [ "$condition" = human-unaware ] && [ "$dep" != on_robot ]; then
+  if [ "$condition" = human-unaware ]; then
     PYTHONHASHSEED=0 $PY $D/reference.py $RUN $steps $OUT/${name}_reference.log $OUT/reference.json \
       --strategy $strategy 2>&1 | grep -v -e '^\[' -e '^  step' || true
+    # a script that depends on the robot: no oracle, the reference check alone (T-K part 1, step 6, point 2)
+    if [ "$dep" = on_robot ]; then $PY $D/reference_check.py $OUT; fi
   fi
   if [ "$dep" != on_robot ] && { [ "$condition" != intention-aware ] || [ "$assignment" = True ]; }; then
     if PYTHONHASHSEED=0 $PY $D/mpb_oracle.py $OUT/trajectory.json $RUN $LOG $OUT/expected_ticks.json; then

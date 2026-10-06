@@ -71,11 +71,13 @@ def parse(path):
             d = dict(re.findall(r"(\w+)=(\S+)", l)); d["task"] = short(l.split()[1]); cands.append(d); continue
         if l.startswith("[meta-b3]"):
             b3 = dict(re.findall(r"(\w+)=(\S+)", l)); continue
-        m = re.match(r"\[meta\] step=(\d+) trigger=(\S+) winner=\S+\{'\?item': '(item_\d+)'", l)
+        # the winner and the queue by each task's first binding, in any domain (T-K part 1, step 6: dock_loading's
+        # `deliver_pallet{'?pallet': 'pallet_0'}`; kitting's `deliver_item{'?item': 'item_1'}` reads as before)
+        m = re.match(r"\[meta\] step=(\d+) trigger=(\S+) winner=\w+\{'\?\w+': '([^']+)'", l)
         if m:
             s, trig, w = int(m[1]), m[2], m[3]
             q = re.search(r"queue=(.*)$", l)
-            if pool is None and q: pool = [w] + re.findall(r"item_\d+", q[1])
+            if pool is None and q: pool = [w] + re.findall(r"\{'\?\w+': '([^']+)'", q[1])
             if b3 is not None:
                 dec = dict(step=s, trigger=trig, winner=w, source="b3", selection=b3["selection"],
                            hold=int(b3["hold"]), T_h=num(b3["T_h"]), cands=cands)
