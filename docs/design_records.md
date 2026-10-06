@@ -4749,3 +4749,33 @@ HOW IT WAS CHECKED:
 4. The test suite: 398 passed before, 416 after (18 new). The four maintained sets (48 logs and their `.rec`) rerun on
    the change (`run_config`'s two edits) into a scratch folder: all 96 files byte-identical to the baselines on disk,
    whose `.log` md5s are those of each README's latest section (checked on tb1a).
+
+0.2'S FAULT IN THE SOLARA-UI, FIXED (ccode, 6 October 2026; found in Hadi's browser check of 0.2; scope narrowed by Hadi
+to one tab). The fault: a step raised `RuntimeError: a closed log pair is not opened again` (`mesa_sim/sim_run.py`,
+`RunLog.open`, from `SolaraSimRun.step`). Reproduced under `solara run` with headless Chrome: two tabs on one server,
+the first tab's Step after the second tab opened.
+- The cause: since 0.2 one log pair is attached at a time, and a new `RunLog` closed the pair attached before it, so
+  displacing a sim-run was treated as ending it. The solara server holds more than one sim-run in its process (a model
+  per page session, and the one a Reset or reload leaves behind), and a page that steps a sim-run another one displaced
+  reopens a closed pair.
+- The fix (`mesa_sim/sim_run.py`): a new pair detaches the pair attached before it instead of closing it; a sim-run's
+  step and end attach its own pair again (`RunLog.attach`, `RunLog.detach`). Only `close()` (a sim-run's end, or its
+  owner leaving it) ends a pair. What happens to the log of a displaced sim-run: its files, if opened, stay open and
+  stop growing while it is displaced; its next step or end attaches it again and its lines go on in its own files; if
+  it is never stepped again, its files end where they stand (and a pair never opened leaves no file, as before).
+  Steps of two sim-runs taken one after the other each go to their own pair. Headless is unchanged (one sim-run per
+  start): the four maintained sets rerun, all 96 files byte-identical; the test suite 417 passed.
+- The test: tests/test_tviz_sim_run.py, `test_a_displaced_sim_run_steps_again_into_its_own_pair` (two sim-runs
+  stepped alternately in one process: no error, each one's lines in its own pair); it fails on the code before the fix
+  with the same RuntimeError.
+- Checked by Hadi, not by ccode after the fix: the one-tab sequence Step, Play, pause, Reset, then Step and Play again,
+  on both domains. Before the fix, in one tab, Play then Reset and a reload during Play did not raise (headless Chrome).
+- Known limits of the solara-ui, not fixed (it is archived after stage 1a), not tested after the fix, by reading:
+  - Two tabs on one server: no error; two steps at the same moment in two tabs could write a line into the other
+    tab's log pair (logging is process-wide).
+  - A tab left open from an earlier server on the same port: the same as two tabs once it reconnects.
+  - A reload during Play: the sim-run left behind is no longer stepped; its pair ends where it stands.
+- The web-ui's piece (`mesa_sim/webui_adapter.py`), by reading: the same cause could occur there before the fix, since
+  `MesaSimulator.build` creates a `RunLog`, which closed the current sim-run's pair, and a `MesaSimRun` stepped
+  afterwards would have raised. The server's rules (the current sim-run ended or discarded before a build; a step on a
+  sim-run that is not current refused) keep it from being stepped; since the fix it would attach its own pair again.
