@@ -60,8 +60,8 @@ def test_the_registry_is_the_union_of_the_modules():
     by_module = scenarios_by_module(kitting_scenarios)
     from_modules = {cfg.id for configs in by_module.values() for cfg in configs}
     assert from_modules == set(domain_config["scenarios"])
-    assert len(domain_config["scenarios"]) == 721          # 102, T-K part 1 step 4's 26 and step 5's 6 (4 October 2026), step 5e's 555 (5 October 2026), T-F part 1's 32 copies (5 October 2026)
-    assert set(domain_config["setups"]) == {f"env_setup_{n:02d}" for n in range(1, 31)}     # env_setup_17 to _30: step 5e
+    assert len(domain_config["scenarios"]) == 722          # 102, T-K part 1 step 4's 26 and step 5's 6 (4 October 2026), step 5e's 555 (5 October 2026), T-F part 1's 32 copies (5 October 2026), Hadi's scenario_s31_01 (6 October 2026)
+    assert set(domain_config["setups"]) == {f"env_setup_{n:02d}" for n in range(1, 32)}     # env_setup_17 to _30: step 5e; env_setup_31: Hadi's (6 October 2026)
 
 
 @pytest.mark.parametrize("scenario_id,layout_id", [
