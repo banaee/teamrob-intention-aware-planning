@@ -83,18 +83,32 @@ solara run mesa_sim/run_mesa.py -- --domain kitting --scenario scenario_s01_01
 
 - The panels' roles and panel 4a's content above. The right panel's content (the robot's body and its mind) is decided
   with Hadi before stage 1b is planned.
+  DECIDED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1b, THE RIGHT PANEL'S CONTENT AND
+  STAGES 1d AND 1e): panel 4b shows the robot at the tick in five blocks, in this order: body (its action and progress,
+  what it carries, a hold in progress, its current task), belief, admission (the gate, or why it refuses), projection
+  (the admitted task's plan, the fallback projection, or none), decision (the last one: tick, trigger and cause, the
+  chosen task, the hold). The order is the chain from recognition to planning and the per-run figure's; each block's
+  content is ccode's (`docs/handoffs/plan_T-viz_1b.md`).
 - The messages leave room for it: the run description and the tick update hold the world under `world`; the robot's
   mind is a section of its own beside it (0.4), not yet defined.
 - Open questions that land in 1b: whether and which paths the scene shows (TODO-197); whether the scene shows
   `min_separation` around the robot (the plan's M5).
+  ANSWERED in part (Hadi, 6 October 2026, preferred; the same block): paths are stages 1d and 1e, added after 1c (stage
+  1's order 1b, 1c, 1d, 1e): 1d the movement of the current task of the human and of the robot as wide,
+  semi-transparent stripes on the floor (the walk segments; a first try, the form open), 1e the robot's projection of
+  the human drawn the same way. Proposed by cchat: 1d against 1e shows where the robot's expectation differs from what
+  the human does; the simulator's side derives the segments and the page computes none; the human's real movement is
+  a world fact, the robot's plan and projection belong to the robot's section. TODO-197 is answered by 1d and 1e. The
+  plan's M5 (min_separation in the scene) stays open.
 
 ### What is still open
 
-1. The polishing round, after stage 1c, from Hadi's written list. Candidates known so far: the seven stale layout
+1. The polishing round, after stage 1c, from Hadi's written list (open since 6 October 2026: after 1c or after 1e). Candidates known so far: the seven stale layout
    titles (kitting env_layout_01 to _06, env_layout_30) and showing the title beside the id again; the width of panel
    4a (360 px now, 300 to 400); the tuning Hadi mentioned after increment (i), not yet specified; the see-through table
    top. Whether a second polishing round follows: open.
-2. The right panel's content (stage 1b), and paths in the scene (TODO-197, stage 1b).
+2. The right panel's content (stage 1b), and paths in the scene (TODO-197, stage 1b). DECIDED (6 October 2026): the
+   five blocks above; paths in stages 1d and 1e.
 3. Panel 4c: the plots, the robot-human distance, the timeline facts' subplot (stage 1c).
 4. The tag for a fact that lowers a task (TODO-185): Hadi.
 5. The stale layout titles themselves: Hadi, whenever the layout files are next touched (with item 1).

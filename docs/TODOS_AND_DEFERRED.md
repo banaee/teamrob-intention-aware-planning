@@ -5066,3 +5066,9 @@ holds no path per agent. The handoff's 8.4 raises whether a path is world conten
 handoff's "a straight line now, replaced later" (6.2) is superseded in part.
 Files: webui/messages.py, mesa_sim/webui_adapter.py
 Reference: docs/handoffs/handoff_T-viz.md, 5.4, 6.2, 8.4; design_records.md, "T-viz, the web-ui", 0.1 (fact 3), 0.4
+ANSWERED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1b, THE RIGHT PANEL'S CONTENT AND
+STAGES 1d AND 1e): the scene shows paths in two stages added after 1c: 1d the movement of the current task of the human
+and of the robot as wide, semi-transparent stripes on the floor (the walk segments; a first try, the form open); 1e the
+robot's projection of the human (the admitted task's plan or the fallback projection) in the same way. The simulator's
+side derives the segments, the page computes none; the human's real movement is a world fact, the robot's plan and its
+projection belong to the robot's section of the messages (proposed by cchat). Stage 1b draws no path.

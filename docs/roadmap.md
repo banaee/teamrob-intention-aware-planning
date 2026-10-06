@@ -872,6 +872,13 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     Hadi's list. The solara-ui is not archived: an alternative start, kept running with a light check. Next within
     T-viz: stage 1b, the robot's panel (its body and its mind), its content decided with Hadi before it is planned;
     the state for the next design chat: the handoff's "State after stage 1a".
+    AMENDED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1b, THE RIGHT PANEL'S CONTENT AND
+    STAGES 1d AND 1e): panel 4b shows the robot at the tick in five blocks, in the order of the chain from recognition to
+    planning: body, belief, admission, projection, decision. Two stages follow 1c, stage 1's order being 1b, 1c, 1d, 1e:
+    1d the movement of the current task of the human and of the robot as wide, semi-transparent stripes on the floor; 1e
+    the robot's projection of the human drawn the same way (TODO-197 answered). Open: whether the polishing round comes
+    after 1c or after 1e. ASKED FOR (Hadi, 6 October 2026): stage 1b, planned briefly and built without a pause
+    (`docs/handoffs/plan_T-viz_1b.md`).
   - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
     editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
     each saved as a new artefact; 2.4 sim-runs side by side.

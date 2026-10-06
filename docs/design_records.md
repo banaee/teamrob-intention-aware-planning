@@ -5263,3 +5263,25 @@ THE CHECK (ccode, 6 October 2026): `solara run mesa_sim/run_mesa.py` serves in k
 dock_loading (scenario_s03_02), HTTP 200; a sim-run of each, built from the command line's configuration as under
 solara, takes three steps without an error.
 The state for the next design chat: `docs/handoffs/handoff_T-viz.md`, "State after stage 1a".
+
+1b, THE RIGHT PANEL'S CONTENT AND STAGES 1d AND 1e (Hadi, 6 October 2026, preferred; recorded by ccode the same day,
+with the task of stage 1b; records only, no code changed).
+1. Panel 4b, the right panel, shows the robot at the tick in five blocks, in this order: (1) Body: the robot's action
+   and its progress, what it carries, a hold in progress, its current task. (2) Belief: the robot's belief over the
+   tasks the human may be doing. (3) Admission: whether the leading hypothesis passes the gate, or why it is refused.
+   (4) Projection: what the robot expects the human to do, and its kind: the plan of the admitted task, the fallback
+   projection, or none. (5) Decision: the last decision: its tick, its trigger and cause, the chosen task, the hold.
+   Reason: the order is the framework's chain from intention recognition to adaptive planning, and it matches the
+   per-run figure Hadi reads (analysis/instruments/irb/plot.py, mpb/decision_panel.py); the panel is that figure at one
+   tick. The content of each block is ccode's (`docs/handoffs/plan_T-viz_1b.md`).
+2. Two stages are added to stage 1, after 1c; stage 1's order is 1b, 1c, 1d, 1e.
+   - 1d: the env-pane draws the movement of the current task of the human and of the robot as wide, semi-transparent
+     stripes on the floor (the walk segments). A first try; the form is open.
+   - 1e: the env-pane draws the robot's projection of the human (the plan of the admitted task, or the fallback
+     projection) in the same way.
+   Proposed by cchat, recorded with them: 1d against 1e shows where the robot's expectation differs from what the human
+   does; the model holds no path per agent (0.1, fact 3), so the simulator's side derives the segments and the page
+   computes none; the human's real movement is a world fact, the robot's plan and its projection belong to the robot's
+   section of the messages.
+   TODO-197 (whether and which paths the scene shows) is answered by 1d and 1e. Open: whether the polishing round
+   comes after 1c or after 1e.
