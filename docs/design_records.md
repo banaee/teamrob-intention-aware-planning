@@ -3959,6 +3959,28 @@ force, an admission at tick 0 of a task the human is not doing (scenario_s05_01,
 under "T-F part 1", THE CLOSE, FINDINGS. A second (5 October 2026; not ruled): with a timeline fact in force, a fact in
 accord with the human's task speeds its admission, a fact not in accord delays it (design_records.md, "T-F part 1",
 PART 1 OF THE LAST STEP; COMPARISON.md).
+STEP 6 NAMED AND RULED (Hadi, 6 October 2026): dock_loading's stage 1 measured in full, before T-G's stage 2 opens (the
+older ruling on the order reopened by Hadi on 5 October; reason: the instruments, the gate and the run conditions
+changed since stage 1's tests). Debugging, not the evaluation: the set covers various situations roughly and need not be
+complete; nothing is adjusted to a result; a case that does not occur is recorded as absent. The form is kitting's: step
+5e's authoring (added scripts, scenarios that differ only in their timeline, expectations committed before the runs)
+and T-F part 1's measurement (run files per scenario by serial, no setting in a name, the result table, one figure per
+run, a comparison report generated from the table). No A/C switch in stage 1's rooms (stage 2's room). Four conditions:
+human-unaware, intention-unaware, intention-aware with context knowledge off, with it on; assignment knowledge on;
+`single_task` in every run. The old stage 1 outputs, expectation files and run files of both test-beds and the milestone
+runs deleted as at T-F part 1's close (the tracked part reachable by a commit hash, the untracked outputs copied outside
+the repository); the layouts, setups, scenarios and recorded findings stay; the old reports stay, marked stale. The
+existing scenarios stay unchanged; their intention-aware runs with context knowledge off are the re-measurement of stage
+1 under the present gate. A new setup on env_layout_02 with the pallets already in the bays. New scripts: one of each of
+the survey's kinds (a) to (f) per room, more where they may show something about context knowledge; no expectation
+derived by hand per scenario. Timelines: two or three scenarios per script that differ only in where break_time lies,
+placed roughly, written before the runs and not moved; no window over the whole run; a scenario may hold two windows;
+the scripts that depend on the robot get such variants too. The tag per task (THE TAG PER TASK, "T-F part 1") computed
+by a reader that takes the raised task from the declared context knowledge, not from names; TODO-185 decided
+provisionally by ccode and reported for Hadi's confirmation. The tag's measures report "admitted" in both readings, two
+columns: the gate's answer per tick and the meta-planner's decision record. ADDITION (Hadi, the same day): ccode may add
+a few new layouts (a new file with the next serial id; the three existing rooms unchanged; no A/C switch) and new setups
+where more tests need them, each with one line stating why and what it makes testable.
 
 
 ## T-F part 1: the conditions human-unaware and intention-unaware
