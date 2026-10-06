@@ -1,11 +1,11 @@
 # The web-ui's page (T-viz)
 
-Stage 1a, increments (i) to (iii): the page served by the web-ui's server (`webui/server.py`, started by
+Stage 1a, increments (i) to (iv): the page served by the web-ui's server (`webui/server.py`, started by
 `mesa_sim/run_webui.py`). The frame of the page for the whole of stage 1 (the selection on top; the human and the world,
 the env-pane with its control bar, the robot's mind; the plots below); the choice by domain, layout, setup and scenario,
 a layout or a layout and setup drawn before a scenario is chosen, every run option, the choice mirrored in the address;
 the env-pane drawing the current sim-run tick by tick under play, pause, step and reset, its camera at two presets or
-moved freely.
+moved freely; panel 4a, what each human does (the action in hand, the stack, the last switches and resumptions).
 The plan: `docs/handoffs/plan_T-viz_1a.md`; the records: `docs/design_records.md`, "T-viz, the web-ui".
 
 ## Run it
@@ -39,7 +39,9 @@ After a change of `webui/messages.py` or `webui/appearance.py`, regenerate the p
 - `src/App.tsx`: the page's state and its frame; the play loop (one step requested after another, pausing by itself
   on the tick at which all agents have finished).
 - `src/api.ts`: the requests to the server. The server holds every rule; the page asks and draws the answers.
-- `src/frame/`: the selection panel and the control bar.
+- `src/frame/`: the selection panel (`selection.ts` the offer), the control bar, panel 4a (`activity.ts` its reading
+  of the human's activity).
+- `src/opening.ts`: what the page opens on; `src/address.ts`: the address.
 - `src/theme.ts`: the theme, the one file of colours, line weights, spacing and type sizes; the page's CSS and the
   scene read it.
 - `src/env-pane/`: the env-pane. `Scene.tsx` draws one tick from the run description, the tick update and the scene

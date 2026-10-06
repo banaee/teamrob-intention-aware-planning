@@ -28,13 +28,22 @@ web-ui", 1a blocks.
 - Hadi's change of mode recorded (design_records.md, 1a, THE MODE OF CHECKS; the plan's P25 and section 8), and the
   records of (ii) and (iii).
 
+- Session of (iv), part 1 (6 October 2026): Hadi's review of (ii) and (iii) recorded (ddde9cc; P25 corrected, P26);
+  the discovery test for scenario_s31_01 (0edd3dc); dock_loading's four layout notes (1fef671, B4 equals B0); the page
+  logic of (ii) and (iii) tested (7e9716e: opening.ts, withOption, foldBook; vitest 23).
+
+- Increment (iv) BUILT (8f05287 panel 4a, 795fc34 test 2): the suite 438 passed; vitest 27; the build; one look in
+  Chrome (kitting scenario_s02_02, dock_loading scenario_s06_09, the unseen domain). Records: design_records.md, 1a,
+  INCREMENT (iv), BUILT.
+
 ## In progress
 
-- None. Paused for Hadi's review of (ii) and (iii).
+- None. Paused for Hadi's review of (iv).
 
 ## Next
 
-- Hadi's review; then (iv) in a new session, under P25's checks.
+- (v), polishing from Hadi's written list, in a new session; then the close of 1a (the solara-ui check once, the
+  README's archive line, the roadmap's line).
 
 ## Decisions taken on the way
 

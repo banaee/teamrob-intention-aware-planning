@@ -86,6 +86,8 @@ Increments (ii) and (iii) BUILT (6 October 2026; design_records.md, 1a, INCREMEN
 selection with views of a layout and a setup, the run options, the address; the free camera, looks by state, display
 places kept, see-through table tops. Checks of the page reduced for the rest of stage 1 (Hadi, P25). Next: Hadi's
 review, then (iv).
+Increment (iv) BUILT without the close (6 October 2026; design_records.md, 1a, INCREMENT (iv), BUILT): panel 4a, the
+human's activity; test 2. Next: Hadi's review, then (v), polishing from his list, then the close of 1a.
 
 ### What Hadi prefers now
 

@@ -12,7 +12,8 @@ ccode pauses after each increment for Hadi's review in the browser. AMENDED (Had
 increments (ii) and (iii) are built in one session with no pause between them; then one pause; (iv) and (v) each in a
 session of its own.
 
-Progress: increments (ii) and (iii) BUILT (ccode, 6 October 2026; design_records.md, 1a, INCREMENTS (ii) AND (iii),
+Progress: increment (iv) BUILT without the close (ccode, 6 October 2026; design_records.md, 1a, INCREMENT (iv), BUILT);
+Hadi's review open; then (v), then the close of 1a. Increments (ii) and (iii) BUILT (ccode, 6 October 2026; design_records.md, 1a, INCREMENTS (ii) AND (iii),
 BUILT); Hadi's review of them open. Increment (i) BUILT (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, INCREMENT (i),
 BUILT, with its checks and its deviations from this plan); Hadi's review of it done (6 October 2026; design_records.md,
 "T-viz, the web-ui", 1a, HADI'S REVIEW OF INCREMENT (i); P17 to P24 below). Increments (ii) to (v) not started.

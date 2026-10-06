@@ -5164,10 +5164,23 @@ plan is amended to match (P25 corrected, P26).
    logic are written, not deferred; logic of (ii) and (iii) without a test gets one now. Unchanged: one look in a real
    browser per new feature; headless byte-identical when simulator code changes; short record entries.
 2. The 15 page tests stay.
-3. `tests/test_tl2_discovery.py` updated for scenario_s31_01 (722 scenarios, setups to env_setup_31; f0 below).
+3. `tests/test_tl2_discovery.py` updated for scenario_s31_01 (722 scenarios, setups to env_setup_31; 0edd3dc).
 4. A choice that cannot be built keeps the env-pane's last picture, the controls disabled, the error in at most three
    lines: kept.
 5. The address carries every run option: kept.
 6. The see-through table top keeps its opacity (0.4) for now.
 7. dock_loading's four layout notes rewritten, shorter, the purpose first, every fact kept (cchat's assumption, not
    confirmed by Hadi: these four only; whether other layouts' notes are rewritten is open). Headless byte-identical.
+
+1a, INCREMENT (iv), BUILT (ccode, 6 October 2026; plan section 2 (iv) without the close; proposals of ccode; Hadi's
+review open). Before it, the review's items: 0edd3dc (the discovery test), 1fef671 (dock_loading's notes, headless
+byte-identical), 7e9716e (the page logic of (ii) and (iii) tested: `src/opening.ts`, `withOption`, `foldBook`, moved out
+of `App.tsx` unchanged).
+- Panel 4a (8f05287): per human the action in hand with its progress and its task, the stack with the task below the
+  top suspended, the last five switches of the stack and resumptions with their ticks and, for a switch, the task it
+  suspended and where it cut it; 340 px wide (P18). Test 2 (795fc34): dock_loading's content under a new name, no
+  appearance file, listed with the default appearance, built and stepped through the server.
+- Checks: the suite 438 passed; vitest 27 passed; the build and type check; one look in Chrome at 1440 wide (kitting
+  scenario_s02_02, dock_loading scenario_s06_09, the new domain drawn from the defaults, no console error).
+- Deviations: an action is written with all its bindings' values, the agent included (`move_to(human_0, pallet_0)`), as
+  the logs write it, not the plan's example without the agent; test 2's screenshot is a look, not a saved file (P25).
