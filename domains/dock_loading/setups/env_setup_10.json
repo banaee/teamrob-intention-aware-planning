@@ -1,0 +1,109 @@
+{
+  "notes": "T-K part 1, step 6 (design_records.md, \"T-K\", STEP 6): kind 3 \"pallets in the bays\", env_setup_08's content, written for env_layout_02. Why: Hadi's ruling (T-K part 1, step 6): the planning runs cover three rooms; env_layout_02 had only the recognition setup and the work cycle. Testable: the planning runs with an independent script in the room with the latest admissions (stage 1). T-G stage 1, kind 3 \"pallets in the bays\" (the MPB's controlled scenarios), (design_decisions.md, \"T-G: the second domain's rulings\", THE MPB ON DOCK_LOADING, MPB-DL2 as amended and named): two full unscanned pallets in each delivery bay, each designated to the bay it stands in (the human scans only these); one full pallet in the truck designated to each delivery bay; two empty pallets in the empties container, each designated to the truck. A test condition, not the domain's work cycle (D9): the pallets the robot delivers here are never scanned.",
+  "env_objects": [
+    {
+      "id": "pallet_0",
+      "type": "pallet",
+      "subtype": "dry",
+      "initial_container": "dry_delivery_bay_0",
+      "destination": "dry_delivery_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_1",
+      "type": "pallet",
+      "subtype": "dry",
+      "initial_container": "dry_delivery_bay_0",
+      "destination": "dry_delivery_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_2",
+      "type": "pallet",
+      "subtype": "frozen",
+      "initial_container": "frozen_delivery_bay_0",
+      "destination": "frozen_delivery_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_3",
+      "type": "pallet",
+      "subtype": "frozen",
+      "initial_container": "frozen_delivery_bay_0",
+      "destination": "frozen_delivery_bay_0",
+      "size": [
+        80,
+        120
+      ]
+    },
+    {
+      "id": "pallet_4",
+      "type": "pallet",
+      "subtype": "dry",
+      "initial_container": "truck_interior",
+      "destination": "dry_delivery_bay_0",
+      "size": [
+        80,
+        120
+      ],
+      "notes": "The robot's deliver-dry; never scanned in this setup's scenarios."
+    },
+    {
+      "id": "pallet_5",
+      "type": "pallet",
+      "subtype": "frozen",
+      "initial_container": "truck_interior",
+      "destination": "frozen_delivery_bay_0",
+      "size": [
+        80,
+        120
+      ],
+      "notes": "The robot's deliver-frozen; never scanned in this setup's scenarios."
+    },
+    {
+      "id": "pallet_6",
+      "type": "pallet",
+      "initial_container": "empty_pallet_bay_0",
+      "destination": "truck_interior",
+      "size": [
+        80,
+        120
+      ],
+      "notes": "The robot's return-1."
+    },
+    {
+      "id": "pallet_7",
+      "type": "pallet",
+      "initial_container": "empty_pallet_bay_0",
+      "destination": "truck_interior",
+      "size": [
+        80,
+        120
+      ],
+      "notes": "The robot's return-2."
+    }
+  ],
+  "states": [
+    {
+      "state": "is_empty",
+      "object": "pallet_6"
+    },
+    {
+      "state": "is_empty",
+      "object": "pallet_7"
+    },
+    {
+      "state": "is_open",
+      "object": "dock_gate"
+    }
+  ]
+}

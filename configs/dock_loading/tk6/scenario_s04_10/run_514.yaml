@@ -1,0 +1,17 @@
+# T-K part 1, step 6 (not a baseline): scenario_s04_10, intention-aware, context knowledge on.
+# Run: analysis/instruments/mpb/run_set.sh dock_loading -o analysis/dock_loading/tk6/measurement <this file>
+
+domain: dock_loading
+layout: env_layout_03
+setup: env_setup_04
+scenario: scenario_s04_10
+steps: 900
+human_aware: true
+intention_aware: true
+assignment_knowledge: true
+context_knowledge: true
+strategy: single_task
+gate_strategy: none
+cost_strategy: realized
+separation_stop: false
+test_level: 0.05

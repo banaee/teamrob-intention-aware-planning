@@ -1,0 +1,168 @@
+{
+  "space": {
+    "width": 1200,
+    "height": 1480,
+    "name": "Dock Loading Domain Layout 05 (T-K part 1, step 6)",
+    "units": "cm",
+    "note": "env_layout_03 with coffee_machine_0 moved to (-90, 250), in the hall beside the office door (T-K part 1, step 6; design_records.md, \"T-K\", STEP 6, its addition). Why: from either bay and from the standby place the walk to the coffee break and the walk to the office break begin in nearly the same direction, so break_time is the one thing that can tell the two foreseeable tasks apart early; testable: the raised coffee break against the office break on one shared walk. Everything else is env_layout_03's. origin (0,0) at the centre of the hall, y up. T-G stage 1 room (design_decisions.md, \"T-G: the second domain's rulings\", B14). The space is centred on the origin, x [-600, 600], y [-740, 740]: it holds every fixed object, the truck included (y from -740 to -440) and the office (y up to 415)."
+  },
+  "areas": [
+    {
+      "id": "area_hall",
+      "bounds": {
+        "x_min": -600,
+        "x_max": 600,
+        "y_min": -300,
+        "y_max": 300
+      },
+      "label": "hall"
+    },
+    {
+      "id": "area_office",
+      "bounds": {
+        "x_min": -170,
+        "x_max": 170,
+        "y_min": 300,
+        "y_max": 415
+      },
+      "label": "office"
+    },
+    {
+      "id": "area_truck_side",
+      "bounds": {
+        "x_min": -600,
+        "x_max": 600,
+        "y_min": -740,
+        "y_max": -300
+      },
+      "label": "truck_side: the dock platform (y -440 to -300) and the truck (x -125 to 125, y -740 to -440), outside the gate; written as one rectangle, the form holds one rectangle per area"
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "truck_interior",
+      "type": "truck",
+      "position": [
+        0,
+        -590
+      ],
+      "size": [
+        250,
+        300
+      ]
+    },
+    {
+      "id": "dock_gate",
+      "type": "gate",
+      "position": [
+        0,
+        -300
+      ],
+      "size": [
+        300,
+        10
+      ]
+    },
+    {
+      "id": "dry_delivery_bay_0",
+      "type": "delivery_bay",
+      "subtype": "dry",
+      "position": [
+        -515,
+        215
+      ],
+      "size": [
+        170,
+        170
+      ]
+    },
+    {
+      "id": "frozen_delivery_bay_0",
+      "type": "delivery_bay",
+      "subtype": "frozen",
+      "position": [
+        515,
+        0
+      ],
+      "size": [
+        170,
+        170
+      ]
+    },
+    {
+      "id": "empty_pallet_bay_0",
+      "type": "empty_pallet_bay",
+      "position": [
+        -515,
+        -35
+      ],
+      "size": [
+        170,
+        170
+      ],
+      "notes": "The one container for empty pallets of this room."
+    },
+    {
+      "id": "coffee_machine_0",
+      "type": "coffee_machine",
+      "position": [
+        -90,
+        250
+      ],
+      "size": [
+        50,
+        50
+      ]
+    },
+    {
+      "id": "office_door",
+      "type": "door",
+      "position": [
+        0,
+        300
+      ],
+      "size": [
+        100,
+        10
+      ]
+    },
+    {
+      "id": "office_chair",
+      "type": "office_chair",
+      "position": [
+        130,
+        365
+      ],
+      "size": [
+        50,
+        50
+      ]
+    },
+    {
+      "id": "desk",
+      "type": "landmark",
+      "position": [
+        300,
+        -260
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark: the target of the closing part (B13), at the wall on the gate's side, beside the place of the gate's button; no task of the robot's task model names it."
+    },
+    {
+      "id": "standby_place",
+      "type": "landmark",
+      "position": [
+        0,
+        0
+      ],
+      "size": [
+        20,
+        20
+      ],
+      "notes": "Landmark: the standby place (A3's standby entry); the human's start position."
+    }
+  ]
+}

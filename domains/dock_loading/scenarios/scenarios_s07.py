@@ -9,6 +9,9 @@ from shared.types import AgentConfig, RepeatableEntry, ScenarioConfig, Script, S
 from domains.dock_loading.actions import move_to, scan_it
 from domains.dock_loading.script import (coffee_break, confirm_delivered_pallet, deliver_pallet, go_to, load_return,
                                          office_break)
+from shared.types import Timeline
+from domains.dock_loading.script import window
+from domains.dock_loading.facts import BREAK_TIME
 
 
 # A viewing fixture: the scene loads and initialises; not a baseline, not an
@@ -269,6 +272,475 @@ scenario_s07_06 = ScenarioConfig(
         "ones; the human starts at the standby place, takes the standby entry whenever no scan is applicable, and "
         "closes at the desk; prior on. Contains behaviour with no hypothesis: the walks to and stays at the "
         "standby place, the walk to the desk."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_2").during(move_to, "PT28S", drop, occurrence=0),
+                    confirm_delivered_pallet("pallet_3").at(move_to, coffee_break("coffee_machine_0"), occurrence=0),
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
+            ],
+        ),
+    ],
+)
+
+
+# T-K part 1, step 6 (6 October 2026): the copies with break_time (analysis/dock_loading/tk6/make_set.py variants).
+scenario_s07_07 = ScenarioConfig(
+    id="scenario_s07_07",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 59, 119),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_02's copy with break_time from 59 to 119 (V1, from the first delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_02's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [confirm_delivered_pallet("pallet_0"), RepeatableEntry(go_to("standby_place"))],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[confirm_delivered_pallet("pallet_0")],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[deliver_pallet("pallet_0"), load_return("pallet_4")],
+        ),
+    ],
+)
+
+
+scenario_s07_08 = ScenarioConfig(
+    id="scenario_s07_08",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 0, 60),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_02's copy with break_time from 0 to 60 (V2, the first 60 ticks; the "
+        "rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_02's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [confirm_delivered_pallet("pallet_0"), RepeatableEntry(go_to("standby_place"))],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[confirm_delivered_pallet("pallet_0")],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[deliver_pallet("pallet_0"), load_return("pallet_4")],
+        ),
+    ],
+)
+
+
+scenario_s07_09 = ScenarioConfig(
+    id="scenario_s07_09",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 59, 119),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_03's copy with break_time from 59 to 119 (V1, from the first delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_03's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                load_return("pallet_4"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s07_10 = ScenarioConfig(
+    id="scenario_s07_10",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 150, 210),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_03's copy with break_time from 150 to 210 (V2, from the second delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_03's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                load_return("pallet_4"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s07_11 = ScenarioConfig(
+    id="scenario_s07_11",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 59, 119),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_04's copy with break_time from 59 to 119 (V1, from the first delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_04's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2"),
+                    confirm_delivered_pallet("pallet_3"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s07_12 = ScenarioConfig(
+    id="scenario_s07_12",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 150, 210),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_04's copy with break_time from 150 to 210 (V2, from the second delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_04's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2"),
+                    confirm_delivered_pallet("pallet_3"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s07_13 = ScenarioConfig(
+    id="scenario_s07_13",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 59, 119),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_05's copy with break_time from 59 to 119 (V1, from the first delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_05's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2").at(scan_it, office_break("office_chair"), occurrence=0),
+                    confirm_delivered_pallet("pallet_3"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s07_14 = ScenarioConfig(
+    id="scenario_s07_14",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 150, 210),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_05's copy with break_time from 150 to 210 (V2, from the second delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_05's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2").at(scan_it, office_break("office_chair"), occurrence=0),
+                    confirm_delivered_pallet("pallet_3"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s07_15 = ScenarioConfig(
+    id="scenario_s07_15",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 59, 119),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_06's copy with break_time from 59 to 119 (V1, from the first delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_06's."
+    ),
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(0, 0),
+            scheduled_tasks=Script(
+                [
+                    confirm_delivered_pallet("pallet_2").during(move_to, "PT28S", drop, occurrence=0),
+                    confirm_delivered_pallet("pallet_3").at(move_to, coffee_break("coffee_machine_0"), occurrence=0),
+                    confirm_delivered_pallet("pallet_0"),
+                    confirm_delivered_pallet("pallet_1"),
+                    confirm_delivered_pallet("pallet_2"),
+                    RepeatableEntry(go_to("standby_place")),
+                ],
+                closing=[go_to("desk")],
+                dependence=ScriptDependence.ON_ROBOT,
+            ),
+            observes=[],
+            assigned_tasks=[
+                confirm_delivered_pallet("pallet_0"),
+                confirm_delivered_pallet("pallet_1"),
+                confirm_delivered_pallet("pallet_2"),
+                confirm_delivered_pallet("pallet_3"),
+            ],
+        ),
+        AgentConfig(
+            agent_id="robot_0",
+            agent_type="robot",
+            start_position=(0, -370),
+            observes=["human_0"],
+            assigned_tasks=[
+                deliver_pallet("pallet_0"),
+                deliver_pallet("pallet_1"),
+                deliver_pallet("pallet_2"),
+                deliver_pallet("pallet_3"),
+                load_return("pallet_4"),
+                load_return("pallet_5"),
+            ],
+        ),
+    ],
+)
+
+
+scenario_s07_16 = ScenarioConfig(
+    id="scenario_s07_16",
+    setup="env_setup_07",
+    reference_layouts=["env_layout_04"],
+    timeline=Timeline((window(BREAK_TIME, 150, 210),)),
+    description=(
+        "T-K part 1, step 6: scenario_s07_06's copy with break_time from 150 to 210 (V2, from the second delivery; "
+        "the rule: analysis/dock_loading/tk6/make_set.py, windows). Everything else is scenario_s07_06's."
     ),
     agents=[
         AgentConfig(
