@@ -5204,3 +5204,39 @@ cchat; recorded by ccode the same day). The plan is amended to match (P27 to P33
    scenario_s11_03 (env_layout_05), an office break at 28 resumed at 108.
 7. The notes of every layout of both domains are rewritten to be readable for a screen-user (supersedes the review of
    (ii) and (iii), item 7's assumption "these four only").
+
+1a, THE TAG PER TASK IN PANEL 4a (Hadi, 6 October 2026, preferred). Panel 4a shows the tag per task as the records
+define it (THE TAG PER TASK, under "T-F part 1"): "in accord", "not in accord", "no fact", on every task the human
+performs. Reason: the page and the analyses then use one meaning. The provisional rule of T-K step 6 is followed
+(TODO-185: a fact that lowers a task gives no tag), provisional until Hadi confirms or changes it. Increment (iv) is
+accepted in advance; its open details are decided by ccode (below). The plan's P34.
+
+1a, INCREMENT (iv), SECOND PART, BUILT (ccode, 6 October 2026). Increment (iv) is complete.
+- Records: 512a167 (the panels' content, P27 to P33). Outside the web-ui: 33c9394 (the discovery test pins no
+  inventory and runs alone; TODO-126 closed); a48b1b3 (every layout's notes rewritten, headless byte-identical).
+- The tag's one definition: e50cb81, `world/tag.py` (the tag, the recency facts, the stretches), read by
+  `analysis/instruments/mpb/tag.py` and by Mesa's piece. Unchanged analyses: 120 sampled dock_loading runs equal tk6's
+  `tags.csv`, 150 sampled kitting runs (tf1) equal the reader before the move.
+- The messages and the piece: fddcf7b (`HumanActivity.stack_entries` and `.tag`; `Left.entry`, `Started.event`,
+  `Unfired.position`). Tests: 705653e (the script lines' fixtures of the four reference cases; the tag the page
+  receives equals the reader's on four scenarios with a timeline fact, all three values). The page: 3cb88e5 (block C
+  the script, block D the world's context, the tag beside the task in progress and on its script line).
+- Checks: headless byte-identical (102 files) after each change of `mesa_sim/`, `world/`, `domains/`; the suite 444
+  passed; vitest 32 passed; the build and type check; one look in Chrome (kitting scenario_s10_14, dock_loading
+  scenario_s03_02 and scenario_s03_04, no console error). The tag is computed under every run option (all on; context
+  knowledge, assignment knowledge, intention-aware, human-aware each off: the same tags).
+- Decided by ccode: the one definition in `world/tag.py` (a term of the world; `mesa_sim/` may import `world/`, not
+  `analysis/`), the reader keeping only its parsing. The tag sent as the top's (`HumanActivity.tag`: the value, its
+  stretch's first tick, the raised and lowered tasks); a script line shows the tag its task last had on top.
+  Entries and events named in the piece by object identity (a frame's task is its entry's task object; an event's
+  trigger and object are the record's); a task entered and left within one tick whose task object belongs to two
+  entries gets no entry. A Drop event counts as fired when its entry was abandoned. With a domain that declares no
+  context knowledge the tag is none (no domain of today; no run option removes the declaration). The script test's
+  fixtures live outside `webui/` (`tests/fixtures/tviz_panel/`, they name a domain's tasks), the truth from the
+  executor's own state, ticks with no change dropped. Panel 4a 360 px; its blocks in the order A, C, B, D; a repeatable
+  entry shows how often its task was completed. The layout notes keep every measured fact, so the measured rooms' notes
+  stay long, their first sentence the purpose; env_layout_02 got its first note; a description copied from another
+  room replaced by a reference to it.
+- Found for Part 2b: the stale titles are kitting env_layout_01 to _06 ("Kitting Domain Layout 0" to "5", from the old
+  ids) and env_layout_30 ("env_layout_18", a copy of env_layout_18); a layout's title is written into no log line (it
+  reaches only the web-ui's run description and `scripts/layout_tool.py`).

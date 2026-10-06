@@ -12,7 +12,9 @@ ccode pauses after each increment for Hadi's review in the browser. AMENDED (Had
 increments (ii) and (iii) are built in one session with no pause between them; then one pause; (iv) and (v) each in a
 session of its own.
 
-Progress: increment (iv) BUILT without the close (ccode, 6 October 2026; design_records.md, 1a, INCREMENT (iv), BUILT);
+Progress: increment (iv) COMPLETE (ccode, 6 October 2026; design_records.md, 1a, INCREMENT (iv), SECOND PART, BUILT):
+panel 4a with the script, the world's context and the tag per task. Next: (v), from Hadi's list, then the close.
+Earlier: increment (iv) BUILT without the close (ccode, 6 October 2026; design_records.md, 1a, INCREMENT (iv), BUILT);
 Hadi's review open; then (v), then the close of 1a. Increments (ii) and (iii) BUILT (ccode, 6 October 2026; design_records.md, 1a, INCREMENTS (ii) AND (iii),
 BUILT); Hadi's review of them open. Increment (i) BUILT (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, INCREMENT (i),
 BUILT, with its checks and its deviations from this plan); Hadi's review of it done (6 October 2026; design_records.md,
@@ -102,6 +104,9 @@ OF CHECKS FOR THE REST OF STAGE 1):
   go to 4c, not 4a. P30, the tag per task is wanted in 4a, its definition open, nothing built. P31, task names show
   values only. P32, 4a's reference cases (the record lists them). P33, every layout's notes rewritten for a
   screen-user.
+- P34 (Hadi, 6 October 2026; design_records.md, 1a, THE TAG PER TASK IN PANEL 4a): panel 4a shows the tag per task
+  as the records define it, on every task the human performs; TODO-185's provisional rule followed. Increment (iv) is
+  accepted in advance; its open details decided by ccode.
 - P26. Kept at the review of (ii) and (iii): the page's behaviour on a choice that cannot be built; the address with
   every run option; the table top's opacity for now; the 15 page tests. dock_loading's four layout notes rewritten.
 

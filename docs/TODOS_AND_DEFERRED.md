@@ -4899,6 +4899,8 @@ The tag per task (design_records.md, "T-F part 1", THE TAG PER TASK; glossary §
 that raise a task (break_time raises coffee_break; room_warm raises ac_activation). For a fact that lowers a task (a
 suppressing condition: the human just had a break, the A/C is on), what "in accord" and "not in accord" mean is not
 decided.
+FOLLOWED PROVISIONALLY (Hadi, 6 October 2026, T-viz 1a (iv)): the web-ui's panel 4a shows the tag with the provisional
+rule of T-K step 6 (a fact that lowers a task gives no tag), from the one definition `world/tag.py`; still open.
 Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM36 (the three levels)
 
 **TODO-186: T-viz stage 2, editing: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open [FW]; decided when the stage is reached
