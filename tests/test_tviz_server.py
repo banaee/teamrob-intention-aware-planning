@@ -13,6 +13,7 @@ docs/handoffs/plan_T-viz_1a.md, sections 2 (i) and 7.
 - The point where all agents have finished is the tick of the robot's empty-pool line or of the human's last tick
   with a task, whichever is later, read from the sim-run's own log pair.
 - The start refuses what the page cannot show.
+- The view (T-viz 1a (ii)): refused while a stepped sim-run is current.
 """
 
 import json
@@ -203,6 +204,34 @@ def test_the_server_answers_current_and_refuses_what_it_cannot_do(server, new_fi
     assert web.post("step", m.SimRunRef(sim_run="sim-run-0"))[0] == 409
     web.stop()
     assert new_files() == []      # a sim-run never stepped writes no file, at a choice or at the server's stop
+
+
+def test_a_view_is_refused_while_a_stepped_sim_run_is_current(server, new_files):
+    """The view (T-viz 1a (ii)): it discards an unstepped sim-run and is the current view until a choice replaces it;
+    refused while a stepped sim-run is current; one that cannot be produced changes nothing."""
+    web = server("--domain", "kitting", "--scenario", "scenario_s01_01")
+    catalogue = m.Catalogue.model_validate_json(web.get("catalogue")[1])
+    state = _choose(web, catalogue.default_choice)
+    run = state.description.run
+    view_choice = m.ViewChoice(domain=run.domain, layout=run.layout, setup=run.setup)
+    status, body = web.post("view", view_choice)
+    assert status == 200
+    view = m.LayoutView.model_validate_json(body)
+    assert view.setup.movable_objects == state.description.world.movable_objects
+    current = m.Current.model_validate_json(web.get("current")[1])
+    assert current.state is None and current.view == view          # the unstepped sim-run discarded
+    status, body = web.post("view", m.ViewChoice(domain=run.domain, layout="no_layout", setup=None))
+    assert status == 422 and m.BuildFailure.model_validate_json(body).message
+    assert m.Current.model_validate_json(web.get("current")[1]).view == view      # nothing changed
+
+    state = _choose(web, catalogue.default_choice)
+    assert m.Current.model_validate_json(web.get("current")[1]).view is None
+    assert web.post("step", m.SimRunRef(sim_run=state.description.sim_run))[0] == 200
+    status, body = web.post("view", view_choice)
+    assert status == 409 and m.ViewRefusal.model_validate_json(body).sim_run == state.description.sim_run
+    assert m.Current.model_validate_json(web.get("current")[1]).state.description == state.description
+    web.stop()
+    assert len(new_files()) == 2      # the stepped sim-run's pair, ended at the server's stop
 
 
 # =============================================================================

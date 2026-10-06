@@ -16,7 +16,8 @@ ONE THREAD (T-viz 1a):
 
 from typing import Protocol
 
-from webui.messages import Catalogue, EndReason, RunDescription, SimRunChoice, SimRunId, TickUpdate
+from webui.messages import (Catalogue, EndReason, LayoutView, RunDescription, SimRunChoice, SimRunId, TickUpdate,
+                            ViewChoice)
 
 
 class BuildFailed(Exception):
@@ -50,3 +51,7 @@ class Simulator(Protocol):
     def build(self, choice: SimRunChoice, sim_run: SimRunId) -> SimRunSide:
         """The sim-run of the choice, built, at its start. The caller ends or discards the current sim-run first.
         Raises BuildFailed."""
+
+    def view(self, choice: ViewChoice) -> LayoutView:
+        """The view of a layout, or of a layout and a setup at its start (T-viz 1a), read as a model built on them
+        reads them; no model is built and nothing is written. Raises BuildFailed."""

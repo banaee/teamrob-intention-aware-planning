@@ -9,6 +9,13 @@ PURPOSE:
     sim-run (SimRunChoice, the body of a build request), the two refusals (BuildFailure, StepRefusal), and the other
     bodies and answers of the server's requests (SimRunRef, SimRunState, Current; T-viz 1a, webui/server.py).
 
+THE VIEW (T-viz 1a, increment (ii)):
+    With a layout chosen and no scenario, the page shows the layout alone; with a setup chosen as well, the layout with
+    the setup's movable objects in their home containers and the setup's object states at its start (LayoutView, asked
+    for by ViewChoice). A view has no sim-run, no agent and no tick. Its fields are the run description's and the tick
+    update's types, produced by the simulator's side from the same reading of the layout and the setup as a model's,
+    so that a view equals the matching part of the run description and the start tick update of every scenario on it.
+
 THE TERMS:
     The framework's, as docs/glossary.md defines them: agents (humans, robots), fixed objects, movable objects, areas,
     the space, the human's script, the human executor's record, ticks. No simulator class or attribute name, no domain
@@ -164,12 +171,17 @@ class SimRunChoice(Message):
 # =============================================================================
 
 class LayoutEntry(Message):
+    """A layout: its id, its title (stale in older layouts), and its notes, the free text of the layout file that says
+    what the room is for (None when it has none)."""
     id: str
     title: str
+    notes: Optional[str]
 
 
 class SetupEntry(Message):
+    """A setup: its id and its notes, the free text of the setup file (None when it has none)."""
     id: str
+    notes: Optional[str]
 
 
 class ScenarioEntry(Message):
@@ -570,6 +582,37 @@ class TickUpdate(Message):
 
 
 # =============================================================================
+# The view of a layout, or of a layout and a setup (T-viz 1a)
+# =============================================================================
+
+class ViewChoice(Message):
+    """The body of a view request: a layout of the domain, and optionally a setup."""
+    domain: str
+    layout: str
+    setup: Optional[str]
+
+
+class SetupView(Message):
+    """A setup's part of a view: its movable objects in the setup's order, the fixed objects that hold them at the
+    start (each with them in the setup's order), and the object states that hold at the start."""
+    id: str
+    movable_objects: tuple[MovableObject, ...]
+    fixed_object_contents: tuple[FixedObjectContents, ...]
+    object_states: tuple[ObjectState, ...]
+
+
+class LayoutView(Message):
+    """The view of a layout (the space, the areas, the fixed objects) and, with a setup chosen, of the setup at its
+    start. No sim-run, no agent, no tick."""
+    domain: str
+    layout: str
+    space: Space
+    areas: tuple[Area, ...]
+    fixed_objects: tuple[FixedObject, ...]
+    setup: Optional[SetupView]
+
+
+# =============================================================================
 # Refusals
 # =============================================================================
 
@@ -591,14 +634,20 @@ class SimRunState(Message):
 
 
 class Current(Message):
-    """The answer to current: the current sim-run, or None when there is none."""
+    """The answer to current: the current sim-run, or the current view, or neither (both None). At most one is set."""
     state: Optional[SimRunState]
+    view: Optional[LayoutView]
 
 
 class StepRefusalReason(str, Enum):
     NOT_CURRENT = "not_current"
     ENDED = "ended"
     BUSY = "busy"
+
+
+class ViewRefusal(Message):
+    """A view refused: a sim-run that has been stepped is current, and the choices are locked until a reset."""
+    sim_run: SimRunId
 
 
 class StepRefusal(Message):

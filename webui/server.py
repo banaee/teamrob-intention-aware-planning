@@ -20,6 +20,9 @@ THE RULES:
       advances by itself.
     - The lock of the choices after the first step is the page's: the server ends a stepped sim-run when a new choice
       arrives, as 0.4 recorded.
+    - A view (a layout, or a layout and a setup, with no scenario; T-viz 1a) is the current view until a choice or
+      another view replaces it. It is refused while a stepped sim-run is current (the choices are locked); an
+      unstepped current sim-run is discarded by it. A view that cannot be produced changes nothing.
 
 ONE THREAD:
     Every call into the simulator's side runs on one worker thread of the server (webui/simulator.py, ONE THREAD),
@@ -30,7 +33,8 @@ THE REQUESTS (JSON, plain request and response, on 127.0.0.1 only):
     POST /api/choose      SimRunChoice -> SimRunState, or 422 BuildFailure
     POST /api/step        SimRunRef    -> TickUpdate, or 409 StepRefusal
     POST /api/reset       SimRunRef    -> SimRunState, or 409 StepRefusal
-    GET  /api/current     Current (the current sim-run with its latest tick update, or none)
+    POST /api/view        ViewChoice   -> LayoutView, or 422 BuildFailure, or 409 ViewRefusal
+    GET  /api/current     Current (the current sim-run with its latest tick update, or the current view, or neither)
     The built page is served at /, when the start names its folder.
 
 THE TERMINAL:
@@ -100,6 +104,7 @@ class WebUiServer:
         self._worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix="webui-sim")
         self._catalogue: Optional[msg.Catalogue] = None
         self._current: Optional[_Current] = None
+        self._view: Optional[msg.LayoutView] = None
         self._serial = 0
         self._stepping = False      # read and written on the HTTP side only
 
@@ -142,7 +147,17 @@ class WebUiServer:
 
     def _on_worker_choose(self, choice: msg.SimRunChoice) -> msg.SimRunState:
         self._on_worker_leave(msg.EndReason.CHOICE_CHANGED)
+        self._view = None
         return self._on_worker_build(choice)
+
+    def _on_worker_view(self, choice: msg.ViewChoice) -> Union[msg.LayoutView, msg.ViewRefusal]:
+        current = self._current
+        if current is not None and current.steps_done > 0:
+            return msg.ViewRefusal(sim_run=current.side.description.sim_run)
+        view = self._simulator.view(choice)      # BuildFailed: nothing changes
+        self._on_worker_leave(msg.EndReason.CHOICE_CHANGED)     # unstepped: discarded, no log pair
+        self._view = view
+        return view
 
     def _refusal(self, ref: msg.SimRunRef, step: bool) -> Optional[msg.StepRefusal]:
         current = self._current
@@ -175,9 +190,9 @@ class WebUiServer:
 
     def _on_worker_current(self) -> msg.Current:
         if self._current is None:
-            return msg.Current(state=None)
+            return msg.Current(state=None, view=self._view)
         side = self._current.side
-        return msg.Current(state=msg.SimRunState(description=side.description, tick=side.state()))
+        return msg.Current(state=msg.SimRunState(description=side.description, tick=side.state()), view=None)
 
     def _on_worker_stop(self) -> None:
         self._on_worker_leave(msg.EndReason.SERVER_STOPPED)
@@ -219,6 +234,17 @@ class WebUiServer:
         answer = await self.on_worker(self._on_worker_reset, ref)
         return _answer(answer, 409 if isinstance(answer, msg.StepRefusal) else 200)
 
+    async def view(self, request: Request) -> Response:
+        choice = await _body(request, msg.ViewChoice)
+        if isinstance(choice, Response):
+            return choice
+        try:
+            answer = await self.on_worker(self._on_worker_view, choice)
+        except BuildFailed as e:
+            log.info("a view was not produced: %s", e)
+            return _answer(msg.BuildFailure(message=str(e)), 422)
+        return _answer(answer, 409 if isinstance(answer, msg.ViewRefusal) else 200)
+
     async def current(self, request: Request) -> Response:
         return _answer(await self.on_worker(self._on_worker_current))
 
@@ -251,6 +277,7 @@ def create_app(server: WebUiServer, page: Optional[Path]) -> Starlette:
         Route("/api/choose", server.choose, methods=["POST"]),
         Route("/api/step", server.step, methods=["POST"]),
         Route("/api/reset", server.reset, methods=["POST"]),
+        Route("/api/view", server.view, methods=["POST"]),
         Route("/api/current", server.current, methods=["GET"]),
     ]
     if page is not None:

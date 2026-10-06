@@ -9,8 +9,12 @@ PURPOSE:
     same sim-run without (tests/test_tviz_messages.py).
 
 WHAT THIS MODULE DOES:
-    - MesaSimulator: the catalogue (with each domain's scene appearance, T-viz 1a), and the build of a sim-run from the
-      screen-user's choice. A choice that cannot be built raises BuildFailed and writes no log pair (T-viz 0.4, Q4)
+    - MesaSimulator: the catalogue (with each domain's scene appearance, and the notes of its layouts and setups,
+      T-viz 1a), and the build of a sim-run from the screen-user's choice. A choice that cannot be built raises
+      BuildFailed and writes no log pair (T-viz 0.4, Q4)
+    - The view of a layout, or of a layout and a setup at its start (T-viz 1a): read through the loader's own functions
+      (mesa_sim/sim_model.py: read_layout, read_setup_objects, read_setup_states), translated by the same functions as
+      a sim-run's run description and tick update; no model is built, nothing is written
     - MesaSimRun: one sim-run; per step its tick update; its end and its discard
     - A sim-run's log pair takes only the lines of the thread the server calls it on, and does not echo to the
       terminal (webui/simulator.py, ONE THREAD; mesa_sim/sim_run.py, RunLog)
@@ -39,7 +43,8 @@ from typing import Callable, Dict, List, Optional, Tuple
 from mesa_sim.run_config import (BOOL_OPTIONS, DOMAIN_REGISTRY, EXPERIMENT_CONFIG_PATH, ONE_OF_OPTIONS,
                                  OPTION_DEFAULTS, RUN_OPTIONS, load_experiment, resolve_triple, run_configuration,
                                  user_args_parser)
-from mesa_sim.sim_model import SimModel
+from mesa_sim.sim_model import (SimModel, SimObject, declared_states, read_layout, read_setup_objects,
+                                read_setup_states)
 from mesa_sim.sim_run import RunLog, SimRun
 from shared.types import (AfterAction, DuringAction, Drop, Event, GroundedAction, Now, ScriptDependence, Start,
                           TaskInstance, TimelineSource, Trigger, task_instance_key)
@@ -129,9 +134,18 @@ def _value(declaration, value) -> msg.RunOptionValue:
     return _VALUE_OF[type(declaration)](name=declaration.name, value=value)
 
 
-def _layout_title(path: str, layout_id: str) -> str:
+def _read_json(path: str) -> dict:
     with open(path, "r") as f:
-        return json.load(f)["space"].get("name", layout_id)
+        return json.load(f)
+
+
+def _layout_entry(layout_id: str, path: str) -> msg.LayoutEntry:
+    space = _read_json(path)["space"]
+    return msg.LayoutEntry(id=layout_id, title=space.get("name", layout_id), notes=space.get("notes"))
+
+
+def _setup_entry(setup_id: str, path: str) -> msg.SetupEntry:
+    return msg.SetupEntry(id=setup_id, notes=_read_json(path).get("notes"))
 
 
 def appearance(domain: str) -> Appearance:
@@ -144,8 +158,8 @@ def appearance(domain: str) -> Appearance:
 def _domain_entry(name: str, domain: dict) -> msg.DomainEntry:
     return msg.DomainEntry(
         name=name,
-        layouts=tuple(msg.LayoutEntry(id=lid, title=_layout_title(path, lid)) for lid, path in domain["layouts"].items()),
-        setups=tuple(msg.SetupEntry(id=sid) for sid in domain["setups"]),
+        layouts=tuple(_layout_entry(lid, path) for lid, path in domain["layouts"].items()),
+        setups=tuple(_setup_entry(sid, path) for sid, path in domain["setups"].items()),
         scenarios=tuple(msg.ScenarioEntry(id=s.id, setup=s.setup, reference_layouts=tuple(s.reference_layouts),
                                           description=s.description)
                         for s in domain["scenarios"].values()),
@@ -190,6 +204,49 @@ class MesaSimulator:
             log.close()
             raise BuildFailed(str(e)) from e
         return MesaSimRun(sim_run, choice, run, self._declarations)
+
+    def view(self, choice: msg.ViewChoice) -> msg.LayoutView:
+        """The view of a layout, or of a layout and a setup at its start: the layout and the setup read and checked by
+        the loader's functions, as a model built on them reads them. A layout or a setup that is not registered, or
+        that the loader refuses, raises BuildFailed."""
+        domain = DOMAIN_REGISTRY.get(choice.domain)
+        if domain is None:
+            raise BuildFailed(f"unknown domain '{choice.domain}'. Available: {list(DOMAIN_REGISTRY)}")
+        layout_path = domain["layouts"].get(choice.layout)
+        if layout_path is None:
+            raise BuildFailed(f"unknown layout '{choice.layout}' for domain '{choice.domain}'")
+        setup_path = None
+        if choice.setup is not None:
+            setup_path = domain["setups"].get(choice.setup)
+            if setup_path is None:
+                raise BuildFailed(f"unknown setup '{choice.setup}' for domain '{choice.domain}'")
+        try:
+            layout = read_layout(_read_json(layout_path), layout_path)
+            setup = None
+            if setup_path is not None:
+                env_setup = _read_json(setup_path)
+                movable = read_setup_objects(env_setup.get("env_objects", []), layout.fixed_objects,
+                                             domain["register_fn"]().get_types_with_destination(), layout_path,
+                                             setup_path)
+                states, timeline_facts = declared_states(domain["states"], domain["timeline_facts"])
+                facts = read_setup_states(env_setup.get("states", []), setup_path, {**layout.fixed_objects, **movable},
+                                          states, timeline_facts)
+                setup = msg.SetupView(
+                    id=choice.setup,
+                    movable_objects=tuple(_movable_object(m) for m in movable.values()),
+                    fixed_object_contents=tuple(
+                        msg.FixedObjectContents(fixed_object=fid, movable_objects=held)
+                        for fid in layout.fixed_objects
+                        for held in [tuple(mid for mid, m in movable.items() if m.home_container == fid)] if held),
+                    object_states=_object_states(facts))
+        except ValueError as e:
+            raise BuildFailed(str(e)) from e
+        return msg.LayoutView(
+            domain=choice.domain, layout=choice.layout,
+            space=_space(layout.display_name, layout.x_min, layout.x_max, layout.y_min, layout.y_max),
+            areas=tuple(_area(a) for a in layout.areas),
+            fixed_objects=tuple(_fixed_object(f) for f in layout.fixed_objects.values()),
+            setup=setup)
 
     def _configuration(self, choice: msg.SimRunChoice) -> dict:
         """The run configuration's mapping of the choice: the triple, and one value per declared run option, matched
@@ -297,6 +354,32 @@ def _extent(xy) -> msg.Extent:
 
 def _bounds(x_min, x_max, y_min, y_max) -> msg.Bounds:
     return msg.Bounds(x_min=float(x_min), x_max=float(x_max), y_min=float(y_min), y_max=float(y_max))
+
+
+# The world's things, translated by one function each for a sim-run's messages and for a view (T-viz 1a).
+
+def _space(title: str, x_min, x_max, y_min, y_max) -> msg.Space:
+    return msg.Space(title=title, bounds=_bounds(x_min, x_max, y_min, y_max))
+
+
+def _area(area) -> msg.Area:
+    return msg.Area(id=area.id, bounds=_bounds(area.x_min, area.x_max, area.y_min, area.y_max))
+
+
+def _fixed_object(obj: SimObject) -> msg.FixedObject:
+    return msg.FixedObject(id=obj.obj_id, type=obj.type, subtype=obj.subtype, position=_point(obj.position),
+                           size=_extent(obj.size))
+
+
+def _movable_object(obj: SimObject) -> msg.MovableObject:
+    return msg.MovableObject(id=obj.obj_id, type=obj.type, subtype=obj.subtype, size=_extent(obj.size),
+                             home_container=obj.home_container, destination=obj.destination)
+
+
+def _object_states(facts) -> Tuple[msg.ObjectState, ...]:
+    """The object states that hold, in the order of their names and arguments."""
+    return tuple(msg.ObjectState(state=p.name, object=p.args[0].value if p.args else None)
+                 for p in sorted(facts, key=lambda p: (p.name, tuple(a.value for a in p.args))))
 
 
 # =============================================================================
@@ -414,18 +497,11 @@ class MesaSimRun:
         model = self._model
         objects = model.objects
         return msg.WorldDescription(
-            space=msg.Space(title=model.env_display_name,
-                            bounds=_bounds(model.space.x_min, model.space.x_max, model.space.y_min, model.space.y_max)),
-            areas=tuple(msg.Area(id=a.id, bounds=_bounds(a.x_min, a.x_max, a.y_min, a.y_max)) for a in model.areas),
-            fixed_objects=tuple(
-                msg.FixedObject(id=oid, type=objects[oid].type, subtype=objects[oid].subtype,
-                                position=_point(objects[oid].position), size=_extent(objects[oid].size))
-                for oid in self._fixed),
-            movable_objects=tuple(
-                msg.MovableObject(id=oid, type=objects[oid].type, subtype=objects[oid].subtype,
-                                  size=_extent(objects[oid].size), home_container=objects[oid].home_container,
-                                  destination=objects[oid].destination)
-                for oid in self._movable),
+            space=_space(model.env_display_name, model.space.x_min, model.space.x_max, model.space.y_min,
+                         model.space.y_max),
+            areas=tuple(_area(a) for a in model.areas),
+            fixed_objects=tuple(_fixed_object(objects[oid]) for oid in self._fixed),
+            movable_objects=tuple(_movable_object(objects[oid]) for oid in self._movable),
             humans=tuple(msg.AgentEntry(id=hid) for hid in model.humans),
             robots=tuple(msg.AgentEntry(id=rid) for rid in model.robots),
             scripts=tuple(self._script(hid, human) for hid, human in model.humans.items()),
@@ -454,7 +530,6 @@ class MesaSimRun:
         objects = model.objects
         agent_tick = lambda aid: msg.AgentTick(id=aid, position=_point(self._positions[aid]),
                                                last_motion=self._last_motion[aid])
-        states = sorted(model.state_facts, key=lambda p: (p.name, tuple(a.value for a in p.args)))
         return msg.WorldTick(
             humans=tuple(agent_tick(hid) for hid in model.humans),
             robots=tuple(agent_tick(rid) for rid in model.robots),
@@ -462,8 +537,7 @@ class MesaSimRun:
                                         for fixed, held in self._contents.items() if held),
             carried=tuple(msg.Carried(agent=objects[oid].held_by, movable_object=oid)
                           for oid in self._movable if objects[oid].held_by is not None),
-            object_states=tuple(msg.ObjectState(state=p.name, object=p.args[0].value if p.args else None)
-                                for p in states),
+            object_states=_object_states(model.state_facts),
             timeline_facts=tuple(sorted(p.name for p in model.timeline.facts_at(0 if tick is None else tick))),
             activity=tuple(self._activity(hid, human, tick) for hid, human in model.humans.items()),
         )
