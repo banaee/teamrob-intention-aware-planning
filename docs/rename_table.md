@@ -140,3 +140,19 @@ they run at the commit their READMEs state, as every frozen record.
 Commands: `bash analysis/ir_testbed/run.sh ...` reads `bash analysis/instruments/irb/run.sh kitting ...`, and
 `bash analysis/mpb/run.sh ...` reads `bash analysis/instruments/mpb/run.sh kitting ...`; a maintained set's
 `bash analysis/<set>/sweep.sh <dir>` reads `bash analysis/kitting/<set>/sweep.sh <dir>`.
+
+## Task names: T-V and T-E to T-viz (6 October 2026)
+
+Hadi, 6 October 2026 (preferred, in T-viz's status words; design_records.md, "T-viz, the web-ui", HADI'S ANSWERS): T-viz
+is the name for all web-ui work, and T-V is carried out as T-viz. Dated entries, frozen reports and handoffs keep the
+old names; this table maps them. "The viewer" in such text means the program of the row it belongs to.
+
+| old | new |
+|---|---|
+| T-E (the demonstration's viewer; superseded by T-V track 1 on 30 September 2026) | T-viz stage 1 |
+| T-V track 1 (the viewer for pre-loaded scripts: what is shown) | T-viz stage 1 (1a, 1b, 1c), V1 |
+| T-V track 2 (Phase 7: live events on the human's script, the export, the replay rule) | T-viz stage 3, [FW] for now |
+| T-V, unqualified (both tracks) | T-viz stages 1 and 3 |
+| Phase 7 (interactive deviations) | T-viz stage 3 |
+
+V1 holds T-viz stages 0 and 1; stages 2 and 3 are [FW], the default until Hadi draws the V1 border inside the web-ui.

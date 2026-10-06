@@ -1288,3 +1288,11 @@ with files and lines, is in `docs/design_records.md`, "T-viz, the web-ui", 0.1.
   cognitive event was built.
 - 7.5's condition is measured: a `SimModel` builds in 1 to 6 ms (one outlier of 68 ms) over all 1019 registered
   scenarios, after a one-time import of about 1.7 s.
+
+Hadi's answers to the 0.1 report (6 October 2026, preferred; design_records.md, "T-viz, the web-ui", HADI'S ANSWERS):
+- 4.4, 13.3, 15 item 12 (T-viz and T-V): T-viz is the name for all web-ui work. T-V track 1 (what the viewer shows) is
+  carried out as T-viz stage 1 (1a, 1b, 1c). T-V track 2 (Phase 7, live events on the human's script) is T-viz stage 3:
+  stage 3 means T-V, the mechanism included, not only "the page's side" of it. docs/rename_table.md, "Task names".
+- 12.1, 13 (V1 and FW): T-viz stages 0 and 1 are in V1; stages 2 and 3 are after V1, [FW], the default until Hadi draws
+  the V1 border inside the web-ui. TODO-173 (slots, section 9) is [FW]. 6.1 item 6 is unchanged: stage 0's choice of
+  technology still considers the needs of stages 2 and 3.

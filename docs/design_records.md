@@ -1275,6 +1275,11 @@ analysis/kitting/mpb/REPORT.md reproduces exactly. An instrument correction, no 
   are FW.
   Reason: whatever was agreed for V1 about knowledge stays in V1. This ruling was made before T-K existed as a task, so
   its restatements were incomplete.
+  AMENDED (Hadi, 6 October 2026, for T-viz; preferred, in T-viz's status words; design_records.md, "T-viz, the web-ui",
+  HADI'S ANSWERS): T-V is carried out as T-viz. "T-V track 1 and track 2" in V1 reads "T-viz stages 0 and 1" (track 1 is
+  T-viz stage 1); track 2 is T-viz stage 3, which with stage 2 is FW for now, the default until Hadi draws the V1
+  border inside the web-ui. ccode's note: the Tags paragraph below reserves [FW] for conceptual, higher-level directions;
+  the web-ui's stages 2 and 3 and TODO-173 are tagged [FW] by Hadi's answer all the same.
   Tags. Each open TODO may carry a tag beside its status: [V1] or [FW]. A TODO keeps its number and identifier for good:
   no renumbering, no renaming. An untagged TODO is not yet ruled. There is no full pass now: a TODO gets its tag when it
   is next touched, by Hadi's ruling; a new item gets its tag when recorded.
@@ -4400,6 +4405,32 @@ RELATIONS (ccode's reading of the records, 6 October 2026; how the records join 
   selection panel; it is among stage 2's open questions (TODO-186). `mesa_sim/list_scenarios.py` is its one reader
   over the registry today; the web-ui's catalogue of what the registry holds (handoff, 7.3, proposed by cchat) would be
   a second reader of the same registry.
+
+HADI'S ANSWERS (6 October 2026, to the 0.1 report's questions 2 and 3; preferred; recorded by ccode the same day). They
+settle the open point of RELATIONS above.
+- T-viz and T-V. T-viz is the name for all web-ui work. T-V track 1 (the viewer task: what is shown) is carried out as
+  T-viz stage 1 (1a, 1b, 1c). T-V track 2 (Phase 7, live events on the human's script) is T-viz stage 3: stage 3 means
+  T-V, the live-event mechanism with the page's side. The mapping: docs/rename_table.md, "Task names". Dated entries
+  that say T-V, T-E or "the viewer" stay as written.
+- V1 and FW. T-viz stages 0 and 1 are in V1. Stages 2 and 3 are after V1, [FW], the default until Hadi draws the V1
+  border inside the web-ui; with stage 3 the live-event task (T-V track 2) is [FW]. TODO-173 (slots in containers) is
+  [FW]; TODO-186, TODO-187 and TODO-188 are tagged [FW]. Stage 0's choice of technology still considers stages 2 and 3
+  (handoff, 6.1, item 6), unchanged.
+- The place in the order (proposed by ccode; the answers move T-V's content, not its place): T-viz stage 0 runs now;
+  T-viz stage 1 stands in T-V's place in the present order, after T-F and before track 3b; stages 2 and 3 leave the V1
+  queue. Hadi may place stage 1 elsewhere.
+- What the answers contradict, recorded and left for Hadi:
+  - A1's tag rule (T-G records, "Tags"; glossary, **FW**): [FW] is for "conceptual, higher-level directions only"; the
+    web-ui's stages 2 and 3 and TODO-173 are build work, tagged [FW] by this answer.
+  - design_decisions.md, "T-G: the second domain's rulings", A3's paragraph: the human's choice among applicable tasks
+    is one isolated point of its executor "so that a live user (T-V track 2, in V1) ... can supply the choice. This
+    isolation is a V1 requirement." The live user is now FW; whether the isolation stays a V1 requirement (it is built,
+    A3, 048a36e) is Hadi's. Also the roadmap's T-V bullet, its T-G line.
+  - Track 3b and track 4 placed "after T-V" (roadmap.md, T-D's CLOSED EXCEPT ITS TAIL line and its amendment; glossary,
+    **T-D tail**; TODO-140's and TODO-145's PLACEMENT REVISED lines): with T-V split, "after T-V" reads "after T-viz
+    stage 1" under ccode's proposal; dated, left as written.
+  - design_decisions.md, Phase 7's entry, SCHEDULED: "Phase 7 is T-V, track 2", still true; that it is now FW is
+    recorded in the roadmap's Phase 7 section, not in the entry.
 
 0.1, RECORDING, DONE (ccode, 6 October 2026; no code changed). THE VERIFICATIONS of the handoff's 16.2, read at
 069282b (line numbers at that commit):

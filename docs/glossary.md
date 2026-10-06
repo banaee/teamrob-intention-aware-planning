@@ -1364,12 +1364,16 @@ FW. Track 3b stays after T-V.
 October 2026; amended by Hadi, 3 October 2026, for T-K): T-G; T-K part 1 and T-K part 2; T-F; T-V tracks 1 and 2;
 track 3b (TODO-145); track 4 in its reduced form (TODO-140). An open TODO
 may carry the tag [V1] beside its status.
+AMENDED (Hadi, 6 October 2026, preferred, for T-viz): "T-V tracks 1 and 2" reads "T-viz stages 0 and 1" (T-V track 1
+is T-viz stage 1); T-V track 2 is T-viz stage 3, FW for now, until Hadi draws the V1 border inside the web-ui.
 **FW** — future work: not designed, ruled or built within V1 (T-G A1; amended by Hadi, 3 October 2026, for T-K): the 4D
 detour, T-S, T-K's later directions (the stream of context values with the world's dynamics, TODO-158 to TODO-161,
 TODO-163, TODO-164), and conceptual, higher-level directions only, each a TODO tagged [FW]. An alternative not taken in a design question is recorded in that question's
 ruling, never as FW; FW never hides a known wrong behaviour inside what V1 claims. An untagged TODO is not yet ruled;
 a TODO is tagged when next touched by Hadi's ruling, and keeps its number and identifier for good.
 → `docs/design_decisions.md`, "T-G: the second domain's rulings", A1.
+AMENDED (Hadi, 6 October 2026, preferred, for T-viz): T-viz stages 2 and 3 (stage 3 is T-V track 2, Phase 7) are FW
+for now, the default until Hadi draws the V1 border inside the web-ui.
 **T-E** — the demonstration's viewer, as the plan from T-A defined it. Superseded by T-V, track 1 (30 September
 2026); T-E in older records means the viewer.
 → `docs/roadmap.md`, "The plan from T-A", T-E and T-V.
@@ -1388,6 +1392,15 @@ world's dynamics is T-K's future work.
 SUPERSEDED IN PART (T-G C1, Hadi, 1 October 2026): the pre-loaded context stream moves to T-K part 1 (context
 knowledge); track 2 keeps the live events. design_decisions.md, "T-G: the second domain's rulings", C1.
 → `docs/roadmap.md`, "The plan from T-A", T-V; `docs/handoffs/phase7_interactive_deviations.md`.
+AMENDED (Hadi, 6 October 2026, preferred): carried out as **T-viz**: track 1 is T-viz stage 1 (V1), track 2 is T-viz
+stage 3 (FW for now). docs/rename_table.md, "Task names".
+**T-viz** — the name for all web-ui work (Hadi, 6 October 2026, preferred): a web user interface for the framework, its
+own page in the browser and a small Python server, without Solara. Stage 0 the foundation, stage 1 the first web-ui
+(T-V track 1), stage 2 editing and comparison, stage 3 changes during a run (T-V track 2, Phase 7). Stages 0 and 1 are
+in V1, stages 2 and 3 FW for now. Its records use the status words open, preferred, preferred, replaceable, proposed by
+cchat, verified, not verified, not "ruling" or "ruled". A name, not a task letter.
+→ `docs/handoffs/handoff_T-viz.md`; `docs/design_records.md`, "T-viz, the web-ui"; `docs/roadmap.md`, "The plan from
+T-A", T-viz.
 **T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
 the end of the queue. FW (T-G A1, 1 October 2026).
 → `docs/roadmap.md`, "The plan from T-A", T-S.

@@ -4753,7 +4753,7 @@ Kitting items carry `subtype` in the setups, and no code reads it (`SimObject.su
 Files: domains/kitting/setups/, mesa_sim/sim_model.py
 Reference: design_decisions.md, "`subtype` is a stated fact of an object"
 
-**TODO-173: Slots in containers (recorded, layout tool, 3 Oct 2026; T-G, covers both domains)**
+**TODO-173: Slots in containers (recorded, layout tool, 3 Oct 2026; T-G, covers both domains)** [FW]
 A possible change from one position per container to named slots inside a container (kitting `shelf` and
 `kitting_table`, dock_loading containers). A movable object would have a designated slot, and the world would state
 which slot is empty or full. The existing `slots` field on kitting shelves is kept for this. The terms need glossary
@@ -4765,6 +4765,7 @@ slots in containers are deferred to the framework's next version. In the current
 movable objects of one container across that container's footprint (a display place, never written to the world, a
 log or a file); the world does not change. Whether "the framework's next version" makes this item [FW] is Hadi's to
 tag. The display side is T-viz's (design_records.md, "T-viz, the web-ui").
+TAGGED [FW] (Hadi, 6 October 2026).
 
 **TODO-174: "door" names two things (recorded, layout tool, 3 Oct 2026)** open
 "door" is a type in dock_loading (`office_door`, size [100, 10]) and the id of a landmark in kitting (size [80, 20]).
@@ -4881,7 +4882,9 @@ suppressing condition: the human just had a break, the A/C is on), what "in acco
 decided.
 Reference: design_decisions.md, "T-K: context knowledge in the recognizer's belief", AM36 (the three levels)
 
-**TODO-186: T-viz stage 2, editing: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open; decided when the stage is reached
+**TODO-186: T-viz stage 2, editing: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open [FW]; decided when the stage is reached
+TAGGED [FW] (Hadi, 6 October 2026, preferred): T-viz stages 2 and 3 are after V1 for now, the default until Hadi draws
+the V1 border inside the web-ui. Stage 0's choice of technology still considers this stage (handoff, 6.1, item 6).
 In T-viz records the status words are the handoff's (open, preferred, proposed by cchat), not "ruled". Hadi's words:
 stage 2 allows editing of layouts (scene arrangement, add or remove objects), setups (placements) and scenarios
 (scripted human behaviour, the timeline of context facts), each saved as a new artefact. The questions, all open:
@@ -4899,7 +4902,8 @@ stage 2 allows editing of layouts (scene arrangement, add or remove objects), se
 Files: mesa_sim/overrides.py, shared/types.py (ScenarioConfig), scripts/layout_tool.py
 Reference: docs/handoffs/handoff_T-viz.md, sections 7.5, 7.6, 13.1; design_records.md, "T-viz, the web-ui"
 
-**TODO-187: T-viz stage 2, sim-runs side by side: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open; decided when the stage is reached
+**TODO-187: T-viz stage 2, sim-runs side by side: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open [FW]; decided when the stage is reached
+TAGGED [FW] (Hadi, 6 October 2026, preferred): as TODO-186.
 Hadi's idea: two env-panes on the same triple, for example one with `intention_aware` on and one off, the two sim-runs
 fully isolated. Three ways (a mode of one server with two `SimModel`s stepped together; two tabs on one server; two
 starts in two windows) and their trade-offs: the handoff, 13.2. Proposed by cchat: the mode, since a comparison is
@@ -4913,7 +4917,11 @@ demonstrates; evaluation numbers come from headless sim-runs.
 Files: mesa_sim/run_mesa.py (the logging set-up), mesa_sim/sim_model.py
 Reference: docs/handoffs/handoff_T-viz.md, sections 5.10, 13.2; design_records.md, "T-viz, the web-ui"
 
-**TODO-188: T-viz stage 3, changes during a sim-run: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open; decided when the stage is reached
+**TODO-188: T-viz stage 3, changes during a sim-run: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open [FW]; decided when the stage is reached
+ANSWERED AND TAGGED [FW] (Hadi, 6 October 2026, preferred): T-V track 2 (Phase 7, live events on the human's script)
+is T-viz stage 3: stage 3 means T-V, the live-event mechanism included, not only the page's side. It is after V1 for
+now, the default until Hadi draws the V1 border inside the web-ui. "Proposed by cchat, not answered" below is
+superseded.
 Hadi's words: stage 3 allows interactive changes during a sim-run, such as adding events, interruptions and deviations
 to the human's scripted behaviour. Hadi placed the change of the human's behaviour during a sim-run in T-V track 2
 (Phase 7). Proposed by cchat, not answered: stage 3 is the page's side of T-V track 2; the mechanism (the human

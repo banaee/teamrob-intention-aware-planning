@@ -403,6 +403,12 @@ paragraph, not in the alphabet.
 - ADDED (6 October 2026; design_records.md, "T-viz, the web-ui"; `docs/handoffs/handoff_T-viz.md`): T-viz, the web-ui,
   asked for by Hadi (the design chat of 4 to 6 October 2026); its stage 0 starts now (0.1 recording, 6 October 2026).
   Its place in the order above, and how it joins T-V (whose track 1 is the viewer), are open (the T-viz bullet below).
+- AMENDED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", HADI'S ANSWERS; docs/rename_table.md,
+  "Task names"): T-viz is the name for all web-ui work. T-V track 1 (what the viewer shows) is carried out as T-viz
+  stage 1 (1a, 1b, 1c); T-V track 2 (Phase 7, live events on the human's script) is T-viz stage 3: stage 3 means T-V.
+  T-viz stages 0 and 1 are in V1; stages 2 and 3 are after V1, [FW], the default until Hadi draws the V1 border inside
+  the web-ui. In the present order: T-viz stage 0 runs now (asked for); "T-V" reads "T-viz stage 1", in T-V's place
+  (after T-F, before track 3b), proposed by ccode, since the answers move T-V's content, not its place.
 
 V1 AND FW (Hadi, 1 October 2026, amended by Hadi 3 October 2026 for T-K; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);
@@ -414,6 +420,9 @@ track 4 leaves the T-D tail for its place inside T-G (after stage 2); the 4D det
 is open: its design is ruled (30 September and 1 October 2026) and build 1 is in (30 September 2026). Next, in order
 (1 October 2026): the lifecycle question of the human's list (parked under A3), then the layout and the setup of T-G's
 stage 1, agreed in the design chat, then stage 1's plan.
+AMENDED (Hadi, 6 October 2026, preferred; design_records.md, "T-G, the second domain", A1's dated line): "T-V track 1
+and track 2" in V1 reads "T-viz stages 0 and 1" (T-V track 1 is T-viz stage 1); T-V track 2 is T-viz stage 3, which
+with stage 2 is [FW] for now, until Hadi draws the V1 border inside the web-ui.
 SUPERSEDED (T-G records 2, 1 October 2026): the lifecycle question is ruled (T-G Q12 to Q15; design_decisions.md, "T-G:
 the second domain's rulings", A3, B13). Next: the layout and the setup of T-G's stage 1, then stage 1's plan. T-G's
 order is stage 1, stage 2, track 4, stage 3; context knowledge (T-K part 1) runs between T-G's stage 1 and stage 2.
@@ -814,6 +823,9 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     T-G (1 October 2026; design_decisions.md, "T-G: the second domain's rulings", A3, A10): the human's choice among applicable tasks is one isolated point of
     its executor (a V1 requirement), so that a live user can supply it. An interruption of a busy human caused by a world
     fact, if wanted, is designed here as the same entry point as the live user's click.
+  CARRIED OUT AS T-VIZ (Hadi, 6 October 2026, preferred; docs/rename_table.md, "Task names"): track 1 is T-viz stage 1
+  (1a, 1b, 1c), in V1; track 2 is T-viz stage 3 (stage 3 means T-V), [FW] for now, until Hadi draws the V1 border
+  inside the web-ui. The T-viz bullet below holds both from here on.
 - **T-viz — The web-ui** (asked for by Hadi, design chat of 4 to 6 October 2026; `docs/handoffs/handoff_T-viz.md`, read
   in every T-viz session; design_records.md, "T-viz, the web-ui"). A web user interface for the framework: its own page
   in the browser and a small Python server, without Solara; domain-independent; a sim-run's run options fixed before
@@ -832,18 +844,20 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     actual world; on Hadi's acceptance of 1a the solara-ui becomes archived, preferred); 1b the robot's mind (panel 4b,
     its contents decided later); 1c plots over ticks, growing during the sim-run, with the timeline of context facts
     where one exists (panel 4c).
-  - Stage 2, editing and comparison (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1 editing
-    layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts), each saved
-    as a new artefact; 2.4 sim-runs side by side.
-  - Stage 3, changes during a sim-run (open questions recorded, TODO-188): 3.1 events, interruptions and deviations of
-    the human's script.
+  - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
+    editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
+    each saved as a new artefact; 2.4 sim-runs side by side.
+  - Stage 3, changes during a sim-run [FW]: T-V track 2 (Phase 7), the live events on the human's script; stage 3
+    means T-V (open questions recorded, TODO-188): 3.1 events, interruptions and deviations of the human's script.
+  - V1 and FW (Hadi, 6 October 2026, preferred): stages 0 and 1 are in V1; stages 2 and 3 are after V1, [FW], the
+    default until Hadi draws the V1 border inside the web-ui. Stage 0's choice of technology still considers stages 2
+    and 3 (handoff, 6.1, item 6: chosen for the full target, not for the first increment).
   - Unassigned (TODO-189): inspecting an object during a pause; an automatic pause at an event of the robot's
     cognition; moving back along the ticks; replay without Mesa; saving the page's choice as a run file.
-  - Relations (design_records.md, "T-viz, the web-ui", RELATIONS): T-E is superseded by T-V track 1 (30 September
-    2026) and is not an open task; T-V track 1 (the viewer for pre-loaded scripts) has the content that T-viz's stages
-    1b and 1c show; T-viz's stage 3 would be the page's side of T-V track 2 (Phase 7), the mechanism staying T-V's
-    (proposed by cchat); how the records join T-viz and T-V is open. T-L's run-file panel is the solara-ui's form of
-    T-L ruling 7; the web-ui has none yet. TODO-110 (selection by composition) bears on the selection panel.
+  - Relations (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", HADI'S ANSWERS): T-viz is the
+    name for all web-ui work. T-V track 1 (what the viewer shows; T-E as originally defined) is carried out as T-viz
+    stage 1, track 2 is T-viz stage 3. T-L's run-file panel is the solara-ui's form of T-L ruling 7; the web-ui has
+    none yet. TODO-110 (selection by composition) bears on the selection panel.
 - **T-K — Context knowledge** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-K: context knowledge in the
   recognizer's belief"; design_records.md, "T-K"; `docs/handoffs/T-G_forward_inputs.md`, section 5). Context knowledge
   as a whole, framework-wide: it concerns kitting and dock_loading alike. Three parts.
@@ -1085,6 +1099,8 @@ the belief is used as a bar, not a magnitude, recorded as a limitation (design_d
 
 ## Phase 7 (recorded, not scheduled): interactive deviations 🔲 *(after T-G; nothing decided)*
 - SCHEDULED (30 September 2026): T-V, track 2, in the plan from T-A (after T-G and T-F).
+- [FW] (Hadi, 6 October 2026, preferred): T-V track 2 is T-viz stage 3, after V1 for now, until Hadi draws the V1
+  border inside the web-ui (the T-viz bullet above). The live-event task leaves V1 with it.
 - Run-time deviation events into the human executor from a viewer, replayable as pre-loaded scripts: live runs
   demonstrate, pre-loaded scripts evaluate. PULLED FORWARD IN PART by T-H (25 Sept 2026): `executor.inject(Start(task) |
   Drop())` and the export of `Now` as `AfterAction` / `DuringAction` are T-H2's; events may cut mid-action; an

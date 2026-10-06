@@ -78,8 +78,8 @@ Relevant (read as needed):
   `docs/handoffs/tviz_refs/`). Read it in full in every T-viz session. T-viz records use its status words (open,
   preferred, preferred, replaceable, proposed by cchat, verified, not verified), never "ruling" or "ruled"; "sim-run"
   is a word of the T-viz records only. "The viewer" in older records and in code means the solara-ui (a tentative
-  name for the existing program, `solara run mesa_sim/run_mesa.py`) or T-V's planned viewer; nothing is renamed without
-  Hadi's word.
+  name for the existing program, `solara run mesa_sim/run_mesa.py`) or T-V's planned viewer, now T-viz stage 1;
+  nothing is renamed without Hadi's word.
 - `analysis/`, sorted by domain (the sort, 1 October 2026; `analysis/README.md`): `analysis/instruments/` holds the
   test-beds' code both domains run (`run.sh <domain>`), `analysis/kitting/` every earlier analysis with kitting's run
   sets, expectations and reports, `analysis/dock_loading/` dock_loading's; the run files under `configs/<domain>/`, the
@@ -296,12 +296,14 @@ Decisions
   stage 1 is closed and T-G is paused. Now: T-K part 1 (crisp context knowledge). Then, in order: T-G's stage 2, track 4
   (its reduced form, TODO-140) and T-G's stage 3; T-F (the evaluation, framed in TODO-144, the randomised harness
   TODO-47 part of it; kitting's part without a departure, dock_loading's may use the unmonitored office (Hadi, 1 Oct
-  2026); before track 3b it measures without knowing that the adaptive branches fire under conflict); T-V (viewer,
-  interface and interactive simulator: track 1 the viewer, which was T-E; track 2 Phase 7); track 3b (TODO-145); T-K
-  part 2 (degrees) at the end of the V1 queue. FW: the 4D detour strategy, T-S (ROS/PRIEST, Phase 6) and T-K's later
-  directions.
-  V1 and FW (Hadi, 1 Oct 2026, amended by Hadi 3 Oct 2026; design_decisions.md, "T-G: the second domain's rulings",
-  A1): V1, the first complete version, holds T-G, T-K part 1 and T-K part 2 (the amendment), T-F, T-V tracks 1 and 2,
+  2026); before track 3b it measures without knowing that the adaptive branches fire under conflict); T-viz stage 1
+  (the web-ui's first version; T-V track 1, the viewer, which was T-E; in T-V's place, proposed by ccode, 6 Oct 2026);
+  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 runs now (asked for, 6 Oct 2026).
+  FW: the 4D detour strategy, T-S (ROS/PRIEST, Phase 6), T-K's later directions, and T-viz stages 2 and 3 (stage 3 is
+  T-V track 2, Phase 7; the default until Hadi draws the V1 border inside the web-ui).
+  V1 and FW (Hadi, 1 Oct 2026, amended by Hadi 3 Oct 2026 and 6 Oct 2026 for T-viz; design_decisions.md, "T-G: the second
+  domain's rulings", A1): V1, the first complete version, holds T-G, T-K part 1 and T-K part 2 (the amendment), T-F,
+  T-viz stages 0 and 1 (T-V track 1 is T-viz stage 1; T-V track 2 is T-viz stage 3, FW for now),
   track 3b (TODO-145) and track 4 in a reduced form (monitored areas, A8, TODO-140), placed after T-G's stage 2; FW (not
   designed, ruled or built within V1) holds the 4D detour, T-S, T-K's later directions (the stream of context values
   with the world's dynamics, TODO-158 to TODO-161, TODO-163, TODO-164; the amendment) and the conceptual directions
@@ -590,8 +592,9 @@ Decisions
   strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
   ASKED FOR (Hadi, 6 October 2026): T-viz, the web-ui (`docs/handoffs/handoff_T-viz.md`; design_records.md, "T-viz, the
   web-ui"). Its stage 0 runs now, one step per session (0.1 recording done, 6 October 2026); a later T-viz stage starts
-  only when Hadi asks for it. T-V's own items (what track 1 shows, track 2's live-event mechanism) stay not to be
-  started unasked; how T-viz and T-V join is open.
+  only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
+  T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
+  viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized
   cost) exist. `full_reorder` (B3.B) is built (`_replan_orderings()`, T-B2b / T-B2c): orderings are ranked
   on their realized cost, `realize()` running one minimal-shift search per entry (T-B Q2), and the hold sent
@@ -902,10 +905,11 @@ across that commit without it.
   design, C2 build); T-H the human behaviour model (T-H1 to T-H4, before T-D); T-D robustness in kitting (change of mind, unmodelled behaviour, the blocked case; closed except its tail: track 3b,
   track 4, 4D); T-E the demonstration's viewer (superseded by T-V, track 1; T-E in older records means the viewer);
   T-F evaluation (Phase 5); T-G the second domain in Mesa (dock_loading; 4D and ROS left it on 30 Sept 2026); T-V
-  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7); T-K context knowledge (part 1 crisp
+  viewer, interface and interactive simulator (track 1 the viewer, track 2 Phase 7; carried out as T-viz since 6 Oct
+  2026: track 1 is T-viz stage 1, track 2 is T-viz stage 3); T-K context knowledge (part 1 crisp
   context knowledge, between T-G's stage 1 and stage 2; part 2 degrees of context facts, R5, after track 3b); T-S
-  ROS/PRIEST (Phase 6); T-viz the web-ui (asked for 6 October 2026; stages 0 to 3, a name not a letter; the solara-ui
-  is the existing Solara program). Task
+  ROS/PRIEST (Phase 6); T-viz the web-ui, the name for all web-ui work (asked for 6 October 2026; stages 0 to 3, a name
+  not a letter; stages 0 and 1 in V1, 2 and 3 [FW] for now; the solara-ui is the existing Solara program). Task
   prompts and reports use these names; the order is the roadmap's, not the alphabet's.
 - cchat: the design chat with Hadi, where design is decided. ccode: this Claude Code session in
   the repository, which builds and checks; older reports call it Fable.
