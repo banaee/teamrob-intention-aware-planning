@@ -34,6 +34,7 @@ import { addressOf, type RunOptionValue } from "./address";
 import { api } from "./api";
 import { ControlBar, type Speed } from "./frame/ControlBar";
 import { type Selection, withOption } from "./frame/selection";
+import { HumanPanel } from "./frame/HumanPanel";
 import { SelectionPanel } from "./frame/SelectionPanel";
 import type {
   BuildFailure, Catalogue, LayoutView, RunDescription, ScenarioEntry, SimRunChoice, SimRunHistory, SimRunState,
@@ -327,10 +328,8 @@ export function App() {
       {message && <p className="page-message" role="status">{message}</p>}
 
       <div className="main-row">
-        <aside className="panel panel-human" aria-label="The human and the world">
-          <h2 className="panel-title"><span className="panel-dot" />The human</h2>
-          <p className="panel-later">The action in hand, the stack, the last switches and resumptions: increment (iv).</p>
-        </aside>
+        <HumanPanel humans={run?.description.world.humans.map((h) => h.id) ?? []}
+                    ticks={run?.built ? run.ticks : null} />
         {shown && room && moment && appearance ? (
           <EnvPane layout={shownLayout!} room={room} moment={moment} book={book} appearance={appearance} view={view}
                    free={free} onView={(v) => { setView(v); setFree(false); }} onFree={() => setFree(true)}
