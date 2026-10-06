@@ -53,6 +53,13 @@ export type EndReason = "steps_reached" | "reset" | "choice_changed" | "server_s
  */
 export type EntryPart = "ordinary" | "repeatable" | "closing";
 /**
+ * The tag per task (glossary §7; world/tag.py): a label of the world, never the robot's.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TagValue".
+ */
+export type TagValue = "in accord" | "not in accord" | "no fact";
+/**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "Outcome".
  */
@@ -750,7 +757,9 @@ export interface WorldTick {
 }
 /**
  * What a human's executor is doing at the tick, from its record: the stack, top first; the action in hand; the
- * stack's transitions on the tick; the script's entries still open (ordinary, then closing).
+ * stack's transitions on the tick; the script's entries still open (ordinary, then closing). T-viz 1a (iv): the script
+ * entry each task of the stack runs (None for a task an event started), and the tag of the task on top (None with an
+ * empty stack, or when the domain declares no context knowledge).
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "HumanActivity".
@@ -760,7 +769,22 @@ export interface HumanActivity {
   human: string;
   open_entries: EntryPosition[];
   stack: TaskRef[];
+  stack_entries: (EntryPosition | null)[];
+  tag: TaskTagged | null;
   transitions: (Entered | Started | Resumed | Left | Refused | Unfired | StillOpen)[];
+}
+/**
+ * The tag of the task on top of the stack, by the facts in force at its stretch's first tick `since` (world/tag.py):
+ * the foreseeable tasks at the raised and at the suppressed level then, by their schemas' names.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TaskTagged".
+ */
+export interface TaskTagged {
+  lowered: string[];
+  raised: string[];
+  since: number;
+  tag: TagValue;
 }
 /**
  * A script entry's task pushed on the empty stack.
@@ -773,16 +797,28 @@ export interface Entered {
   task: TaskRef;
 }
 /**
- * A task pushed on the stack by an event; `where` on the task below it, None on an empty stack.
+ * A task pushed on the stack by an event; `where` on the task below it, None on an empty stack. `event`: the
+ * script's event that fired, None for a live event (T-viz 1a (iv)).
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "Started".
  */
 export interface Started {
+  event: EventPosition | null;
   kind: "started";
   task: TaskRef;
   trigger: AfterActionTrigger | DuringActionTrigger | NowTrigger;
   where: (AtBoundary | AtBeginning | AtCut) | null;
+}
+/**
+ * Which authored event of the script: its entry, and its index among the entry's events (T-viz 1a (iv)).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "EventPosition".
+ */
+export interface EventPosition {
+  entry: EntryPosition;
+  index: number;
 }
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
@@ -793,12 +829,14 @@ export interface Resumed {
   task: TaskRef;
 }
 /**
- * A task left the top of the stack, or was pushed down (suspended).
+ * A task left the top of the stack, or was pushed down (suspended). `entry`: the script entry the task runs, None
+ * for a task an event started (T-viz 1a (iv)).
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "Left".
  */
 export interface Left {
+  entry: EntryPosition | null;
   kind: "left";
   outcome: Outcome;
   task: TaskRef;
@@ -813,12 +851,15 @@ export interface Refused {
   reason: DecisionRefusalReason;
 }
 /**
+ * An authored event that will not fire; `position`: where the script states it (T-viz 1a (iv)).
+ *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "Unfired".
  */
 export interface Unfired {
   event: Event;
   kind: "unfired";
+  position: EventPosition;
   reason: UnfiredReason;
   task: TaskRef;
 }

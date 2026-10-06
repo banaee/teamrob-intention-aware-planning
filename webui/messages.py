@@ -310,6 +310,12 @@ class EntryPosition(Message):
     index: int
 
 
+class EventPosition(Message):
+    """Which authored event of the script: its entry, and its index among the entry's events (T-viz 1a (iv))."""
+    entry: EntryPosition
+    index: int
+
+
 # =============================================================================
 # The run description
 # =============================================================================
@@ -483,11 +489,13 @@ class Entered(Message):
 
 
 class Started(Message):
-    """A task pushed on the stack by an event; `where` on the task below it, None on an empty stack."""
+    """A task pushed on the stack by an event; `where` on the task below it, None on an empty stack. `event`: the
+    script's event that fired, None for a live event (T-viz 1a (iv))."""
     kind: Literal["started"] = "started"
     task: TaskRef
     trigger: Trigger
     where: Optional[Where]
+    event: Optional[EventPosition]
 
 
 class Resumed(Message):
@@ -496,10 +504,12 @@ class Resumed(Message):
 
 
 class Left(Message):
-    """A task left the top of the stack, or was pushed down (suspended)."""
+    """A task left the top of the stack, or was pushed down (suspended). `entry`: the script entry the task runs, None
+    for a task an event started (T-viz 1a (iv))."""
     kind: Literal["left"] = "left"
     task: TaskRef
     outcome: Outcome
+    entry: Optional[EntryPosition]
 
 
 class Refused(Message):
@@ -509,10 +519,12 @@ class Refused(Message):
 
 
 class Unfired(Message):
+    """An authored event that will not fire; `position`: where the script states it (T-viz 1a (iv))."""
     kind: Literal["unfired"] = "unfired"
     task: TaskRef
     event: Event
     reason: UnfiredReason
+    position: EventPosition
 
 
 class StillOpen(Message):
@@ -526,14 +538,34 @@ Transition = Annotated[Union[Entered, Started, Resumed, Left, Refused, Unfired, 
                        Field(discriminator="kind")]
 
 
+class TagValue(str, Enum):
+    """The tag per task (glossary §7; world/tag.py): a label of the world, never the robot's."""
+    IN_ACCORD = "in accord"
+    NOT_IN_ACCORD = "not in accord"
+    NO_FACT = "no fact"
+
+
+class TaskTagged(Message):
+    """The tag of the task on top of the stack, by the facts in force at its stretch's first tick `since` (world/tag.py):
+    the foreseeable tasks at the raised and at the suppressed level then, by their schemas' names."""
+    tag: TagValue
+    since: int
+    raised: tuple[str, ...]
+    lowered: tuple[str, ...]
+
+
 class HumanActivity(Message):
     """What a human's executor is doing at the tick, from its record: the stack, top first; the action in hand; the
-    stack's transitions on the tick; the script's entries still open (ordinary, then closing)."""
+    stack's transitions on the tick; the script's entries still open (ordinary, then closing). T-viz 1a (iv): the script
+    entry each task of the stack runs (None for a task an event started), and the tag of the task on top (None with an
+    empty stack, or when the domain declares no context knowledge)."""
     human: str
     stack: tuple[TaskRef, ...]
+    stack_entries: tuple[Optional[EntryPosition], ...]
     action: Optional[ActionInHand]
     transitions: tuple[Transition, ...]
     open_entries: tuple[EntryPosition, ...]
+    tag: Optional[TaskTagged]
 
 
 class WorldTick(Message):

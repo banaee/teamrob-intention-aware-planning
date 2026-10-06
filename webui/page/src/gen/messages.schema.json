@@ -614,6 +614,24 @@
       "title": "Event",
       "type": "object"
     },
+    "EventPosition": {
+      "additionalProperties": false,
+      "description": "Which authored event of the script: its entry, and its index among the entry's events (T-viz 1a (iv)).",
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/EntryPosition"
+        },
+        "index": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "entry",
+        "index"
+      ],
+      "title": "EventPosition",
+      "type": "object"
+    },
     "Extent": {
       "additionalProperties": false,
       "description": "A size: the extent along x and along y.",
@@ -787,7 +805,7 @@
     },
     "HumanActivity": {
       "additionalProperties": false,
-      "description": "What a human's executor is doing at the tick, from its record: the stack, top first; the action in hand; the\nstack's transitions on the tick; the script's entries still open (ordinary, then closing).",
+      "description": "What a human's executor is doing at the tick, from its record: the stack, top first; the action in hand; the\nstack's transitions on the tick; the script's entries still open (ordinary, then closing). T-viz 1a (iv): the script\nentry each task of the stack runs (None for a task an event started), and the tag of the task on top (None with an\nempty stack, or when the domain declares no context knowledge).",
       "properties": {
         "action": {
           "anyOf": [
@@ -813,6 +831,29 @@
             "$ref": "#/$defs/TaskRef"
           },
           "type": "array"
+        },
+        "stack_entries": {
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/EntryPosition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "tag": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TaskTagged"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "transitions": {
           "items": {
@@ -860,6 +901,8 @@
         "human",
         "open_entries",
         "stack",
+        "stack_entries",
+        "tag",
         "transitions"
       ],
       "title": "HumanActivity",
@@ -982,8 +1025,18 @@
     },
     "Left": {
       "additionalProperties": false,
-      "description": "A task left the top of the stack, or was pushed down (suspended).",
+      "description": "A task left the top of the stack, or was pushed down (suspended). `entry`: the script entry the task runs, None\nfor a task an event started (T-viz 1a (iv)).",
       "properties": {
+        "entry": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EntryPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "kind": {
           "const": "left",
           "type": "string"
@@ -996,6 +1049,7 @@
         }
       },
       "required": [
+        "entry",
         "kind",
         "outcome",
         "task"
@@ -1833,8 +1887,18 @@
     },
     "Started": {
       "additionalProperties": false,
-      "description": "A task pushed on the stack by an event; `where` on the task below it, None on an empty stack.",
+      "description": "A task pushed on the stack by an event; `where` on the task below it, None on an empty stack. `event`: the\nscript's event that fired, None for a live event (T-viz 1a (iv)).",
       "properties": {
+        "event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EventPosition"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
         "kind": {
           "const": "started",
           "type": "string"
@@ -1893,6 +1957,7 @@
         }
       },
       "required": [
+        "event",
         "kind",
         "task",
         "trigger",
@@ -2021,6 +2086,16 @@
       "title": "SwitchValue",
       "type": "object"
     },
+    "TagValue": {
+      "description": "The tag per task (glossary \u00a77; world/tag.py): a label of the world, never the robot's.",
+      "enum": [
+        "in accord",
+        "not in accord",
+        "no fact"
+      ],
+      "title": "TagValue",
+      "type": "string"
+    },
     "TaskRef": {
       "additionalProperties": false,
       "description": "A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the\nlogs show.",
@@ -2044,6 +2119,38 @@
         "task"
       ],
       "title": "TaskRef",
+      "type": "object"
+    },
+    "TaskTagged": {
+      "additionalProperties": false,
+      "description": "The tag of the task on top of the stack, by the facts in force at its stretch's first tick `since` (world/tag.py):\nthe foreseeable tasks at the raised and at the suppressed level then, by their schemas' names.",
+      "properties": {
+        "lowered": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "raised": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "since": {
+          "type": "integer"
+        },
+        "tag": {
+          "$ref": "#/$defs/TagValue"
+        }
+      },
+      "required": [
+        "lowered",
+        "raised",
+        "since",
+        "tag"
+      ],
+      "title": "TaskTagged",
       "type": "object"
     },
     "TickUpdate": {
@@ -2149,6 +2256,7 @@
     },
     "Unfired": {
       "additionalProperties": false,
+      "description": "An authored event that will not fire; `position`: where the script states it (T-viz 1a (iv)).",
       "properties": {
         "event": {
           "$ref": "#/$defs/Event"
@@ -2156,6 +2264,9 @@
         "kind": {
           "const": "unfired",
           "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/EventPosition"
         },
         "reason": {
           "$ref": "#/$defs/UnfiredReason"
@@ -2167,6 +2278,7 @@
       "required": [
         "event",
         "kind",
+        "position",
         "reason",
         "task"
       ],

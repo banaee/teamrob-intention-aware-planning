@@ -23,6 +23,11 @@ WHAT THIS MODULE DOES:
     - Keeps per sim-run what the model does not hold and a page reload must not lose: the order in which movable
       objects arrived in each fixed object, and each agent's direction of its most recent step that moved it, from
       its own positions. Neither is a world fact; neither is written anywhere
+    - Names, per human (T-viz 1a (iv)), the script entry each task on the stack runs and the entry a task that left it
+      ran (from the executor's frames, matched by object identity: a frame's task is its entry's task object), the
+      script event a switch fired or an unfired event is (by identity with the script's events), and the tag of the
+      task on top (world/tag.py, the one definition the analyses read too, on the model's timeline and the human's
+      record)
 
 WHAT THIS MODULE DOES NOT DO:
     - No rule of the web-ui (which sim-run is current, the end at the configured steps, the lock): the server's
@@ -43,6 +48,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 from mesa_sim.run_config import (BOOL_OPTIONS, DOMAIN_REGISTRY, EXPERIMENT_CONFIG_PATH, ONE_OF_OPTIONS,
                                  OPTION_DEFAULTS, RUN_OPTIONS, load_experiment, resolve_triple, run_configuration,
                                  user_args_parser)
+from mesa_sim.action_decomposer import _parse_duration_to_steps
 from mesa_sim.sim_model import (SimModel, SimObject, declared_states, read_layout, read_setup_objects,
                                 read_setup_states)
 from mesa_sim.sim_run import RunLog, SimRun
@@ -50,6 +56,7 @@ from shared.types import (AfterAction, DuringAction, Drop, Event, GroundedAction
                           TaskInstance, TimelineSource, Trigger, task_instance_key)
 from world import record as rec
 from world.queries import truth_at
+from world.tag import Stretches, recent_tasks, tag_at
 from webui import messages as msg
 from webui.appearance import Appearance
 from webui.simulator import BuildFailed
@@ -346,19 +353,65 @@ def _entry_position(ref: rec.EntryRef) -> msg.EntryPosition:
     return msg.EntryPosition(part=_ENTRY_PART[type(ref)], index=ref.index)
 
 
-def _transition(t: rec.Transition) -> msg.Transition:
+class _HumanSide:
+    """What the piece keeps per human to name entries and events and to tag the task on top (T-viz 1a (iv)): the script
+    entry of every task seen on the stack, by object identity (a frame's task is its entry's task object; a task an
+    event started has none); the script's events with their positions; the completions and the stretches of the
+    record (world/tag.py)."""
+
+    def __init__(self, machine):
+        self.machine = machine
+        self.refs: List[rec.EntryRef] = ([rec.OrdinaryRef(i) for i in range(len(machine.entries))]
+                                         + [rec.RepeatableRef(i) for i in range(len(machine.repeatable))]
+                                         + [rec.ClosingRef(j) for j in range(len(machine.closing))])
+        self.events: List[Tuple[Event, msg.EventPosition]] = [
+            (ev, msg.EventPosition(entry=_entry_position(ref), index=k))
+            for ref, entries in ((rec.OrdinaryRef(i), e) for i, e in enumerate(machine.entries))
+            for k, ev in enumerate(entries.events)] + [
+            (ev, msg.EventPosition(entry=_entry_position(rec.ClosingRef(j)), index=k))
+            for j, e in enumerate(machine.closing) for k, ev in enumerate(e.events)]
+        self.entries: List[Tuple[TaskInstance, Optional[rec.EntryRef]]] = []
+        self.completions: List[Tuple[int, object]] = []
+        self.stretches = Stretches()
+        self.tagged: Optional[msg.TaskTagged] = None
+
+    def observe(self, transitions) -> None:
+        """Registers the tasks on the stack with their frames' entries, and a task entered and left within the tick
+        by the one entry whose task object it is (ambiguous or none: no entry)."""
+        for frame in self.machine.stack:
+            if not any(task is frame.task for task, _ in self.entries):
+                self.entries.append((frame.task, frame.entry))
+        for t in transitions:
+            if isinstance(t, rec.Entered) and not any(task is t.task for task, _ in self.entries):
+                refs = [r for r in self.refs if self.machine.entry_task(r) is t.task]
+                self.entries.append((t.task, refs[0] if len(refs) == 1 else None))
+
+    def entry_of(self, task: TaskInstance) -> Optional[msg.EntryPosition]:
+        ref = next((entry for known, entry in self.entries if known is task), None)
+        return None if ref is None else _entry_position(ref)
+
+    def event_of(self, match) -> Optional[msg.EventPosition]:
+        return next((position for ev, position in self.events if match(ev)), None)
+
+
+def _transition(t: rec.Transition, side: _HumanSide) -> msg.Transition:
     if isinstance(t, rec.Entered):
         return msg.Entered(task=_task_ref(t.task))
     if isinstance(t, rec.Started):
-        return msg.Started(task=_task_ref(t.task), trigger=_trigger(t.trigger), where=_where(t.where))
+        return msg.Started(task=_task_ref(t.task), trigger=_trigger(t.trigger), where=_where(t.where),
+                           event=side.event_of(lambda ev: ev.trigger is t.trigger))
     if isinstance(t, rec.Resumed):
         return msg.Resumed(task=_task_ref(t.task))
     if isinstance(t, rec.Left):
-        return msg.Left(task=_task_ref(t.task), outcome=_OUTCOME[t.outcome])
+        return msg.Left(task=_task_ref(t.task), outcome=_OUTCOME[t.outcome], entry=side.entry_of(t.task))
     if isinstance(t, rec.Refused):
         return msg.Refused(decision=_decision(t.decision), reason=_DECISION_REFUSAL[t.reason])
     if isinstance(t, rec.Unfired):
-        return msg.Unfired(task=_task_ref(t.task), event=_event(t.event), reason=_UNFIRED[t.reason])
+        position = side.event_of(lambda ev: ev is t.event)
+        if position is None:
+            raise ValueError(f"unfired event {t.event!r} is not an event of the script")
+        return msg.Unfired(task=_task_ref(t.task), event=_event(t.event), reason=_UNFIRED[t.reason],
+                           position=position)
     if isinstance(t, rec.StillOpen):
         return msg.StillOpen(task=_task_ref(t.task), entry=_entry_position(t.entry))
     raise TypeError(f"unknown transition {t!r}")
@@ -424,6 +477,15 @@ class MesaSimRun:
         self._positions: Dict[str, Tuple[float, float]] = {aid: self._position(a) for aid, a in self._agents()}
         self._last_motion: Dict[str, Optional[msg.Direction]] = {aid: None for aid, _ in self._agents()}
         self._finished_at: Optional[int] = None
+        self._sides: Dict[str, _HumanSide] = {hid: _HumanSide(h.machine) for hid, h in model.humans.items()}
+        for side in self._sides.values():
+            side.observe(())
+        # The tag per task (world/tag.py): the domain's declared context knowledge (None: no tag) and its recency
+        # durations in ticks, the body's conversion, as the robot's memory of observed completions has them.
+        self._knowledge = model.declared_context
+        self._recency = ([] if self._knowledge is None else
+                         [(e.task, int(_parse_duration_to_steps(e.recency.duration, model)))
+                          for e in self._knowledge.entries() if e.recency is not None])
 
         _, layout_id, setup_id, scenario = resolve_triple(run.config)
         self.description = msg.RunDescription(
@@ -562,18 +624,38 @@ class MesaSimRun:
             activity=tuple(self._activity(hid, human, tick) for hid, human in model.humans.items()),
         )
 
-    @staticmethod
-    def _activity(hid: str, human, tick: Optional[int]) -> msg.HumanActivity:
-        machine, record = human.machine, human.record
+    def _activity(self, hid: str, human, tick: Optional[int]) -> msg.HumanActivity:
+        machine, record, side = human.machine, human.record, self._sides[hid]
         if tick is None:
-            stack, action, transitions = machine.stack_tasks(), None, ()
+            stack, action, transitions, tagged = machine.stack_tasks(), None, (), None
         else:
             snap = truth_at(record, tick)
             stack = snap.stack
             action = (None if snap.action is None else
                       msg.ActionInHand(action=_action_ref(snap.action), occurrence=snap.occurrence,
                                        done=snap.done, total=snap.total))
-            transitions = tuple(_transition(t) for t in record.transitions_at(tick))
-        return msg.HumanActivity(human=hid, stack=tuple(_task_ref(t) for t in stack), action=action,
+            raw = record.transitions_at(tick)
+            side.observe(raw)
+            transitions = tuple(_transition(t, side) for t in raw)
+            tagged = self._tag(side, tick, stack, raw)
+        return msg.HumanActivity(human=hid, stack=tuple(_task_ref(t) for t in stack),
+                                 stack_entries=tuple(side.entry_of(t) for t in stack), action=action,
                                  transitions=transitions,
-                                 open_entries=tuple(_entry_position(r) for r in machine.open_entries()))
+                                 open_entries=tuple(_entry_position(r) for r in machine.open_entries()),
+                                 tag=tagged)
+
+    def _tag(self, side: _HumanSide, tick: int, stack, transitions) -> Optional[msg.TaskTagged]:
+        """The tag of the task on top at `tick` (world/tag.py), computed at its stretch's first tick and kept through
+        it; called once per tick, in order. The completions of the tick count at it (the reader's rule)."""
+        side.completions += [(tick, t.task.schema) for t in transitions
+                             if isinstance(t, rec.Left) and t.outcome is rec.Outcome.COMPLETED]
+        start = side.stretches.at(tick, task_instance_key(stack[0]) if stack else None)
+        if start is None or self._knowledge is None:
+            side.tagged = None
+        elif start == tick or side.tagged is None or side.tagged.since != start:
+            found = tag_at(self._knowledge, stack[0].schema, set(self._model.timeline.facts_at(tick)),
+                           recent_tasks(self._knowledge, side.completions, self._recency, tick))
+            side.tagged = msg.TaskTagged(tag=msg.TagValue(found.tag.value), since=start,
+                                         raised=tuple(sorted(s.name for s in found.raised)),
+                                         lowered=tuple(sorted(s.name for s in found.lowered)))
+        return side.tagged
