@@ -5184,3 +5184,23 @@ of `App.tsx` unchanged).
   scenario_s02_02, dock_loading scenario_s06_09, the new domain drawn from the defaults, no console error).
 - Deviations: an action is written with all its bindings' values, the agent included (`move_to(human_0, pallet_0)`), as
   the logs write it, not the plan's example without the agent; test 2's screenshot is a look, not a saved file (P25).
+
+1a, THE PANELS' CONTENT (Hadi, 6 October 2026, preferred; after trying increment (iv) and discussing the panels with
+cchat; recorded by ccode the same day). The plan is amended to match (P27 to P33).
+1. The roles of the three panels: the left panel (4a) shows the human and the world's context as they are at the tick;
+   the right panel (4b, stage 1b) shows the robot in two parts, its body (its action, what it carries) and its mind; the
+   bottom panel (4c, stage 1c) shows both over time.
+2. Panel 4a's content: (A) the human now and (B) the recent switches of the stack and resumptions, as built in (iv);
+   (C) the human's script; (D) the world's context now. C and D are built in (iv)'s second part.
+3. Not in panel 4a: the distance between robot and human (panel 4c, stage 1c). The timeline facts also get their own
+   subplot in panel 4c.
+4. The tag per task ("in accord", "not in accord", "no fact"; THE TAG PER TASK, under "T-F part 1") is wanted in panel
+   4a. Open: Hadi and cchat first settle which definition the panel shows. Nothing is built for it.
+5. Task names in the panel show values only, as actions do: `deliver_item(item_2, kitting_table_0)`.
+6. Panel 4a's reference cases (the scenarios of the increment (iv) report): a task in progress, kitting
+   scenario_s02_02 from its start; an interruption after an action, scenario_s02_02 at tick 33 (a coffee break after
+   `pick_up`); an interruption inside an action, kitting scenario_s09_13 at tick 46 and dock_loading scenario_s06_09
+   (env_layout_04) at tick 14; a resumption, scenario_s02_02 at tick 77, scenario_s06_09 at tick 68, and dock_loading
+   scenario_s11_03 (env_layout_05), an office break at 28 resumed at 108.
+7. The notes of every layout of both domains are rewritten to be readable for a screen-user (supersedes the review of
+   (ii) and (iii), item 7's assumption "these four only").

@@ -95,6 +95,13 @@ OF CHECKS FOR THE REST OF STAGE 1):
   message went further than meant. Tested: the flow, the functions and the logic of the web-ui, page-side included
   (written, not deferred; logic of (ii) and (iii) without a test gets one). Not tested: details of appearance and how
   good the page looks (no screenshot sets, no second window size, no visual refinement rounds). The rest of P25 stands.
+- P27 to P33 (Hadi, 6 October 2026, after trying (iv); design_records.md, 1a, THE PANELS' CONTENT): P27, the roles
+  of the panels: 4a the human and the world's context at the tick, 4b (1b) the robot's body and mind, 4c (1c) both over
+  time. P28, panel 4a holds (A) the human now, (B) the recent switches and resumptions, (C) the human's script, (D) the
+  world's context now; C and D in (iv)'s second part. P29, the robot-human distance and a subplot of the timeline facts
+  go to 4c, not 4a. P30, the tag per task is wanted in 4a, its definition open, nothing built. P31, task names show
+  values only. P32, 4a's reference cases (the record lists them). P33, every layout's notes rewritten for a
+  screen-user.
 - P26. Kept at the review of (ii) and (iii): the page's behaviour on a choice that cannot be built; the address with
   every run option; the table top's opacity for now; the 15 page tests. dock_loading's four layout notes rewritten.
 
@@ -258,7 +265,8 @@ one free angle.
 ### (iv) Panel 4a, test 2, the close of 1a
 
 Scope:
-- Panel 4a (section 4, item 8; P5); its width adjusted between 300 and 400 pixels (P18).
+- Panel 4a (section 4, item 8; P5); its width adjusted between 300 and 400 pixels (P18). AMENDED (P28): also the
+  human's script (C) and the world's context now (D), in a second part of (iv).
 - Test 2 (section 7).
 - The page's README, the README's starts, and the records of 1a's build.
 
