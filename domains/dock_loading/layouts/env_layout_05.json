@@ -4,7 +4,7 @@
     "height": 1480,
     "name": "Dock Loading Domain Layout 05 (T-K part 1, step 6)",
     "units": "cm",
-    "notes": "env_layout_03 with coffee_machine_0 moved to (-90, 250), in the hall beside the office door (T-K part 1, step 6; design_records.md, \"T-K\", STEP 6, its addition). Why: from either bay and from the standby place the walk to the coffee break and the walk to the office break begin in nearly the same direction, so break_time is the one thing that can tell the two foreseeable tasks apart early; testable: the raised coffee break against the office break on one shared walk. Everything else is env_layout_03's. origin (0,0) at the centre of the hall, y up. T-G stage 1 room (design_decisions.md, \"T-G: the second domain's rulings\", B14). The space is centred on the origin, x [-600, 600], y [-740, 740]: it holds every fixed object, the truck included (y from -740 to -440) and the office (y up to 415)."
+    "notes": "T-K part 1, step 6 (design_records.md, \"T-K\", STEP 6, its addition): env_layout_03 with coffee_machine_0 at (-90, 250), beside the office door, so that break_time alone can tell the coffee break from the office break early: from either bay and from the standby place both walks start in nearly the same direction (testable: the raised coffee break against the office break on one shared walk). Otherwise env_layout_03, a T-G stage 1 room (design_decisions.md, \"T-G: the second domain's rulings\", B14). Origin at the hall's centre, y up; the space x ±600, y ±740 holds every fixed object (truck y -740 to -440, office to y 415)."
   },
   "areas": [
     {

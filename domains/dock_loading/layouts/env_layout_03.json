@@ -4,7 +4,7 @@
     "height": 1480,
     "name": "Dock Loading Domain Layout 03 (T-G stage 1)",
     "units": "cm",
-    "notes": "origin (0,0) at the centre of the hall, y up. T-G stage 1 room (design_decisions.md, \"T-G: the second domain's rulings\", B14). The space is centred on the origin, x [-600, 600], y [-740, 740]: it holds every fixed object, the truck included (y from -740 to -440) and the office (y up to 415)."
+    "notes": "T-G stage 1 room (design_decisions.md, \"T-G: the second domain's rulings\", B14): the frozen bay lower on the east; the coffee machine west, near the gate. Origin at the hall's centre, y up; the space x ±600, y ±740 holds every fixed object (truck y -740 to -440, office to y 415)."
   },
   "areas": [
     {
