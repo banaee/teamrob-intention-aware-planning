@@ -11,7 +11,7 @@ import { useMemo } from "react";
 
 import type { Direction, Figure } from "../gen/messages";
 import { theme } from "../theme";
-import { at, Ball, Block, Cylinder, disc, FloorPatch, type Paint } from "./solids";
+import { at, Ball, Block, Cylinder, disc, FloorPatch, type Paint, paints } from "./solids";
 
 export interface Stance {
   x: number;
@@ -48,7 +48,7 @@ export function FigureForm({ figure, h, stance, paint }: { figure: Figure; h: nu
   );
 }
 
-/** Two legs, a tapered body, two arms and a round head. */
+/** Two legs, a tapered body in a work safety vest, two arms and a round head. */
 function Person({ h, s, paint }: { h: number; s: Stance; paint: Paint }) {
   const leg = 0.045 * h;
   return (
@@ -58,6 +58,7 @@ function Person({ h, s, paint }: { h: number; s: Stance; paint: Paint }) {
                   paint={paint} segments={16} />
       ))}
       <Cylinder x={s.x} y={s.y} r={0.11 * h} rTop={0.14 * h} h={0.3 * h} base={0.4 * h} paint={paint} />
+      <Cylinder x={s.x} y={s.y} r={0.122 * h} rTop={0.146 * h} h={0.22 * h} base={0.47 * h} paint={paints.vest} />
       {[-1, 1].map((side) => (
         <Cylinder key={`arm${side}`} x={s.x + side * 0.175 * h} y={s.y} r={0.032 * h} rTop={0.038 * h} h={0.27 * h}
                   base={0.42 * h} paint={paint} segments={14} />

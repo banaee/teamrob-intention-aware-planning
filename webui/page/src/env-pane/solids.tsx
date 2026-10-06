@@ -49,6 +49,11 @@ export const paints = {
     line: theme.color.humanDark,
     lineWidth: theme.line.agent,
   },
+  vest: {
+    tone: { top: theme.color.vestLight, light: theme.color.vest, shade: theme.color.vestDark, hatch: null },
+    line: theme.color.vestDark,
+    lineWidth: theme.line.agent,
+  },
 } satisfies Record<string, Paint>;
 
 /** A thin member (a post, a leg, a stem) drawn as one stroke: its faces in its outline's colour, no outline. */

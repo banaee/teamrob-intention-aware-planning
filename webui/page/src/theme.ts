@@ -38,6 +38,9 @@ export const theme = {
     human: "#D9653B",
     humanLight: "#F4C2A9",
     humanDark: "#A9482A",
+    vest: "#F2D024",          // the person's work safety vest: safety yellow (a trial, T-viz 1a)
+    vestLight: "#F8E57A",
+    vestDark: "#C9A90F",
   },
   opacity: {
     shadow: 0.10,
