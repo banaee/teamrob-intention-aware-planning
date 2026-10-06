@@ -4468,7 +4468,10 @@ handoff):
 - Reference images: the handoff places them in `docs/handoffs/tviz_refs/`; commit 069282b held them in
   `docs/handoffs/`, and Hadi's 4e71335 moved them to `tviz_refs/` during this step, so the place now agrees. The
   handoff (10.3) says the folder should stay out of version control if the repository is public; the repository is
-  public, and both commits, with the thirteen third-party images, are pushed. For Hadi.
+  public, and both commits, with the thirteen third-party images, are pushed.
+  RESOLVED (Hadi, 6 October 2026): `docs/handoffs/tviz_refs/` is git-ignored and untracked from ef0726d on, its 14
+  files (the 13 images and `sketch_A_and_J.svg`) kept on disk; no copy of 069282b's image blobs is tracked at another
+  path. They remain in the public history of 069282b and 4e71335; history is not rewritten.
 - 4.4 lists T-E as a task and names T-V for track 2 only; T-E is superseded and T-V track 1 is the existing record of
   the viewer as a task (fact 1).
 - 5.4, 8.4 and 12.1: "the model already holds a path per agent (`agent.planned_path`) ... Today that path is a straight

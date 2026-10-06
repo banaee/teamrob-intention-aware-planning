@@ -1265,8 +1265,10 @@ The body above is left as written. Where it and the repo differ, the repo wins. 
 with files and lines, is in `docs/design_records.md`, "T-viz, the web-ui", 0.1.
 
 - Sections 4, 10.3, 17: the reference images and `sketch_A_and_J.svg` are in `docs/handoffs/tviz_refs/` since 4e71335,
-  as stated here. The repository is public and the images are committed and pushed (069282b, 4e71335), so the
-  third-party images are in version control, against 10.3's condition.
+  as stated here. The repository is public and the images were committed and pushed (069282b, 4e71335), against
+  10.3's condition. From ef0726d on (6 October 2026, Hadi's answer) the folder is git-ignored and untracked, its files
+  kept on disk; no copy is tracked at another path. They remain in the public history of 069282b and 4e71335 (history
+  not rewritten).
 - 4.4: T-E is not an open task. It was superseded by T-V track 1 on 30 September 2026. T-V track 1 ("the viewer for
   pre-loaded scripts") is the existing record of the viewer as a task; the handoff names T-V for track 2 only.
 - 5.4, 8.4, 12.1 ("planned paths"): no module writes `agent.planned_path`. The drawer reads it behind a `hasattr` guard
