@@ -283,6 +283,20 @@
       "title": "Bounds",
       "type": "object"
     },
+    "BuildFailure": {
+      "additionalProperties": false,
+      "description": "A model that could not be built from the choice; no sim-run exists and no log pair is written.",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ],
+      "title": "BuildFailure",
+      "type": "object"
+    },
     "Carried": {
       "additionalProperties": false,
       "properties": {
@@ -317,8 +331,8 @@
           "items": {
             "discriminator": {
               "mapping": {
-                "count": "#/$defs/CountOption",
                 "level": "#/$defs/LevelOption",
+                "limit": "#/$defs/LimitOption",
                 "one_of": "#/$defs/OneOfOption",
                 "switch": "#/$defs/SwitchOption"
               },
@@ -335,7 +349,7 @@
                 "$ref": "#/$defs/LevelOption"
               },
               {
-                "$ref": "#/$defs/CountOption"
+                "$ref": "#/$defs/LimitOption"
               }
             ]
           },
@@ -350,57 +364,25 @@
       "title": "Catalogue",
       "type": "object"
     },
-    "CountOption": {
+    "Current": {
       "additionalProperties": false,
-      "description": "A run option that is a whole number, at least `minimum`.",
+      "description": "The answer to current: the current sim-run, or None when there is none.",
       "properties": {
-        "default": {
-          "type": "integer"
-        },
-        "description": {
-          "type": "string"
-        },
-        "kind": {
-          "const": "count",
-          "type": "string"
-        },
-        "minimum": {
-          "type": "integer"
-        },
-        "name": {
-          "type": "string"
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SimRunState"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
-        "default",
-        "description",
-        "kind",
-        "minimum",
-        "name"
+        "state"
       ],
-      "title": "CountOption",
-      "type": "object"
-    },
-    "CountValue": {
-      "additionalProperties": false,
-      "properties": {
-        "kind": {
-          "const": "count",
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "value": {
-          "type": "integer"
-        }
-      },
-      "required": [
-        "kind",
-        "name",
-        "value"
-      ],
-      "title": "CountValue",
+      "title": "Current",
       "type": "object"
     },
     "DecisionRefusalReason": {
@@ -431,7 +413,11 @@
     },
     "DomainEntry": {
       "additionalProperties": false,
+      "description": "A domain: what can be chosen in it, and its scene appearance (the defaults where it states none).",
       "properties": {
+        "appearance": {
+          "$ref": "#/$defs/Appearance"
+        },
         "layouts": {
           "items": {
             "$ref": "#/$defs/LayoutEntry"
@@ -455,6 +441,7 @@
         }
       },
       "required": [
+        "appearance",
         "layouts",
         "name",
         "scenarios",
@@ -948,6 +935,74 @@
       "title": "LevelValue",
       "type": "object"
     },
+    "LimitOption": {
+      "additionalProperties": false,
+      "description": "A run option that is a limit: a whole number, at least `minimum`, or no limit (None).",
+      "properties": {
+        "default": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "limit",
+          "type": "string"
+        },
+        "minimum": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "default",
+        "description",
+        "kind",
+        "minimum",
+        "name"
+      ],
+      "title": "LimitOption",
+      "type": "object"
+    },
+    "LimitValue": {
+      "additionalProperties": false,
+      "description": "A limit's value; None: no limit.",
+      "properties": {
+        "kind": {
+          "const": "limit",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "title": "LimitValue",
+      "type": "object"
+    },
     "MovableLook": {
       "additionalProperties": false,
       "properties": {
@@ -1228,8 +1283,8 @@
           "items": {
             "discriminator": {
               "mapping": {
-                "count": "#/$defs/CountValue",
                 "level": "#/$defs/LevelValue",
+                "limit": "#/$defs/LimitValue",
                 "one_of": "#/$defs/OneOfValue",
                 "switch": "#/$defs/SwitchValue"
               },
@@ -1246,7 +1301,7 @@
                 "$ref": "#/$defs/LevelValue"
               },
               {
-                "$ref": "#/$defs/CountValue"
+                "$ref": "#/$defs/LimitValue"
               }
             ]
           },
@@ -1294,6 +1349,27 @@
         "still_open"
       ],
       "title": "RunEnd",
+      "type": "object"
+    },
+    "RunTick": {
+      "additionalProperties": false,
+      "description": "The facts of the sim-run at the tick that are neither the world's nor the robot's mind's. `finished_at`: the\nfirst tick at which every human's script had ended (every entry closed, the stack empty) and every robot's task\npool was empty (the tick of its empty-pool log line); None before. Once set, it is kept.",
+      "properties": {
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "finished_at"
+      ],
+      "title": "RunTick",
       "type": "object"
     },
     "RunTriple": {
@@ -1422,8 +1498,8 @@
           "items": {
             "discriminator": {
               "mapping": {
-                "count": "#/$defs/CountValue",
                 "level": "#/$defs/LevelValue",
+                "limit": "#/$defs/LimitValue",
                 "one_of": "#/$defs/OneOfValue",
                 "switch": "#/$defs/SwitchValue"
               },
@@ -1440,7 +1516,7 @@
                 "$ref": "#/$defs/LevelValue"
               },
               {
-                "$ref": "#/$defs/CountValue"
+                "$ref": "#/$defs/LimitValue"
               }
             ]
           },
@@ -1457,6 +1533,38 @@
         "scenario"
       ],
       "title": "SimRunChoice",
+      "type": "object"
+    },
+    "SimRunRef": {
+      "additionalProperties": false,
+      "description": "The body of a request on one sim-run (step, reset).",
+      "properties": {
+        "sim_run": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sim_run"
+      ],
+      "title": "SimRunRef",
+      "type": "object"
+    },
+    "SimRunState": {
+      "additionalProperties": false,
+      "description": "A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before\nthe first step). The answer to choose, reset and current.",
+      "properties": {
+        "description": {
+          "$ref": "#/$defs/RunDescription"
+        },
+        "tick": {
+          "$ref": "#/$defs/TickUpdate"
+        }
+      },
+      "required": [
+        "description",
+        "tick"
+      ],
+      "title": "SimRunState",
       "type": "object"
     },
     "Space": {
@@ -1563,6 +1671,33 @@
       ],
       "title": "Started",
       "type": "object"
+    },
+    "StepRefusal": {
+      "additionalProperties": false,
+      "description": "A step or a reset refused: the sim-run is not the current one, it has ended (a step only), or a step of it is\nunder way.",
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/StepRefusalReason"
+        },
+        "sim_run": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason",
+        "sim_run"
+      ],
+      "title": "StepRefusal",
+      "type": "object"
+    },
+    "StepRefusalReason": {
+      "enum": [
+        "not_current",
+        "ended",
+        "busy"
+      ],
+      "title": "StepRefusalReason",
+      "type": "string"
     },
     "StillOpen": {
       "additionalProperties": false,
@@ -1695,6 +1830,9 @@
             }
           ]
         },
+        "run": {
+          "$ref": "#/$defs/RunTick"
+        },
         "sim_run": {
           "type": "string"
         },
@@ -1714,6 +1852,7 @@
       },
       "required": [
         "end",
+        "run",
         "sim_run",
         "tick",
         "world"

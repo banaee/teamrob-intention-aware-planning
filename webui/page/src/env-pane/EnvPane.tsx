@@ -1,25 +1,26 @@
 /**
- * The env-pane (glossary §11): the region of the page that shows the simulated environment. In stage 0.3 it holds the
- * scene of one sim-run at its start, seen tilted or from above (the same scene, the camera moved), and a header that
- * names the sim-run.
+ * The env-pane (glossary §11): the region of the page that shows the simulated environment. A header with the room's
+ * title and the two views (tilted, from above: the same scene, the camera moved); the scene of the current sim-run at
+ * its latest tick; and, at its foot, the control bar the page passes in (it acts on what the env-pane shows).
  */
 
 import { Canvas, useThree } from "@react-three/fiber";
-import { useLayoutEffect, useMemo } from "react";
+import { type ReactNode, useLayoutEffect, useMemo } from "react";
 
 import type { Appearance, RunDescription, TickUpdate } from "../gen/messages";
 import { FramingCamera, type View } from "./camera";
 import { setPixelRatio } from "./material";
 import { Scene } from "./Scene";
 
-export function EnvPane({ description, tick, appearance, view, onView }: {
+export function EnvPane({ description, tick, appearance, view, onView, glideMs, controls }: {
   description: RunDescription;
   tick: TickUpdate;
   appearance: Appearance;
   view: View;
   onView: (view: View) => void;
+  glideMs: number;
+  controls: ReactNode;
 }) {
-  const run = description.run;
   const tallest = useMemo(() => Math.max(
     appearance.human.height, appearance.robot.height, appearance.default_fixed.height,
     ...Object.values(appearance.fixed).map((l) => l.height)), [appearance]);
@@ -28,9 +29,7 @@ export function EnvPane({ description, tick, appearance, view, onView }: {
       <header className="env-pane-header">
         <div className="env-pane-title">
           <span className="env-pane-name">{description.world.space.title}</span>
-          <span className="env-pane-run">
-            {run.domain} · {run.layout} · {run.setup} · {run.scenario} · {tick.tick === null ? "start" : `tick ${tick.tick}`}
-          </span>
+          <span className="env-pane-run">{description.run.layout}</span>
         </div>
         <div className="segmented" role="group" aria-label="View">
           {(["tilted", "top"] as const).map((v) => (
@@ -44,9 +43,10 @@ export function EnvPane({ description, tick, appearance, view, onView }: {
         <Canvas orthographic flat dpr={[1, 2]} gl={{ antialias: true, preserveDrawingBuffer: true }}>
           <PixelRatio />
           <FramingCamera view={view} bounds={description.world.space.bounds} height={tallest} />
-          <Scene description={description} tick={tick} appearance={appearance} />
+          <Scene description={description} tick={tick} appearance={appearance} glideMs={glideMs} />
         </Canvas>
       </div>
+      {controls}
     </section>
   );
 }

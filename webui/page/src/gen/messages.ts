@@ -34,9 +34,14 @@ export type MovableShape = "crate" | "skid";
 export type Figure = "person" | "cube_head_robot" | "lift_vehicle";
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "DecisionRefusalReason".
+ * via the `definition` "ScriptDependence".
  */
-export type DecisionRefusalReason = "stack_full" | "empty_stack";
+export type ScriptDependence = "independent" | "on_robot";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TimelineSource".
+ */
+export type TimelineSource = "scenario" | "setup" | "none";
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "EndReason".
@@ -54,20 +59,20 @@ export type EntryPart = "ordinary" | "repeatable" | "closing";
 export type Outcome = "completed" | "suspended" | "abandoned" | "infeasible";
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "DecisionRefusalReason".
+ */
+export type DecisionRefusalReason = "stack_full" | "empty_stack";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "UnfiredReason".
  */
 export type UnfiredReason =
   "anchor_absent" | "anchor_ambiguous" | "anchor_out_of_range" | "never_reached" | "past_action";
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "ScriptDependence".
+ * via the `definition` "StepRefusalReason".
  */
-export type ScriptDependence = "independent" | "on_robot";
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "TimelineSource".
- */
-export type TimelineSource = "scenario" | "setup" | "none";
+export type StepRefusalReason = "not_current" | "ended" | "busy";
 
 export interface WebUiMessages {
   [k: string]: unknown;
@@ -246,6 +251,15 @@ export interface AtCut {
   occurrence: number;
 }
 /**
+ * A model that could not be built from the choice; no sim-run exists and no log pair is written.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "BuildFailure".
+ */
+export interface BuildFailure {
+  message: string;
+}
+/**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "Carried".
  */
@@ -263,7 +277,7 @@ export interface Carried {
 export interface Catalogue {
   default_choice: SimRunChoice;
   domains: DomainEntry[];
-  run_options: (SwitchOption | OneOfOption | LevelOption | CountOption)[];
+  run_options: (SwitchOption | OneOfOption | LevelOption | LimitOption)[];
 }
 /**
  * The screen-user's choice of a sim-run: the domain, the layout, the scenario (its setup is the scenario's) and
@@ -275,7 +289,7 @@ export interface Catalogue {
 export interface SimRunChoice {
   domain: string;
   layout: string;
-  options: (SwitchValue | OneOfValue | LevelValue | CountValue)[];
+  options: (SwitchValue | OneOfValue | LevelValue | LimitValue)[];
   scenario: string;
 }
 /**
@@ -306,19 +320,24 @@ export interface LevelValue {
   value: number;
 }
 /**
+ * A limit's value; None: no limit.
+ *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "CountValue".
+ * via the `definition` "LimitValue".
  */
-export interface CountValue {
-  kind: "count";
+export interface LimitValue {
+  kind: "limit";
   name: string;
-  value: number;
+  value: number | null;
 }
 /**
+ * A domain: what can be chosen in it, and its scene appearance (the defaults where it states none).
+ *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "DomainEntry".
  */
 export interface DomainEntry {
+  appearance: Appearance;
   layouts: LayoutEntry[];
   name: string;
   scenarios: ScenarioEntry[];
@@ -390,17 +409,163 @@ export interface LevelOption {
   name: string;
 }
 /**
- * A run option that is a whole number, at least `minimum`.
+ * A run option that is a limit: a whole number, at least `minimum`, or no limit (None).
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "CountOption".
+ * via the `definition` "LimitOption".
  */
-export interface CountOption {
-  default: number;
+export interface LimitOption {
+  default: number | null;
   description: string;
-  kind: "count";
+  kind: "limit";
   minimum: number;
   name: string;
+}
+/**
+ * The answer to current: the current sim-run, or None when there is none.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Current".
+ */
+export interface Current {
+  state: SimRunState | null;
+}
+/**
+ * A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before
+ * the first step). The answer to choose, reset and current.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "SimRunState".
+ */
+export interface SimRunState {
+  description: RunDescription;
+  tick: TickUpdate;
+}
+/**
+ * Everything constant in one sim-run, sent when its model is built: the triple, the run options as the
+ * screen-user stated them and as the model applies them (an option set off by another shows here), and the world.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RunDescription".
+ */
+export interface RunDescription {
+  effective: (SwitchValue | OneOfValue | LevelValue | LimitValue)[];
+  run: RunTriple;
+  sim_run: string;
+  stated: SimRunChoice;
+  world: WorldDescription;
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RunTriple".
+ */
+export interface RunTriple {
+  domain: string;
+  layout: string;
+  scenario: string;
+  setup: string;
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "WorldDescription".
+ */
+export interface WorldDescription {
+  areas: Area[];
+  fixed_objects: FixedObject[];
+  humans: AgentEntry[];
+  movable_objects: MovableObject[];
+  robots: AgentEntry[];
+  scripts: HumanScript[];
+  space: Space;
+  timeline: TimelineInForce;
+}
+/**
+ * A fixed object of the layout, at its position for the whole sim-run (an override applied).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "FixedObject".
+ */
+export interface FixedObject {
+  id: string;
+  position: Point;
+  size: Extent;
+  subtype: string | null;
+  type: string;
+}
+/**
+ * A size: the extent along x and along y.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Extent".
+ */
+export interface Extent {
+  x: number;
+  y: number;
+}
+/**
+ * A movable object of the setup: its home container and, where the domain determines one, its designated
+ * destination. Where it is at a tick is the tick update's.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "MovableObject".
+ */
+export interface MovableObject {
+  destination: string | null;
+  home_container: string;
+  id: string;
+  size: Extent;
+  subtype: string | null;
+  type: string;
+}
+/**
+ * A human's script: the ordinary entries of the priority list in written order, its repeatable entries, its
+ * closing part, and whether it depends on the robot.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "HumanScript".
+ */
+export interface HumanScript {
+  closing: ScriptEntry[];
+  dependence: ScriptDependence;
+  entries: ScriptEntry[];
+  human: string;
+  repeatable: RepeatableEntry[];
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "ScriptEntry".
+ */
+export interface ScriptEntry {
+  events: Event[];
+  task: TaskRef;
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Event".
+ */
+export interface Event {
+  decision: StartDecision | DropDecision;
+  trigger: AfterActionTrigger | DuringActionTrigger | NowTrigger;
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "StartDecision".
+ */
+export interface StartDecision {
+  kind: "start";
+  task: TaskRef;
+}
+/**
+ * A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the
+ * logs show.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TaskRef".
+ */
+export interface TaskRef {
+  bindings: Binding[];
+  label: string;
+  task: string;
 }
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
@@ -422,26 +587,77 @@ export interface DuringActionTrigger {
   time: string;
 }
 /**
- * A script entry's task pushed on the empty stack.
+ * A live event, fired on the tick it is applied.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "Entered".
+ * via the `definition` "NowTrigger".
  */
-export interface Entered {
-  kind: "entered";
+export interface NowTrigger {
+  kind: "now";
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RepeatableEntry".
+ */
+export interface RepeatableEntry {
   task: TaskRef;
 }
 /**
- * A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the
- * logs show.
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Space".
+ */
+export interface Space {
+  bounds: Bounds;
+  title: string;
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TimelineInForce".
+ */
+export interface TimelineInForce {
+  source: TimelineSource;
+  windows: TimelineWindow[];
+}
+/**
+ * A timeline fact holds on the ticks [start, until); `until` None: to the run's end.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "TaskRef".
+ * via the `definition` "TimelineWindow".
  */
-export interface TaskRef {
-  bindings: Binding[];
-  label: string;
-  task: string;
+export interface TimelineWindow {
+  fact: string;
+  start: number;
+  until: number | null;
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TickUpdate".
+ */
+export interface TickUpdate {
+  end: RunEnd | null;
+  run: RunTick;
+  sim_run: string;
+  tick: number | null;
+  world: WorldTick;
+}
+/**
+ * The sim-run's end: why, and the entries still open of each script that depends on the robot.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RunEnd".
+ */
+export interface RunEnd {
+  reason: EndReason;
+  still_open: StillOpenEntry[];
+}
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "StillOpenEntry".
+ */
+export interface StillOpenEntry {
+  entry: EntryPosition;
+  human: string;
+  task: TaskRef;
 }
 /**
  * Which entry of the script: its part and its index there.
@@ -454,63 +670,30 @@ export interface EntryPosition {
   part: EntryPart;
 }
 /**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "Event".
- */
-export interface Event {
-  decision: StartDecision | DropDecision;
-  trigger: AfterActionTrigger | DuringActionTrigger | NowTrigger;
-}
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "StartDecision".
- */
-export interface StartDecision {
-  kind: "start";
-  task: TaskRef;
-}
-/**
- * A live event, fired on the tick it is applied.
+ * The facts of the sim-run at the tick that are neither the world's nor the robot's mind's. `finished_at`: the
+ * first tick at which every human's script had ended (every entry closed, the stack empty) and every robot's task
+ * pool was empty (the tick of its empty-pool log line); None before. Once set, it is kept.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "NowTrigger".
+ * via the `definition` "RunTick".
  */
-export interface NowTrigger {
-  kind: "now";
+export interface RunTick {
+  finished_at: number | null;
 }
 /**
- * A size: the extent along x and along y.
+ * The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "Extent".
+ * via the `definition` "WorldTick".
  */
-export interface Extent {
-  x: number;
-  y: number;
-}
-/**
- * A fixed object of the layout, at its position for the whole sim-run (an override applied).
- *
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "FixedObject".
- */
-export interface FixedObject {
-  id: string;
-  position: Point;
-  size: Extent;
-  subtype: string | null;
-  type: string;
-}
-/**
- * A fixed object that holds movable objects at the tick, with them in their order of arrival (at the start, the
- * setup's order; two arriving on one tick, the setup's order).
- *
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "FixedObjectContents".
- */
-export interface FixedObjectContents {
-  fixed_object: string;
-  movable_objects: string[];
+export interface WorldTick {
+  activity: HumanActivity[];
+  carried: Carried[];
+  fixed_object_contents: FixedObjectContents[];
+  humans: AgentTick[];
+  object_states: ObjectState[];
+  robots: AgentTick[];
+  timeline_facts: string[];
 }
 /**
  * What a human's executor is doing at the tick, from its record: the stack, top first; the action in hand; the
@@ -525,6 +708,16 @@ export interface HumanActivity {
   open_entries: EntryPosition[];
   stack: TaskRef[];
   transitions: (Entered | Started | Resumed | Left | Refused | Unfired | StillOpen)[];
+}
+/**
+ * A script entry's task pushed on the empty stack.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Entered".
+ */
+export interface Entered {
+  kind: "entered";
+  task: TaskRef;
 }
 /**
  * A task pushed on the stack by an event; `where` on the task below it, None on an empty stack.
@@ -588,48 +781,15 @@ export interface StillOpen {
   task: TaskRef;
 }
 /**
- * A human's script: the ordinary entries of the priority list in written order, its repeatable entries, its
- * closing part, and whether it depends on the robot.
+ * A fixed object that holds movable objects at the tick, with them in their order of arrival (at the start, the
+ * setup's order; two arriving on one tick, the setup's order).
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "HumanScript".
+ * via the `definition` "FixedObjectContents".
  */
-export interface HumanScript {
-  closing: ScriptEntry[];
-  dependence: ScriptDependence;
-  entries: ScriptEntry[];
-  human: string;
-  repeatable: RepeatableEntry[];
-}
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "ScriptEntry".
- */
-export interface ScriptEntry {
-  events: Event[];
-  task: TaskRef;
-}
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "RepeatableEntry".
- */
-export interface RepeatableEntry {
-  task: TaskRef;
-}
-/**
- * A movable object of the setup: its home container and, where the domain determines one, its designated
- * destination. Where it is at a tick is the tick update's.
- *
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "MovableObject".
- */
-export interface MovableObject {
-  destination: string | null;
-  home_container: string;
-  id: string;
-  size: Extent;
-  subtype: string | null;
-  type: string;
+export interface FixedObjectContents {
+  fixed_object: string;
+  movable_objects: string[];
 }
 /**
  * A declared state that holds; `object` None for a fact about no object.
@@ -642,111 +802,22 @@ export interface ObjectState {
   state: string;
 }
 /**
- * Everything constant in one sim-run, sent when its model is built: the triple, the run options as the
- * screen-user stated them and as the model applies them (an option set off by another shows here), and the world.
+ * The body of a request on one sim-run (step, reset).
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "RunDescription".
+ * via the `definition` "SimRunRef".
  */
-export interface RunDescription {
-  effective: (SwitchValue | OneOfValue | LevelValue | CountValue)[];
-  run: RunTriple;
+export interface SimRunRef {
   sim_run: string;
-  stated: SimRunChoice;
-  world: WorldDescription;
 }
 /**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "RunTriple".
- */
-export interface RunTriple {
-  domain: string;
-  layout: string;
-  scenario: string;
-  setup: string;
-}
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "WorldDescription".
- */
-export interface WorldDescription {
-  areas: Area[];
-  fixed_objects: FixedObject[];
-  humans: AgentEntry[];
-  movable_objects: MovableObject[];
-  robots: AgentEntry[];
-  scripts: HumanScript[];
-  space: Space;
-  timeline: TimelineInForce;
-}
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "Space".
- */
-export interface Space {
-  bounds: Bounds;
-  title: string;
-}
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "TimelineInForce".
- */
-export interface TimelineInForce {
-  source: TimelineSource;
-  windows: TimelineWindow[];
-}
-/**
- * A timeline fact holds on the ticks [start, until); `until` None: to the run's end.
+ * A step or a reset refused: the sim-run is not the current one, it has ended (a step only), or a step of it is
+ * under way.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "TimelineWindow".
+ * via the `definition` "StepRefusal".
  */
-export interface TimelineWindow {
-  fact: string;
-  start: number;
-  until: number | null;
-}
-/**
- * The sim-run's end: why, and the entries still open of each script that depends on the robot.
- *
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "RunEnd".
- */
-export interface RunEnd {
-  reason: EndReason;
-  still_open: StillOpenEntry[];
-}
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "StillOpenEntry".
- */
-export interface StillOpenEntry {
-  entry: EntryPosition;
-  human: string;
-  task: TaskRef;
-}
-/**
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "TickUpdate".
- */
-export interface TickUpdate {
-  end: RunEnd | null;
+export interface StepRefusal {
+  reason: StepRefusalReason;
   sim_run: string;
-  tick: number | null;
-  world: WorldTick;
-}
-/**
- * The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.
- *
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "WorldTick".
- */
-export interface WorldTick {
-  activity: HumanActivity[];
-  carried: Carried[];
-  fixed_object_contents: FixedObjectContents[];
-  humans: AgentTick[];
-  object_states: ObjectState[];
-  robots: AgentTick[];
-  timeline_facts: string[];
 }

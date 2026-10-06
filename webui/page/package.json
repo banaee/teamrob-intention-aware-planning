@@ -2,7 +2,7 @@
   "name": "teamrob-webui-page",
   "private": true,
   "version": "0.3.0",
-  "description": "The web-ui's page (T-viz). Stage 0.3: the env-pane's style trial, drawn from saved messages.",
+  "description": "The web-ui's page (T-viz). Stage 1a: the page served by the web-ui's server.",
   "type": "module",
   "engines": { "node": ">=22.12.0" },
   "scripts": {

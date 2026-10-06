@@ -4,11 +4,16 @@
  * background objects as lines and pale faces; the active objects with a representative form and a warm tone; the
  * agents as figures in their semantic colours. The movable objects are solid ink: what can change stands out.
  *
+ * What is constant is drawn once per sim-run; a tick moves the existing shapes. An agent moves smoothly from its last
+ * position to the tick's over `glideMs` (during play), or is put there at once (`glideMs` 0: paused, or a step), so
+ * that a paused scene shows exactly the tick's positions. It turns at once to its last motion.
+ *
  * Nothing here names a domain, an object type or an area id: they arrive as data.
  */
 
 import { Html, Line, Text } from "@react-three/drei";
-import { useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { type ReactNode, useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 import plexMono from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff?url";
@@ -33,22 +38,26 @@ const floorPaint: Paint = {
   lineWidth: theme.line.floor,
 };
 
-export function Scene({ description, tick, appearance }: {
-  description: RunDescription; tick: TickUpdate; appearance: Appearance;
+export function Scene({ description, tick, appearance, glideMs }: {
+  description: RunDescription; tick: TickUpdate; appearance: Appearance; glideMs: number;
 }) {
   const world = description.world;
   const fixedById = useMemo(() => new Map(world.fixed_objects.map((f) => [f.id, f])), [world]);
   const movableById = useMemo(() => new Map(world.movable_objects.map((o) => [o.id, o])), [world]);
-
-  return (
+  const constant = useMemo(() => (
     <group>
       <Floor bounds={world.space.bounds} />
       {world.areas.map((area) => (
         <AreaMark key={area.id} id={area.id} bounds={area.bounds} space={world.space.bounds}
                   occupied={world.fixed_objects} />
       ))}
-
       {world.fixed_objects.map((f) => <Fixed key={f.id} f={f} appearance={appearance} bounds={world.space.bounds} />)}
+    </group>
+  ), [world, appearance]);
+
+  return (
+    <group>
+      {constant}
 
       {tick.world.fixed_object_contents.flatMap((contents) => {
         const holder = fixedById.get(contents.fixed_object);
@@ -69,24 +78,51 @@ export function Scene({ description, tick, appearance }: {
       {[...tick.world.humans.map((a) => ({ a, figure: appearance.human, paint: paints.human, colour: theme.color.human })),
         ...tick.world.robots.map((a) => ({ a, figure: appearance.robot, paint: paints.robot, colour: theme.color.robot }))]
         .map(({ a, figure, paint, colour }) => {
-          const stance = { x: a.position.x, y: a.position.y, facing: a.last_motion };
+          // Drawn at the group's origin; the group carries the agent to its position.
+          const stance = { x: 0, y: 0, facing: a.last_motion };
           const carried = tick.world.carried.filter((c) => c.agent === a.id).map((c) => movableById.get(c.movable_object)!);
           const hold = carryOffset(figure.figure, figure.height, a.last_motion);
           return (
-            <group key={a.id}>
+            <Gliding key={`${description.sim_run} ${a.id}`} x={a.position.x} y={a.position.y} glideMs={glideMs}>
               <FigureForm figure={figure.figure} h={figure.height} stance={stance} paint={paint} />
               {carried.map((o) => {
                 const look = movableLook(appearance, o.type);
-                return <MovableForm key={o.id} shape={look.shape} x={a.position.x + hold.x} y={a.position.y + hold.y}
+                return <MovableForm key={o.id} shape={look.shape} x={hold.x} y={hold.y}
                                     sx={o.size.x} sy={o.size.y} h={look.height}
                                     base={carryHeight(figure.figure, figure.height)} paint={paints.movable} />;
               })}
-              <Pill position={at(a.position.x, a.position.y, figure.height)} text={a.id} dot={colour} />
-            </group>
+              <Pill position={at(0, 0, figure.height)} text={a.id} dot={colour} />
+            </Gliding>
           );
         })}
     </group>
   );
+}
+
+/** A group at a point of the floor that moves to a new point over `glideMs`, from where it is drawn now; at once when
+ * `glideMs` is 0. A display convention between two ticks: the world knows only the ticks' positions. */
+function Gliding({ x, y, glideMs, children }: { x: number; y: number; glideMs: number; children: ReactNode }) {
+  const group = useRef<THREE.Group>(null);
+  const glide = useRef({ fromX: x, fromY: y, toX: x, toY: y, start: 0, ms: 0 });
+
+  useLayoutEffect(() => {
+    const g = group.current!;
+    const placed = glide.current.start === 0;
+    glide.current = {
+      fromX: placed ? x : g.position.x, fromY: placed ? y : -g.position.z, toX: x, toY: y,
+      start: performance.now(), ms: glideMs,
+    };
+    if (placed || glideMs <= 0) g.position.set(...at(x, y));
+  }, [x, y, glideMs]);
+
+  useFrame(() => {
+    const { fromX, fromY, toX, toY, start, ms } = glide.current;
+    if (ms <= 0) return;
+    const k = Math.min(1, (performance.now() - start) / ms);
+    group.current!.position.set(...at(fromX + k * (toX - fromX), fromY + k * (toY - fromY)));
+  });
+
+  return <group ref={group}>{children}</group>;
 }
 
 /** The space: a floor plate with its outline, and a faint dot grid at the floor's step. */
