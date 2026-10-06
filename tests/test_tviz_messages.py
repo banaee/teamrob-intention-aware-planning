@@ -292,14 +292,22 @@ def _domain_words():
     return words
 
 
+# Framework terms that are also an object type of a domain (T-viz 1b): "gate", the confidence gate (glossary; panel 4b's
+# admission block) and dock_loading's gate. Such a term may name a field or stand in prose; a string literal that is the
+# term alone, the form a dependence on the object type takes, is still refused.
+FRAMEWORK_TERMS = {"gate"}
+
+
 def test_webui_names_no_domain_object_type_or_area_id():
     words = _domain_words()
     for path in _webui_sources():
         for token in tokenize.generate_tokens(io.StringIO(path.read_text()).readline):
             if token.type == tokenize.NAME:
-                found = {token.string} & words
+                found = {token.string} & words - FRAMEWORK_TERMS
             elif token.type == tokenize.STRING:
-                found = set(ast.literal_eval(token.string).replace(".", " ").replace(",", " ").split()) & words
+                text = ast.literal_eval(token.string)
+                found = (set(text.replace(".", " ").replace(",", " ").split()) & words - FRAMEWORK_TERMS) | (
+                    {text} & words)
             else:
                 continue
             assert not found, f"{path.relative_to(ROOT)}:{token.start[0]} names {sorted(found)}"
@@ -311,5 +319,6 @@ def test_the_page_names_no_domain_object_type_or_area_id():
     assert any(p.suffix == ".tsx" for p in sources)
     for path in sources:
         for number, line in enumerate(path.read_text().splitlines(), 1):
-            found = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", line)) & words
+            found = (set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", line)) & words - FRAMEWORK_TERMS) | (
+                set(re.findall(r"""["'`]([A-Za-z_][A-Za-z0-9_]*)["'`]""", line)) & words)
             assert not found, f"{path.relative_to(ROOT)}:{number} names {sorted(found)}"

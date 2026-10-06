@@ -35,6 +35,9 @@ SECTIONS:
     stage 1c the plots, each as a new field with an empty default; nothing defined here changes. The world's
     vocabulary and the mind's stay in separate sections. The tick update's `run` (T-viz 1a) holds the facts of the
     sim-run that are neither the world's nor the robot's mind's: the tick at which every agent had finished.
+    T-viz 1b: `robots`, per robot, in the run description what is constant of its mind (RobotDescription) and in the
+    tick update its body and its mind at the tick (RobotTick): the action at its plan's cursor, a hold; the belief; the
+    gate's answer; the last decision and the projection it rested on. Its position and what it carries stay in `world`.
 
 THE STEP LIMIT (T-viz 1a):
     A sim-run in the web-ui has a step limit only when one is set (LimitOption); without one it ends by reset, by a
@@ -317,6 +320,239 @@ class EventPosition(Message):
 
 
 # =============================================================================
+# The robot's section (T-viz 1b): its body and its mind, beside the world
+# =============================================================================
+
+class RobotCondition(str, Enum):
+    """The robot's condition in the sim-run (glossary §9): as designed; observing the human's motion without its
+    intention (the recognizer does not run, the gate admits nothing); or not taking the human into account."""
+    INTENTION_AWARE = "intention-aware"
+    INTENTION_UNAWARE = "intention-unaware"
+    HUMAN_UNAWARE = "human-unaware"
+
+
+class Hypothesis(Message):
+    """A hypothesis of the robot's hypothesis space: its key (the label the logs and the belief use) and the task it
+    names, by its schema's name and its bindings."""
+    key: str
+    task: str
+    bindings: tuple[Binding, ...]
+
+
+class RobotDescription(Message):
+    """What is constant in a sim-run about a robot's mind: its condition; the human it observes (None when it observes
+    none); θ, the gate's share; the adequacy test's level α; min_separation, in the layout's unit; whether context
+    knowledge acts on its prior; its hypothesis space, in the recognizer's order; its own assigned tasks; the observed
+    human's assigned tasks it knows (assignment knowledge; None when off)."""
+    robot: str
+    condition: RobotCondition
+    observes: Optional[str]
+    theta: float
+    test_level: float
+    min_separation: float
+    context_knowledge: bool
+    hypotheses: tuple[Hypothesis, ...]
+    assigned: tuple[TaskRef, ...]
+    known_assigned: Optional[tuple[TaskRef, ...]]
+
+
+class HoldInProgress(Message):
+    """The hold the last decision (at `decided_at`) carries, while it runs or waits behind a completion tick the body
+    still owes: `stood` of its `planned` ticks executed."""
+    decided_at: int
+    planned: int
+    stood: int
+
+
+class RobotAction(Message):
+    """The action at the robot's plan's cursor, and its progress: the microactions of its expansion executed, in
+    ticks (0 of 0: not yet begun)."""
+    action: ActionRef
+    done: int
+    total: int
+
+
+class RobotBody(Message):
+    """The robot's body at the tick: the task its last decision chose, while it runs; the action at its plan's cursor;
+    what the body did on the tick (the executor's microaction, None on a tick it spends acknowledging a completion);
+    a hold in progress; whether its task pool is empty (it still observes). What it carries is the world's."""
+    task: Optional[TaskRef]
+    action: Optional[RobotAction]
+    microaction: Optional[str]
+    hold: Optional[HoldInProgress]
+    finished: bool
+
+
+class Lifecycle(str, Enum):
+    LIVE = "live"
+    EXHAUSTED = "exhausted"
+
+
+class Finding(str, Enum):
+    UNRESOLVED = "unresolved"
+    ADEQUATE = "adequate"
+    UNEXPLAINED = "unexplained"
+
+
+class Adequacy(str, Enum):
+    ADEQUATE = "adequate"
+    INADEQUATE = "inadequate"
+    NO_OBSERVATION = "no_observation"
+
+
+class Warrant(str, Enum):
+    OBSERVATION = "observation"
+    NONE = "none"
+
+
+class Rank(str, Enum):
+    OUTRANKED = "outranked"
+    NOT_OUTRANKED = "not_outranked"
+
+
+class Level(str, Enum):
+    SUPPRESSED = "suppressed"
+    ORDINARY = "ordinary"
+    RAISED = "raised"
+
+
+class HypothesisBelief(Message):
+    """A live hypothesis at the tick: its belief over the live hypotheses (the value the gate compares with θ), its
+    prior (context knowledge on; else None), its hypothesis adequacy, its tail probability S (a member of the adequacy
+    test; else None), its observation warrant and its evidence rank."""
+    key: str
+    belief: float
+    prior: Optional[float]
+    adequacy: Adequacy
+    tail: Optional[float]
+    warrant: Warrant
+    rank: Rank
+
+
+class TaskLevel(Message):
+    """A foreseeable task's strength level on the tick (context knowledge on), by its schema's name."""
+    task: str
+    level: Level
+
+
+class RobotBelief(Message):
+    """The recognizer's outputs at the tick: the leader (None when exhausted) and its belief, the lifecycle, the
+    adequacy finding (None when exhausted), whether the tick is an episode boundary, every live hypothesis in the
+    recognizer's order; with context knowledge on, the foreseeable tasks' levels and the recency facts of the robot's
+    memory of observed completions (the tasks by their schemas' names)."""
+    leader: Optional[str]
+    confidence: float
+    lifecycle: Lifecycle
+    finding: Optional[Finding]
+    boundary: bool
+    live: tuple[HypothesisBelief, ...]
+    levels: tuple[TaskLevel, ...]
+    recent: tuple[str, ...]
+
+
+class Gate(str, Enum):
+    """The gate's answer for the leader, in the order admission asks (the values are the log's codes): no human
+    observed (asked before the gate), intention off, below θ, the leader with no observation, inadequate,
+    unwarranted, outranked; or it clears."""
+    CLEARS = "clears"
+    NO_HUMAN = "none(no_human)"
+    INTENTION_OFF = "none(intention_off)"
+    BELOW_THETA = "none(below_theta)"
+    LEADER_NO_OBSERVATION = "none(leader_no_observation)"
+    LEADER_INADEQUATE = "none(leader_inadequate)"
+    LEADER_UNWARRANTED = "none(leader_unwarranted)"
+    LEADER_OUTRANKED = "none(leader_outranked)"
+
+
+class TriggerKind(str, Enum):
+    NO_CURRENT_TASK = "no_current_task"
+    RECOGNITION_CHANGED = "recognition_changed"
+    PROJECTION_EXPIRED = "projection_expired"
+
+
+class Cause(str, Enum):
+    """Which condition of recognition_changed fired."""
+    ENTERED = "entered"
+    REPLACED = "replaced"
+    BOUNDARY = "boundary"
+    RETRACTION = "retraction"
+
+
+class FallbackMode(str, Enum):
+    """The fallback projection's form: the human standing where seen, or walking straight on."""
+    STANDING = "standing"
+    MOVING = "moving"
+
+
+class NoProjectionReason(str, Enum):
+    NO_HUMAN = "no_human"
+    UNASSESSED = "unassessed"
+
+
+class AdmittedProjection(Message):
+    """The admitted hypothesis's projection: the task's plan, its actions in order; `until`, the tick its last segment
+    ends (the decision tick − 1 + T_h)."""
+    kind: Literal["admitted"] = "admitted"
+    hypothesis: str
+    plan: tuple[ActionRef, ...]
+    until: float
+
+
+class FallbackProjection(Message):
+    """The fallback projection: standing or moving, over `span` ticks, to the end of tick `until` (the decision tick −
+    1 + T_h); the decision is re-decided after it unless another trigger fires first."""
+    kind: Literal["fallback"] = "fallback"
+    mode: FallbackMode
+    span: float
+    until: float
+
+
+class NoProjection(Message):
+    """No projection: no human observed, or no previous observation of it (unassessed)."""
+    kind: Literal["none"] = "none"
+    reason: NoProjectionReason
+
+
+Projection = Annotated[Union[AdmittedProjection, FallbackProjection, NoProjection], Field(discriminator="kind")]
+
+
+class TaskChange(str, Enum):
+    """What the decision did to the robot's task: starts one (it had none), continues it (the same task, task
+    equality), switches to another, or finishes (the pool is empty)."""
+    STARTS = "starts"
+    CONTINUES = "continues"
+    SWITCHES = "switches"
+    FINISHES = "finishes"
+
+
+class DecisionMade(Message):
+    """A decision of the robot: its tick, the trigger that fired and its cause (recognition_changed only), the
+    admission's answer then, the projection it rested on, what it did to the task, the chosen task (None when it
+    finishes), the hold it carries, in ticks, and the rest of the pool (the queue, unordered)."""
+    tick: int
+    trigger: TriggerKind
+    cause: Optional[Cause]
+    gate_answer: Gate
+    projection: Projection
+    change: TaskChange
+    chosen: Optional[TaskRef]
+    hold: int
+    queue: tuple[TaskRef, ...]
+
+
+class RobotTick(Message):
+    """A robot at the tick: its body; its belief (None while the recognizer has produced none: intention-unaware,
+    human-unaware, or before the first step); the gate's answer for the leader at the tick (the gate is asked at a
+    decision; this is what it would answer now); and its last decision, kept on every tick after it (None before the
+    first). The hypothesis a decision rests on (the decision record) is its admitted projection's."""
+    robot: str
+    body: RobotBody
+    belief: Optional[RobotBelief]
+    gate_answer: Gate
+    decision: Optional[DecisionMade]
+
+
+# =============================================================================
 # The run description
 # =============================================================================
 
@@ -398,6 +634,7 @@ class RunDescription(Message):
     stated: SimRunChoice
     effective: tuple[RunOptionValue, ...]
     world: WorldDescription
+    robots: tuple[RobotDescription, ...] = ()
 
 
 # =============================================================================
@@ -611,6 +848,7 @@ class TickUpdate(Message):
     world: WorldTick
     run: RunTick
     end: Optional[RunEnd]
+    robots: tuple[RobotTick, ...] = ()
 
 
 # =============================================================================

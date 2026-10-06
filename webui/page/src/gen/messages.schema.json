@@ -47,6 +47,45 @@
       "title": "ActionRef",
       "type": "object"
     },
+    "Adequacy": {
+      "enum": [
+        "adequate",
+        "inadequate",
+        "no_observation"
+      ],
+      "title": "Adequacy",
+      "type": "string"
+    },
+    "AdmittedProjection": {
+      "additionalProperties": false,
+      "description": "The admitted hypothesis's projection: the task's plan, its actions in order; `until`, the tick its last segment\nends (the decision tick \u2212 1 + T_h).",
+      "properties": {
+        "hypothesis": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "admitted",
+          "type": "string"
+        },
+        "plan": {
+          "items": {
+            "$ref": "#/$defs/ActionRef"
+          },
+          "type": "array"
+        },
+        "until": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "hypothesis",
+        "kind",
+        "plan",
+        "until"
+      ],
+      "title": "AdmittedProjection",
+      "type": "object"
+    },
     "AfterActionTrigger": {
       "additionalProperties": false,
       "description": "After the action (its schema's name) of the entry's expansion completes; `occurrence` its 0-based occurrence,\nNone when it occurs once.",
@@ -364,6 +403,17 @@
       "title": "Catalogue",
       "type": "object"
     },
+    "Cause": {
+      "description": "Which condition of recognition_changed fired.",
+      "enum": [
+        "entered",
+        "replaced",
+        "boundary",
+        "retraction"
+      ],
+      "title": "Cause",
+      "type": "string"
+    },
     "Current": {
       "additionalProperties": false,
       "description": "The answer to current: the current sim-run with its tick updates, or the current view, or neither (both\nNone). At most one is set.",
@@ -394,6 +444,87 @@
         "view"
       ],
       "title": "Current",
+      "type": "object"
+    },
+    "DecisionMade": {
+      "additionalProperties": false,
+      "description": "A decision of the robot: its tick, the trigger that fired and its cause (recognition_changed only), the\nadmission's answer then, the projection it rested on, what it did to the task, the chosen task (None when it\nfinishes), the hold it carries, in ticks, and the rest of the pool (the queue, unordered).",
+      "properties": {
+        "cause": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Cause"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "change": {
+          "$ref": "#/$defs/TaskChange"
+        },
+        "chosen": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TaskRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gate_answer": {
+          "$ref": "#/$defs/Gate"
+        },
+        "hold": {
+          "type": "integer"
+        },
+        "projection": {
+          "discriminator": {
+            "mapping": {
+              "admitted": "#/$defs/AdmittedProjection",
+              "fallback": "#/$defs/FallbackProjection",
+              "none": "#/$defs/NoProjection"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/AdmittedProjection"
+            },
+            {
+              "$ref": "#/$defs/FallbackProjection"
+            },
+            {
+              "$ref": "#/$defs/NoProjection"
+            }
+          ]
+        },
+        "queue": {
+          "items": {
+            "$ref": "#/$defs/TaskRef"
+          },
+          "type": "array"
+        },
+        "tick": {
+          "type": "integer"
+        },
+        "trigger": {
+          "$ref": "#/$defs/TriggerKind"
+        }
+      },
+      "required": [
+        "cause",
+        "change",
+        "chosen",
+        "gate_answer",
+        "hold",
+        "projection",
+        "queue",
+        "tick",
+        "trigger"
+      ],
+      "title": "DecisionMade",
       "type": "object"
     },
     "DecisionRefusalReason": {
@@ -650,6 +781,42 @@
       "title": "Extent",
       "type": "object"
     },
+    "FallbackMode": {
+      "description": "The fallback projection's form: the human standing where seen, or walking straight on.",
+      "enum": [
+        "standing",
+        "moving"
+      ],
+      "title": "FallbackMode",
+      "type": "string"
+    },
+    "FallbackProjection": {
+      "additionalProperties": false,
+      "description": "The fallback projection: standing or moving, over `span` ticks, to the end of tick `until` (the decision tick \u2212\n1 + T_h); the decision is re-decided after it unless another trigger fires first.",
+      "properties": {
+        "kind": {
+          "const": "fallback",
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/FallbackMode"
+        },
+        "span": {
+          "type": "number"
+        },
+        "until": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "kind",
+        "mode",
+        "span",
+        "until"
+      ],
+      "title": "FallbackProjection",
+      "type": "object"
+    },
     "Figure": {
       "description": "The figures of the agents.",
       "enum": [
@@ -676,6 +843,15 @@
       ],
       "title": "FigureLook",
       "type": "object"
+    },
+    "Finding": {
+      "enum": [
+        "unresolved",
+        "adequate",
+        "unexplained"
+      ],
+      "title": "Finding",
+      "type": "string"
     },
     "FixedLook": {
       "additionalProperties": false,
@@ -801,6 +977,43 @@
         "states"
       ],
       "title": "FixedTypeLook",
+      "type": "object"
+    },
+    "Gate": {
+      "description": "The gate's answer for the leader, in the order admission asks (the values are the log's codes): no human\nobserved (asked before the gate), intention off, below \u03b8, the leader with no observation, inadequate,\nunwarranted, outranked; or it clears.",
+      "enum": [
+        "clears",
+        "none(no_human)",
+        "none(intention_off)",
+        "none(below_theta)",
+        "none(leader_no_observation)",
+        "none(leader_inadequate)",
+        "none(leader_unwarranted)",
+        "none(leader_outranked)"
+      ],
+      "title": "Gate",
+      "type": "string"
+    },
+    "HoldInProgress": {
+      "additionalProperties": false,
+      "description": "The hold the last decision (at `decided_at`) carries, while it runs or waits behind a completion tick the body\nstill owes: `stood` of its `planned` ticks executed.",
+      "properties": {
+        "decided_at": {
+          "type": "integer"
+        },
+        "planned": {
+          "type": "integer"
+        },
+        "stood": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "decided_at",
+        "planned",
+        "stood"
+      ],
+      "title": "HoldInProgress",
       "type": "object"
     },
     "HumanActivity": {
@@ -947,6 +1160,83 @@
       "title": "HumanScript",
       "type": "object"
     },
+    "Hypothesis": {
+      "additionalProperties": false,
+      "description": "A hypothesis of the robot's hypothesis space: its key (the label the logs and the belief use) and the task it\nnames, by its schema's name and its bindings.",
+      "properties": {
+        "bindings": {
+          "items": {
+            "$ref": "#/$defs/Binding"
+          },
+          "type": "array"
+        },
+        "key": {
+          "type": "string"
+        },
+        "task": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bindings",
+        "key",
+        "task"
+      ],
+      "title": "Hypothesis",
+      "type": "object"
+    },
+    "HypothesisBelief": {
+      "additionalProperties": false,
+      "description": "A live hypothesis at the tick: its belief over the live hypotheses (the value the gate compares with \u03b8), its\nprior (context knowledge on; else None), its hypothesis adequacy, its tail probability S (a member of the adequacy\ntest; else None), its observation warrant and its evidence rank.",
+      "properties": {
+        "adequacy": {
+          "$ref": "#/$defs/Adequacy"
+        },
+        "belief": {
+          "type": "number"
+        },
+        "key": {
+          "type": "string"
+        },
+        "prior": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rank": {
+          "$ref": "#/$defs/Rank"
+        },
+        "tail": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "warrant": {
+          "$ref": "#/$defs/Warrant"
+        }
+      },
+      "required": [
+        "adequacy",
+        "belief",
+        "key",
+        "prior",
+        "rank",
+        "tail",
+        "warrant"
+      ],
+      "title": "HypothesisBelief",
+      "type": "object"
+    },
     "LayoutEntry": {
       "additionalProperties": false,
       "description": "A layout: its id, its title (stale in older layouts), and its notes, the free text of the layout file that says\nwhat the room is for (None when it has none).",
@@ -1057,6 +1347,15 @@
       "title": "Left",
       "type": "object"
     },
+    "Level": {
+      "enum": [
+        "suppressed",
+        "ordinary",
+        "raised"
+      ],
+      "title": "Level",
+      "type": "string"
+    },
     "LevelOption": {
       "additionalProperties": false,
       "description": "A run option that is a number strictly between 0 and 1.",
@@ -1105,6 +1404,14 @@
       ],
       "title": "LevelValue",
       "type": "object"
+    },
+    "Lifecycle": {
+      "enum": [
+        "live",
+        "exhausted"
+      ],
+      "title": "Lifecycle",
+      "type": "string"
     },
     "LimitOption": {
       "additionalProperties": false,
@@ -1292,6 +1599,33 @@
       "title": "MovableTypeLook",
       "type": "object"
     },
+    "NoProjection": {
+      "additionalProperties": false,
+      "description": "No projection: no human observed, or no previous observation of it (unassessed).",
+      "properties": {
+        "kind": {
+          "const": "none",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/NoProjectionReason"
+        }
+      },
+      "required": [
+        "kind",
+        "reason"
+      ],
+      "title": "NoProjection",
+      "type": "object"
+    },
+    "NoProjectionReason": {
+      "enum": [
+        "no_human",
+        "unassessed"
+      ],
+      "title": "NoProjectionReason",
+      "type": "string"
+    },
     "NowTrigger": {
       "additionalProperties": false,
       "description": "A live event, fired on the tick it is applied.",
@@ -1423,6 +1757,14 @@
       "title": "Presence",
       "type": "string"
     },
+    "Rank": {
+      "enum": [
+        "outranked",
+        "not_outranked"
+      ],
+      "title": "Rank",
+      "type": "string"
+    },
     "Refused": {
       "additionalProperties": false,
       "properties": {
@@ -1490,6 +1832,278 @@
       "title": "Resumed",
       "type": "object"
     },
+    "RobotAction": {
+      "additionalProperties": false,
+      "description": "The action at the robot's plan's cursor, and its progress: the microactions of its expansion executed, in\nticks (0 of 0: not yet begun).",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ActionRef"
+        },
+        "done": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "action",
+        "done",
+        "total"
+      ],
+      "title": "RobotAction",
+      "type": "object"
+    },
+    "RobotBelief": {
+      "additionalProperties": false,
+      "description": "The recognizer's outputs at the tick: the leader (None when exhausted) and its belief, the lifecycle, the\nadequacy finding (None when exhausted), whether the tick is an episode boundary, every live hypothesis in the\nrecognizer's order; with context knowledge on, the foreseeable tasks' levels and the recency facts of the robot's\nmemory of observed completions (the tasks by their schemas' names).",
+      "properties": {
+        "boundary": {
+          "type": "boolean"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "finding": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Finding"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "leader": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "levels": {
+          "items": {
+            "$ref": "#/$defs/TaskLevel"
+          },
+          "type": "array"
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/Lifecycle"
+        },
+        "live": {
+          "items": {
+            "$ref": "#/$defs/HypothesisBelief"
+          },
+          "type": "array"
+        },
+        "recent": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "boundary",
+        "confidence",
+        "finding",
+        "leader",
+        "levels",
+        "lifecycle",
+        "live",
+        "recent"
+      ],
+      "title": "RobotBelief",
+      "type": "object"
+    },
+    "RobotBody": {
+      "additionalProperties": false,
+      "description": "The robot's body at the tick: the task its last decision chose, while it runs; the action at its plan's cursor;\nwhat the body did on the tick (the executor's microaction, None on a tick it spends acknowledging a completion);\na hold in progress; whether its task pool is empty (it still observes). What it carries is the world's.",
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RobotAction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "finished": {
+          "type": "boolean"
+        },
+        "hold": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HoldInProgress"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "microaction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "task": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TaskRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "action",
+        "finished",
+        "hold",
+        "microaction",
+        "task"
+      ],
+      "title": "RobotBody",
+      "type": "object"
+    },
+    "RobotCondition": {
+      "description": "The robot's condition in the sim-run (glossary \u00a79): as designed; observing the human's motion without its\nintention (the recognizer does not run, the gate admits nothing); or not taking the human into account.",
+      "enum": [
+        "intention-aware",
+        "intention-unaware",
+        "human-unaware"
+      ],
+      "title": "RobotCondition",
+      "type": "string"
+    },
+    "RobotDescription": {
+      "additionalProperties": false,
+      "description": "What is constant in a sim-run about a robot's mind: its condition; the human it observes (None when it observes\nnone); \u03b8, the gate's share; the adequacy test's level \u03b1; min_separation, in the layout's unit; whether context\nknowledge acts on its prior; its hypothesis space, in the recognizer's order; its own assigned tasks; the observed\nhuman's assigned tasks it knows (assignment knowledge; None when off).",
+      "properties": {
+        "assigned": {
+          "items": {
+            "$ref": "#/$defs/TaskRef"
+          },
+          "type": "array"
+        },
+        "condition": {
+          "$ref": "#/$defs/RobotCondition"
+        },
+        "context_knowledge": {
+          "type": "boolean"
+        },
+        "hypotheses": {
+          "items": {
+            "$ref": "#/$defs/Hypothesis"
+          },
+          "type": "array"
+        },
+        "known_assigned": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/TaskRef"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "min_separation": {
+          "type": "number"
+        },
+        "observes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "robot": {
+          "type": "string"
+        },
+        "test_level": {
+          "type": "number"
+        },
+        "theta": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "assigned",
+        "condition",
+        "context_knowledge",
+        "hypotheses",
+        "known_assigned",
+        "min_separation",
+        "observes",
+        "robot",
+        "test_level",
+        "theta"
+      ],
+      "title": "RobotDescription",
+      "type": "object"
+    },
+    "RobotTick": {
+      "additionalProperties": false,
+      "description": "A robot at the tick: its body; its belief (None while the recognizer has produced none: intention-unaware,\nhuman-unaware, or before the first step); the gate's answer for the leader at the tick (the gate is asked at a\ndecision; this is what it would answer now); and its last decision, kept on every tick after it (None before the\nfirst). The hypothesis a decision rests on (the decision record) is its admitted projection's.",
+      "properties": {
+        "belief": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RobotBelief"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "body": {
+          "$ref": "#/$defs/RobotBody"
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DecisionMade"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gate_answer": {
+          "$ref": "#/$defs/Gate"
+        },
+        "robot": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "belief",
+        "body",
+        "decision",
+        "gate_answer",
+        "robot"
+      ],
+      "title": "RobotTick",
+      "type": "object"
+    },
     "RunDescription": {
       "additionalProperties": false,
       "description": "Everything constant in one sim-run, sent when its model is built: the triple, the run options as the\nscreen-user stated them and as the model applies them (an option set off by another shows here), and the world.",
@@ -1522,6 +2136,12 @@
           },
           "type": "array"
         },
+        "robots": {
+          "items": {
+            "$ref": "#/$defs/RobotDescription"
+          },
+          "type": "array"
+        },
         "run": {
           "$ref": "#/$defs/RunTriple"
         },
@@ -1537,6 +2157,7 @@
       },
       "required": [
         "effective",
+        "robots",
         "run",
         "sim_run",
         "stated",
@@ -2096,6 +2717,35 @@
       "title": "TagValue",
       "type": "string"
     },
+    "TaskChange": {
+      "description": "What the decision did to the robot's task: starts one (it had none), continues it (the same task, task\nequality), switches to another, or finishes (the pool is empty).",
+      "enum": [
+        "starts",
+        "continues",
+        "switches",
+        "finishes"
+      ],
+      "title": "TaskChange",
+      "type": "string"
+    },
+    "TaskLevel": {
+      "additionalProperties": false,
+      "description": "A foreseeable task's strength level on the tick (context knowledge on), by its schema's name.",
+      "properties": {
+        "level": {
+          "$ref": "#/$defs/Level"
+        },
+        "task": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "level",
+        "task"
+      ],
+      "title": "TaskLevel",
+      "type": "object"
+    },
     "TaskRef": {
       "additionalProperties": false,
       "description": "A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the\nlogs show.",
@@ -2166,6 +2816,12 @@
             }
           ]
         },
+        "robots": {
+          "items": {
+            "$ref": "#/$defs/RobotTick"
+          },
+          "type": "array"
+        },
         "run": {
           "$ref": "#/$defs/RunTick"
         },
@@ -2188,6 +2844,7 @@
       },
       "required": [
         "end",
+        "robots",
         "run",
         "sim_run",
         "tick",
@@ -2253,6 +2910,15 @@
       ],
       "title": "TimelineWindow",
       "type": "object"
+    },
+    "TriggerKind": {
+      "enum": [
+        "no_current_task",
+        "recognition_changed",
+        "projection_expired"
+      ],
+      "title": "TriggerKind",
+      "type": "string"
     },
     "Unfired": {
       "additionalProperties": false,
@@ -2338,6 +3004,14 @@
       ],
       "title": "ViewRefusal",
       "type": "object"
+    },
+    "Warrant": {
+      "enum": [
+        "observation",
+        "none"
+      ],
+      "title": "Warrant",
+      "type": "string"
     },
     "WorldDescription": {
       "additionalProperties": false,

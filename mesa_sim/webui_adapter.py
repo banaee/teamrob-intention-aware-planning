@@ -28,11 +28,18 @@ WHAT THIS MODULE DOES:
       script event a switch fired or an unfired event is (by identity with the script's events), and the tag of the
       task on top (world/tag.py, the one definition the analyses read too, on the model's timeline and the human's
       record)
+    - Reads, per robot (T-viz 1b), its body and its mind after each step, into the messages' robot section beside the
+      world: the action at its plan's cursor with its progress, the hold its last decision carries (the executor's);
+      the belief (RobotAgent.belief); the gate's answer for the leader, asked at its one home
+      (MetaPlanner._clears_gate, as the test-beds ask it), after the question admission asks first (no human observed);
+      the last decision (RobotAgent.last_decision) with the projection it rested on; the recency facts of its memory of
+      observed completions. It keeps each robot's last decision and the hold's ticks stood, as it keeps the order of
+      arrival
 
 WHAT THIS MODULE DOES NOT DO:
     - No rule of the web-ui (which sim-run is current, the end at the configured steps, the lock): the server's
     - No server, no transport, no page
-    - Nothing of the robot's mind: the tick update's world is the environment and the human executor's record
+    - No decision: it compares nothing with θ and calls nothing of the robot's mind that changes it
 
 RUN OPTIONS BY NAME (T-viz 0.4, Q3, a deliberate exception at the input boundary): the web-ui knows the run options
 only as the catalogue declares them, each identified by its name, so that it stays independent of the simulator's
@@ -52,8 +59,11 @@ from mesa_sim.action_decomposer import _parse_duration_to_steps
 from mesa_sim.sim_model import (SimModel, SimObject, declared_states, read_layout, read_setup_objects,
                                 read_setup_states)
 from mesa_sim.sim_run import RunLog, SimRun
-from shared.types import (AfterAction, DuringAction, Drop, Event, GroundedAction, Now, ScriptDependence, Start,
-                          TaskInstance, TimelineSource, Trigger, task_instance_key)
+from shared.meta_planner import GateOutcome
+from shared.types import (AdequacyFinding, AfterAction, DuringAction, Drop, Event, EvidenceRank, GroundedAction,
+                          HypothesisAdequacy, Now, ObservationWarrant, RecognitionChange, RecognizerLifecycle,
+                          ScriptDependence, Start, StrengthLevel, TaskInstance, TimelineSource, Trigger, same_task,
+                          task_instance_key)
 from world import record as rec
 from world.queries import truth_at
 from world.tag import Stretches, recent_tasks, tag_at
@@ -103,6 +113,30 @@ _TIMELINE_SOURCE = {TimelineSource.SCENARIO: msg.TimelineSource.SCENARIO, Timeli
                     TimelineSource.NONE: msg.TimelineSource.NONE}
 _ENTRY_PART = {rec.OrdinaryRef: msg.EntryPart.ORDINARY, rec.RepeatableRef: msg.EntryPart.REPEATABLE,
                rec.ClosingRef: msg.EntryPart.CLOSING}
+
+# The robot's mind (T-viz 1b), translated value by value.
+_GATE = {GateOutcome.CLEARS: msg.Gate.CLEARS, GateOutcome.INTENTION_OFF: msg.Gate.INTENTION_OFF,
+         GateOutcome.BELOW_THETA: msg.Gate.BELOW_THETA,
+         GateOutcome.LEADER_NO_OBSERVATION: msg.Gate.LEADER_NO_OBSERVATION,
+         GateOutcome.LEADER_INADEQUATE: msg.Gate.LEADER_INADEQUATE,
+         GateOutcome.LEADER_UNWARRANTED: msg.Gate.LEADER_UNWARRANTED,
+         GateOutcome.LEADER_OUTRANKED: msg.Gate.LEADER_OUTRANKED}
+# A trigger's reason is a string in shared/types.py (TriggerDecision.reason): a closed table of the three triggers a
+# fired decision names; an unknown one stops the piece (_robot_tick).
+_TRIGGER = {"no_current_task": msg.TriggerKind.NO_CURRENT_TASK,
+            "recognition_changed": msg.TriggerKind.RECOGNITION_CHANGED,
+            "projection_expired": msg.TriggerKind.PROJECTION_EXPIRED}
+_CAUSE = {RecognitionChange.ENTERED: msg.Cause.ENTERED, RecognitionChange.REPLACED: msg.Cause.REPLACED,
+          RecognitionChange.BOUNDARY: msg.Cause.BOUNDARY, RecognitionChange.RETRACTION: msg.Cause.RETRACTION}
+_LIFECYCLE = {RecognizerLifecycle.LIVE: msg.Lifecycle.LIVE, RecognizerLifecycle.EXHAUSTED: msg.Lifecycle.EXHAUSTED}
+_FINDING = {AdequacyFinding.UNRESOLVED: msg.Finding.UNRESOLVED, AdequacyFinding.ADEQUATE: msg.Finding.ADEQUATE,
+            AdequacyFinding.UNEXPLAINED: msg.Finding.UNEXPLAINED}
+_ADEQUACY = {HypothesisAdequacy.ADEQUATE: msg.Adequacy.ADEQUATE, HypothesisAdequacy.INADEQUATE: msg.Adequacy.INADEQUATE,
+             HypothesisAdequacy.NO_OBSERVATION: msg.Adequacy.NO_OBSERVATION}
+_WARRANT = {ObservationWarrant.OBSERVATION: msg.Warrant.OBSERVATION, ObservationWarrant.NONE: msg.Warrant.NONE}
+_RANK = {EvidenceRank.OUTRANKED: msg.Rank.OUTRANKED, EvidenceRank.NOT_OUTRANKED: msg.Rank.NOT_OUTRANKED}
+_LEVEL = {StrengthLevel.SUPPRESSED: msg.Level.SUPPRESSED, StrengthLevel.ORDINARY: msg.Level.ORDINARY,
+          StrengthLevel.RAISED: msg.Level.RAISED}
 
 
 # =============================================================================
@@ -487,6 +521,10 @@ class MesaSimRun:
                          [(e.task, int(_parse_duration_to_steps(e.recency.duration, model)))
                           for e in self._knowledge.entries() if e.recency is not None])
 
+        # Per robot (T-viz 1b): its last decision as sent, and the ticks its hold had stood after the last step.
+        self._decisions: Dict[str, Optional[msg.DecisionMade]] = {rid: None for rid in model.robots}
+        self._stood: Dict[str, int] = {rid: 0 for rid in model.robots}
+
         _, layout_id, setup_id, scenario = resolve_triple(run.config)
         self.description = msg.RunDescription(
             sim_run=sim_run,
@@ -494,9 +532,12 @@ class MesaSimRun:
             stated=choice,
             effective=tuple(_value(d, _EFFECTIVE[d.name](model, run.config)) for d in declarations),
             world=self._world_description(),
+            robots=tuple(self._robot_description(rid, robot, scenario) for rid, robot in model.robots.items()),
         )
         self._update = msg.TickUpdate(sim_run=sim_run, tick=None, world=self._world_tick(None),
-                                      run=msg.RunTick(finished_at=None), end=None)
+                                      run=msg.RunTick(finished_at=None), end=None,
+                                      robots=tuple(self._robot_tick(rid, robot, None, None)
+                                                   for rid, robot in model.robots.items()))
 
     # ------------------------------------------------------------------
     # SimRunSide
@@ -508,6 +549,8 @@ class MesaSimRun:
     def step(self) -> msg.TickUpdate:
         if self._ended:
             raise RuntimeError(f"sim-run {self.sim_run} has ended")
+        # each robot's task before the step: what its decision on this tick starts, continues or switches
+        before = {rid: robot.current_task_instance for rid, robot in self._model.robots.items()}
         self._run.step()
         tick = self._run.steps_done - 1     # the run log's number of the step executed
         self._place()
@@ -521,7 +564,9 @@ class MesaSimRun:
         if self._finished_at is None and self._all_finished():
             self._finished_at = tick
         self._update = msg.TickUpdate(sim_run=self.sim_run, tick=tick, world=self._world_tick(tick),
-                                      run=msg.RunTick(finished_at=self._finished_at), end=None)
+                                      run=msg.RunTick(finished_at=self._finished_at), end=None,
+                                      robots=tuple(self._robot_tick(rid, robot, tick, before[rid])
+                                                   for rid, robot in self._model.robots.items()))
         return self._update
 
     def end(self, reason: msg.EndReason) -> msg.TickUpdate:
@@ -659,3 +704,123 @@ class MesaSimRun:
                                          raised=tuple(sorted(s.name for s in found.raised)),
                                          lowered=tuple(sorted(s.name for s in found.lowered)))
         return side.tagged
+
+    # ------------------------------------------------------------------
+    # The robot: its body and its mind (T-viz 1b)
+    # ------------------------------------------------------------------
+
+    def _robot_description(self, rid: str, robot, scenario) -> msg.RobotDescription:
+        """What is constant of the robot's mind: its condition (the model's effective run options), the human it
+        observes, θ and min_separation (its meta-planner's), α, its hypothesis space in the recognizer's order (sorted
+        by key), its own assigned tasks, and the observed human's assigned tasks it was given (as the loader gives
+        them: assignment knowledge on and a human observed; else None)."""
+        model = self._model
+        condition = (msg.RobotCondition.HUMAN_UNAWARE if not model.human_aware else
+                     msg.RobotCondition.INTENTION_UNAWARE if not model.intention_aware else
+                     msg.RobotCondition.INTENTION_AWARE)
+        observed = robot.observed_agent_id
+        observed_cfg = next((a for a in scenario.agents if a.agent_id == observed), None)
+        known = (tuple(_task_ref(t) for t in observed_cfg.assigned_tasks)
+                 if model.assignment_knowledge and observed_cfg is not None else None)
+        return msg.RobotDescription(
+            robot=rid, condition=condition, observes=observed, theta=float(robot.meta_planner.theta),
+            test_level=float(model.test_level), min_separation=float(robot.meta_planner.min_separation),
+            context_knowledge=bool(model.context_knowledge),
+            hypotheses=tuple(msg.Hypothesis(key=repr(h), task=h.task_name,
+                                            bindings=tuple(msg.Binding(parameter=k, value=v)
+                                                           for k, v in sorted(h.bindings.items())))
+                             for h in sorted(model.observing[rid].hypotheses, key=repr)),
+            assigned=tuple(_task_ref(t) for t in robot.assigned_tasks),
+            known_assigned=known)
+
+    def _robot_tick(self, rid: str, robot, tick: Optional[int], before: Optional[TaskInstance]) -> msg.RobotTick:
+        """The robot at `tick` (None: the start), read after the step. The gate is asked of the belief the
+        meta-planner receives (the robot's, or the body's belief before any observation), after the question admission
+        asks first: a robot that observes no human is refused before the gate. A decision taken on this tick (its
+        record's tick) is translated once and kept."""
+        belief = robot.belief or robot._make_dummy_belief()
+        gate = (msg.Gate.NO_HUMAN if robot.observed_agent_id is None
+                else _GATE[robot.meta_planner._clears_gate(belief)])
+        decided = robot.last_decision
+        if tick is not None and decided is not None and decided.tick == tick:
+            self._decisions[rid] = self._decision(robot, decided, gate, belief, before)
+        return msg.RobotTick(robot=rid, body=self._body(rid, robot, tick),
+                             belief=None if robot.belief is None else self._belief(robot, tick),
+                             gate_answer=gate, decision=self._decisions[rid])
+
+    def _body(self, rid: str, robot, tick: Optional[int]) -> msg.RobotBody:
+        """The body: the task its last decision chose, while it runs; the action at the plan's cursor and its
+        progress; the microaction of the tick; the hold, while ticks of it remain or it stood on this tick."""
+        executor = robot.executor
+        plan = executor.current_plan
+        action = None
+        if plan is not None and executor.action_index < len(plan.actions):
+            progress = executor.progress()
+            action = msg.RobotAction(action=_action_ref(plan.actions[executor.action_index]), done=progress.done,
+                                     total=progress.total)
+        decision = self._decisions[rid]
+        stood = executor._hold_executed
+        stood_now = stood > 0 and (stood > self._stood[rid] or (decision is not None and decision.tick == tick))
+        hold = None
+        if executor._hold_planned > 0 and (executor._hold_remaining > 0 or stood_now):
+            hold = msg.HoldInProgress(decided_at=decision.tick, planned=executor._hold_planned, stood=stood)
+        self._stood[rid] = stood
+        task = robot.current_task_instance
+        return msg.RobotBody(task=None if task is None else _task_ref(task), action=action,
+                             microaction=robot.current_microaction, hold=hold, finished=bool(robot.finished))
+
+    def _belief(self, robot, tick: int) -> msg.RobotBelief:
+        """The recognizer's outputs: every live hypothesis (the keys of the belief over H) in the recognizer's order,
+        with its prior (context knowledge on), adequacy, tail (a member only), warrant and rank; the levels and the
+        recency facts of the memory (context knowledge on)."""
+        b = robot.belief
+        order = sorted(b.belief)     # the recognizer's order: its hypotheses sorted by key
+        live = tuple(msg.HypothesisBelief(key=k, belief=float(b.belief[k]),
+                                          prior=float(b.prior[k]) if k in b.prior else None,
+                                          adequacy=_ADEQUACY[b.hypothesis_adequacy[k]],
+                                          tail=float(b.tails[k]) if k in b.tails else None,
+                                          warrant=_WARRANT[b.observation_warrant[k]], rank=_RANK[b.evidence_rank[k]])
+                     for k in order)
+        recent = () if robot.memory is None else tuple(t.name for t in robot.memory.recent(tick))
+        return msg.RobotBelief(leader=b.most_likely, confidence=float(b.confidence), lifecycle=_LIFECYCLE[b.lifecycle],
+                               finding=None if b.finding is None else _FINDING[b.finding],
+                               boundary=bool(b.episode_boundary), live=live,
+                               levels=tuple(msg.TaskLevel(task=name, level=_LEVEL[level])
+                                            for name, level in b.levels.items()),
+                               recent=recent)
+
+    def _decision(self, robot, decided, gate: msg.Gate, belief, before: Optional[TaskInstance]) -> msg.DecisionMade:
+        trigger = _TRIGGER.get(decided.trigger.reason)
+        if trigger is None:
+            raise ValueError(f"a fired trigger the web-ui does not know: '{decided.trigger.reason}'")
+        result = decided.result
+        chosen = result.current_task
+        change = (msg.TaskChange.FINISHES if chosen is None else
+                  msg.TaskChange.STARTS if before is None else
+                  msg.TaskChange.CONTINUES if same_task(chosen, before) else msg.TaskChange.SWITCHES)
+        return msg.DecisionMade(
+            tick=decided.tick, trigger=trigger,
+            cause=None if decided.trigger.cause is None else _CAUSE[decided.trigger.cause],
+            gate_answer=gate, projection=self._projection(robot, decided, belief), change=change,
+            chosen=None if chosen is None else _task_ref(chosen), hold=int(result.hold),
+            queue=tuple(_task_ref(t) for t in result.queue))
+
+    @staticmethod
+    def _projection(robot, decided, belief) -> msg.Projection:
+        """The projection the decision rested on, by its own form: none; the fallback (its one entry has no plan); or
+        the admitted hypothesis's (the leader's at the decision). Its end, T_h, is its last segment's end step, on the
+        decision's projection clock (step s ends world tick decision − 1 + s)."""
+        projection = decided.projection
+        if projection is None:
+            return msg.NoProjection(reason=msg.NoProjectionReason.NO_HUMAN if robot.observed_agent_id is None
+                                    else msg.NoProjectionReason.UNASSESSED)
+        segments = [seg for entry in projection.entries for seg in entry.segments]
+        t_h = float(segments[-1].end_step)
+        until = decided.tick - 1 + t_h
+        entry = projection.entries[0]
+        if entry.abstract_plan is None:
+            moving = any(tuple(seg.start_pos) != tuple(seg.end_pos) for seg in segments)
+            return msg.FallbackProjection(mode=msg.FallbackMode.MOVING if moving else msg.FallbackMode.STANDING,
+                                          span=t_h - float(segments[0].start_step), until=until)
+        return msg.AdmittedProjection(hypothesis=belief.most_likely,
+                                      plan=tuple(_action_ref(a) for a in entry.abstract_plan.actions), until=until)

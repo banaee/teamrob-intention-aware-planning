@@ -7,6 +7,11 @@
 
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Adequacy".
+ */
+export type Adequacy = "adequate" | "inadequate" | "no_observation";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "Presence".
  */
 export type Presence = "background" | "active";
@@ -33,6 +38,21 @@ export type MovableShape = "crate" | "skid" | "loaded_skid";
  */
 export type Figure = "person" | "cube_head_robot" | "lift_vehicle";
 /**
+ * Which condition of recognition_changed fired.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Cause".
+ */
+export type Cause = "entered" | "replaced" | "boundary" | "retraction";
+/**
+ * The robot's condition in the sim-run (glossary §9): as designed; observing the human's motion without its
+ * intention (the recognizer does not run, the gate admits nothing); or not taking the human into account.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RobotCondition".
+ */
+export type RobotCondition = "intention-aware" | "intention-unaware" | "human-unaware";
+/**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "ScriptDependence".
  */
@@ -52,6 +72,73 @@ export type EndReason = "steps_reached" | "reset" | "choice_changed" | "server_s
  * via the `definition` "EntryPart".
  */
 export type EntryPart = "ordinary" | "repeatable" | "closing";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Finding".
+ */
+export type Finding = "unresolved" | "adequate" | "unexplained";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Level".
+ */
+export type Level = "suppressed" | "ordinary" | "raised";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Lifecycle".
+ */
+export type Lifecycle = "live" | "exhausted";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Rank".
+ */
+export type Rank = "outranked" | "not_outranked";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Warrant".
+ */
+export type Warrant = "observation" | "none";
+/**
+ * What the decision did to the robot's task: starts one (it had none), continues it (the same task, task
+ * equality), switches to another, or finishes (the pool is empty).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TaskChange".
+ */
+export type TaskChange = "starts" | "continues" | "switches" | "finishes";
+/**
+ * The gate's answer for the leader, in the order admission asks (the values are the log's codes): no human
+ * observed (asked before the gate), intention off, below θ, the leader with no observation, inadequate,
+ * unwarranted, outranked; or it clears.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Gate".
+ */
+export type Gate =
+  | "clears"
+  | "none(no_human)"
+  | "none(intention_off)"
+  | "none(below_theta)"
+  | "none(leader_no_observation)"
+  | "none(leader_inadequate)"
+  | "none(leader_unwarranted)"
+  | "none(leader_outranked)";
+/**
+ * The fallback projection's form: the human standing where seen, or walking straight on.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "FallbackMode".
+ */
+export type FallbackMode = "standing" | "moving";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "NoProjectionReason".
+ */
+export type NoProjectionReason = "no_human" | "unassessed";
+/**
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TriggerKind".
+ */
+export type TriggerKind = "no_current_task" | "recognition_changed" | "projection_expired";
 /**
  * The tag per task (glossary §7; world/tag.py): a label of the world, never the robot's.
  *
@@ -114,6 +201,19 @@ export interface ActionRef {
 export interface Binding {
   parameter: string;
   value: string;
+}
+/**
+ * The admitted hypothesis's projection: the task's plan, its actions in order; `until`, the tick its last segment
+ * ends (the decision tick − 1 + T_h).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "AdmittedProjection".
+ */
+export interface AdmittedProjection {
+  hypothesis: string;
+  kind: "admitted";
+  plan: ActionRef[];
+  until: number;
 }
 /**
  * After the action (its schema's name) of the entry's expansion completes; `occurrence` its 0-based occurrence,
@@ -510,10 +610,56 @@ export interface SimRunHistory {
  */
 export interface RunDescription {
   effective: (SwitchValue | OneOfValue | LevelValue | LimitValue)[];
+  robots: RobotDescription[];
   run: RunTriple;
   sim_run: string;
   stated: SimRunChoice;
   world: WorldDescription;
+}
+/**
+ * What is constant in a sim-run about a robot's mind: its condition; the human it observes (None when it observes
+ * none); θ, the gate's share; the adequacy test's level α; min_separation, in the layout's unit; whether context
+ * knowledge acts on its prior; its hypothesis space, in the recognizer's order; its own assigned tasks; the observed
+ * human's assigned tasks it knows (assignment knowledge; None when off).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RobotDescription".
+ */
+export interface RobotDescription {
+  assigned: TaskRef[];
+  condition: RobotCondition;
+  context_knowledge: boolean;
+  hypotheses: Hypothesis[];
+  known_assigned: TaskRef[] | null;
+  min_separation: number;
+  observes: string | null;
+  robot: string;
+  test_level: number;
+  theta: number;
+}
+/**
+ * A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the
+ * logs show.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TaskRef".
+ */
+export interface TaskRef {
+  bindings: Binding[];
+  label: string;
+  task: string;
+}
+/**
+ * A hypothesis of the robot's hypothesis space: its key (the label the logs and the belief use) and the task it
+ * names, by its schema's name and its bindings.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Hypothesis".
+ */
+export interface Hypothesis {
+  bindings: Binding[];
+  key: string;
+  task: string;
 }
 /**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
@@ -616,18 +762,6 @@ export interface StartDecision {
   task: TaskRef;
 }
 /**
- * A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the
- * logs show.
- *
- * This interface was referenced by `WebUiMessages`'s JSON-Schema
- * via the `definition` "TaskRef".
- */
-export interface TaskRef {
-  bindings: Binding[];
-  label: string;
-  task: string;
-}
-/**
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "DropDecision".
  */
@@ -695,6 +829,7 @@ export interface TimelineWindow {
  */
 export interface TickUpdate {
   end: RunEnd | null;
+  robots: RobotTick[];
   run: RunTick;
   sim_run: string;
   tick: number | null;
@@ -728,6 +863,149 @@ export interface StillOpenEntry {
 export interface EntryPosition {
   index: number;
   part: EntryPart;
+}
+/**
+ * A robot at the tick: its body; its belief (None while the recognizer has produced none: intention-unaware,
+ * human-unaware, or before the first step); the gate's answer for the leader at the tick (the gate is asked at a
+ * decision; this is what it would answer now); and its last decision, kept on every tick after it (None before the
+ * first). The hypothesis a decision rests on (the decision record) is its admitted projection's.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RobotTick".
+ */
+export interface RobotTick {
+  belief: RobotBelief | null;
+  body: RobotBody;
+  decision: DecisionMade | null;
+  gate_answer: Gate;
+  robot: string;
+}
+/**
+ * The recognizer's outputs at the tick: the leader (None when exhausted) and its belief, the lifecycle, the
+ * adequacy finding (None when exhausted), whether the tick is an episode boundary, every live hypothesis in the
+ * recognizer's order; with context knowledge on, the foreseeable tasks' levels and the recency facts of the robot's
+ * memory of observed completions (the tasks by their schemas' names).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RobotBelief".
+ */
+export interface RobotBelief {
+  boundary: boolean;
+  confidence: number;
+  finding: Finding | null;
+  leader: string | null;
+  levels: TaskLevel[];
+  lifecycle: Lifecycle;
+  live: HypothesisBelief[];
+  recent: string[];
+}
+/**
+ * A foreseeable task's strength level on the tick (context knowledge on), by its schema's name.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "TaskLevel".
+ */
+export interface TaskLevel {
+  level: Level;
+  task: string;
+}
+/**
+ * A live hypothesis at the tick: its belief over the live hypotheses (the value the gate compares with θ), its
+ * prior (context knowledge on; else None), its hypothesis adequacy, its tail probability S (a member of the adequacy
+ * test; else None), its observation warrant and its evidence rank.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "HypothesisBelief".
+ */
+export interface HypothesisBelief {
+  adequacy: Adequacy;
+  belief: number;
+  key: string;
+  prior: number | null;
+  rank: Rank;
+  tail: number | null;
+  warrant: Warrant;
+}
+/**
+ * The robot's body at the tick: the task its last decision chose, while it runs; the action at its plan's cursor;
+ * what the body did on the tick (the executor's microaction, None on a tick it spends acknowledging a completion);
+ * a hold in progress; whether its task pool is empty (it still observes). What it carries is the world's.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RobotBody".
+ */
+export interface RobotBody {
+  action: RobotAction | null;
+  finished: boolean;
+  hold: HoldInProgress | null;
+  microaction: string | null;
+  task: TaskRef | null;
+}
+/**
+ * The action at the robot's plan's cursor, and its progress: the microactions of its expansion executed, in
+ * ticks (0 of 0: not yet begun).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "RobotAction".
+ */
+export interface RobotAction {
+  action: ActionRef;
+  done: number;
+  total: number;
+}
+/**
+ * The hold the last decision (at `decided_at`) carries, while it runs or waits behind a completion tick the body
+ * still owes: `stood` of its `planned` ticks executed.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "HoldInProgress".
+ */
+export interface HoldInProgress {
+  decided_at: number;
+  planned: number;
+  stood: number;
+}
+/**
+ * A decision of the robot: its tick, the trigger that fired and its cause (recognition_changed only), the
+ * admission's answer then, the projection it rested on, what it did to the task, the chosen task (None when it
+ * finishes), the hold it carries, in ticks, and the rest of the pool (the queue, unordered).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "DecisionMade".
+ */
+export interface DecisionMade {
+  cause: Cause | null;
+  change: TaskChange;
+  chosen: TaskRef | null;
+  gate_answer: Gate;
+  hold: number;
+  projection: AdmittedProjection | FallbackProjection | NoProjection;
+  queue: TaskRef[];
+  tick: number;
+  trigger: TriggerKind;
+}
+/**
+ * The fallback projection: standing or moving, over `span` ticks, to the end of tick `until` (the decision tick −
+ * 1 + T_h); the decision is re-decided after it unless another trigger fires first.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "FallbackProjection".
+ */
+export interface FallbackProjection {
+  kind: "fallback";
+  mode: FallbackMode;
+  span: number;
+  until: number;
+}
+/**
+ * No projection: no human observed, or no previous observation of it (unassessed).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "NoProjection".
+ */
+export interface NoProjection {
+  kind: "none";
+  reason: NoProjectionReason;
 }
 /**
  * The facts of the sim-run at the tick that are neither the world's nor the robot's mind's. `finished_at`: the
