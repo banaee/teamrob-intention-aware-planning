@@ -30,7 +30,7 @@ STEP ORDER (RobotAgent):
 from __future__ import annotations
 import logging
 import math
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, List, Optional, Dict, Tuple
 
 from shared.knowledge import TaskModel
@@ -40,9 +40,9 @@ from shared.recognizer import IntentionRecognizer, HypothesisKey
 
 from shared.planner import AdaptivePlanner
 from shared.meta_planner import MetaPlanner
-from shared.types import (AbstractPlan, AdequacyFinding, BeliefState, Decision, ExecutorState, GroundedAction, Script,
-                          ScriptDependence, Start, RecognizerLifecycle, TaskInstance, WorldState, same_task,
-                          task_instance_key)
+from shared.types import (AbstractPlan, AdequacyFinding, BeliefState, Decision, ExecutorState, GroundedAction,
+                          ProjectedPlan, Script, ScriptDependence, Start, RecognizerLifecycle, TaskInstance,
+                          TriggerDecision, UpdateResult, WorldState, same_task, task_instance_key)
 from world.record import Record, Snapshot
 from world.human_executor import StackMachine, RunAction, ResumeAction
 
@@ -86,6 +86,22 @@ HUMAN_TASK_COMPLETION_LATENCY = 0.0
 # (measured at the P4 plan step), eight orders of magnitude below a turn of any
 # size an agent makes; exact equality would read nearly every run as 1.
 DIRECTION_RESOLUTION = 1e-9
+
+
+@dataclass(frozen=True)
+class DecisionTaken:
+    """
+    The robot's last decision (T-viz 1b): the tick, the trigger that fired, the
+    human projection the decision rested on (the admitted projection, the
+    fallback projection, or None) and the meta-planner's result. The values
+    RobotAgent.step() already holds, kept so that a reader (the web-ui's
+    piece, mesa_sim/webui_adapter.py) reads them from the model; nothing in
+    the cognitive loop reads it.
+    """
+    tick: int
+    trigger: TriggerDecision
+    projection: Optional[ProjectedPlan]
+    result: UpdateResult
 
 
 # =============================================================================
@@ -407,6 +423,7 @@ class RobotAgent(FactoryAgent):
         self.meta_planner.seed_tasks(assigned_tasks)
         self.current_task_instance: Optional[TaskInstance] = None
         self.finished: bool = False   # no work remains (the terminal return); the robot still observes
+        self.last_decision: Optional[DecisionTaken] = None   # for readers only (T-viz 1b); nothing decides on it
 
         self.belief: Optional[BeliefState] = None
         self.prev_belief: Optional[BeliefState] = None
@@ -559,6 +576,7 @@ class RobotAgent(FactoryAgent):
                 executor_state=executor_state,
                 human_projection=human_projection,
             )
+            self.last_decision = DecisionTaken(int(self.model.schedule.steps), trigger, human_projection, result)
 
             if result.current_task is None:
                 self.executor.hold(0, trigger.reason)
