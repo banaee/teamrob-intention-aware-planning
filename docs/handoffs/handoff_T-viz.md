@@ -88,6 +88,8 @@ places kept, see-through table tops. Checks of the page reduced for the rest of 
 review, then (iv).
 Increment (iv) BUILT without the close (6 October 2026; design_records.md, 1a, INCREMENT (iv), BUILT): panel 4a, the
 human's activity; test 2. Next: Hadi's review, then (v), polishing from his list, then the close of 1a.
+Increment (iv) COMPLETE (6 October 2026; design_records.md, 1a, INCREMENT (iv), SECOND PART, BUILT): panel 4a also
+shows the human's script, the world's context and the tag per task (`world/tag.py`). Next: (v), then the close.
 
 ### What Hadi prefers now
 

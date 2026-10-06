@@ -47,7 +47,8 @@ Do not explore the whole tree. Start from the files a task names; widen only wit
 Relevant (read as needed):
 - `shared/*.py`: cognitive layer (the robot's mind)
 - `world/*.py`: the world's side (T-H2): the human's executor (`world/human_executor.py`, the stack machine and
-  the load-time replay) and its record (`world/record.py`)
+  the load-time replay) and its record (`world/record.py`); the tag per task, one definition for the analyses and the
+  web-ui (`world/tag.py`, T-viz 1a)
 - `mesa_sim/*.py` (top level only); `mesa_sim/viz/` only for visualization or when grepping
   for readers of a field
 - `mesa_sim/run_config.py`: the run configuration (run file, flags, or any mapping) read and checked, and the
@@ -614,8 +615,8 @@ Decisions
   Fiber and drei, uPlot planned for 1c, no UI kit). A new T-viz session reads the handoff's section "State after stage
   0" first. Stage 1a is under way (6 October 2026): its plan `docs/handoffs/plan_T-viz_1a.md`, increments (i) to
   (iv) built (the server `webui/server.py`, the start `mesa_sim/run_webui.py`, the page's frame; the full selection,
-  the views, the address; the free camera, looks by state, display places; panel 4a, test 2), Hadi's review of (iv)
-  open, then (v) and the close; the web-ui's logic is tested, its look is not (P25 of the plan, corrected); a later
+  the views, the address; the free camera, looks by state, display places; panel 4a with the human's script, the
+  world's context and the tag per task, test 2), (iv) complete; next (v), from Hadi's list, then the close; the web-ui's logic is tested, its look is not (P25 of the plan, corrected); a later
   T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").

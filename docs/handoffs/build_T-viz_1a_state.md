@@ -36,9 +36,13 @@ web-ui", 1a blocks.
   Chrome (kitting scenario_s02_02, dock_loading scenario_s06_09, the unseen domain). Records: design_records.md, 1a,
   INCREMENT (iv), BUILT.
 
+- Increment (iv), second part, COMPLETE (512a167, 33c9394, a48b1b3, e50cb81, fddcf7b, 705653e, 3cb88e5, ca6a037;
+  records: design_records.md, 1a, INCREMENT (iv), SECOND PART, BUILT, with ccode's decisions): the suite 444 passed;
+  vitest 32; headless byte-identical; the analyses' tags unchanged on samples of both domains.
+
 ## In progress
 
-- None. Paused for Hadi's review of (iv).
+- None. Increment (iv) is complete.
 
 ## Next
 
