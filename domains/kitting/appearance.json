@@ -1,0 +1,14 @@
+{
+  "fixed": {
+    "shelf":          {"shape": "rack",      "height": 150, "presence": "background"},
+    "kitting_table":  {"shape": "counter",   "height": 85,  "presence": "background"},
+    "coffee_machine": {"shape": "appliance", "height": 95,  "presence": "active"},
+    "ac_switch":      {"shape": "panel",     "height": 130, "presence": "active"},
+    "landmark":       {"shape": "marker",    "height": 60,  "presence": "background"}
+  },
+  "movable": {
+    "item": {"shape": "crate", "height": 22}
+  },
+  "human": {"figure": "person", "height": 150},
+  "robot": {"figure": "cube_head_robot", "height": 120}
+}

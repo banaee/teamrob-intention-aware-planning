@@ -1,0 +1,17 @@
+{
+  "fixed": {
+    "truck":            {"shape": "enclosure", "height": 90,  "presence": "background"},
+    "gate":             {"shape": "barrier",   "height": 130, "presence": "background"},
+    "delivery_bay":     {"shape": "pad",       "height": 0,   "presence": "background"},
+    "empty_pallet_bay": {"shape": "pad",       "height": 0,   "presence": "background"},
+    "coffee_machine":   {"shape": "appliance", "height": 95,  "presence": "active"},
+    "door":             {"shape": "barrier",   "height": 130, "presence": "background"},
+    "office_chair":     {"shape": "seat",      "height": 70,  "presence": "active"},
+    "landmark":         {"shape": "marker",    "height": 60,  "presence": "background"}
+  },
+  "movable": {
+    "pallet": {"shape": "skid", "height": 14}
+  },
+  "human": {"figure": "person", "height": 150},
+  "robot": {"figure": "lift_vehicle", "height": 130}
+}
