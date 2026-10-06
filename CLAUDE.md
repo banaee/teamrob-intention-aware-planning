@@ -74,7 +74,7 @@ Relevant (read as needed):
   human behaviour model"; glossary §6 and §7). Read it in every T-H session. `docs/terminology_revision.md` §8 states
   what T-H changed in the 24 Sept terms.
 - `docs/handoffs/handoff_T-viz.md`: T-viz, the web-ui (the design chat of 4 to 6 October 2026; design_records.md,
-  "T-viz, the web-ui"; roadmap.md, the T-viz bullet; TODO-186 to TODO-189; reference images in
+  "T-viz, the web-ui"; roadmap.md, the T-viz bullet; TODO-186 to TODO-197; reference images in
   `docs/handoffs/tviz_refs/`). Read it in full in every T-viz session. T-viz records use its status words (open,
   preferred, preferred, replaceable, proposed by cchat, verified, not verified), never "ruling" or "ruled"; "sim-run"
   is a word of the T-viz records only. "The viewer" in older records and in code means the solara-ui (a tentative
@@ -298,7 +298,7 @@ Decisions
   TODO-47 part of it; kitting's part without a departure, dock_loading's may use the unmonitored office (Hadi, 1 Oct
   2026); before track 3b it measures without knowing that the adaptive branches fire under conflict); T-viz stage 1
   (the web-ui's first version; T-V track 1, the viewer, which was T-E; in T-V's place, proposed by ccode, 6 Oct 2026);
-  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 runs now (asked for, 6 Oct 2026).
+  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 is closed (6 Oct 2026); stage 1a when Hadi asks.
   FW: the 4D detour strategy, T-S (ROS/PRIEST, Phase 6), T-K's later directions, and T-viz stages 2 and 3 (stage 3 is
   T-V track 2, Phase 7; the default until Hadi draws the V1 border inside the web-ui).
   V1 and FW (Hadi, 1 Oct 2026, amended by Hadi 3 Oct 2026 and 6 Oct 2026 for T-viz; design_decisions.md, "T-G: the second
@@ -591,12 +591,16 @@ Decisions
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
   strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
   ASKED FOR (Hadi, 6 October 2026): T-viz, the web-ui (`docs/handoffs/handoff_T-viz.md`; design_records.md, "T-viz, the
-  web-ui"). Its stage 0 runs now, one step per session (0.1 recording done, 6 October 2026; 0.2 code structure done, 6 October
+  web-ui"). Its stage 0 is done and closed (6 October 2026), one step per session (0.1 recording done, 6 October 2026; 0.2 code structure done, 6 October
   2026: `mesa_sim/run_config.py` reads the run configuration and builds the model, `mesa_sim/sim_run.py` is one
   sim-run with its log pair, every start uses both, the headless start imports no Solara; 0.4 messages done, 6 October
   2026: `webui/` at the root, the message definitions and the interface a simulator's piece implements, independent of
-  every simulator and domain, and Mesa's piece `mesa_sim/webui_adapter.py`; glossary §11); a later T-viz stage starts
-  only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
+  every simulator and domain, and Mesa's piece `mesa_sim/webui_adapter.py`; glossary §11; 0.3 the style trial done,
+  6 October 2026: `webui/page/`, the env-pane drawn from saved messages (`mesa_sim/webui_export.py`), the scene appearance
+  `webui/appearance.py` with `domains/<domain>/appearance.json`, the theme `webui/page/src/theme.ts`; its look accepted by
+  Hadi "for now and for stage 0", its technology the web-ui's: React, TypeScript, Vite, three.js through React Three
+  Fiber and drei, uPlot planned for 1c, no UI kit). A new T-viz session reads the handoff's section "State after stage
+  0" first. Next within T-viz: stage 1a; a later T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized

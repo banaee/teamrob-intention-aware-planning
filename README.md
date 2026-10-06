@@ -102,6 +102,9 @@ Use any IDE (e.g., [VS Code](https://code.visualstudio.com/)) or editor of your 
 
 ## Running the MESA Simulation
 
+Each start has its own command; there is no single start command with subcommands (T-viz, TODO-196). Run them from the
+repository's root, with the hash seed fixed (`PYTHONHASHSEED=0`) wherever a run must repeat.
+
 ### Headless (default)
 
 ```bash
@@ -115,11 +118,26 @@ python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_s01_01
 Logs are written to `logs/run_<timestamp>.log` (and the human executor's record to `logs/run_<timestamp>.rec`) as
 well as the terminal: one pair per sim-run, written from its first step (`mesa_sim/sim_run.py`).
 
-### Visualization (Solara)
+### Visualization (Solara): the solara-ui
 
 ```bash
 solara run mesa_sim/run_mesa.py
+solara run mesa_sim/run_mesa.py -- --domain kitting --scenario scenario_s01_01   # the start's own flags after --
 ```
+
+### The web-ui's page (T-viz): the trial of stage 0.3
+
+The env-pane of the coming web-ui, drawing the start of a sim-run from saved messages, tilted or from above. No server
+yet. It needs Node.js 22.12 or later; every dependency is pinned (`webui/page/package.json` and its lock file).
+
+```bash
+cd webui/page && npm ci && cd ../..                                     # once, and after a change of package.json
+PYTHONHASHSEED=0 python -m mesa_sim.webui_export                       # the samples (the trial's two sim-runs)
+PYTHONHASHSEED=0 python -m mesa_sim.webui_export --domain kitting --scenario scenario_s01_01   # another sim-run
+cd webui/page && npm run dev                                            # the page, http://localhost:5173
+```
+
+More in `webui/page/README.md`; the state of the web-ui's work in `docs/handoffs/handoff_T-viz.md`, "State after stage 0".
 
 ### Layout drawings
 
@@ -171,7 +189,12 @@ teamrob-intention-aware-planning/
 │   ├── run_config.py               # The run configuration (run file, flags) and the model built from it
 │   ├── sim_run.py                  # One sim-run: the model stepped, its log pair and run-level lines
 │   ├── run_mesa.py                 # Entry point: the headless start and the solara-ui's start
+│   ├── webui_adapter.py            # Mesa's piece for the web-ui: the messages from a sim-run
+│   ├── webui_export.py             # A sim-run's messages written as files for the web-ui's page (stage 0.3)
 │   └── mesa_configs.yaml           # Mesa-specific settings
+│
+├── webui/                       # The web-ui (T-viz): messages, the simulator interface, the scene appearance, the page
+│   └── page/                       # The page: React, TypeScript, Vite, three.js through React Three Fiber
 │
 ├── ros_sim/                     # ROS embodiment (planned)
 ├── configs/                     # Cross-domain config (costs.yaml)
