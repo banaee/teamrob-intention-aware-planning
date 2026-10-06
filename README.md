@@ -112,7 +112,8 @@ python mesa_sim/run_mesa.py --domain dock_loading --scenario scenario_s01_01
 
 `--layout` is optional: a run that names none takes the scenario's first reference layout.
 
-Logs are written to `logs/run_<timestamp>.log` as well as stdout.
+Logs are written to `logs/run_<timestamp>.log` (and the human executor's record to `logs/run_<timestamp>.rec`) as
+well as the terminal: one pair per sim-run, written from its first step (`mesa_sim/sim_run.py`).
 
 ### Visualization (Solara)
 
@@ -165,9 +166,11 @@ teamrob-intention-aware-planning/
 │   ├── obs_builder.py              # Mesa → Observation translation
 │   ├── action_decomposer.py        # GroundedAction → microaction expansion
 │   ├── executor.py                 # Microaction execution engine
-│   ├── viz/                        # Solara + Plotly visualization
+│   ├── viz/                        # Solara + Plotly visualization (the solara-ui; solara_page.py its page)
 │   ├── mesa_fork/                  # Vendored Mesa 3.0 fork
-│   ├── run_mesa.py                 # Entry point
+│   ├── run_config.py               # The run configuration (run file, flags) and the model built from it
+│   ├── sim_run.py                  # One sim-run: the model stepped, its log pair and run-level lines
+│   ├── run_mesa.py                 # Entry point: the headless start and the solara-ui's start
 │   └── mesa_configs.yaml           # Mesa-specific settings
 │
 ├── ros_sim/                     # ROS embodiment (planned)

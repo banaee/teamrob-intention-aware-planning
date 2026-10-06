@@ -834,8 +834,9 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
   in later design stages. Every item is open until Hadi marks it preferred.
   - Stage 0, foundation: 0.1 recording (done, 6 October 2026); 0.2 code structure (reading the run configuration and
     building the `SimModel` move out of `mesa_sim/run_mesa.py` into a module of their own, which the headless start,
-    the solara-ui and the web-ui import; preferred by Hadi); 0.3 the trial of the style (one real layout drawn without
-    motion; the choice of page framework and drawing library for the needs of all stages; reviewed by Hadi); 0.4 the
+    the solara-ui and the web-ui import; preferred by Hadi; done, 6 October 2026: `mesa_sim/run_config.py` and
+    `mesa_sim/sim_run.py`, the log pair a sim-run's; design_records.md, "T-viz, the web-ui", 0.2);
+    0.3 the trial of the style (one real layout drawn without motion; the choice of page framework and drawing library for the needs of all stages; reviewed by Hadi); 0.4 the
     messages between server and page (open, parked; proposed contents in the handoff, section 8). Order proposed by
     cchat: 0.1, 0.2, 0.4, 0.3.
   - Stage 1, the first web-ui: 1a a sim-run in the browser (predefined layouts, setups and scenarios only; all run

@@ -1283,6 +1283,9 @@ with files and lines, is in `docs/design_records.md`, "T-viz, the web-ui", 0.1.
 - 4.2 and 7.2: besides A, B and C, `mesa_sim/run_mesa.py` opens the run log and the `.rec` stream at import, once per
   process. The start line, the override lines, the per-step agent lines, `[sep]` and the run's end (`end_run`) are
   written by `run_headless()`, not by the model, so the solara-ui writes none of them.
+  Since 0.2 (6 October 2026; design_records.md, "T-viz, the web-ui", 0.2): A and B are `mesa_sim/run_config.py`, the
+  log pair and the run-level lines `mesa_sim/sim_run.py`, one pair per stepped sim-run, written from every start; the
+  headless start imports no Solara (4.2's last paragraph no longer holds).
 - 2.2: "viewer" for the program occurs about 110 times in the records and code, not in three places only.
 - 13.4: the earlier chat's pause events `theta_crossed` and `task_committed` no longer exist (D2, D3). No pause on a
   cognitive event was built.

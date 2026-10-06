@@ -4554,3 +4554,84 @@ FLAGS, outside T-viz's scope, not fixed: the solara-ui's hardcoded agent ids `ro
 (mesa_sim/mesa_fork/visualization/solara_viz.py 215 to 216); the drawer's per-domain colour tables (TODO-171); the
 roadmap's Phase 2.2 line (fact 6); the README's "Mesa visualization (Solara) | Running" (README.md 190), to change when
 the solara-ui becomes archived; `model.running` never set (above).
+
+0.2, CODE STRUCTURE, DONE (ccode, 6 October 2026; the plan agreed by Hadi the same day, with his answers to Q1 to Q3
+and three conditions). Handoff 7.2 built: the reading of the run configuration and the building of the model, and the
+log pair with the run-level lines, are each one definition that every start uses; the log pair belongs to a sim-run,
+not to a process (alternative B, Hadi's preference). Behaviour of the headless start unchanged (verified, below).
+- `mesa_sim/run_config.py` (new): A and B of handoff 4.2, moved from `mesa_sim/run_mesa.py`: `DOMAIN_REGISTRY`, the
+  choices, `RUN_OPTIONS` (the keys a run configuration may state, equal to the flags, a test holds them equal),
+  `run_configuration(config, source, flags, cli_overrides)` (the checks of a run file applied to any mapping: a caller
+  whose configuration did not come from the command line gets the same validation), `load_experiment` (the run file
+  read, then `run_configuration`), the parser and `load_user_config(argv)` (with `UNDER_SOLARA` and `script_argv()`,
+  needed by both starts), `resolve_triple`, `resolve_model_params`, `build_model`. It opens no file at import and
+  imports nothing of Solara.
+- `mesa_sim/sim_run.py` (new): `RunLog`, the log pair of one sim-run (`logs/run_<timestamp>.log` and `.rec`, relative to
+  the working directory as before; a name already taken gets `_2`, `_3`); `SimRun(config, log)`, the start line and the
+  override lines, the model (`build_model`), `step()` (the per-step agent lines and `[sep]`), `end()` (`end_run`, the end
+  line, the pair closed), `close()` (the pair left without the end); `start_sim_run(read_config)`.
+  - Point 6: the pair's lines are held in memory until the sim-run's first step or its end, which create the files; a
+    model built and never stepped leaves no file. Cost: the lines of the build (about 11 lines, 1.7 KB, measured on
+    scenario_s01_01) held in memory until the first step, one handler swap at the first step; the terminal echo is
+    immediate as before. A headless start of 0 steps still writes its pair, since its end opens it.
+  - Logging stays process-wide (the model, its agents and `shared/` log through the root logger and the logger `rec`):
+    one pair is attached at a time, and a new sim-run closes the one attached before it, its files ending where they
+    stand, or none if never stepped. Two sim-runs stepped alternately in one process do not get their own logs; how they
+    could later: TODO-187, LOGGING SINCE T-VIZ 0.2.
+  - Q2 (Hadi: a failed build writes its log pair, and the same reasoning for flag errors, unless every sweep script
+    stops on a non-zero exit). The four maintained sweeps do not stop (`|| echo "$tag: exit $?"`, then the newest
+    `logs/run_*.log` is copied); the instruments' `run.sh` and `run_set.sh` stop (`set -eo pipefail`). Chosen:
+    `start_sim_run` creates the pair before the configuration is read, and on any failure before the sim-run exists
+    (a flag error, a configuration error, a failed resolution or build, SystemExit included) opens it, so the start
+    writes its pair: empty on a flag or configuration error, the lines before the error on a failed build, as before
+    0.2. The policy is the start's: a later start (the web-ui) that treats a failed build otherwise creates its
+    `RunLog` and `SimRun` itself and closes the log unopened, with no second copy of the logic.
+  - Q1 (the end of a sim-run for a start that steps on request): not decided; it goes to the message round (stage 0.4).
+    `SimRun.end()` exists; the headless start calls it after its N steps; the solara-ui never calls it, as before.
+  - Q3 (agreed): the start line `[run_mesa] Starting headless run — ...` and the end line `[run_mesa] Headless run
+    complete.` keep their text for byte-identity; every start writes them; TODO-191.
+- `mesa_sim/run_mesa.py`: the starts only. `run_headless()` is `start_sim_run(load_user_config)` stepped `steps` times
+  and ended; it re-exports the names of `run_config` its callers used. Under solara only, it imports `Page` from
+  `mesa_sim/viz/solara_page.py` (new; the page moved unchanged but for its model), so a headless start imports neither
+  Solara nor anything of `mesa_sim/viz/` or the fork's `visualization`.
+- The solara-ui: start command unchanged, `solara run mesa_sim/run_mesa.py [-- <flags>]`. SolaraViz (vendored, not
+  touched) builds its model by `model_class.__new__` and `__init__`; the page passes `SolaraSimRun`, which starts a
+  sim-run of the run configuration, steps it, and hands every other attribute to its `SimModel`.
+  THE SOLARA-UI'S LOGS CHANGE (condition 1): before 0.2 one pair per process, opened at import, holding the model's own
+  lines only (every model the page built, stepped or not); since 0.2 one pair per stepped sim-run, holding also the
+  start line, the override lines, the per-step agent lines and `[sep]`, as the headless start writes them; a reset or a
+  reload starts a new pair at its first step; a model never stepped writes none; no end lines (Q1). Verified in both
+  domains: its first pair equals a headless run of the same steps but for the start line's `steps=` (the run file's,
+  50) and the end lines.
+  THE LEAK, NOT FIXED (condition 1): the run-file panel's trial build of the overrides
+  (`mesa_sim/viz/run_file_panel.py`, `SimModel(**{**model_params, "overrides": trial})`) is built outside any sim-run,
+  so its build lines go to the sim-run attached at that moment: into its open file, or held for its first step. Before
+  0.2 they went into the process's pair.
+- `mesa_sim/list_scenarios.py` imports `DOMAIN_REGISTRY` from `run_config` (its own copy removed; its reason, that
+  importing `run_mesa` opened a run's log files, is gone). Comments updated: `sim_agents.py` (the `rec` logger),
+  `viz/portrayal.py`, `viz/space_drawer.py`.
+- FLAG, not touched (agreed): `analysis/instruments/mpb/actual.py` builds the `SimModel` and states the run's end with
+  its own code (a copy of reading, building and `end_run`); since 0.2 it could use `run_config` and `SimRun`.
+HOW THE EIGHT POINTS WERE CHECKED (B0 at 5d6eb50, after the records session's ff23cef and 5d6eb50; B1 on the change):
+1. Headless unchanged: B0 and B1 byte-identical in all 114 files: the four maintained sets (48 logs and their `.rec`,
+   every md5 equal to the READMEs'), dock_loading's scenario_s03_02, s05_02, s07_02 (800 steps), a run with the three
+   override kinds, a run of 0 steps, and four failed starts (a bad flag value, an unknown run-file key, an unknown
+   scenario, an override out of bounds): the same exit codes, the same last line on stderr, the same log pair (three
+   empty, one with the lines before the error). `mesa_sim/list_scenarios.py`: the same output (1019 lines). The test
+   suite: 385 passed before, 398 after (13 new, tests/test_tviz_sim_run.py).
+2. A headless start imports no Solara: a test runs `mesa_sim/run_mesa.py --steps 1` in a subprocess that refuses any
+   import of `solara`, `reacton`, `mesa_sim.viz` or the fork's `visualization`; it completes.
+3. The solara-ui works: `solara run` per domain serves the page (HTTP 200, no error); the page rendered in process per
+   domain (`solara.render`, the loggers `solara` and `reacton` at ERROR as `solara run` sets them), Step three times,
+   Reset, Step once: no file after the build, one pair per stepped sim-run, the first equal to the headless run as
+   above. Hadi opens it in a browser once per domain before accepting 0.2 (condition 3).
+4. A configuration not from the command line: tests give the same mappings to `run_configuration` and, as a yaml file,
+   to `load_experiment`: the same refusal (unknown key, strategy, switch, test level, an override of an unknown object)
+   and, for a valid one, the same configuration and a model.
+5. Two sim-runs in one process, one after the other: tests: two pairs, each with its own start line; a sim-run left
+   unended keeps its pair as it stood when the next began.
+6. A model never stepped leaves no file: a test (three builds, none stepped: no file); the cost under point 6 above.
+7. No second copy: `run_mesa.py` holds no reading, building or logging logic; the solara page calls `run_config` and
+   `start_sim_run`; `list_scenarios.py`'s copy of the domain map removed. Outside 0.2: `actual.py` (flag above).
+8. Callers of `run_mesa`: tests/kitting/test_tl1_artefacts.py and test_tl4_overrides.py use `resolve_triple`,
+   `load_user_config` and `run_headless` from it unchanged and pass.

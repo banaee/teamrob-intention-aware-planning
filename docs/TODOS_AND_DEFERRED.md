@@ -4914,7 +4914,15 @@ THE VERIFICATIONS, fact 10): no global random source in use and no registry chan
 in one process would write into one log. The decisive check (proposed by cchat): step two models alternately in one
 process and compare each one's log with the same sim-run executed alone and headless. A limit: the side-by-side view
 demonstrates; evaluation numbers come from headless sim-runs.
-Files: mesa_sim/run_mesa.py (the logging set-up), mesa_sim/sim_model.py
+LOGGING SINCE T-VIZ 0.2 (ccode, 6 October 2026, verified; what follows the first sentence is proposed by ccode, open):
+the log pair is a sim-run's (`mesa_sim/sim_run.py`, `RunLog`), not a process's, but logging stays process-wide: the
+model, its agents and `shared/` write through the root logger and the logger `rec`, so one pair is attached at a time
+and a new sim-run closes the one before it. Two sim-runs stepped alternately in one process would therefore not get
+their own logs. They could be separated later without changing `SimModel`: the sim-run sets a context variable to
+itself around its build, each step and its end, and each pair's handlers take only the records emitted while their
+sim-run is the current one (a `logging.Filter` reading the variable); a record emitted outside every sim-run then goes
+to none. The decisive check above stays the test of it.
+Files: mesa_sim/sim_run.py (the log pair), mesa_sim/sim_model.py
 Reference: docs/handoffs/handoff_T-viz.md, sections 5.10, 13.2; design_records.md, "T-viz, the web-ui"
 
 **TODO-188: T-viz stage 3, changes during a sim-run: the open questions (recorded, T-viz 0.1, 6 Oct 2026)** open [FW]; decided when the stage is reached
@@ -4959,3 +4967,14 @@ settle then, each open, Hadi decides later:
 4. The place of T-viz stage 1 in the order: ccode's proposal, in T-V's place, after T-F and before track 3b (roadmap.md,
    the order block's line of 6 October 2026).
 Reference: design_records.md, "T-viz, the web-ui", HADI'S ANSWERS and HADI'S ANSWER ON THE CONTRADICTIONS AND THE PLACE
+
+**TODO-191: The two run-level lines that say "headless" for every start (recorded, T-viz 0.2, 6 Oct 2026)** open
+Since T-viz 0.2 every start writes the start line `[run_mesa] Starting headless run — ...`, and every start that ends
+its sim-run the end line `[run_mesa] Headless run complete.` (`mesa_sim/sim_run.py`, `SimRun`): the solara-ui writes
+the start line now (it never ends a sim-run), the web-ui will write both (when a sim-run ends there is open). The
+text was kept for byte-identity with the maintained baseline sets (Hadi, 6 October 2026, agreed with ccode's proposal).
+To be renamed at the next regeneration of the baseline sets. Readers of the text (6 October 2026):
+`analysis/instruments/mpb/figure_of_log.py` and `analysis/instruments/irb/summary.py` (the start line), tests/kitting/
+test_tl4_overrides.py and tests/test_tviz_sim_run.py.
+Files: mesa_sim/sim_run.py
+Reference: design_records.md, "T-viz, the web-ui", 0.2

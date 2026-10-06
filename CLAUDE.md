@@ -591,7 +591,9 @@ Decisions
   (evaluation, T-F; the randomised harness TODO-47 is part of it), the viewer and the demonstration, 4D (detour
   strategy) and Phase 6 (ROS / PRIEST execution); and no T-G stage before its task.
   ASKED FOR (Hadi, 6 October 2026): T-viz, the web-ui (`docs/handoffs/handoff_T-viz.md`; design_records.md, "T-viz, the
-  web-ui"). Its stage 0 runs now, one step per session (0.1 recording done, 6 October 2026); a later T-viz stage starts
+  web-ui"). Its stage 0 runs now, one step per session (0.1 recording done, 6 October 2026; 0.2 code structure done, 6 October
+  2026: `mesa_sim/run_config.py` reads the run configuration and builds the model, `mesa_sim/sim_run.py` is one
+  sim-run with its log pair, every start uses both, the headless start imports no Solara); a later T-viz stage starts
   only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").
@@ -730,7 +732,11 @@ PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run my_run.yaml --override layout
 solara run mesa_sim/run_mesa.py -- --domain kitting --layout env_layout_03 --scenario scenario_s03_01
 ```
 
-Logs go to `logs/run_<timestamp>.log`. Defaults come from the run file, `configs/experiment.yaml` or the yaml
+Logs go to `logs/run_<timestamp>.log`, with the `.rec` stream beside it: one pair per sim-run, not per process (T-viz
+0.2, `mesa_sim/sim_run.py`), opened at the sim-run's first step or its end, so a model built and never stepped writes
+none; a start that fails still writes its pair (empty on a flag error), so the newest pair is always the last start's;
+a name already taken gets `_2`, `_3`. The reading of the run file and flags and the building of the model are
+`mesa_sim/run_config.py`'s, one definition for every start. Defaults come from the run file, `configs/experiment.yaml` or the yaml
 `--run` names; CLI flags override. The flags: `--domain`, `--layout`, `--scenario`, `--steps`, `--human_aware` and `--intention_aware` (true/false; T-F
 part 1: off the human-unaware and the intention-unaware robot, an option off setting the options above it off),
 `--assignment_knowledge`
