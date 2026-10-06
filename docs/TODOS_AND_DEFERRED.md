@@ -3870,10 +3870,14 @@ hands it a copy of the log without its `[coverage]` lines, which nothing there r
 Files: analysis/td_stage1b/tdlib.py (frozen); analysis/irb/actual.py (`from_log`)
 Reference: `analysis/irb/REPORT.md`, IRB.3b flags
 
-**TODO-126: The registry inventory literal in the discovery test (recorded, IRB close-out, 27 Sept 2026)** [OPEN; recorded only]
+**TODO-126: The registry inventory literal in the discovery test (recorded, IRB close-out, 27 Sept 2026)** [CLOSED, 6 October 2026: the test no longer pins a count or a set of ids]
 `tests/test_tl2_discovery.py::test_the_registry_is_the_union_of_the_modules` pins the registry's inventory as literals
 (the scenario count and the set of setup ids), so it must be edited with every new scenario or setup: 38 to 42 in IRB.3b,
 42 to 54 and setups 01 to 09 in IRB.4b.
+CLOSED (Hadi, 6 October 2026, T-viz 1a (iv)'s second part): the test now checks, for both domains, that every module's
+scenarios are registered and nothing else, that no id is there twice, and that every module's setup is registered; no
+count and no list of ids is pinned, so a scenario or a setup added by hand needs no edit. It also runs alone (it imports
+`mesa_sim.run_config`, which puts `mesa_sim/` on the path for `mesa_fork`).
 Files: tests/test_tl2_discovery.py
 Reference: `analysis/irb/REPORT.md`, IRB.3b and IRB.4b, "Runs and tests that disagree with the mechanism"
 

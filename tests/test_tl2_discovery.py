@@ -16,8 +16,10 @@ import pkgutil
 
 import pytest
 
+import mesa_sim.run_config  # noqa: F401  (puts mesa_sim/ on the path, so that SimModel's mesa_fork imports alone)
 from shared.types import ScenarioConfig
 from domains.discovery import discover_scenarios
+from domains.dock_loading.registry import domain_config as dock_config
 from domains.kitting.registry import domain_config, register_kitting_domain
 import domains.kitting.scenarios as kitting_scenarios
 import domains.dock_loading.scenarios as dock_scenarios
@@ -56,12 +58,16 @@ def test_every_module_carries_one_setup_and_no_two_modules_share_one():
             setups_seen[setup] = module_name
 
 
-def test_the_registry_is_the_union_of_the_modules():
-    by_module = scenarios_by_module(kitting_scenarios)
-    from_modules = {cfg.id for configs in by_module.values() for cfg in configs}
-    assert from_modules == set(domain_config["scenarios"])
-    assert len(domain_config["scenarios"]) == 722          # 102, T-K part 1 step 4's 26 and step 5's 6 (4 October 2026), step 5e's 555 (5 October 2026), T-F part 1's 32 copies (5 October 2026), Hadi's scenario_s31_01 (6 October 2026)
-    assert set(domain_config["setups"]) == {f"env_setup_{n:02d}" for n in range(1, 32)}     # env_setup_17 to _30: step 5e; env_setup_31: Hadi's (6 October 2026)
+@pytest.mark.parametrize("package,config", [(kitting_scenarios, domain_config), (dock_scenarios, dock_config)])
+def test_the_registry_is_the_union_of_the_modules(package, config):
+    """Every scenario of every module is registered, and nothing else is; every module's setup is a registered setup.
+    No count and no list of ids is pinned (TODO-126): a scenario or a setup added by hand needs no edit here."""
+    by_module = scenarios_by_module(package)
+    from_modules = [cfg.id for configs in by_module.values() for cfg in configs]
+    assert len(from_modules) == len(set(from_modules))     # no id twice (discovery refuses it at import, above)
+    assert set(from_modules) == set(config["scenarios"])
+    for configs in by_module.values():
+        assert configs[0].setup in config["setups"]
 
 
 @pytest.mark.parametrize("scenario_id,layout_id", [
