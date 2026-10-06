@@ -127,8 +127,9 @@ solara run mesa_sim/run_mesa.py -- --domain kitting --scenario scenario_s01_01  
 
 ### The web-ui (T-viz)
 
-The framework's own page in the browser and a small Python server (stage 1a, increment (i)): choose a sim-run, then
-play, pause, step and reset it, and watch the env-pane. The page is built once with Node.js 22.12 or later (every
+The framework's own page in the browser and a small Python server (stage 1a): choose a domain, a layout, a setup and
+a scenario and the run options, then play, pause, step and reset the sim-run, and watch the env-pane and what the human
+does (panel 4a). The page is built once with Node.js 22.12 or later (every
 dependency pinned in `webui/page/package.json` and its lock file), and again after a change of the page's sources; the
 start stops and says so when the built page is missing or older than its sources.
 
@@ -139,10 +140,11 @@ PYTHONHASHSEED=0 python mesa_sim/run_webui.py --domain dock_loading --scenario s
 ```
 
 The start takes the headless start's run file and flags, and `--port`. It opens on the run file's sim-run at its start.
-The web-ui has no step limit unless `--steps` (or, from increment (ii), the page) sets one; the run file's `steps` is
-not used. A sim-run's log pair is the one the same sim-run writes headless; Ctrl+C stops the server and ends a stepped
+The web-ui has no step limit unless `--steps` or the page sets one; the run file's `steps` is not used. The page's choice
+is mirrored in its address, so a bookmark reopens a choice at its start. A sim-run's log pair is the one the same sim-run writes headless; Ctrl+C stops the server and ends a stepped
 sim-run. More in `webui/page/README.md`; the state of the web-ui's work in `docs/handoffs/handoff_T-viz.md`, "State after
-stage 0", and the plan of stage 1a in `docs/handoffs/plan_T-viz_1a.md`.
+stage 1a", and the plan of stage 1a in `docs/handoffs/plan_T-viz_1a.md`. The solara-ui (above) stays as an alternative
+start.
 
 ### Layout drawings
 

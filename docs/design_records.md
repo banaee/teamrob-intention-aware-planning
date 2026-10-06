@@ -4379,6 +4379,7 @@ PREFERRED BY HADI (handoff, 6.1 to 6.3, 7.2, 7.5, 12.4):
 - Preferred, replaceable: an agent's path is a straight line now, another path method later (see fact 3 below).
 - The solara-ui stays in the repo as archived (not updated with core and model changes, not guaranteed to run, not
   deleted); the archived status begins when Hadi accepts stage 1a; until then it is kept working.
+  CHANGED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1a, STAGE 1a CLOSED): the solara-ui is not archived; it stays as an alternative start, kept running with a light check.
 Everything else in the handoff is open or proposed by cchat (collected in its section 15).
 
 THE STAGES: `docs/roadmap.md`, "The plan from T-A", the T-viz bullet (stages 0 to 3 and the unassigned items); the
@@ -5240,3 +5241,25 @@ accepted in advance; its open details are decided by ccode (below). The plan's P
 - Found for Part 2b: the stale titles are kitting env_layout_01 to _06 ("Kitting Domain Layout 0" to "5", from the old
   ids) and env_layout_30 ("env_layout_18", a copy of env_layout_18); a layout's title is written into no log line (it
   reaches only the web-ui's run description and `scripts/layout_tool.py`).
+
+1a, STAGE 1a CLOSED (Hadi, 6 October 2026, preferred; recorded by ccode the same day; records only, no code changed).
+1. Hadi tried increments (i) to (iv) in both domains and accepts stage 1a.
+2. Increment (v), polishing, is not done in stage 1a. One polishing round follows after stage 1c, from Hadi's written
+   list. Candidates known so far, all open: the seven stale layout titles (kitting env_layout_01 to _06, env_layout_30),
+   and showing the title beside the id again once they are correct; the width of panel 4a; the tuning Hadi mentioned
+   after increment (i), not yet specified; the see-through table top.
+3. The solara-ui is not archived: it stays in the repository as an alternative start, as it is. This replaces the
+   preference that it becomes archived when Hadi accepts stage 1a (the handoff's 6.3; the earlier passages carry a
+   dated line). The README and the roadmap carry no "archived" line.
+4. The roles of the three panels and the content of panel 4a, as recorded (THE PANELS' CONTENT; THE TAG PER TASK IN
+   PANEL 4a), are what stage 1b starts from. The right panel shows the robot in two parts, its body and its mind; its
+   content is decided with Hadi before stage 1b is planned.
+5. The solara-ui's light check (Hadi, 6 October 2026, preferred; it answers the open point of item 3): after a change to
+   code the solara-ui uses, check only that it starts and that one sim-run takes a few steps without an error, in one
+   domain. No check after a change to the web-ui's page alone, no check of its look, no second domain unless the change
+   is specific to that domain. A failed light check is reported, and fixed only when the fix is small; otherwise
+   reported, and the work waits. The rule stands in the handoff's "State after stage 1a" and in the plan's section 8.
+THE CHECK (ccode, 6 October 2026): `solara run mesa_sim/run_mesa.py` serves in kitting (scenario_s01_01) and
+dock_loading (scenario_s03_02), HTTP 200; a sim-run of each, built from the command line's configuration as under
+solara, takes three steps without an error.
+The state for the next design chat: `docs/handoffs/handoff_T-viz.md`, "State after stage 1a".

@@ -40,14 +40,17 @@ web-ui", 1a blocks.
   records: design_records.md, 1a, INCREMENT (iv), SECOND PART, BUILT, with ccode's decisions): the suite 444 passed;
   vitest 32; headless byte-identical; the analyses' tags unchanged on samples of both domains.
 
+- STAGE 1a CLOSED (Hadi, 6 October 2026; design_records.md, 1a, STAGE 1a CLOSED): (v) not done in 1a (one polishing
+  round after stage 1c); the solara-ui not archived, kept running with a light check; the check once: it serves in both
+  domains and a sim-run steps. The state for the next design chat: handoff_T-viz.md, "State after stage 1a".
+
 ## In progress
 
-- None. Increment (iv) is complete.
+- None. Stage 1a is closed; this file is the record of its build.
 
 ## Next
 
-- (v), polishing from Hadi's written list, in a new session; then the close of 1a (the solara-ui check once, the
-  README's archive line, the roadmap's line).
+- Stage 1b, when Hadi asks: the robot's panel (its body and its mind), its content decided with Hadi first.
 
 ## Decisions taken on the way
 

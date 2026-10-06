@@ -12,7 +12,7 @@ ccode pauses after each increment for Hadi's review in the browser. AMENDED (Had
 increments (ii) and (iii) are built in one session with no pause between them; then one pause; (iv) and (v) each in a
 session of its own.
 
-Progress: increment (iv) COMPLETE (ccode, 6 October 2026; design_records.md, 1a, INCREMENT (iv), SECOND PART, BUILT):
+Progress: STAGE 1a CLOSED (Hadi, 6 October 2026, P35; design_records.md, 1a, STAGE 1a CLOSED). Earlier: increment (iv) COMPLETE (ccode, 6 October 2026; design_records.md, 1a, INCREMENT (iv), SECOND PART, BUILT):
 panel 4a with the script, the world's context and the tag per task. Next: (v), from Hadi's list, then the close.
 Earlier: increment (iv) BUILT without the close (ccode, 6 October 2026; design_records.md, 1a, INCREMENT (iv), BUILT);
 Hadi's review open; then (v), then the close of 1a. Increments (ii) and (iii) BUILT (ccode, 6 October 2026; design_records.md, 1a, INCREMENTS (ii) AND (iii),
@@ -107,6 +107,9 @@ OF CHECKS FOR THE REST OF STAGE 1):
 - P34 (Hadi, 6 October 2026; design_records.md, 1a, THE TAG PER TASK IN PANEL 4a): panel 4a shows the tag per task
   as the records define it, on every task the human performs; TODO-185's provisional rule followed. Increment (iv) is
   accepted in advance; its open details decided by ccode.
+- P35 (Hadi, 6 October 2026; design_records.md, 1a, STAGE 1a CLOSED): stage 1a accepted after (iv); (v) not done in
+  1a, one polishing round after stage 1c from Hadi's list; the solara-ui not archived, kept running with a light check
+  (section 8); the panels' roles and panel 4a's content are what 1b starts from.
 - P26. Kept at the review of (ii) and (iii): the page's behaviour on a choice that cannot be built; the address with
   every run option; the table top's opacity for now; the 15 page tests. dock_loading's four layout notes rewritten.
 
@@ -281,7 +284,7 @@ break started by an event) and resumes.
 Checks: test 2; the domain-word scan of `webui/` and the page; screenshots of both domains, every page state
 (AMENDED, P25: one look in a browser per new feature, one window size; the solara-ui checked once here). Then
 Hadi's acceptance of 1a, from which the solara-ui is archived (the README and the roadmap say so). AMENDED (P24):
-Hadi's acceptance of 1a follows (v).
+Hadi's acceptance of 1a follows (v). CHANGED (P35): 1a is accepted after (iv); the solara-ui is not archived.
 
 ### (v) Polishing (added by Hadi, 6 October 2026, P24)
 
@@ -623,6 +626,11 @@ AMENDED (Hadi, 6 October 2026, P25), from (iii) on: the list below is reduced to
 check; one look in a browser per new feature at one window size; the domain-word scan stays (it is in the suite). The
 screenshot sets and the second size, the saved folder and the solara-ui per increment are dropped (the solara-ui once
 before Hadi's acceptance of 1a). CORRECTED (P25): page-side tests of logic are written in every increment.
+THE SOLARA-UI'S LIGHT CHECK (Hadi, 6 October 2026, preferred; P35), for every later session: after a change to code the
+solara-ui uses, check only that it starts and that one sim-run takes a few steps without an error, in one domain. No
+check after a change to the web-ui's page alone, no check of its look, no second domain unless the change is specific to
+that domain. A failed light check is reported, and fixed only when the fix is small; otherwise reported, and the work
+waits.
 
 - Headless byte-identical where `mesa_sim/` changes ((i): `sim_run.py`; (ii): the loader's move): the four maintained
   sets (48 logs and their `.rec`) and dock_loading's scenario_s03_02, s05_02, s07_02, rerun into a scratch folder and

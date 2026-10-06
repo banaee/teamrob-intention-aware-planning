@@ -311,7 +311,7 @@ Decisions
   TODO-47 part of it; kitting's part without a departure, dock_loading's may use the unmonitored office (Hadi, 1 Oct
   2026); before track 3b it measures without knowing that the adaptive branches fire under conflict); T-viz stage 1
   (the web-ui's first version; T-V track 1, the viewer, which was T-E; in T-V's place, proposed by ccode, 6 Oct 2026);
-  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 is closed (6 Oct 2026); stage 1a when Hadi asks.
+  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 is closed (6 Oct 2026); stage 1a is closed (6 Oct 2026); stage 1b when Hadi asks.
   FW: the 4D detour strategy, T-S (ROS/PRIEST, Phase 6), T-K's later directions, and T-viz stages 2 and 3 (stage 3 is
   T-V track 2, Phase 7; the default until Hadi draws the V1 border inside the web-ui).
   V1 and FW (Hadi, 1 Oct 2026, amended by Hadi 3 Oct 2026 and 6 Oct 2026 for T-viz; design_decisions.md, "T-G: the second
@@ -612,12 +612,16 @@ Decisions
   6 October 2026: `webui/page/`, the env-pane drawn from saved messages (`mesa_sim/webui_export.py`), the scene appearance
   `webui/appearance.py` with `domains/<domain>/appearance.json`, the theme `webui/page/src/theme.ts`; its look accepted by
   Hadi "for now and for stage 0", its technology the web-ui's: React, TypeScript, Vite, three.js through React Three
-  Fiber and drei, uPlot planned for 1c, no UI kit). A new T-viz session reads the handoff's section "State after stage
-  0" first. Stage 1a is under way (6 October 2026): its plan `docs/handoffs/plan_T-viz_1a.md`, increments (i) to
-  (iv) built (the server `webui/server.py`, the start `mesa_sim/run_webui.py`, the page's frame; the full selection,
-  the views, the address; the free camera, looks by state, display places; panel 4a with the human's script, the
-  world's context and the tag per task, test 2), (iv) complete; next (v), from Hadi's list, then the close; the web-ui's logic is tested, its look is not (P25 of the plan, corrected); a later
-  T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
+  Fiber and drei, uPlot planned for 1c, no UI kit). Stage 1a is CLOSED (Hadi, 6 October 2026, preferred;
+  design_records.md, "T-viz, the web-ui", 1a, STAGE 1a CLOSED; its plan `docs/handoffs/plan_T-viz_1a.md`): increments
+  (i) to (iv) built (the server `webui/server.py`, the start `mesa_sim/run_webui.py`, the page's frame; the full
+  selection, the views, the address; the free camera, looks by state, display places; panel 4a with the human's script,
+  the world's context and the tag per task, test 2); one polishing round follows after stage 1c, from Hadi's list; the
+  solara-ui is not archived, an alternative start kept running with a light check (after a change to code it uses: it
+  starts and one sim-run takes a few steps without an error, in one domain; none after a change to the page alone). The
+  web-ui's logic is tested, its look is not (the plan's P25, corrected). A new T-viz session reads the handoff's section
+  "State after stage 1a" first. Next: stage 1b (the robot's panel, its body and its mind), its content decided with Hadi
+  before it is planned; a later T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized

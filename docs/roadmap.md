@@ -854,7 +854,8 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
   - Stage 1, the first web-ui: 1a a sim-run in the browser (predefined layouts, setups and scenarios only; all run
     options as toggles and selectors; every change builds the model and the env-pane shows step 0, preferred; play,
     pause, step, reset; the env-pane's first version in the style direction, minimal 3D; panel 4a, the human and the
-    actual world; on Hadi's acceptance of 1a the solara-ui becomes archived, preferred); 1b the robot's mind (panel 4b,
+    actual world; on Hadi's acceptance of 1a the solara-ui becomes archived, preferred [CHANGED, 6 October 2026: not
+    archived, below]); 1b the robot's mind (panel 4b,
     its contents decided later); 1c plots over ticks, growing during the sim-run, with the timeline of context facts
     where one exists (panel 4c).
     AMENDED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 0.4 and STAGE 0 CLOSED): 1a shows
@@ -866,6 +867,11 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     and (iii) together, then one pause for Hadi's review; (iv) in a new session; then (v), polishing, from a written
     list Hadi gives, ccode working that list and nothing else. Whether a second polishing round follows after stage 1c
     is open.
+    CLOSED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1a, STAGE 1a CLOSED): stage 1a is
+    accepted after increments (i) to (iv); (v) is not done in 1a: one polishing round follows after stage 1c, from
+    Hadi's list. The solara-ui is not archived: an alternative start, kept running with a light check. Next within
+    T-viz: stage 1b, the robot's panel (its body and its mind), its content decided with Hadi before it is planned;
+    the state for the next design chat: the handoff's "State after stage 1a".
   - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
     editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
     each saved as a new artefact; 2.4 sim-runs side by side.

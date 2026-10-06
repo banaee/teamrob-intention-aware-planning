@@ -9,7 +9,112 @@ doubted or corrected, and the facts that ccode must verify. It is not a specific
 
 ---
 
+## State after stage 1a (ccode, 6 October 2026, at the close of T-viz stage 1a)
+
+The present state, the first thing a new design chat reads. Stage 1a is closed (Hadi, 6 October 2026, preferred;
+design_records.md, "T-viz, the web-ui", 1a, STAGE 1a CLOSED). The detail of each step: design_records.md, the 1a blocks;
+the plan, `docs/handoffs/plan_T-viz_1a.md` (P1 to P35); the build's state file, `docs/handoffs/build_T-viz_1a_state.md`.
+
+### What exists in the code after stage 1a
+
+- The server, `webui/server.py` (Starlette, uvicorn; 127.0.0.1 only): one current sim-run, built, stepped, reset and
+  ended by the page's requests (catalogue, choose, view, step, reset, current); a step limit only when one is set;
+  every call into the simulator on one worker thread. It imports no simulator.
+- The start, `mesa_sim/run_webui.py`: the headless start's run file and flags, and `--port`; it refuses an override, a
+  layout outside the scenario's reference layouts, a look by a state the domain does not declare, and a page whose build
+  is missing or older than its sources.
+- Mesa's piece, `mesa_sim/webui_adapter.py`: the catalogue (with each domain's scene appearance and the notes of
+  layouts and setups), the view of a layout or of a layout and a setup (read through the loader's own functions,
+  `mesa_sim/sim_model.py`, `read_layout`, `read_setup_objects`, `read_setup_states`), the run description and the tick
+  updates. Beside the world, a tick update names the script entry of each task on the human's stack and of each task
+  that left it, the script event a switch fired, the point where all agents have finished (`run.finished_at`), and the
+  tag per task of the task on top.
+- The tag per task: one definition, `world/tag.py`, read by the piece and by `analysis/instruments/mpb/tag.py`.
+- The messages, `webui/messages.py`, and the scene appearance, `webui/appearance.py` (looks by state); the page's types
+  generated from them (`webui/schema.py`, then `npm run gen:types`).
+- The page, `webui/page/` (React, TypeScript, Vite, three.js through React Three Fiber and drei): the selection by
+  domain, layout, setup and scenario with notes, descriptions and a filter; every run option by its declared kind; lock
+  and unlock; the choice mirrored in the address (the server's stepped sim-run wins on loading); the env-pane (two
+  camera presets and a free camera, looks by state, display places kept while an object stays, see-through table
+  tops); the control bar; panel 4a (the human now, the human's script, the recent switches and resumptions, the world's
+  context, the tag per task); panels 4b and 4c as a rail and a strip.
+- Tests: `tests/test_tviz_server.py` (the same log pair as headless; the server's rules; test 2, a domain the web-ui has
+  never seen), `tests/test_tviz_view.py`, `tests/test_tviz_panel.py` (with `tests/tviz_panel_cases.py` and its fixtures),
+  `tests/test_tviz_messages.py` (no domain word in `webui/` or the page), `tests/test_tviz_sim_run.py`; the page's
+  vitest under `webui/page/test/` (`npm test`).
+- Removed in 1a: `mesa_sim/webui_export.py` and the 0.3 trial's samples.
+
+### The starts
+
+```bash
+# headless
+PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python mesa_sim/run_mesa.py --domain kitting --scenario scenario_s01_01 --steps 200
+# the web-ui: the page built once, and after a change of its sources; then http://127.0.0.1:8000/
+cd webui/page && npm ci && npm run build && cd ../..
+PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python mesa_sim/run_webui.py
+# the solara-ui (an alternative start, not archived)
+solara run mesa_sim/run_mesa.py -- --domain kitting --scenario scenario_s01_01
+```
+
+### What Hadi prefers now (6 October 2026; in the status words of 1.1, none ruled)
+
+- Stage 1a is accepted after increments (i) to (iv). One polishing round follows after stage 1c, from Hadi's written
+  list; ccode works that list and nothing else.
+- The solara-ui stays as an alternative start, not archived (replacing 6.3). Its light check: after a change to code the
+  solara-ui uses, check only that it starts and that one sim-run takes a few steps without an error, in one domain; no
+  check after a change to the web-ui's page alone, none of its look, no second domain unless the change is specific to
+  that domain; a failed light check is reported, fixed only when the fix is small, otherwise the work waits.
+- The checks of the web-ui (P25, corrected): its flow, functions and logic are tested, page-side included; its look is
+  not (no screenshot sets, no second window size, no visual refinement rounds); one look in a real browser per new
+  feature; headless byte-identical whenever `mesa_sim/`, `shared/`, `world/` or `domains/` changes; short records.
+- The panels: 4a, left, the human and the world's context at the tick; 4b, right (stage 1b), the robot in two parts,
+  its body (its action, what it carries) and its mind; 4c, bottom (stage 1c), both over time, with the robot-human
+  distance and a subplot of the timeline facts.
+- Panel 4a: the human now, the recent switches and resumptions, the human's script (which the robot does not know),
+  the world's context now, and the tag per task as the records define it (TODO-185's provisional rule followed); tasks
+  written by their values. Its reference cases: design_records.md, 1a, THE PANELS' CONTENT, item 6.
+- The page as built: the selection folds at the first step; the control bar under the env-pane; the env-pane's header
+  shows the layout's id; play at 5 ticks per second by default; no step limit unless one is set; play pauses where all
+  agents have finished; a choice that cannot be built keeps the picture with the controls disabled; the address
+  carries every run option.
+- Every layout's notes say first what the room is for.
+
+### What stage 1b starts from
+
+- The panels' roles and panel 4a's content above. The right panel's content (the robot's body and its mind) is decided
+  with Hadi before stage 1b is planned.
+- The messages leave room for it: the run description and the tick update hold the world under `world`; the robot's
+  mind is a section of its own beside it (0.4), not yet defined.
+- Open questions that land in 1b: whether and which paths the scene shows (TODO-197); whether the scene shows
+  `min_separation` around the robot (the plan's M5).
+
+### What is still open
+
+1. The polishing round, after stage 1c, from Hadi's written list. Candidates known so far: the seven stale layout
+   titles (kitting env_layout_01 to _06, env_layout_30) and showing the title beside the id again; the width of panel
+   4a (360 px now, 300 to 400); the tuning Hadi mentioned after increment (i), not yet specified; the see-through table
+   top. Whether a second polishing round follows: open.
+2. The right panel's content (stage 1b), and paths in the scene (TODO-197, stage 1b).
+3. Panel 4c: the plots, the robot-human distance, the timeline facts' subplot (stage 1c).
+4. The tag for a fact that lowers a task (TODO-185): Hadi.
+5. The stale layout titles themselves: Hadi, whenever the layout files are next touched (with item 1).
+6. Whether the domain declares its container types, so that an empty container is known: when a stage needs it.
+7. The orientation of fixed objects (TODO-192): when a form needs a front.
+8. The override kinds in the web-ui (TODO-186): stage 1 or 2.
+9. The "headless" text of the two run-level lines, and `steps=none` with it (TODO-191): at the next regeneration of the
+   maintained baseline sets.
+10. A sim-run's tick updates grow without a step limit (about 13 MB at 10 000 ticks), held by the server and the page:
+    noted, no limit set; when it matters.
+11. The items with no stage (TODO-189), saving the page's choice as a run file among them; Hadi's idea that every start
+    stops when no agent has anything left (TODO-33): no stage.
+12. Dark mode (TODO-193), stage 2 or 3, [FW]; stages 2 and 3 (TODO-186 to TODO-188), [FW]; the V1 border inside the
+    web-ui (TODO-190): Hadi, later.
+
+---
+
 ## State after stage 0 (ccode, 6 October 2026, at the close of T-viz stage 0)
+
+SUPERSEDED AS THE PRESENT STATE (6 October 2026) by "State after stage 1a" above; kept as the record of stage 0's close.
 
 This section is the first thing a new design chat reads. It states what stage 0 left in the code, what Hadi prefers
 now, what stage 1a starts from and what is still open. The sections after it are the design chat's record of 4 to 6
@@ -118,6 +223,7 @@ In the status words of section 1.1. None of these is ruled; each can change in a
 - There is no single "mother" start command now. The question of one command with subcommands returns in stage 1a,
   when the web-ui's start command is defined.
 - The solara-ui stays in the repository. It becomes archived when Hadi accepts stage 1a; until then it is kept working.
+  CHANGED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1a, STAGE 1a CLOSED): the solara-ui is not archived; it stays as an alternative start, kept running with a light check.
 - Everything of stages 2 and 3 stays [FW] until Hadi draws the V1 border for the web-ui. Stages 0 and 1 are in V1.
 
 Preferred for stage 1a (Hadi, 6 October 2026, given with the task of 1a's plan; design_records.md, "T-viz, the web-ui",
@@ -198,6 +304,7 @@ by what was decided or found since:
 - Two tests: a sim-run through the server gives the same result and the same logs as the headless run; a domain the
   web-ui has never seen is drawn without a change to the web-ui's code. The 0.3 trial checked the second by hand.
 - On Hadi's acceptance of stage 1a the solara-ui becomes archived, and the README and the roadmap say so from then on.
+  CHANGED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1a, STAGE 1a CLOSED): the solara-ui is not archived; it stays as an alternative start, kept running with a light check.
 
 Findings of stage 0 that stage 1a meets:
 
@@ -746,6 +853,7 @@ assigned it to stage 2, to be resolved there. The label "viz-stage2" is dropped.
   want".
 - Preferred: the archived status begins when Hadi accepts stage 1a. Until then it is the working visual run and is
   kept working.
+- CHANGED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1a, STAGE 1a CLOSED): the solara-ui is not archived; it stays as an alternative start, kept running with a light check.
 - Proposed by cchat, two conditions that "archived" needs:
   1. Archived code must not be able to break the working parts. This is met by 7.2, after which the headless start
      no longer imports Solara.
@@ -1357,7 +1465,7 @@ T-viz: the web-ui
 │   │   ├── panel 4a: the human and the actual world
 │   │   ├── shared theme file
 │   │   ├── tests: same result as headless, a third domain without code change
-│   │   └── on Hadi's acceptance: the solara-ui becomes archived
+│   │   └── on Hadi's acceptance: the solara-ui becomes archived (CHANGED, 6 October 2026: not archived; 1a CLOSED)
 │   ├── 1b Robot's mind
 │   │   └── panel 4b: belief, decision, current task, last plan change (contents decided later)
 │   └── 1c Plots

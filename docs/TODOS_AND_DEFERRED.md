@@ -4972,6 +4972,9 @@ Raised in the design chat of 4 to 6 October 2026, no stage assigned:
 - Saving the page's choice as a run file, so that a sim-run configured in the page repeats headless (proposed by
   cchat).
 Hadi's global freeze button: with the clock proposed by cchat (the page requests each step) it is the pause.
+UPDATED (T-viz 1a, 6 October 2026): the page's choice is mirrored in its address (a bookmark reopens a choice at its
+start); the address is not a run file, so the last item stays open. The page holds every tick update of a sim-run
+(`current` answers with them), which moving back along the ticks would read.
 Reference: docs/handoffs/handoff_T-viz.md, sections 7.3, 7.4, 8.5, 13.4
 
 **TODO-190: The V1 border inside the web-ui: four open points (recorded, T-viz, 6 Oct 2026)** open; Hadi decides later
@@ -4997,6 +5000,9 @@ text was kept for byte-identity with the maintained baseline sets (Hadi, 6 Octob
 To be renamed at the next regeneration of the baseline sets. Readers of the text (6 October 2026):
 `analysis/instruments/mpb/figure_of_log.py` and `analysis/instruments/irb/summary.py` (the start line), tests/kitting/
 test_tl4_overrides.py and tests/test_tviz_sim_run.py.
+UPDATED (T-viz 1a, 6 October 2026): the web-ui writes both lines since increment (i) (a sim-run ends at a step limit,
+a reset, a change of choice or the server's stop), and a web-ui sim-run without a step limit writes `steps=none` on the
+start line.
 Files: mesa_sim/sim_run.py
 Reference: design_records.md, "T-viz, the web-ui", 0.2
 
@@ -5020,20 +5026,24 @@ Files: webui/page/src/theme.ts
 Reference: docs/handoffs/handoff_T-viz.md, "State after stage 0" and 10.7; design_records.md, "T-viz, the web-ui",
 STAGE 0 CLOSED
 
-**TODO-194: An object's state changes its shape in the scene (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open; stage 1a
+**TODO-194: An object's state changes its shape in the scene (recorded, at the close of T-viz stage 0, 6 Oct 2026)** DONE in T-viz 1a (iii), 6 Oct 2026
 Hadi, 6 October 2026 (preferred): an object's state may change its shape, for example an empty pallet or an open gate,
 with minimal effort, in stage 1a. The tick update carries the object states that hold (`ObjectState`); the scene
 appearance (`webui/appearance.py`) maps an object type to a form and does not yet map a state to anything. Found in
 0.3: an empty pallet is drawn as a full one, and the gate's `is_open` is not drawn. Open for stage 1a: how the
 appearance data names a state and its effect on the form, without a domain word in the page's code.
+DONE (T-viz 1a (iii), 9e1bef1, e42bd2b): looks by state in the appearance data, checked against the domain's declared
+states; dock_loading's loaded and empty pallet and its open gate.
 Files: webui/appearance.py, webui/page/src/env-pane/forms.tsx, domains/*/appearance.json
 Reference: design_records.md, "T-viz, the web-ui", 0.3 and STAGE 0 CLOSED
 
-**TODO-195: The free camera of the env-pane (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open; stage 1a
+**TODO-195: The free camera of the env-pane (recorded, at the close of T-viz stage 0, 6 Oct 2026)** DONE in T-viz 1a (iii), 6 Oct 2026
 Hadi, 6 October 2026 (preferred): the tilted view at 35° and the view from above stay as presets, and in stage 1a the
 screen-user can change the camera freely during a sim-run: rotate, tilt, zoom and move. Open for stage 1a: the controls,
 and how they sit beside the two presets. The trial's camera is `webui/page/src/env-pane/camera.tsx` (an orthographic
 camera framed on the space).
+DONE (T-viz 1a (iii), e42bd2b): drei's orbit controls beside the two presets; tuning, if any, in the polishing round
+after stage 1c.
 Files: webui/page/src/env-pane/camera.tsx
 Reference: docs/handoffs/handoff_T-viz.md, 10.6 item 5 and 10.8; design_records.md, "T-viz, the web-ui", STAGE 0 CLOSED
 

@@ -1730,6 +1730,8 @@ T-V track 1); they are not renamed. Preferred (Hadi, 6 October 2026).
 Hadi said it with "maybe". The records and code comments that say "the viewer" for the present program mean the
 solara-ui (glossary §9, **run file**; `mesa_sim/run_mesa.py`; `mesa_sim/viz/run_file_panel.py`); they are not renamed.
 Archived from Hadi's acceptance of T-viz stage 1a on (preferred). Preferred, tentative (Hadi, 6 October 2026).
+CHANGED (Hadi, 6 October 2026, preferred, at the close of stage 1a): not archived; an alternative start, kept running
+with a light check (docs/handoffs/handoff_T-viz.md, "State after stage 1a").
 
 **screen-user** — the person at the screen during a sim-run in the web-ui, who watches and presses the controls. Not the
 **author** (below), though one person may be both. Preferred (Hadi, 6 October 2026).
