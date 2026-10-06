@@ -85,14 +85,16 @@ working robot is the same (point 1).
 ## The conditions and the runs
 
 The run files are `configs/dock_loading/tk6/<scenario>/run_NNN.yaml`, one per run. A run is named by its serial; no
-setting appears in any name. The settings are columns of the result table. Assignment knowledge is on and the strategy
-is single_task in every run.
+setting appears in any name. The settings are columns of the result table. Assignment knowledge is on in every run; the strategy is
+single_task, and also full_reorder for the planning scripts (run_569 to run_864); every comparison of conditions stays
+inside one strategy.
 
 | part | count |
 |---|---|
 | 74 planning scripts in four conditions (human-unaware, intention-unaware, intention-aware with context knowledge off, with it on) | run_001 to run_296 |
 | 164 copies with break_time, intention-aware with context knowledge on | run_297 to run_460 |
 | 54 recognition scenarios, intention-aware with context knowledge off and on | run_461 to run_568 |
+| the 74 planning scripts under full_reorder in the four conditions (Hadi, 6 October 2026; the step's second ruling) | run_569 to run_864 |
 
 The expectations come before the runs. For every run of a script independent of the robot (478; the scripts that
 depend on it, among them the recognition set's C13, C14 and M4, have none, MPB-DL3), the human's replay and the oracle's

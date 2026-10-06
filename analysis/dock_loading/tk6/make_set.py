@@ -7,6 +7,7 @@ and the run files into configs/dock_loading/tk6/. The literals are the source; t
     make_set.py bases       the new scripts and the copies of the planning scripts on env_layout_02 (new literals)
     make_set.py variants    per planning script, two or three scenarios that differ only in where break_time lies
     make_set.py runs        the run files, by serial (no setting in a name)
+    make_set.py runs_full_reorder   the planning scripts' run files under full_reorder, serials after the first 568
 
 The scripts (kind 3, "pallets in the bays", independent of the robot; the robot's pool deliver pallet_4 and pallet_5,
 return pallet_6 and pallet_7; the human starts at the standby place and closes at the desk; sN the scan of pallet_N):
@@ -349,5 +350,19 @@ def runs():
           f"(context knowledge on), {len(RECOGNITION)} recognition scenarios in the two intention-aware conditions")
 
 
+def runs_full_reorder():
+    """The 74 planning scripts under full_reorder in the four conditions (Hadi, 6 October 2026; design_records.md,
+    "T-K", STEP 6, FULL_REORDER), serials after the existing 568, in the order of `runs`."""
+    n = max(int(p.stem[4:]) for p in CFG.glob("*/run_*.yaml"))
+    first = n + 1
+    for sid in [s for s, _ in planning_bases()]:
+        for label, change in CONDITIONS:
+            n += 1
+            p = run_file(sid, CFG / sid / f"run_{n:03d}.yaml", strategy="full_reorder", **change)
+            p.write_text(f"# {MARK} (not a baseline): {sid}, {label}, full_reorder.\n# Run: analysis/instruments/mpb/"
+                         f"run_set.sh dock_loading -o analysis/dock_loading/tk6/measurement <this file>\n\n" + p.read_text())
+    print(f"run_{first:03d} to run_{n:03d}: {n - first + 1} run files under full_reorder")
+
+
 if __name__ == "__main__":
-    {"bases": bases, "variants": variants, "runs": runs}[sys.argv[1]]()
+    {"bases": bases, "variants": variants, "runs": runs, "runs_full_reorder": runs_full_reorder}[sys.argv[1]]()
