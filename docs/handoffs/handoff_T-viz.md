@@ -91,10 +91,31 @@ In the status words of section 1.1. None of these is ruled; each can change in a
 - The solara-ui stays in the repository. It becomes archived when Hadi accepts stage 1a; until then it is kept working.
 - Everything of stages 2 and 3 stays [FW] until Hadi draws the V1 border for the web-ui. Stages 0 and 1 are in V1.
 
+Preferred for stage 1a (Hadi, 6 October 2026, given with the task of 1a's plan; design_records.md, "T-viz, the web-ui",
+1a, HADI'S PREFERENCES, with the reason of each):
+
+- One plan covers the whole of 1a. ccode builds it in increments and pauses after each for Hadi's review.
+- The selection goes domain, layout, setup, scenario. The setups offered for a layout are those with at least one
+  scenario that has the layout among its reference layouts; the scenarios offered are those of the chosen setup.
+  Proposed by cchat, not marked by Hadi: the page offers only these combinations; a sim-run on a layout outside a
+  scenario's reference layouts stays possible headless.
+- With a layout chosen and the triple not complete, the env-pane shows the layout alone (space, areas, fixed objects,
+  no model), read through the same loader as the model. Every change that completes a triple builds the model (7.5
+  changes accordingly).
+- The scenario list shows each scenario's description beside its id, with a plain text filter over both. The
+  structured filter by composition (TODO-110) is stage 2, [FW].
+- Panel 4a shows the action in hand with its progress and its task, the human executor's stack, and the last few
+  switches and resumptions with their ticks. Hadi adjusts it after he sees it.
+- One command per start. The web-ui's start command is a file in `mesa_sim/` that accepts the same run file and flags
+  as the headless start, so the page can open with a sim-run already chosen. `webui/` stays at the root and imports no
+  simulator. TODO-196 is answered for now; it returns when a second simulator exists.
+
 ### What stage 1a starts from
 
-Stage 1a is the first sim-run in the browser. Its content, as section 12.1 lists it, adjusted by what was decided or
-found since:
+Stage 1a is the first sim-run in the browser. Its plan, written by ccode on 6 October 2026 for Hadi's review, is
+`docs/handoffs/plan_T-viz_1a.md`: four increments, the message round of 1a, ccode's proposals on the open items below,
+the page layout of stage 1, the two tests and three questions to Hadi. Every build session of 1a reads it first. Its
+content, as section 12.1 lists it, adjusted by what was decided or found since:
 
 - The selection of a layout, a setup and a scenario, predefined only. The selection must handle 1019 scenarios (721 in
   kitting, 298 in dock_loading), so it needs search or filtering. The selection follows the scenario's bindings: its one
@@ -104,6 +125,8 @@ found since:
 - The toggles and selectors cover all run options, as the catalogue declares them. The page shows the values in effect
   that the model reports, so an option that another one sets off shows as off.
 - Every change builds the model, and the env-pane shows the start. The controls are play, pause, step and reset.
+  PREFERRED (Hadi, 6 October 2026, for 1a): every change that completes a triple builds the model; with a layout chosen
+  and the triple not complete, the env-pane shows the layout alone (above, "Preferred for stage 1a").
 - The server answers the requests recorded in 0.4: catalogue, choose, step, reset and current. It ends a sim-run at the
   configured steps, at a reset, at a change of the choice after the first step, and at its own stop. A sim-run started
   from the web-ui writes the same log pair as the same sim-run started headless. The server must keep third-party log
@@ -147,21 +170,31 @@ Findings of stage 0 that stage 1a meets:
 
 ### What is still open
 
-Each item names the stage in which it is to be decided.
+Each item names the stage in which it is to be decided. Updated 6 October 2026, with Hadi's preferences for 1a and
+ccode's plan of 1a (`docs/handoffs/plan_T-viz_1a.md`): "proposed in the plan" means ccode's proposal is there, open
+until Hadi says "I prefer".
 
-1. How the scene appearance reaches the page. Stage 1a.
-2. How an object's state changes its shape, with minimal effort (TODO-194). Stage 1a.
-3. The free camera: its controls and how they sit beside the two presets (TODO-195). Stage 1a.
-4. One start command with subcommands, or a command per start (TODO-196). Stage 1a, with the web-ui's start command.
-5. The server's library and its transport details. Stage 1a.
+1. How the scene appearance reaches the page. Stage 1a. Proposed in the plan (section 4, item 1): the catalogue's
+   per-domain entry carries it.
+2. How an object's state changes its shape, with minimal effort (TODO-194). Stage 1a. Proposed in the plan: looks by
+   state in the appearance data.
+3. The free camera: its controls and how they sit beside the two presets (TODO-195). Stage 1a. Proposed in the plan.
+4. One start command with subcommands, or a command per start (TODO-196). ANSWERED FOR NOW (Hadi, 6 October 2026,
+   preferred): one command per start; the web-ui's is a file in `mesa_sim/`. It returns when a second simulator exists.
+5. The server's library and its transport details. Stage 1a. Proposed in the plan: Starlette with uvicorn, plain
+   request and response.
 6. The selection's search or filtering over 1019 scenarios, and whether the catalogue is sent whole or in parts.
-   Stage 1a.
-7. The page layout, with the place of the controls and of the step number. Stage 1a.
-8. What panel 4a shows of the human's activity. Stage 1a.
-9. How the server keeps third-party log lines out of a sim-run's log. Stage 1a.
+   PREFERRED (Hadi, 6 October 2026): the order domain, layout, setup, scenario, and a plain text filter over the
+   scenarios' ids and descriptions. Proposed in the plan: the catalogue sent whole, compressed.
+7. The page layout, with the place of the controls and of the step number. Stage 1a. Proposed in the plan (section 5).
+8. What panel 4a shows of the human's activity. PREFERRED (Hadi, 6 October 2026): the action in hand with its progress
+   and its task, the stack, the last few switches and resumptions with their ticks; Hadi adjusts it after he sees it.
+9. How the server keeps third-party log lines out of a sim-run's log. Stage 1a. Proposed in the plan: a web-ui
+   sim-run's log pair takes only the lines of the thread that steps it.
 10. The geometry of display places when an object leaves (a freed place) and when more objects arrive than fit
-    (section 9). Stage 1a.
-11. Whether agents get a size, and areas their label, in the messages. Stage 1a, in its message round.
+    (section 9). Stage 1a. Proposed in the plan.
+11. Whether agents get a size, and areas their label, in the messages. Stage 1a, in its message round. Proposed in the
+    plan: neither, in 1a.
 12. The stale layout titles. Hadi, whenever the layout files are next touched.
 13. Whether the domain declares its container types, so that an empty container is known. When a stage needs it; not
     needed by the trial's look.
@@ -181,6 +214,9 @@ Each item names the stage in which it is to be decided.
     robot's cognition, moving back along the ticks, replay without Mesa, saving the page's choice as a run file. No
     stage yet.
 24. The text of the two "headless" run-level lines (TODO-191). At the next regeneration of the maintained baseline sets.
+25. The three questions of 1a's plan (its section 10): what the env-pane shows with a layout and a setup and no
+    scenario; the key of dock_loading's layout notes (`space.note` against kitting's `space.notes`); what the page opens
+    on when started without a run file. Hadi, before increment (i).
 
 ---
 
@@ -711,6 +747,10 @@ Phases on the page:
    PREFERRED (Hadi, 6 October 2026, at the close of stage 0): no single "mother" start command now; each start has its
    own command, which the README states. The question of one command with subcommands returns in stage 1a, when the
    web-ui's start command is defined (TODO-196).
+   ANSWERED FOR NOW (Hadi, 6 October 2026, for stage 1a): one command per start. The web-ui's start command is a file in
+   `mesa_sim/` that accepts the same run file and flags as the headless start, so that the page can open with a
+   sim-run already chosen; `webui/` stays at the root and imports no simulator. TODO-196 returns when a second
+   simulator exists.
 2. Choose: the screen-user picks the domain, the layout, the scenario, and the run options.
 3. Build: the server builds the model from that choice.
 4. Show: the scene appears.
@@ -772,6 +812,11 @@ the question returns to Hadi. Alternative C becomes relevant in stage 2, where e
 valid model exists.
 MEASURED (ccode, 6 October 2026, T-viz 0.1): a `SimModel` builds in 1 to 6 ms (one outlier of 68 ms) over all 1019
 registered scenarios, after a one-time import of about 1.7 s. The condition is met.
+PREFERRED (Hadi, 6 October 2026, for stage 1a; reason: the selection goes domain, layout, setup, scenario, and Hadi
+looks at a room before its setups): every change that completes a triple builds the model. With a layout chosen and the
+triple not complete, the env-pane shows the layout alone (space, areas, fixed objects, no model), read through the same
+loader as the model, so that a layout's picture cannot differ from a sim-run's on it. This is a small part of
+alternative C, for the layout only. design_records.md, "T-viz, the web-ui", 1a, HADI'S PREFERENCES, item 3.
 
 ### 7.6 Where state lives (cchat's answer to Hadi's question on session state)
 

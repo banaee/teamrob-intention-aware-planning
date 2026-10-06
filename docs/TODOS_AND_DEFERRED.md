@@ -3638,6 +3638,9 @@ scenarios: the three artefacts of a run".
 POINTER (6 October 2026): the program that would read the selector is now planned as the web-ui (T-viz); its stage 1a
 selection panel follows the scenario's declared setup and reference layouts; selection by composition is among its
 stage 2's open questions (TODO-186). design_records.md, "T-viz, the web-ui".
+POINTER (Hadi, 6 October 2026, preferred, T-viz stage 1a): the scenario list of stage 1a offers a plain text filter
+over the scenarios' ids and descriptions; the structured filter by composition is stage 2, [FW]. design_records.md,
+"T-viz, the web-ui", 1a, HADI'S PREFERENCES, item 4.
 
 **TODO-111: ros_sim's layout readers move to T-L's sources when ros_sim resumes (recorded, T-L, 26 Sept 2026)**
 [OPEN; ros_sim paused]
@@ -5016,12 +5019,17 @@ camera framed on the space).
 Files: webui/page/src/env-pane/camera.tsx
 Reference: docs/handoffs/handoff_T-viz.md, 10.6 item 5 and 10.8; design_records.md, "T-viz, the web-ui", STAGE 0 CLOSED
 
-**TODO-196: One start command with subcommands (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open; stage 1a
+**TODO-196: One start command with subcommands (recorded, at the close of T-viz stage 0, 6 Oct 2026)** answered for now (6 Oct 2026); returns when a second simulator exists
 Hadi, 6 October 2026 (preferred): no single "mother" start command now; each start (headless, the solara-ui, the trial
 page of 0.3) has its own command, which the README states. The question of one command with subcommands returns in
 stage 1a, when the web-ui's start command is defined.
 Files: mesa_sim/run_mesa.py, README.md
 Reference: docs/handoffs/handoff_T-viz.md, 7.3; design_records.md, "T-viz, the web-ui", STAGE 0 CLOSED
+ANSWERED FOR NOW (Hadi, 6 October 2026, preferred, for stage 1a): one command per start. The web-ui's start command is
+a file in `mesa_sim/` that accepts the same run file and flags as the headless start, so that the page can open with a
+sim-run already chosen; `webui/` stays at the repository's root and imports no simulator. The question returns when a
+second simulator exists. design_records.md, "T-viz, the web-ui", 1a, HADI'S PREFERENCES, item 6; the start proposed
+in `docs/handoffs/plan_T-viz_1a.md`, section 4, item 6.
 
 **TODO-197: Paths in the scene (recorded, at the close of T-viz stage 0, 6 Oct 2026)** open; stage 1b
 Hadi, 6 October 2026 (preferred; at 0.4 and at the close of stage 0): stage 1a shows no planned path; whether and which

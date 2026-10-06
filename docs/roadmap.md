@@ -411,6 +411,10 @@ paragraph, not in the alphabet.
   (after T-F, before track 3b), proposed by ccode, since the answers move T-V's content, not its place.
 - DONE (6 October 2026; design_records.md, "T-viz, the web-ui", STAGE 0 CLOSED): T-viz stage 0 is closed. Next within
   T-viz: stage 1a, when Hadi asks for it. The place of T-viz stage 1 in this order stays open (TODO-190, point 4).
+- ASKED FOR (Hadi, 6 October 2026): T-viz stage 1a. Hadi's preferences for it are recorded and its plan is written
+  for his review (design_records.md, "T-viz, the web-ui", 1a, HADI'S PREFERENCES and 1a, THE PLAN, WRITTEN;
+  `docs/handoffs/plan_T-viz_1a.md`). Nothing built; increment (i) after Hadi's review and his answers to the plan's
+  questions.
 
 V1 AND FW (Hadi, 1 October 2026, amended by Hadi 3 October 2026 for T-K; design_decisions.md, "T-G: the second domain's rulings", A1; T-G records 1). V1 is the first complete version of the framework,
 the package for TeamRob and the publications: T-G (stages 1, 2 and 3, with track 4 in its reduced form after stage 2);

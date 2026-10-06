@@ -4895,3 +4895,64 @@ stays open (TODO-190, point 4).
   shortened to a pointer. The roadmap's T-viz bullet, CLAUDE.md's status block and the README (the commands of the
   starts and the trial page) are updated; TODO-193 to TODO-197 are added. The solara-ui is not marked archived: that
   begins when Hadi accepts stage 1a. "Viewer" is renamed nowhere.
+
+1a, HADI'S PREFERENCES (Hadi, 6 October 2026, preferred; recorded by ccode the same day, records only, no code
+changed). Six preferences for stage 1a, given with the task of its plan:
+1. The size of 1a. One plan covers the whole of 1a; ccode builds it in increments and pauses after each for Hadi's
+   review. Reason: the technology and the page layout are designed for the whole stage, and Hadi sees agents move in
+   the browser after the first increment.
+2. The order of the selection: domain, layout, setup, scenario. Reason: Hadi wants to look at a room first, compare
+   several, then go to its setups. The setups offered for a layout X are the setups that have at least one scenario
+   with X among its reference layouts; the scenarios offered are the scenarios of the chosen setup.
+   Proposed by cchat, not marked by Hadi: the web-ui therefore offers only these combinations; a sim-run on a layout
+   outside a scenario's reference layouts stays possible headless and is not offered in the page.
+3. After a layout is chosen and before a triple is complete, the env-pane shows the layout alone: the space, the areas,
+   the fixed objects, no model. The handoff's 7.5 changes accordingly: every change that completes a triple builds the
+   model. Reason: item 2's way of choosing, a room seen before its setups. Condition: the layout-only description is
+   read through the same loader that the model uses, so that a layout's picture cannot differ from the picture of a
+   sim-run on it. cchat told Hadi that this is a small amount of work (a subset of the run description, one request,
+   one more page state); ccode confirms the cost in the plan (below: the loader reads the layout inline in
+   `SimModel.__init__`, so its layout part moves into a function of its own first).
+4. The scenario list of 1a shows each scenario's description beside its id and offers a plain text filter over id and
+   description. Reason: Hadi cannot select a scenario from its id alone. The structured filter by composition
+   (TODO-110) is stage 2, [FW].
+5. Panel 4a shows the action in hand with its progress and the task it belongs to; the human executor's stack (the
+   task in hand and the interrupted ones below it); the last few switches and resumptions with their ticks. Hadi
+   adjusts it after he sees it. Reason: what the human is doing, and how it changed, is what panel 4a is for (the
+   handoff's 12.3, part a); the right amount is seen only on the page.
+6. The start: one command per start. The web-ui's start command is a file in `mesa_sim/`; it accepts the same run file
+   and flags as the headless start, so that the page can open with a sim-run already chosen. `webui/` stays at the
+   repository's root and imports no simulator. Reason: the web-ui stands above any one simulator (0.4), and its start,
+   which hands Mesa's piece to the server, belongs with the simulator. TODO-196 is answered for now; it returns when a
+   second simulator exists.
+
+1a, THE PLAN, WRITTEN (ccode, 6 October 2026; for Hadi's review; every item proposed by ccode and open until Hadi says
+"I prefer"; nothing built). `docs/handoffs/plan_T-viz_1a.md`, which every build session of 1a reads first. It holds:
+four increments, each with its scope, what Hadi sees at its end, and its checks: (i) the server, the start, the page's
+frame, a minimal choice, the moving env-pane; (ii) the full selection, all run options, lock and unlock; (iii) the
+env-pane additions (free camera, a look by state, display places kept, a reload keeping the picture); (iv) panel 4a,
+test 2, the close. Two changes from cchat's proposal, with reasons: the page layout is built in (i), test 1 is run
+in (i). The message round of 1a (the catalogue carrying each domain's scene appearance and the notes of layouts and
+setups; the view of a layout; the request `view`, and `current` returning every tick update of the sim-run; looks by
+state in the appearance; agents without size and areas labelled by their id); ccode's proposals on the open items 1, 2,
+3, 5, 7, 9 and 10 of the handoff's "State after stage 0"; the page layout for the whole of stage 1; the two tests and
+how a web-ui sim-run writes the same log pair as headless; three questions to Hadi (Q1 what the env-pane shows with a
+layout and a setup and no scenario; Q2 the key of dock_loading's layout notes; Q3 what the page opens on without a run
+file).
+VERIFIED for the plan (at e5de942; the plan's section 1 has the detail):
+- Every one of the 1019 scenarios names exactly one reference layout, so the page offers exactly 1019 triples.
+- Scenarios per pair of layout and setup: kitting 33 pairs, 1 to 52 scenarios, median 21; dock_loading 10 pairs, 7 to
+  58, median 19; 1 to 3 setups per layout; three kitting setups are offered under two layouts each.
+- Layouts and setups carry no description field. Free-text notes that nothing reads: `space.notes` in 19 of kitting's
+  20 layouts, `space.note` (singular) in dock_loading's 4; a top-level `notes` in kitting's env_setup_17 to _30 and in
+  all 10 of dock_loading's setups.
+- The loader reads the layout inline in `SimModel.__init__` (the space, the areas, the first pass of `_init_objects`);
+  no function reads a layout alone. Item 3's condition needs that part moved into a function, with headless
+  byte-identity as its check; otherwise the cost is as cchat stated.
+- Agents are points in the model; an area's `label` is in 22 of the 24 registered layouts and read only by `ros_sim/`.
+- Starlette 0.48.0 and uvicorn 0.30.5 are installed (Solara's dependencies); FastAPI and httpx are not.
+- A tick update is about 1.3 KB as JSON (1.0 to 1.8 KB over scenario_s02_01 and scenario_s08_01).
+- In all ten of dock_loading's setups the gate is open from the start (`is_open`).
+- The terms of panel 4a: "action in hand", "switch", "resumption" and "progress" have no glossary entry of their own
+  (the entry **record** names the queries `switches` and `resumptions` and "the action and its progress"); **stack**,
+  **record** and **outcome** have entries. The plan uses "suspended" (an outcome) for item 5's "interrupted ones".
