@@ -190,16 +190,16 @@ button:disabled { cursor: default; opacity: 0.45; }
 }
 .option-number::placeholder { color: var(--color-inkFaint); }
 
-/* The main row: panel 4a, the env-pane, panel 4b (a rail in 1a). */
+/* The main row: panel 4a, the env-pane, panel 4b (T-viz 1b). */
 .main-row {
   flex: 1 1 0;
   display: grid;
-  grid-template-columns: 360px minmax(0, 1fr) 36px;     /* panel 4a: 300 to 400 px (P18) */
+  grid-template-columns: 360px minmax(0, 1fr) 340px;    /* panel 4a: 300 to 400 px (P18); panel 4b 340 px */
   gap: var(--space-md);
   min-height: 0;
 }
 @media (max-width: 1200px) {
-  .main-row { grid-template-columns: 220px minmax(0, 1fr) 36px; }
+  .main-row { grid-template-columns: 220px minmax(0, 1fr) 260px; }
 }
 
 .panel {
@@ -292,7 +292,44 @@ button:disabled { cursor: default; opacity: 0.45; }
 .context-states dt { flex: none; font-family: var(--font-mono); color: var(--color-inkSoft); }
 .context-states dd { margin: 0; font-family: var(--font-mono); color: var(--color-ink); overflow-wrap: anywhere; }
 
-.rail, .strip {
+/* Panel 4b, the robot (T-viz 1b): the robot's colour where panel 4a has the human's. */
+.robot-dot { background: var(--color-robot); }
+.robot-bar span { background: var(--color-robot); }
+.robot-condition { margin: 0 0 var(--space-sm); padding: var(--space-xs) var(--space-sm); border-radius: 4px; background: var(--color-page); font-size: var(--type-xs); line-height: 1.45; color: var(--color-inkSoft); }
+.robot-facts { margin: var(--space-xs) 0 0; font-size: var(--type-xs); }
+.robot-facts div { display: flex; gap: var(--space-sm); padding: 1px 0; }
+.robot-facts dt { flex: none; width: 64px; color: var(--color-inkFaint); }
+.robot-facts dd { margin: 0; min-width: 0; color: var(--color-ink); overflow-wrap: anywhere; }
+.robot-hold { color: var(--color-stateSuspended); }
+.robot-summary { margin: 0 0 var(--space-xs); font-size: var(--type-xs); color: var(--color-inkSoft); }
+.robot-summary b { font-weight: var(--weight-medium); color: var(--color-ink); }
+.robot-flag { margin-left: var(--space-sm); padding: 0 5px; border-radius: var(--radius-pill); border: var(--line-frame) solid currentColor; color: var(--color-stateSuspended); }
+.robot-note { margin: var(--space-xs) 0 0; font-size: var(--type-xs); line-height: 1.4; color: var(--color-inkFaint); }
+.belief { margin: 0; padding: 0; list-style: none; font-size: var(--type-xs); }
+.belief li { padding: 3px 0; }
+.belief li + li { border-top: var(--line-frame) dotted var(--color-lineFaint); }
+.belief-head { display: flex; justify-content: space-between; gap: var(--space-sm); }
+.belief-value { flex: none; font-family: var(--font-mono); color: var(--color-inkSoft); }
+.belief li.is-leader .belief-value { color: var(--color-robot); font-weight: var(--weight-medium); }
+.belief-bar { position: relative; display: block; height: 5px; margin: 2px 0; border-radius: 3px; background: var(--color-page); }
+.belief-bar span { position: absolute; inset: 0 auto 0 0; border-radius: 3px; background: var(--color-robotLight); }
+.belief li.is-leader .belief-bar span { background: var(--color-robot); }
+.belief-bar i { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--color-ink); }
+.belief-marks { display: flex; flex-wrap: wrap; gap: 2px var(--space-sm); color: var(--color-inkSoft); }
+.mark-adequate { color: var(--color-stateCompleted); }
+.mark-inadequate, .mark-outranked { color: var(--color-stateAbandoned); }
+.mark-no_observation, .mark-faint { color: var(--color-inkFaint); }
+.robot-gate { margin: 0; font-size: var(--type-sm); line-height: 1.4; }
+.robot-gate.is-clear { color: var(--color-stateCompleted); }
+.robot-gate.is-refused { color: var(--color-ink); }
+.robot-gate code, .robot-decision code { margin-left: var(--space-sm); font-family: var(--font-mono); font-size: 10px; color: var(--color-inkFaint); }
+.robot-proj, .robot-decision { margin: 0; font-size: var(--type-sm); line-height: 1.4; }
+.robot-kind { margin-right: var(--space-sm); padding: 0 5px; border-radius: var(--radius-pill); background: var(--color-page); font-size: var(--type-xs); color: var(--color-inkSoft); }
+.robot-kind-admitted { background: var(--color-robotLight); color: var(--color-robotDark); }
+.robot-plan { margin: var(--space-xs) 0 0; padding-left: var(--space-lg); font-size: var(--type-xs); line-height: 1.45; }
+.robot-earlier { margin-top: var(--space-sm); }
+
+.strip {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -303,7 +340,6 @@ button:disabled { cursor: default; opacity: 0.45; }
   font-size: var(--type-xs);
   letter-spacing: 0.04em;
 }
-.rail-title { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
 .strip { flex: none; height: 32px; }
 
 select, button { font: inherit; }

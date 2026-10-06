@@ -4,8 +4,8 @@
  *
  *   header          the choice as a path, the lock, the selection panel's button
  *   selection       domain, layout, setup, scenario, run options (open before the first step, folded after it)
- *   main row        panel 4a (the human and the world) | the env-pane with its control bar | panel 4b (the robot's
- *                   mind, stage 1b, a rail in 1a)
+ *   main row        panel 4a (the human and the world) | the env-pane with its control bar | panel 4b (the robot: its
+ *                   body and its mind, T-viz 1b)
  *   panel 4c        plots over ticks (stage 1c), a strip in 1a
  *
  * The page's states (section 5): nothing chosen; a layout's view; a layout and setup's view; a start (unlocked); a
@@ -35,6 +35,7 @@ import { api } from "./api";
 import { ControlBar, type Speed } from "./frame/ControlBar";
 import { type Selection, withOption } from "./frame/selection";
 import { HumanPanel } from "./frame/HumanPanel";
+import { RobotPanel } from "./frame/RobotPanel";
 import { SelectionPanel } from "./frame/SelectionPanel";
 import type {
   BuildFailure, Catalogue, LayoutView, RunDescription, ScenarioEntry, SimRunChoice, SimRunHistory, SimRunState,
@@ -342,9 +343,7 @@ export function App() {
             {catalogue ? "Choose a layout" : "Connecting to the server"}
           </section>
         )}
-        <aside className="rail" aria-label="The robot's mind">
-          <span className="rail-title">The robot's mind · stage 1b</span>
-        </aside>
+        <RobotPanel robots={run?.description.robots ?? []} ticks={run?.built ? run.ticks : null} />
       </div>
 
       <aside className="strip" aria-label="Plots over ticks">
