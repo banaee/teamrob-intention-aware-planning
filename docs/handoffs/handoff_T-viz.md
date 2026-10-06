@@ -9,6 +9,181 @@ doubted or corrected, and the facts that ccode must verify. It is not a specific
 
 ---
 
+## State after stage 0 (ccode, 6 October 2026, at the close of T-viz stage 0)
+
+This section is the first thing a new design chat reads. It states what stage 0 left in the code, what Hadi prefers
+now, what stage 1a starts from and what is still open. The sections after it are the design chat's record of 4 to 6
+October 2026. Where stage 0 showed a passage of that record to be wrong, or settled what it left open, the passage is
+kept and a dated line after it says what holds now and why: CORRECTED (a fact was wrong), CHANGED BY 0.2 (the code
+changed), SETTLED BY 0.4, ANSWERED or PREFERRED (Hadi's answer), BUILT, DONE or MEASURED (a step of stage 0), NOT TAKEN,
+SUPERSEDED IN PART, UPDATED or TAGGED. Where this section and a later section differ, this section is the newer. The detail of each step, with files, checks and commits, is in
+`docs/design_records.md`, "T-viz, the web-ui", under 0.1 to 0.4 and STAGE 0 CLOSED.
+
+### What exists in the code after stage 0
+
+Stage 0.2 moved the reading of a run and the building of the model into one place that every start uses.
+`mesa_sim/run_config.py` reads the run configuration from the run file and the flags, or from any mapping through
+`run_configuration`, which checks it as it checks a run file, and builds the `SimModel`. `mesa_sim/sim_run.py` holds one
+sim-run: the model stepped, its log pair (`logs/run_<timestamp>.log` and `.rec`, opened at the sim-run's first step or
+its end, so a model that is built and never stepped writes no file) and the run-level lines. A new sim-run detaches the
+log pair of the one before it and does not close it. `mesa_sim/run_mesa.py` holds the starts only. A headless start
+imports neither Solara nor `mesa_sim/viz/`; the solara-ui's page is `mesa_sim/viz/solara_page.py`.
+
+Stage 0.4 defined the messages between the web-ui and a simulator. `webui/` sits at the repository's root and imports
+no simulator, no domain and nothing of the framework's mind or world. `webui/messages.py` defines the three messages
+(the catalogue, the run description, the tick update), the screen-user's choice of a sim-run (`SimRunChoice`) and the
+two refusals (`BuildFailure`, `StepRefusal`), as typed pydantic classes. `webui/simulator.py` is the interface that a
+simulator's piece implements. Mesa's piece is `mesa_sim/webui_adapter.py` (`MesaSimulator`, `MesaSimRun`); it only reads
+the model. The requests of the server are recorded in the 0.4 entry; the server itself is not built.
+
+Stage 0.3 built the beginning of the page and chose its technology. `webui/page/` is the page: React and TypeScript on
+Vite, the scene in three.js through React Three Fiber and drei, every dependency pinned in `package.json` and its lock
+file. In 0.3 it holds the env-pane alone, which draws the start of a sim-run from saved messages, tilted or from above.
+`webui/page/src/theme.ts` is the one theme file. `webui/appearance.py` defines the scene appearance, and each domain
+states its values in `domains/<domain>/appearance.json`; a domain without that file is drawn from defaults.
+`webui/schema.py` writes the JSON Schema of the page's messages, from which the page's TypeScript types are generated
+(`webui/page/src/gen/`). `mesa_sim/webui_export.py` writes the run description, the start tick update and the domain's
+scene appearance of a sim-run as files for the page; stage 1a's server replaces it.
+
+The tests of stage 0 are `tests/test_tviz_sim_run.py` and `tests/test_tviz_messages.py`. Among them, the code of
+`webui/`, the page's files included, names no domain, no object type and no area id.
+
+The starts, each run from the repository's root:
+
+```bash
+# headless
+PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python mesa_sim/run_mesa.py --domain kitting --scenario scenario_s01_01 --steps 200
+# the solara-ui (kept working until Hadi accepts stage 1a, then archived)
+solara run mesa_sim/run_mesa.py -- --domain kitting --scenario scenario_s01_01
+# the trial page of 0.3: once `npm ci` in webui/page; then the samples, then the page at http://localhost:5173
+PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python -m mesa_sim.webui_export
+cd webui/page && npm run dev
+```
+
+There is no single start command with subcommands. Each start has its own command, and the README states them.
+
+### What Hadi prefers now
+
+In the status words of section 1.1. None of these is ruled; each can change in a later stage.
+
+- The framework gets a web-ui: its own page and a small Python server, without Solara. It is independent of every
+  domain and of every simulator. It lives at the repository's root, and only one piece per simulator lives with that
+  simulator. Hadi's reason: a later simulator or ROS may replace Mesa, and the web-ui stands above any one of them.
+- The technology of the trial is the web-ui's technology: React, TypeScript, Vite, and three.js through React Three
+  Fiber and drei. uPlot is planned for the plots of stage 1c. No UI kit is used.
+- The trial's look is accepted "for now and for stage 0". It is the starting point of stage 1a, not a final design.
+- The scene's camera has two presets, the tilted view at 35° and the view from above. In stage 1a the screen-user can
+  also move the camera freely during a sim-run (rotate, tilt, zoom, move).
+- An object's state may change its shape (an empty pallet, an open gate), with minimal effort, in stage 1a.
+- A figure turns at once to its last direction of movement. There is no rotate action in the world. Before its first
+  move a figure faces a default, as a display convention.
+- Labels show the ids. Labels on passive things are small and light.
+- There is no dark mode in stage 1. It is recorded for stage 2 or 3.
+- Presence (active or passive) is a property of the look, declared per object type in the appearance data. It is not a
+  world fact.
+- The run options are fixed for a sim-run. Every change of a choice builds the model and the env-pane shows its start;
+  the choices lock after the first step, and reset unlocks them. The time of a sim-run is its number of ticks.
+- The page requests each step; the server never advances by itself. Requests and answers are plain request and
+  response. Each message names its sim-run. The messages are defined once in Python and the page's types are generated.
+- Stage 1a shows no planned path. Whether and which paths the scene shows is a question for stage 1b.
+- There is no single "mother" start command now. The question of one command with subcommands returns in stage 1a,
+  when the web-ui's start command is defined.
+- The solara-ui stays in the repository. It becomes archived when Hadi accepts stage 1a; until then it is kept working.
+- Everything of stages 2 and 3 stays [FW] until Hadi draws the V1 border for the web-ui. Stages 0 and 1 are in V1.
+
+### What stage 1a starts from
+
+Stage 1a is the first sim-run in the browser. Its content, as section 12.1 lists it, adjusted by what was decided or
+found since:
+
+- The selection of a layout, a setup and a scenario, predefined only. The selection must handle 1019 scenarios (721 in
+  kitting, 298 in dock_loading), so it needs search or filtering. The selection follows the scenario's bindings: its one
+  setup and its reference layouts.
+- The catalogue is large: 645 KB as JSON, 40 KB compressed, measured on 6 October 2026, mostly the scenarios'
+  descriptions. It is sent once, before any model exists.
+- The toggles and selectors cover all run options, as the catalogue declares them. The page shows the values in effect
+  that the model reports, so an option that another one sets off shows as off.
+- Every change builds the model, and the env-pane shows the start. The controls are play, pause, step and reset.
+- The server answers the requests recorded in 0.4: catalogue, choose, step, reset and current. It ends a sim-run at the
+  configured steps, at a reset, at a change of the choice after the first step, and at its own stop. A sim-run started
+  from the web-ui writes the same log pair as the same sim-run started headless. The server must keep third-party log
+  lines out of a sim-run's log: the log pair's handlers sit on the root logger at the INFO level, so any library logger
+  that propagates to the root logger, a web server's for example, would write into the open sim-run's log.
+- The env-pane continues from the trial. To add: the free camera beside the two presets; the motion per tick (a tick
+  moves existing shapes); an object's state that changes its shape; a figure turned to its last direction of movement;
+  a display place kept while its object stays in the fixed object that holds it (section 9, requirement 2), with the
+  geometry of freed places and of too many objects still to settle. No planned path.
+- Panel 4a, the human and the actual world, from the human's activity that the tick update carries. Which part of it
+  the panel shows is a page design matter of stage 1a.
+- The page layout. Hadi's suggestion in section 11.1 is offered, not dictated; the controls and the step number have no
+  place in it yet.
+- The scene appearance reaches the page in a way that stage 1a settles. ccode's recommendation: the catalogue's
+  per-domain entry carries it, read by the simulator's piece.
+- The web-ui's start command, and the question of one command with subcommands.
+- Two tests: a sim-run through the server gives the same result and the same logs as the headless run; a domain the
+  web-ui has never seen is drawn without a change to the web-ui's code. The 0.3 trial checked the second by hand.
+- On Hadi's acceptance of stage 1a the solara-ui becomes archived, and the README and the roadmap say so from then on.
+
+Findings of stage 0 that stage 1a meets:
+
+- Agents have no size in the messages. A figure's height and its ring come from the scene appearance.
+- An area's `label` in the layout (kitting's "southwest_storage", for example) is not carried. The page shows the
+  area's id.
+- Older layouts carry a stale title in `space.name`, which the env-pane shows (env_layout_02 is titled "Kitting Domain
+  Layout 1"). This is a question of the layout files, not of the messages.
+- A page cannot know that an empty fixed object is a container. It knows only the fixed objects that some movable object
+  names as its home container or designated destination. Knowing every container would need the domain to declare its
+  container types and the run description to carry them. The trial's look did not need it, since a form draws the same
+  whether it holds something or not.
+- Only one layout states an orientation for its fixed objects, and the loader drops it (TODO-192). The trial's forms
+  have no front for that reason.
+- The solara-ui's known limits, none fixed, since it becomes archived after stage 1a: play does not stop at a run's end
+  (no framework code sets `model.running`); it never ends a sim-run, so its logs have no end lines; two tabs on one
+  server, or a tab left open from an earlier server, could write a line into the other tab's log pair; a reload during
+  play leaves the sim-run behind, its log pair ending where it stands; the run-file panel's trial build writes its build
+  lines into the log of the sim-run attached at that moment; the Information card names `robot_0` and `human_0`; and the
+  whole Plotly figure is drawn again on every tick.
+- The two run-level lines say "headless" for every start (TODO-191). The web-ui will write both.
+
+### What is still open
+
+Each item names the stage in which it is to be decided.
+
+1. How the scene appearance reaches the page. Stage 1a.
+2. How an object's state changes its shape, with minimal effort (TODO-194). Stage 1a.
+3. The free camera: its controls and how they sit beside the two presets (TODO-195). Stage 1a.
+4. One start command with subcommands, or a command per start (TODO-196). Stage 1a, with the web-ui's start command.
+5. The server's library and its transport details. Stage 1a.
+6. The selection's search or filtering over 1019 scenarios, and whether the catalogue is sent whole or in parts.
+   Stage 1a.
+7. The page layout, with the place of the controls and of the step number. Stage 1a.
+8. What panel 4a shows of the human's activity. Stage 1a.
+9. How the server keeps third-party log lines out of a sim-run's log. Stage 1a.
+10. The geometry of display places when an object leaves (a freed place) and when more objects arrive than fit
+    (section 9). Stage 1a.
+11. Whether agents get a size, and areas their label, in the messages. Stage 1a, in its message round.
+12. The stale layout titles. Hadi, whenever the layout files are next touched.
+13. Whether the domain declares its container types, so that an empty container is known. When a stage needs it; not
+    needed by the trial's look.
+14. The orientation of fixed objects (TODO-192). When a form needs a front; not needed by the trial's look.
+15. The three override kinds are not part of a stage-1a choice (0.4, Q8). Whether the web-ui offers them later in
+    stage 1 or in stage 2 (TODO-186). Stage 1 or stage 2.
+16. The contents of panel 4b, the robot's mind. Stage 1b.
+17. Whether and which paths the scene shows (TODO-197). Stage 1b.
+18. The contents of panel 4c, the plots, and how the timeline of context facts is drawn. Stage 1c.
+19. Dark mode (TODO-193). Stage 2 or 3, [FW].
+20. The open questions of stage 2, editing (TODO-186), and of sim-runs side by side, with the separation of their logs
+    (TODO-187). Stage 2, [FW].
+21. The open questions of stage 3, changes during a sim-run (TODO-188). Stage 3, [FW].
+22. The V1 border inside the web-ui, with its four points (TODO-190), and with it the place of T-viz stage 1 in the
+    order of the tasks. Hadi, later.
+23. The items with no stage (TODO-189): inspecting an object during a pause, an automatic pause at an event of the
+    robot's cognition, moving back along the ticks, replay without Mesa, saving the page's choice as a run file. No
+    stage yet.
+24. The text of the two "headless" run-level lines (TODO-191). At the next regeneration of the maintained baseline sets.
+
+---
+
 ## 1. How to read this file
 
 ### 1.1 Status words
@@ -61,12 +236,18 @@ The first task is recording only. It changes no code. Section 16 states it.
 
 For every other part of the page Hadi uses the standard terms of web design: page, page layout, panel, widget or
 control, header, sidebar, card, tab, dialog, theme or design system, design tokens, wireframe, mockup.
+UPDATED (ccode, 6 October 2026, T-viz 0.4; reason: Hadi approved the glossary entries, preferred): web-ui, solara-ui
+(tentative), screen-user, env-pane, scene and author have entries in the glossary, section 11; "author" describes the
+existing use. Sim-run and start stay words of the T-viz records, with no entry.
 
 ### 2.2 The word "viewer"
 
 - The repo's records and code use "viewer" for the program. Verified in three places: the glossary's entry "run
   file" ("The viewer reads and edits the same file"), `mesa_sim/run_mesa.py` (the `Page` docstring, "The viewer (T-L
   stage 4, ruling 7)"), and `mesa_sim/viz/run_file_panel.py` ("The viewer's run-file panel").
+  CORRECTED (ccode, 6 October 2026, T-viz 0.1; reason: the count made in 0.1): "viewer" for the program occurs about
+  110 times in the records and the code, not in three places only; the places are listed in design_records.md, "T-viz,
+  the web-ui", 0.1. Nothing is renamed without Hadi's word.
 - For Hadi, a viewer is a person, not a program. He asked for another name for the program. The result is "web-ui"
   for the new program and "solara-ui" for the existing one.
 - Open: whether the existing records and code comments are renamed. Nothing is to be renamed without Hadi's word.
@@ -96,6 +277,10 @@ These are used in this file. None is a glossary term. ccode proposes entries whe
 - "active object" and "passive object" (Hadi's distinction for the look of objects, section 10.5).
 - "scene appearance" (cchat's phrase for the look of things inside the scene, as distinct from the page's theme).
 - "shape kind" (cchat's phrase for a generic geometric form that the scene drawer knows, section 10.6).
+UPDATED (ccode, 6 October 2026, T-viz 0.4; reason: Hadi approved the glossary entries, preferred): display place, run
+description and tick update have entries in the glossary, section 11, with catalogue, the first of the three messages.
+Preview, draft, active and passive object, scene appearance and shape kind stay working terms. Since 0.3 the scene
+appearance is `webui/appearance.py`, and the shape kinds are its forms.
 
 ---
 
@@ -130,6 +315,8 @@ Sources: `mesa_sim/mesa_fork/visualization/solara_viz.py` (uploaded by Hadi and 
 **Page.** `run_mesa.py` defines `Page()`. It places `RunFilePanel` in `solara.Sidebar()` and calls the fork's
 `SolaraViz(model_class=SimModel, model_params=..., space_drawer=space_drawer, agent_portrayal=agent_portrayal,
 name="TeamRob Simulation", play_interval=5).key(f"run-{reload_count.value}")`.
+CHANGED BY 0.2 (ccode, 6 October 2026; reason: the code structure of 0.2): `Page()` moved, unchanged but for its model,
+to `mesa_sim/viz/solara_page.py`; it passes `SolaraSimRun`, which starts a sim-run of the run configuration and steps it.
 
 **Clock.** The browser owns it.
 - `ModelController` creates `widgets.Play(interval=play_interval, on_value=on_value_play)` (an `ipywidgets.Play`).
@@ -137,6 +324,8 @@ name="TeamRob Simulation", play_interval=5).key(f"run-{reload_count.value}")`.
 - Solara syncs the counter to Python. `on_value_play` calls `do_step`, which calls `model.step()` once.
 - `play_interval=5` means 5 milliseconds. The round trip cannot meet it, so the round trip sets the real rate.
 - Play stops when `model.running` is false.
+  CORRECTED (ccode, 6 October 2026, T-viz 0.1; reason: read in the code): no framework code sets `model.running`,
+  which the fork initialises to True, so the solara-ui's play does not stop at a run's end.
 - A threaded alternative (`threaded_do_play`, a Python loop that owns the clock) is in the file and is not used.
 
 **Controls.** Three: Step (`do_step` once), the Play widget (play and pause), Reset (increments `reset_counter`,
@@ -186,6 +375,12 @@ in this one).
   both the headless factory and the Solara page use it, "so a name the registry does not have fails the same way on
   both".
 - **C. Two uses of the model.** The headless loop (`run_headless()`), and the Solara page.
+CORRECTED (ccode, 6 October 2026, T-viz 0.1; reason: read in the code): besides A, B and C, `run_mesa.py` opened the
+run log and the `.rec` stream at import, once per process. The start line, the override lines, the per-step agent
+lines, `[sep]` and the run's end were written by `run_headless()`, not by the model, so the solara-ui wrote none of them.
+CHANGED BY 0.2 (6 October 2026; design_records.md, "T-viz, the web-ui", 0.2): A and B are `mesa_sim/run_config.py`; the
+log pair and the run-level lines are `mesa_sim/sim_run.py`, one pair per stepped sim-run, written from every start;
+nothing is opened at import. `run_mesa.py` holds the starts only.
 
 The flags: `--run`, `--override`, `--domain`, `--layout`, `--scenario`, `--steps`, `--human_aware`,
 `--intention_aware`, `--assignment_knowledge`, `--context_knowledge`, `--strategy`, `--gate_strategy`,
@@ -208,6 +403,8 @@ automatic switch, as Hadi said.
 `RunFilePanel` and `SolaraViz` at module level, without a guard. A comment says that Solara needs the page at the
 top level at module load time. A flag `_UNDER_SOLARA` only decides whether `run_headless()` is called. Consequence:
 a headless run imports Solara and the viz modules. A fault in those modules at import would stop a headless run.
+CHANGED BY 0.2 (ccode, 6 October 2026; reason: the code structure of 0.2): a headless start imports neither Solara nor
+`mesa_sim/viz/` nor the fork's `visualization`; a test holds it (tests/test_tviz_sim_run.py).
 
 ### 4.3 Faults and inconsistencies noticed on the way (outside T-viz's scope, flagged)
 
@@ -231,11 +428,18 @@ these. ccode verifies their current state.
 
 - **T-E, "the viewer"**: `docs/handoffs/handoff_T-D_onward.md` lists it as a task: "shows belief, admitted
   projection, decision, hold, refusal, and now the script's events; check `mesa_sim/viz/` first".
+  CORRECTED (ccode, 6 October 2026, T-viz 0.1; reason: the roadmap): T-E is not an open task. It was superseded by T-V
+  track 1 on 30 September 2026. T-V track 1, "the viewer for pre-loaded scripts", is the existing record of the viewer
+  as a task, so T-V has two tracks here, not track 2 alone. ANSWERED (Hadi, 6 October 2026, preferred): T-V track 1 is
+  carried out as T-viz stage 1 (1a, 1b, 1c).
 - **Phase 7, T-V (track 2)**: `docs/design_decisions.md` records (recorded, not decided, 23 September 2026; scheduled
   30 September 2026) that a deviation of the human can arrive "as an event during the run (from a viewer)", applied
   at the next action boundary. The first decision of that phase is the replay rule: the viewer offers a fixed set of
   events, every event is logged with its tick, and a finished live run exports its event log as a pre-loaded script.
   "Live runs demonstrate; every evaluation number comes from pre-loaded scripts."
+  CORRECTED (ccode, 6 October 2026, T-viz 0.1; reason: T-H): "applied at the next action boundary" is superseded in
+  part by T-H: an event may cut into an action (`DuringAction`). ANSWERED (Hadi, 6 October 2026, preferred): T-V track
+  2 is T-viz stage 3, its mechanism included, [FW] for now.
 - **T-L stage 4, ruling 7**: "The viewer reads and edits the same file" (the run file). The run-file panel is the
   built form of this.
 - **TODO-110** (not built): selection by composition and coverage. The glossary says that scenario composition is
@@ -246,6 +450,10 @@ these. ccode verifies their current state.
 Hadi named the present work "T-viz" and confirmed the name. Its relation to T-E is to be stated in the records.
 cchat's reading (proposed): T-viz's stage 1b and 1c cover what T-E lists, and T-viz's stage 3 is the page's side of
 T-V. ccode checks whether T-E still exists as an open task and proposes how the records join the two.
+ANSWERED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", HADI'S ANSWERS; reason: the 0.1
+report's questions): T-viz is the name for all web-ui work. T-V track 1 (what the viewer shows; T-E as originally
+defined) is carried out as T-viz stage 1; T-V track 2 is T-viz stage 3, which means T-V with its live-event mechanism,
+not only the page's side of it (docs/rename_table.md, "Task names").
 
 ---
 
@@ -323,6 +531,9 @@ separate the actual world from the state that the robot keeps in mind, and he wa
 architecture ideas. cchat withdrew the separation as a settled item. The message contents are parked. Later, in the
 stage list, Hadi described three information parts (4a the human and the actual world, 4b the robot's mind, 4c
 plots). That is his description of the separation on the page. It does not yet settle the messages.
+SETTLED BY 0.4 (ccode, 6 October 2026; Hadi confirmed the plan; reason: the message round): the messages are defined in
+`webui/messages.py`; the run description and the tick update hold the world in its own section, and stages 1b and 1c
+add the robot's mind and the plots beside it, each in its own section.
 
 On planned paths: cchat proposed to leave them out of the first stage, reasoning that the robot's planned path is
 content of the robot's mind. Hadi asked "why not?" and proposed a default assumption of a straight Euclidean line,
@@ -331,6 +542,11 @@ line itself. The model already holds a path per agent (`agent.planned_path`, rea
 server copies it. Today that path is a straight line. When the model's path method changes, the page shows the new
 path without a change to the page. This meets Hadi's intent ("straight line now, replaced later") without planning
 logic in the page.
+CORRECTED (ccode, 6 October 2026, T-viz 0.1; reason: read in the code): no module writes `agent.planned_path`. The
+solara-ui's drawer reads it behind a `hasattr` guard and draws nothing. The model holds no path per agent, so "the server
+copies it" and "today that path is a straight line" do not hold. PREFERRED (Hadi, 6 October 2026, at 0.4 and at the close
+of stage 0): stage 1a shows no planned path; whether and which paths the scene shows is a question for stage 1b
+(TODO-197).
 
 ### 5.5 Three ways to run, and the archived solara-ui
 
@@ -426,6 +642,8 @@ assigned it to stage 2, to be resolved there. The label "viz-stage2" is dropped.
 
 - An agent's path is a straight line now. Another path method can replace it later. (The page shows whatever path
   the model holds, see 5.4.)
+  SUPERSEDED IN PART (ccode, 6 October 2026; reason: the correction of 5.4 and Hadi's answer): the model holds no path
+  per agent, and stage 1a shows none. Paths in the scene are a question for stage 1b (TODO-197).
 
 ### 6.3 The solara-ui
 
@@ -482,12 +700,17 @@ web-ui:     choice in the page ->  run configuration  ->  SimModel  ->  step on 
 - Behaviour does not change. The same run file and flags give the same run.
 - The headless start no longer imports Solara.
 - Open: the module's name and location, and where the headless loop itself lives afterwards.
+  DONE (0.2, 6 October 2026): the module is `mesa_sim/run_config.py`; the sim-run with its log pair is
+  `mesa_sim/sim_run.py`; the headless loop stays in `mesa_sim/run_mesa.py` (`run_headless()`).
 - This is the first change to existing files. It does not depend on any design choice of the web-ui.
 
 ### 7.3 The web-ui as the starting place (Hadi's idea, 5.7)
 
 Phases on the page:
 1. Start: one command starts the web-ui. No model exists yet.
+   PREFERRED (Hadi, 6 October 2026, at the close of stage 0): no single "mother" start command now; each start has its
+   own command, which the README states. The question of one command with subcommands returns in stage 1a, when the
+   web-ui's start command is defined (TODO-196).
 2. Choose: the screen-user picks the domain, the layout, the scenario, and the run options.
 3. Build: the server builds the model from that choice.
 4. Show: the scene appears.
@@ -527,6 +750,10 @@ Proposed by cchat, open: the page requests each step. The server never advances 
 
 Controls of stage 1a: play, pause, step, reset.
 
+SETTLED BY 0.4 (ccode, 6 October 2026; Hadi confirmed the plan; reason: the message round): the clock as proposed, the
+page requesting each step, with plain request and response. The requests (catalogue, choose, step, reset, current) and
+the ends of a sim-run are recorded in design_records.md, "T-viz, the web-ui", 0.4. The server is not built.
+
 ### 7.5 What the env-pane shows before the first step (preferred: alternative B)
 
 The question was what the env-pane shows between the screen-user's choice and the first step. cchat first called
@@ -543,6 +770,8 @@ Condition on B, to be measured by ccode: building a model takes about a second o
 validation and the load-time replay (`check_script`), which may take noticeable time. If the build time is too long,
 the question returns to Hadi. Alternative C becomes relevant in stage 2, where editing needs a picture while no
 valid model exists.
+MEASURED (ccode, 6 October 2026, T-viz 0.1): a `SimModel` builds in 1 to 6 ms (one outlier of 68 ms) over all 1019
+registered scenarios, after a one-time import of about 1.7 s. The condition is met.
 
 ### 7.6 Where state lives (cchat's answer to Hadi's question on session state)
 
@@ -573,6 +802,11 @@ Hadi asked that the backend and the messages be settled before the page design, 
 connection. cchat then proposed contents too early (5.4). The contents below are **proposed by cchat and parked**.
 Stage 0.4 settles them.
 
+SETTLED BY 0.4 (ccode, 6 October 2026; Hadi confirmed the plan, Q1 to Q9 each (a); reason: the message round): three
+messages, not two: the catalogue (what can be chosen, before any model exists), the run description, and the tick update
+with the complete changing state. They are defined in `webui/messages.py`. The proposal below is kept as written; where
+it differs from `webui/messages.py`, the code holds. The differences are marked below.
+
 ### 8.1 Two kinds of message (proposed)
 
 The two faults of the solara-ui (4.1) give two requirements.
@@ -598,6 +832,10 @@ bookkeeping and no benefit.
 | The movable objects | Id and type of each | Creates one shape per object. Its place comes per tick |
 | The agents | Id of each, and human or robot | Creates one figure per agent. Its position comes per tick |
 
+SETTLED BY 0.4 (6 October 2026): as proposed, and also the run options as stated and in effect, the movable objects'
+sizes, home containers and designated destinations, each human's script, and the timeline of context facts in force.
+The layout's `orientation_deg` is not carried, since the loader drops it (TODO-192).
+
 ### 8.3 Tick update (proposed content), sent after each step
 
 | Item | Content |
@@ -606,6 +844,12 @@ bookkeeping and no benefit.
 | Each agent | Its position, the movable object it holds if any, and its planned path as the model holds it (a list of points, empty when the agent is not moving) |
 | Each movable object | Where it is now: its container, or the agent holding it |
 | Run ended | Yes or no |
+
+SETTLED BY 0.4 (6 October 2026): no planned path (see the correction of 5.4). Each agent's position and `last_motion`,
+the direction of its most recent step that moved it. A movable object's place is given by `fixed_object_contents` (the
+fixed objects that hold movable objects at the tick, each with them in their order of arrival) and `carried`. "Run
+ended" is the tick update's optional end, with its reason. Added: the object states, the timeline facts and each
+human's activity from the executor's record. The tick is the run log's number of the step executed, none at the start.
 
 Stage 1a adds what panel 4a needs. Stages 1b and 1c add what panels 4b and 4c need. Those additions are not listed
 here, because Hadi decides the contents of 4b later.
@@ -632,6 +876,13 @@ here, because Hadi decides the contents of 4b later.
 - **Facing.** If the agents are drawn as figures with a front (10.5), the drawer needs a direction per agent. Not
   verified: whether the model holds a heading. The usual substitute is the direction of the last movement.
 - **"Tick" and "step".** cchat used both as the code does. ccode checks whether the glossary distinguishes them.
+
+SETTLED BY 0.4 (ccode, 6 October 2026; reason: the message round and the checks of 0.1): each message after the catalogue
+names its sim-run; the simulator's side supplies the order of arrival; the messages are defined once in Python and the
+page's types are generated from them (0.3). No module writes `planned_path` for either kind of agent, so the question of
+world or mind content does not arise in stage 1a; paths are stage 1b's question (TODO-197). No agent holds a heading;
+facing is `last_motion`, from the agent's own positions, not the robot's perception memory, and a figure turns at once
+to it (Hadi, 6 October 2026, preferred). The glossary distinguishes neither "tick" nor "step"; the messages say tick.
 
 ### 8.5 A capability that follows at low cost (unassigned, 13.4)
 
@@ -691,6 +942,11 @@ cchat's additions, open:
   geometry of the spread.
 - The accepted limit is more visible in a tilted view with figure-like agents than in a flat top-down view.
 - Where the order of arrival is kept: see 8.4.
+UPDATED (ccode, 6 October 2026, T-viz 0.3): the trial draws the display places by the rule in
+`webui/page/src/env-pane/displayPlaces.ts`; keeping a place while its object stays, and the geometry of freed places and
+of too many objects, are stage 1a's.
+TAGGED [FW] (Hadi, 6 October 2026, preferred): slots in containers, TODO-173, are [FW], as everything after V1 until Hadi
+draws the V1 border for the web-ui.
 
 ---
 
@@ -724,6 +980,9 @@ on it, and Hadi reviews it.
 The files are in `docs/handoffs/tviz_refs/`. The numbers are the ones used in the chat. They are third-party images
 (screenshots of posts and stock illustrations). They serve as inspiration only. If the repository is public, the
 folder should stay out of version control.
+CORRECTED (ccode, 6 October 2026, T-viz 0.1; reason: the git history): the repository is public, and the images were
+committed and pushed (069282b, 4e71335). From ef0726d on the folder is git-ignored and untracked, its files kept on disk.
+They remain in the public history of those two commits; the history is not rewritten.
 
 | No. | File | What it is | Hadi's relation to it |
 |---|---|---|---|
@@ -805,6 +1064,11 @@ cchat's reading of these together, three levels of presence (proposed):
 An observation of cchat that Hadi has not marked: with static things drawn as lines and changing things drawn with
 fill and colour, the drawing states by itself what can change during a sim-run.
 
+PREFERRED (Hadi, 6 October 2026, at the close of stage 0; reason: his review of the 0.3 trial): the trial's look is
+accepted "for now and for stage 0". It is the starting point of stage 1a, not a final design. The trial built the three
+levels: lines and pale faces for the background, a warm tone and a representative form for active objects, figures in
+their own colours for the agents; the movable objects in solid ink (design_records.md, "T-viz, the web-ui", 0.3).
+
 ### 10.6 Points that the style raises (proposed by cchat, open)
 
 1. **Recognisable shapes against domain independence.** A rack is readable because it looks like a rack. A drawer
@@ -812,16 +1076,25 @@ fill and colour, the drawing states by itself what can change during a sim-run.
    kinds (for example a solid block, an open frame, a flat marked zone, a low platform), and data states which kind
    each object type uses. The drawer's code then knows geometry and no domain word. A lift truck is one possible
    body of the robot in one domain, so the robot's figure would also be chosen by data.
+   BUILT (0.3, 6 October 2026): the forms of `webui/appearance.py`, the data per domain choosing them. A new domain is
+   drawn without a code change, from defaults; a new form is web-ui code.
 2. **Where the look comes from.** Hadi's preference (question 1.4): a visualisation configuration per domain,
    "domain-customised visualization config file", read only by the web-ui. It maps an object type to its look (a
    shape kind, a height, a palette entry) and names the robot's figure. A type without an entry falls back to a
    default, so a new domain works without a file. ccode decides its location and form. cchat advised against
    appearance fields in the layout files: the simulation reads those files, and the look is not a fact of the world.
+   BUILT (0.3, 6 October 2026): `domains/<domain>/appearance.json`, read only by the web-ui. How it reaches the page in
+   stage 1a is open (stage 1a).
 3. **Height is missing.** The layout gives each fixed object a position and a size on the floor. It gives no height.
    A tilted view needs one per object, from a default or from the configuration of item 2.
+   BUILT (0.3, 6 October 2026): a height per object type in the appearance data, with a default.
 4. **Where "active" comes from.** If a person marks objects by hand for the look, the marking can disagree with the
    world. The data already contains the answer: an object is active when a task of the domain or a script of the
    scenario refers to it. ccode can derive it by such a rule. Hadi did not mark this.
+   NOT TAKEN (Hadi, 6 October 2026, at the plan of 0.3, Q2 (a); reason: measured in 0.3): presence is a property of the
+   look, declared per object type in the appearance data, not a world fact. Deriving it from a run's bindings was
+   measured and found unstable: in scenario_s08_01 the script binds no coffee machine, so the coffee machine would be
+   drawn passive, while every landmark that a go_to binds would be drawn active.
 5. **Hiding.** In a tilted view a tall object can hide an agent behind it. A top-down view hides nothing. For a
    research tool this matters more than for a showcase. Outlined and see-through objects, and low heights, reduce
    it. With real 3D a top-down view is the same scene with the camera pointing straight down, so the two views need
@@ -830,6 +1103,8 @@ fill and colour, the drawing states by itself what can change during a sim-run.
    about the most that stays readable. A figure can show what it carries (a worker with an item, a lift truck with a
    pallet), which is more readable than a label.
 7. **Facing.** See 8.4.
+   PREFERRED (Hadi, 6 October 2026, at the close of stage 0): a figure turns at once to its last direction of movement,
+   with no rotate action in the world; before its first move it faces a default, as a display convention.
 
 ### 10.7 Theme and colour
 
@@ -850,6 +1125,10 @@ fill and colour, the drawing states by itself what can change during a sim-run.
   leaves colour free for this. The colours must be clearly distinguishable from each other, not only pleasant
   together.
 
+BUILT (0.3, 6 October 2026): the theme file is `webui/page/src/theme.ts`, with semantic colours for the robot and the
+human. PREFERRED (Hadi, 6 October 2026, at the close of stage 0): no dark mode in stage 1; it is recorded for stage 2 or
+3 (TODO-193).
+
 ### 10.8 Technology for the scene (open, to be chosen in stage 0.3)
 
 Background that cchat gave Hadi:
@@ -868,6 +1147,11 @@ Hadi's answer on the library: "later let's see what actual web library can give 
 stage 0.3 answers it.
 
 The page reads only messages. The scene component is therefore replaceable later without touching the server.
+
+PREFERRED (Hadi, 6 October 2026, at the close of stage 0; reason: his review of the 0.3 trial): the trial's technology
+is the web-ui's technology: React, TypeScript, Vite, and three.js through React Three Fiber and drei. uPlot is planned
+for the plots of stage 1c. No UI kit. The camera keeps two presets (the tilted view at 35° and the view from above), and
+in stage 1a the screen-user can move it freely during a sim-run (TODO-195).
 
 ---
 
@@ -995,6 +1279,11 @@ T-viz: the web-ui
 The numbers inside stage 0 and stage 2 are cchat's, for reference. Inside stage 2 cchat split Hadi's one editing
 item into three, one per artefact, because they differ in difficulty.
 
+UPDATED (ccode, 6 October 2026, at the close of stage 0; reasons: the steps of stage 0 and Hadi's answers): stage 0 is
+done (0.1, 0.2, 0.4, 0.3, in that order). Stage 1a shows no planned path; paths are a question for stage 1b (see the
+correction of 5.4). Stages 0 and 1 are in V1; stages 2 and 3 are [FW] until Hadi draws the V1 border for the web-ui
+(TODO-190). The section "State after stage 0" at the top states what 1a starts from.
+
 ### 12.2 Stage 0 in Hadi's words, and the order of work
 
 Hadi's stage 0:
@@ -1061,6 +1350,8 @@ Panel 4a shows what the human does. Panel 4b shows what the robot believes.
 Items of stage 1a that cchat added and that follow from earlier statements: the controls, the spreading of movable
 objects (section 9), planned paths (5.4), the shared theme file (10.7), the two tests, and that a sim-run from the
 web-ui writes the same logs as a headless one.
+CORRECTED (ccode, 6 October 2026; reason: the correction of 5.4 and Hadi's answer at 0.4): planned paths are not an
+item of stage 1a; they are a question for stage 1b.
 
 ### 12.4 Hadi's answers to the numbered questions
 
@@ -1152,6 +1443,8 @@ deviations to human scripted behaviours".
   human executor's injection path, the replay rule, the event log) stays in that task.
 - The web-ui's architecture leaves room for it: the server already holds the model, so a later "inject" request is
   an addition.
+ANSWERED (Hadi, 6 October 2026, preferred): stage 3 means T-V track 2, its live-event mechanism included, not only the
+page's side of it. It is [FW] for now.
 
 ### 13.4 Unassigned
 
@@ -1160,6 +1453,8 @@ Raised in the chat, with no stage.
 - An automatic pause at an event of the robot's cognition (a cognitive-clock event), to show the robot's decision
   at that tick. An earlier chat designed this for the solara-ui (pause on `theta_crossed` and `task_committed`). Not
   verified whether it was built.
+  CORRECTED (ccode, 6 October 2026, T-viz 0.1; reason: read in the code): it was not built. The two events no longer
+  exist (D2, D3); the event list would be today's triggers or other events (TODO-189).
 - Moving back along the ticks for display (8.5).
 - Replay of a finished sim-run without Mesa (8.5).
 - Saving the page's choice as a run file (7.3).
@@ -1211,6 +1506,10 @@ They appear in the sections above. They are collected here so that nobody takes 
 11. Stage 2 begins with layouts and setups, and scripts follow after a core design step (13.1).
 12. Stage 3 is the page's side of Phase 7 (13.3).
 
+UPDATED (ccode, 6 October 2026, at the close of stage 0): Hadi has since taken items 1 to 3, 6, 8, 9 and 10 with the plan
+of 0.4 (the page requests each step; plain request and response); item 4 is built in the trial's theme; item 7 is
+preferred (10.8); item 5 is not taken (10.6, item 4); item 12 is answered otherwise (13.3); item 11 stays open (stage 2).
+
 ---
 
 ## 16. What ccode does first (0.1), and what it verifies
@@ -1218,6 +1517,9 @@ They appear in the sections above. They are collected here so that nobody takes 
 ### 16.1 The task
 
 Recording only. No code changes.
+
+DONE (ccode, 6 October 2026, T-viz 0.1): the answers to 16.2 are in design_records.md, "T-viz, the web-ui", 0.1, THE
+VERIFICATIONS; those that changed this file are marked at their passages.
 
 - Read this handoff in full.
 - Verify the facts listed in 16.2 by reading the repo. Report every difference between this handoff and the repo.
@@ -1256,88 +1558,14 @@ Recording only. No code changes.
 - The earlier chat "Mesa fork and Solara compatibility" (29 September 2026) held the first comparison of options A
   and B. Hadi deleted it. Its content is in 5.1.
 - The slots discussion: TODO-173. Section 9 holds its input.
+- `docs/handoffs/tviz_trial/`: the screenshots of the 0.3 trial, both domains, tilted and from above, on disk and
+  untracked (added 6 October 2026, T-viz 0.3).
 
 ---
 
-## Correction note (ccode, 6 October 2026, T-viz 0.1)
+## Correction note (ccode, 6 October 2026, T-viz 0.1; shortened at the close of stage 0, 6 October 2026)
 
-The body above is left as written. Where it and the repo differ, the repo wins. Read at commit 069282b; the detail,
-with files and lines, is in `docs/design_records.md`, "T-viz, the web-ui", 0.1.
-
-- Sections 4, 10.3, 17: the reference images and `sketch_A_and_J.svg` are in `docs/handoffs/tviz_refs/` since 4e71335,
-  as stated here. The repository is public and the images were committed and pushed (069282b, 4e71335), against
-  10.3's condition. From ef0726d on (6 October 2026, Hadi's answer) the folder is git-ignored and untracked, its files
-  kept on disk; no copy is tracked at another path. They remain in the public history of 069282b and 4e71335 (history
-  not rewritten).
-- 4.4: T-E is not an open task. It was superseded by T-V track 1 on 30 September 2026. T-V track 1 ("the viewer for
-  pre-loaded scripts") is the existing record of the viewer as a task; the handoff names T-V for track 2 only.
-- 5.4, 8.4, 12.1 ("planned paths"): no module writes `agent.planned_path`. The drawer reads it behind a `hasattr` guard
-  and draws nothing; the model holds no path per agent under that name. "Today that path is a straight line" does not
-  hold. Where a path can be copied from is a question for 0.4.
-- 8.4 (facing): no agent holds a heading. The robot's mind keeps the observed human's last step direction (a
-  perception fact), not a facing.
-- 4.1: no framework code sets `model.running`, which the fork initialises to True, so the solara-ui's play does not
-  stop at a run's end.
-- 4.4: Phase 7's deviation "applied at the next action boundary" is superseded in part by T-H. Events may cut
-  mid-action (`DuringAction`).
-- 4.2 and 7.2: besides A, B and C, `mesa_sim/run_mesa.py` opens the run log and the `.rec` stream at import, once per
-  process. The start line, the override lines, the per-step agent lines, `[sep]` and the run's end (`end_run`) are
-  written by `run_headless()`, not by the model, so the solara-ui writes none of them.
-  Since 0.2 (6 October 2026; design_records.md, "T-viz, the web-ui", 0.2): A and B are `mesa_sim/run_config.py`, the
-  log pair and the run-level lines `mesa_sim/sim_run.py`, one pair per stepped sim-run, written from every start; the
-  headless start imports no Solara (4.2's last paragraph no longer holds).
-- 2.2: "viewer" for the program occurs about 110 times in the records and code, not in three places only.
-- 13.4: the earlier chat's pause events `theta_crossed` and `task_committed` no longer exist (D2, D3). No pause on a
-  cognitive event was built.
-- 7.5's condition is measured: a `SimModel` builds in 1 to 6 ms (one outlier of 68 ms) over all 1019 registered
-  scenarios, after a one-time import of about 1.7 s.
-
-Hadi's answers to the 0.1 report (6 October 2026, preferred; design_records.md, "T-viz, the web-ui", HADI'S ANSWERS):
-- 4.4, 13.3, 15 item 12 (T-viz and T-V): T-viz is the name for all web-ui work. T-V track 1 (what the viewer shows) is
-  carried out as T-viz stage 1 (1a, 1b, 1c). T-V track 2 (Phase 7, live events on the human's script) is T-viz stage 3:
-  stage 3 means T-V, the mechanism included, not only "the page's side" of it. docs/rename_table.md, "Task names".
-- 12.1, 13 (V1 and FW): T-viz stages 0 and 1 are in V1; stages 2 and 3 are after V1, [FW], the default until Hadi draws
-  the V1 border inside the web-ui. TODO-173 (slots, section 9) is [FW]. 6.1 item 6 is unchanged: stage 0's choice of
-  technology still considers the needs of stages 2 and 3.
-- On what these answers contradict, and on the place of stage 1 in the order (preferred for now): "Put everything in
-  FW, I decide later." The [FW] tags stay; no ruling is amended; the three contradictions and the place of stage 1
-  (ccode's proposal) stay open, Hadi decides later (TODO-190).
-
-Stage 0.4, the messages (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 0.4; Hadi confirmed the plan,
-Q1 to Q9 each (a)). Section 8 is settled by 0.4 as follows; the body above is left as written.
-- 8.1: three messages, not two: a catalogue (7.3's catalogue request), a run description, a tick update with the
-  complete changing state. The screen-user's choice of a sim-run is `SimRunChoice`. Defined in `webui/messages.py`
-  (pydantic v2); the interface a simulator's piece implements is `webui/simulator.py`; Mesa's piece is
-  `mesa_sim/webui_adapter.py`.
-- 8.2: as proposed, and also the run options as stated and in effect, the movable objects' home containers and
-  designated destinations, each human's script and the timeline in force. The page receives the space's bounds; the
-  layout's `orientation_deg` is not carried (the loader drops it; TODO-192).
-- 8.3: no planned path in stage 1a (a question for 1b; 5.4's path is not in the model, as the note above says). A
-  movable object's place is given as the fixed objects that hold movable objects at the tick (`fixed_object_contents`,
-  not called containers: the glossary's container is a kind of fixed object) and the objects carried. "Run ended" is
-  the tick update's optional end, with its reason. Added: the object states, the timeline facts, and panel 4a's
-  source, each human's activity from the executor's record (the stack, the action in hand, the tick's transitions, the
-  open entries). The step number is the run log's number of the step executed, none at the start.
-- 8.4: the sim-run's identity is in every message after the catalogue (TODO-187). The order of arrival is supplied by
-  the simulator's side, kept per sim-run by the piece. One definition: done. Path: open for 1b. A carried object: given
-  by its holder. Facing: `last_motion`, the direction of the agent's most recent step that moved it, from its own
-  positions (not the robot's perception memory). "Tick" and "step": the glossary distinguishes neither; the messages say
-  tick, numbered as the run log numbers steps.
-- 7.4: the clock as proposed (the page requests each step; plain request and response). The requests are recorded in
-  the 0.4 entry; the server is not built.
-- 9: "display place" is a glossary entry (§11), with web-ui, solara-ui, screen-user, env-pane, scene, author, catalogue,
-  run description and tick update (Hadi approved them, 6 October 2026, preferred).
-
-Stage 0.3, the style trial (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 0.3; Hadi confirmed the
-plan, Q1 to Q3 each (a)). The body above is left as written.
-- 10.8: the trial is built on React and TypeScript with three.js through React Three Fiber and drei (`webui/page/`),
-  the scene drawn from saved messages; Hadi's review of the picture is open.
-- 10.6 items 1 to 3: the scene appearance is `webui/appearance.py`, its values per domain in
-  `domains/<domain>/appearance.json`; a new domain is drawn from defaults, a new form is web-ui code. How it reaches
-  the page in stage 1a stays open (Q1).
-- 10.6 item 4: presence is declared per object type in the appearance data, a property of the look; deriving it from
-  a run's bindings was measured and found unstable (the 0.3 entry).
-- 10.7: the theme file is `webui/page/src/theme.ts`.
-- 9: the display places are drawn by the rule in `webui/page/src/env-pane/displayPlaces.ts`; keeping a place from tick
-  to tick is stage 1a's.
-- The screenshots are in `docs/handoffs/tviz_trial/`, on disk and untracked, beside `tviz_refs/`.
+The corrections that stood here (those of 0.1, read at commit 069282b; Hadi's answers to the 0.1 report; those of 0.4
+and 0.3) are carried into the body at their passages, each kept beside the passage it corrects and marked with its date
+and reason. The section "State after stage 0" at the top states the present state. Nothing of the note is left that the
+body does not now say; the detail, with files, lines and commits, is in `docs/design_records.md`, "T-viz, the web-ui".
