@@ -172,7 +172,7 @@ def user_args_parser() -> argparse.ArgumentParser:
     parser.add_argument("--domain",      type=str,  default=None, help="Domain name override (e.g. kitting, dock_loading)")
     parser.add_argument("--layout", type=str, default=None, help="Layout selection (default: the scenario's first reference layout)")
     parser.add_argument("--scenario",    type=str,  default=None, help="Scenario ID override (e.g. scenario_s02_02)")
-    parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run")
+    parser.add_argument("--steps",       type=int,  default=None, help="Number of steps override for headless run; in the web-ui, a step limit (none by default)")
     parser.add_argument("--human_aware", type=_bool_arg, default=None, help="Human-aware override: true/false (off: the human-unaware robot, no observed human; sets intention_aware, both knowledge options and separation_stop off; T-F part 1)")
     parser.add_argument("--intention_aware", type=_bool_arg, default=None, help="Intention-aware override: true/false (off: the intention-unaware robot, the recognizer computes nothing and the gate admits nothing; sets both knowledge options off; T-F part 1)")
     parser.add_argument("--assignment_knowledge", type=_bool_arg, default=None, help="Assignment knowledge override: true/false (the robot knows the observed human's assigned tasks)")

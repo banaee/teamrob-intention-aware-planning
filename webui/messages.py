@@ -6,7 +6,8 @@ PURPOSE:
     generated from them later (their JSON Schema, `model_json_schema()`). Three messages: the catalogue (what can be
     chosen), the run description (everything constant in one sim-run, sent when a model is built), the tick update
     (the complete changing state at the tick reached, not differences). Beside them the screen-user's choice of a
-    sim-run (SimRunChoice, the body of a build request) and the two refusals (BuildFailure, StepRefusal).
+    sim-run (SimRunChoice, the body of a build request), the two refusals (BuildFailure, StepRefusal), and the other
+    bodies and answers of the server's requests (SimRunRef, SimRunState, Current; T-viz 1a, webui/server.py).
 
 THE TERMS:
     The framework's, as docs/glossary.md defines them: agents (humans, robots), fixed objects, movable objects, areas,
@@ -25,7 +26,12 @@ THE TERMS:
 SECTIONS:
     The run description and the tick update hold the world under `world`. Stage 1b adds the robot's mind beside it,
     stage 1c the plots, each as a new field with an empty default; nothing defined here changes. The world's
-    vocabulary and the mind's stay in separate sections.
+    vocabulary and the mind's stay in separate sections. The tick update's `run` (T-viz 1a) holds the facts of the
+    sim-run that are neither the world's nor the robot's mind's: the tick at which every agent had finished.
+
+THE STEP LIMIT (T-viz 1a):
+    A sim-run in the web-ui has a step limit only when one is set (LimitOption); without one it ends by reset, by a
+    change of choice or at the server's stop.
 
 TICKS:
     `TickUpdate.tick` is the number the run log gives the last step executed (its `step: N` lines, the record's
@@ -38,14 +44,12 @@ TAGS:
 from enum import Enum
 from typing import Annotated, Literal, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from webui.appearance import Appearance
+from webui.message_base import Message
 
 SimRunId = str   # opaque, assigned by the web-ui's server; every message after the catalogue names its sim-run
-
-
-class Message(BaseModel):
-    """Frozen, no field beyond the definition, no coercion between types."""
-    model_config = ConfigDict(frozen=True, extra="forbid", strict=True)
 
 
 # =============================================================================
@@ -105,16 +109,16 @@ class LevelOption(Message):
     description: str
 
 
-class CountOption(Message):
-    """A run option that is a whole number, at least `minimum`."""
-    kind: Literal["count"] = "count"
+class LimitOption(Message):
+    """A run option that is a limit: a whole number, at least `minimum`, or no limit (None)."""
+    kind: Literal["limit"] = "limit"
     name: str
-    default: int
+    default: Optional[int]
     minimum: int
     description: str
 
 
-RunOptionDeclaration = Annotated[Union[SwitchOption, OneOfOption, LevelOption, CountOption],
+RunOptionDeclaration = Annotated[Union[SwitchOption, OneOfOption, LevelOption, LimitOption],
                                  Field(discriminator="kind")]
 
 
@@ -136,13 +140,14 @@ class LevelValue(Message):
     value: float
 
 
-class CountValue(Message):
-    kind: Literal["count"] = "count"
+class LimitValue(Message):
+    """A limit's value; None: no limit."""
+    kind: Literal["limit"] = "limit"
     name: str
-    value: int
+    value: Optional[int]
 
 
-RunOptionValue = Annotated[Union[SwitchValue, OneOfValue, LevelValue, CountValue], Field(discriminator="kind")]
+RunOptionValue = Annotated[Union[SwitchValue, OneOfValue, LevelValue, LimitValue], Field(discriminator="kind")]
 
 
 class SimRunChoice(Message):
@@ -177,10 +182,12 @@ class ScenarioEntry(Message):
 
 
 class DomainEntry(Message):
+    """A domain: what can be chosen in it, and its scene appearance (the defaults where it states none)."""
     name: str
     layouts: tuple[LayoutEntry, ...]
     setups: tuple[SetupEntry, ...]
     scenarios: tuple[ScenarioEntry, ...]
+    appearance: Appearance
 
 
 class Catalogue(Message):
@@ -547,10 +554,18 @@ class RunEnd(Message):
     still_open: tuple[StillOpenEntry, ...]
 
 
+class RunTick(Message):
+    """The facts of the sim-run at the tick that are neither the world's nor the robot's mind's. `finished_at`: the
+    first tick at which every human's script had ended (every entry closed, the stack empty) and every robot's task
+    pool was empty (the tick of its empty-pool log line); None before. Once set, it is kept."""
+    finished_at: Optional[int]
+
+
 class TickUpdate(Message):
     sim_run: SimRunId
     tick: Optional[int]
     world: WorldTick
+    run: RunTick
     end: Optional[RunEnd]
 
 
@@ -563,6 +578,23 @@ class BuildFailure(Message):
     message: str
 
 
+class SimRunRef(Message):
+    """The body of a request on one sim-run (step, reset)."""
+    sim_run: SimRunId
+
+
+class SimRunState(Message):
+    """A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before
+    the first step). The answer to choose, reset and current."""
+    description: RunDescription
+    tick: TickUpdate
+
+
+class Current(Message):
+    """The answer to current: the current sim-run, or None when there is none."""
+    state: Optional[SimRunState]
+
+
 class StepRefusalReason(str, Enum):
     NOT_CURRENT = "not_current"
     ENDED = "ended"
@@ -570,5 +602,7 @@ class StepRefusalReason(str, Enum):
 
 
 class StepRefusal(Message):
+    """A step or a reset refused: the sim-run is not the current one, it has ended (a step only), or a step of it is
+    under way."""
     sim_run: SimRunId
     reason: StepRefusalReason

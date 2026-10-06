@@ -9,9 +9,13 @@ PURPOSE:
     same sim-run without (tests/test_tviz_messages.py).
 
 WHAT THIS MODULE DOES:
-    - MesaSimulator: the catalogue, and the build of a sim-run from the screen-user's choice. A choice that cannot be
-      built raises BuildFailed and writes no log pair (T-viz 0.4, Q4)
+    - MesaSimulator: the catalogue (with each domain's scene appearance, T-viz 1a), and the build of a sim-run from the
+      screen-user's choice. A choice that cannot be built raises BuildFailed and writes no log pair (T-viz 0.4, Q4)
     - MesaSimRun: one sim-run; per step its tick update; its end and its discard
+    - A sim-run's log pair takes only the lines of the thread the server calls it on, and does not echo to the
+      terminal (webui/simulator.py, ONE THREAD; mesa_sim/sim_run.py, RunLog)
+    - Reads, per tick, the first tick at which every agent had finished (the tick update's `run`, T-viz 1a): every
+      human's script ended (every entry closed, the stack empty) and every robot's task pool empty
     - Keeps per sim-run what the model does not hold and a page reload must not lose: the order in which movable
       objects arrived in each fixed object, and each agent's direction of its most recent step that moved it, from
       its own positions. Neither is a world fact; neither is written anywhere
@@ -29,6 +33,7 @@ which validates them as it validates a run file.
 
 import json
 import math
+from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
 from mesa_sim.run_config import (BOOL_OPTIONS, DOMAIN_REGISTRY, EXPERIMENT_CONFIG_PATH, ONE_OF_OPTIONS,
@@ -41,14 +46,17 @@ from shared.types import (AfterAction, DuringAction, Drop, Event, GroundedAction
 from world import record as rec
 from world.queries import truth_at
 from webui import messages as msg
+from webui.appearance import Appearance
 from webui.simulator import BuildFailed
+
+ROOT = Path(__file__).resolve().parent.parent
 
 # The run options that are not the triple, by kind. Every run option of run_config's RUN_OPTIONS is of one kind; one
 # with none stops the catalogue (_declarations).
 TRIPLE = ("domain", "layout", "scenario")
 LEVEL_OPTIONS = ("test_level",)
-COUNT_OPTIONS = ("steps",)
-COUNT_MINIMUM = 1   # a sim-run in the web-ui takes at least one step
+LIMIT_OPTIONS = ("steps",)
+LIMIT_MINIMUM = 1   # a step limit, when one is set, is at least one step
 
 # Each run option's value in effect: the model's (SimModel applies the rules between them, T-F part 1, R5), the
 # configured steps the run configuration's.
@@ -66,7 +74,7 @@ _EFFECTIVE: Dict[str, Callable[[SimModel, dict], object]] = {
 }
 
 _VALUE_OF = {msg.SwitchOption: msg.SwitchValue, msg.OneOfOption: msg.OneOfValue,
-             msg.LevelOption: msg.LevelValue, msg.CountOption: msg.CountValue}
+             msg.LevelOption: msg.LevelValue, msg.LimitOption: msg.LimitValue}
 
 _OUTCOME = {rec.Outcome.COMPLETED: msg.Outcome.COMPLETED, rec.Outcome.SUSPENDED: msg.Outcome.SUSPENDED,
             rec.Outcome.ABANDONED: msg.Outcome.ABANDONED, rec.Outcome.INFEASIBLE: msg.Outcome.INFEASIBLE}
@@ -89,18 +97,19 @@ _ENTRY_PART = {rec.OrdinaryRef: msg.EntryPart.ORDINARY, rec.RepeatableRef: msg.E
 # The catalogue
 # =============================================================================
 
-def _declarations(run_file_config: dict) -> Tuple[msg.RunOptionDeclaration, ...]:
-    """The run options in RUN_OPTIONS's order, the triple excluded, each of its kind, its default the run file's value
-    or else OPTION_DEFAULTS's, its description the flag's help text."""
+def _declarations(run_file_config: dict, step_limit: Optional[int]) -> Tuple[msg.RunOptionDeclaration, ...]:
+    """The run options in RUN_OPTIONS's order, the triple excluded, each of its kind, its default the run
+    configuration's value or else OPTION_DEFAULTS's, its description the flag's help text. The step limit's default is
+    `step_limit`, never the run file's steps: the web-ui has no step limit unless one is set (T-viz 1a, P11)."""
     help_of = {action.dest: action.help for action in user_args_parser()._actions}
     declarations = []
     for name in RUN_OPTIONS:
         if name in TRIPLE:
             continue
-        if name in COUNT_OPTIONS:
-            if name not in run_file_config:
-                raise ValueError(f"the run file states no '{name}'; the catalogue's default is the run file's")
-            declarations.append(msg.CountOption(name=name, default=run_file_config[name], minimum=COUNT_MINIMUM,
+        if name in LIMIT_OPTIONS:
+            if step_limit is not None and step_limit < LIMIT_MINIMUM:
+                raise ValueError(f"{name}={step_limit}: a step limit is at least {LIMIT_MINIMUM}")
+            declarations.append(msg.LimitOption(name=name, default=step_limit, minimum=LIMIT_MINIMUM,
                                                 description=help_of[name]))
             continue
         default = run_file_config.get(name, OPTION_DEFAULTS[name])
@@ -125,6 +134,13 @@ def _layout_title(path: str, layout_id: str) -> str:
         return json.load(f)["space"].get("name", layout_id)
 
 
+def appearance(domain: str) -> Appearance:
+    """The domain's scene appearance, domains/<domain>/appearance.json, validated against webui/appearance.py; the
+    defaults when the domain has no file. Not a world fact: the simulation never reads it."""
+    path = ROOT / "domains" / domain / "appearance.json"
+    return Appearance.model_validate_json(path.read_text()) if path.is_file() else Appearance()
+
+
 def _domain_entry(name: str, domain: dict) -> msg.DomainEntry:
     return msg.DomainEntry(
         name=name,
@@ -133,17 +149,19 @@ def _domain_entry(name: str, domain: dict) -> msg.DomainEntry:
         scenarios=tuple(msg.ScenarioEntry(id=s.id, setup=s.setup, reference_layouts=tuple(s.reference_layouts),
                                           description=s.description)
                         for s in domain["scenarios"].values()),
+        appearance=appearance(name),
     )
 
 
 class MesaSimulator:
-    """Mesa's side of the web-ui (webui.simulator.Simulator). `run_path` is the run file the catalogue's defaults and
-    default choice come from."""
+    """Mesa's side of the web-ui (webui.simulator.Simulator). `config` is the start's run configuration (the run file
+    and the flags, run_config.load_experiment), from which the catalogue's defaults and its default choice come; by
+    default the run file configs/experiment.yaml. `step_limit` is the default step limit (the web-ui's start: its
+    --steps), None for none; the run file's steps is not used."""
 
-    def __init__(self, run_path: str = EXPERIMENT_CONFIG_PATH):
-        self.run_path = run_path
-        self._run_file_config = load_experiment(run_path, {})
-        self._declarations = _declarations(self._run_file_config)
+    def __init__(self, config: Optional[dict] = None, step_limit: Optional[int] = None):
+        self._run_file_config = load_experiment(EXPERIMENT_CONFIG_PATH, {}) if config is None else config
+        self._declarations = _declarations(self._run_file_config, step_limit)
 
     def catalogue(self) -> msg.Catalogue:
         config = self._run_file_config
@@ -165,7 +183,7 @@ class MesaSimulator:
             config = run_configuration(self._configuration(choice), "web-ui choice")
         except ValueError as e:
             raise BuildFailed(str(e)) from e
-        log = RunLog()
+        log = RunLog(echo=False, own_thread_only=True)
         try:
             run = SimRun(config, log)
         except Exception as e:
@@ -176,7 +194,7 @@ class MesaSimulator:
     def _configuration(self, choice: msg.SimRunChoice) -> dict:
         """The run configuration's mapping of the choice: the triple, and one value per declared run option, matched
         by name (the exception at the input boundary, above); a value of another kind, a missing, repeated or
-        undeclared option, or a count below its minimum, is refused."""
+        undeclared option, or a limit below its minimum, is refused. No limit is the configuration's steps None."""
         declared = {d.name: d for d in self._declarations}
         config = {"domain": choice.domain, "layout": choice.layout, "scenario": choice.scenario}
         for value in choice.options:
@@ -187,7 +205,8 @@ class MesaSimulator:
                 raise BuildFailed(f"run option '{value.name}' is given twice")
             if not isinstance(value, _VALUE_OF[type(declaration)]):
                 raise BuildFailed(f"run option '{value.name}': a {declaration.kind} value is expected")
-            if isinstance(declaration, msg.CountOption) and value.value < declaration.minimum:
+            if (isinstance(declaration, msg.LimitOption) and value.value is not None
+                    and value.value < declaration.minimum):
                 raise BuildFailed(f"run option '{value.name}': at least {declaration.minimum}")
             config[value.name] = value.value
         missing = [name for name in declared if name not in config]
@@ -301,6 +320,7 @@ class MesaSimRun:
         self._place()
         self._positions: Dict[str, Tuple[float, float]] = {aid: self._position(a) for aid, a in self._agents()}
         self._last_motion: Dict[str, Optional[msg.Direction]] = {aid: None for aid, _ in self._agents()}
+        self._finished_at: Optional[int] = None
 
         _, layout_id, setup_id, scenario = resolve_triple(run.config)
         self.description = msg.RunDescription(
@@ -310,7 +330,8 @@ class MesaSimRun:
             effective=tuple(_value(d, _EFFECTIVE[d.name](model, run.config)) for d in declarations),
             world=self._world_description(),
         )
-        self._update = msg.TickUpdate(sim_run=sim_run, tick=None, world=self._world_tick(None), end=None)
+        self._update = msg.TickUpdate(sim_run=sim_run, tick=None, world=self._world_tick(None),
+                                      run=msg.RunTick(finished_at=None), end=None)
 
     # ------------------------------------------------------------------
     # SimRunSide
@@ -332,7 +353,10 @@ class MesaSimRun:
                 norm = math.hypot(dx, dy)
                 self._last_motion[aid] = msg.Direction(x=dx / norm, y=dy / norm)
             self._positions[aid] = position
-        self._update = msg.TickUpdate(sim_run=self.sim_run, tick=tick, world=self._world_tick(tick), end=None)
+        if self._finished_at is None and self._all_finished():
+            self._finished_at = tick
+        self._update = msg.TickUpdate(sim_run=self.sim_run, tick=tick, world=self._world_tick(tick),
+                                      run=msg.RunTick(finished_at=self._finished_at), end=None)
         return self._update
 
     def end(self, reason: msg.EndReason) -> msg.TickUpdate:
@@ -358,6 +382,14 @@ class MesaSimRun:
 
     def _agents(self):
         return list(self._model.humans.items()) + list(self._model.robots.items())
+
+    def _all_finished(self) -> bool:
+        """Every human's script has ended (no script, or every ordinary and closing entry closed with the stack
+        empty: the executor selects nothing more) and every robot's task pool is empty (`RobotAgent.finished`, set on
+        the tick of its `[meta] ... all tasks complete` line). The point MPB-5 names (T-viz 1a, P12)."""
+        humans_done = all(h.machine is None or (h.machine.all_closed() and not h.machine.stack_tasks())
+                          for h in self._model.humans.values())
+        return humans_done and all(r.finished for r in self._model.robots.values())
 
     @staticmethod
     def _position(agent) -> Tuple[float, float]:

@@ -25,7 +25,7 @@ UNITS:
 
 from enum import Enum
 
-from webui.messages import Message
+from webui.message_base import Message
 
 
 class ShapeKind(str, Enum):

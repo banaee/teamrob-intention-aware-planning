@@ -20,7 +20,8 @@ from pathlib import Path
 import pytest
 
 from mesa_sim import webui_adapter
-from mesa_sim.run_config import DOMAIN_REGISTRY, RUN_OPTIONS, load_experiment, run_configuration
+from mesa_sim.run_config import (DOMAIN_REGISTRY, EXPERIMENT_CONFIG_PATH, RUN_OPTIONS, load_experiment,
+                                 run_configuration)
 from mesa_sim.sim_run import LOG_DIR, start_sim_run
 from mesa_sim.webui_adapter import MesaSimulator
 from shared.types import ScriptDependence, TimelineSource
@@ -57,7 +58,7 @@ def simulator():
 def _choice(simulator, domain, scenario, steps):
     catalogue = simulator.catalogue()
     entry = next(s for d in catalogue.domains if d.name == domain for s in d.scenarios if s.id == scenario)
-    options = tuple(m.CountValue(name=o.name, value=steps) if isinstance(o, m.CountValue) else o
+    options = tuple(m.LimitValue(name=o.name, value=steps) if isinstance(o, m.LimitValue) else o
                     for o in catalogue.default_choice.options)
     return m.SimRunChoice(domain=domain, layout=entry.reference_layouts[0], scenario=scenario, options=options)
 
@@ -85,13 +86,17 @@ def test_the_catalogue_validates_and_holds_the_registry_and_the_run_file(simulat
             scenario = registry["scenarios"][s.id]
             assert (s.setup, s.reference_layouts) == (scenario.setup, tuple(scenario.reference_layouts))
     assert [o.name for o in catalogue.run_options] == [n for n in RUN_OPTIONS if n not in webui_adapter.TRIPLE]
-    run_file = load_experiment(simulator.run_path, {})
+    run_file = load_experiment(EXPERIMENT_CONFIG_PATH, {})
     assert (catalogue.default_choice.domain, catalogue.default_choice.scenario) == (run_file["domain"],
                                                                                     run_file["scenario"])
     for declared, value in zip(catalogue.run_options, catalogue.default_choice.options):
         assert value.name == declared.name and value.value == declared.default
-        if declared.name in run_file:
+        if isinstance(declared, m.LimitOption):
+            assert declared.default is None     # the web-ui does not use the run file's steps (T-viz 1a, P11)
+        elif declared.name in run_file:
             assert declared.default == run_file[declared.name]
+    for d in catalogue.domains:
+        assert d.appearance == webui_adapter.appearance(d.name)
 
 
 def test_every_run_option_has_its_value_in_effect():
@@ -214,7 +219,7 @@ def test_a_choice_that_cannot_be_built_fails_and_writes_no_file(simulator, new_f
     elif change == "twice":
         choice = _with(choice, options + options[:1])
     elif change == "count_below":
-        choice = _with(choice, tuple(m.CountValue(name=o.name, value=0) if isinstance(o, m.CountValue) else o
+        choice = _with(choice, tuple(m.LimitValue(name=o.name, value=0) if isinstance(o, m.LimitValue) else o
                                      for o in options))
     elif change == "bad_one_of":
         choice = _with(choice, tuple(m.OneOfValue(name=o.name, value="greedy") if o.name == "strategy" else o

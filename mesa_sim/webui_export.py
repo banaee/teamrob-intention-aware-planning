@@ -6,7 +6,8 @@ PURPOSE:
     style trial): its run description, its start tick update and its domain's scene appearance, in
     webui/page/public/samples/<name>/, with samples/index.json listing the samples. The sim-run is built through Mesa's
     piece (mesa_sim/webui_adapter.py) and discarded: never stepped, it writes no log pair. The samples are data, not
-    tracked by git; a server replaces this in stage 1a.
+    tracked by git. Since T-viz 1a, increment (i), the page reads the web-ui's server (mesa_sim/run_webui.py) and no
+    longer reads the samples; whether this module is removed is Hadi's (flagged at increment (i)).
 
     PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python -m mesa_sim.webui_export            # the trial's two
     PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python -m mesa_sim.webui_export \\
@@ -22,9 +23,8 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from mesa_sim.webui_adapter import MesaSimulator
+from mesa_sim.webui_adapter import MesaSimulator, appearance
 from webui import messages as m
-from webui.appearance import Appearance
 
 ROOT = Path(__file__).resolve().parent.parent
 SAMPLES = ROOT / "webui" / "page" / "public" / "samples"
@@ -33,11 +33,6 @@ SAMPLES = ROOT / "webui" / "page" / "public" / "samples"
 # dock_loading's MPB kind 3, pallets in every container at the start.
 TRIAL = (("kitting", "scenario_s02_01", None),
          ("dock_loading", "scenario_s08_01", None))
-
-
-def appearance(domain: str) -> Appearance:
-    path = ROOT / "domains" / domain / "appearance.json"
-    return Appearance.model_validate_json(path.read_text()) if path.is_file() else Appearance()
 
 
 def export(simulator: MesaSimulator, domain: str, scenario: str, layout: Optional[str], name: str) -> dict:

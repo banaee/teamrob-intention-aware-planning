@@ -7,6 +7,11 @@ PURPOSE:
     rules (which sim-run is current, the end at the configured steps, the lock after the first step). Mesa's piece is
     mesa_sim/webui_adapter.py; the start that hands it to the server lives with the simulator, so nothing here imports
     one.
+
+ONE THREAD (T-viz 1a):
+    The server makes every call into a simulator's side (catalogue, build, and every call on a sim-run) on one thread
+    of its own. A piece may rely on it: Mesa's piece writes into a sim-run's log pair only the lines logged on that
+    thread, so that lines the server or a library logs on other threads never reach a sim-run's log.
 """
 
 from typing import Protocol

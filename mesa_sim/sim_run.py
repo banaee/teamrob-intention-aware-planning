@@ -16,7 +16,10 @@ WHAT THIS MODULE DOES:
       built and never stepped leaves no file; a name already taken gets a suffix _2, _3, ...
       Logging is process-wide: one pair is attached at a time. A new pair detaches the one
       attached before it, which a later step or end of its own sim-run attaches again (T-viz
-      0.2's fault, fixed in 0.4): a sim-run's lines always go to its own pair
+      0.2's fault, fixed in 0.4): a sim-run's lines always go to its own pair. A pair of the
+      web-ui (T-viz 1a) takes only the lines logged on the thread that created it and does not
+      echo to the terminal: the web-ui's server makes every call into a sim-run on one thread,
+      and the lines of the server and of its libraries, logged on other threads, stay out
     - SimRun: the start line and the override lines, the model, per step the agents' lines
       and [sep], and the run's end (end_run, the end line)
     - start_sim_run: the start whose failure still writes its log pair (an empty pair on a
@@ -29,6 +32,7 @@ WHAT THIS MODULE DOES NOT DO:
 """
 
 import logging
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
@@ -86,6 +90,17 @@ class _HeldFile(logging.Handler):
 _attached: Optional["RunLog"] = None
 
 
+class _OnThread(logging.Filter):
+    """Passes the records logged on one thread only."""
+
+    def __init__(self, thread: int):
+        super().__init__()
+        self._thread = thread
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.thread == self._thread
+
+
 class RunLog:
     """
     The log pair of one sim-run. Attached at creation: from then on every line logged in the
@@ -94,18 +109,28 @@ class RunLog:
     before it, whose files, if opened, stay open and stop growing until its own sim-run
     attaches it again (SimRun.step, SimRun.end). A pair never opened leaves no file. Only
     close() ends a pair: a closed pair is not attached or opened again.
+
+    `echo`: every line is also printed to the terminal (the headless start and the
+    solara-ui). `own_thread_only`: the pair takes only the lines logged on the thread that
+    created it (the web-ui, T-viz 1a); off, every line logged in the process.
     """
 
-    def __init__(self):
+    def __init__(self, echo: bool = True, own_thread_only: bool = False):
         self.log_path: Optional[str] = None
         self.rec_path: Optional[str] = None
         self._closed = False
         self._root = logging.getLogger()
         self._rec = logging.getLogger("rec")
         self._log_file = _HeldFile()
-        self._echo = logging.StreamHandler()   # still prints to terminal
-        self._echo.setFormatter(logging.Formatter(_FORMAT))
+        self._echo: Optional[logging.Handler] = None
+        if echo:
+            self._echo = logging.StreamHandler()   # still prints to terminal
+            self._echo.setFormatter(logging.Formatter(_FORMAT))
         self._rec_file = _HeldFile()
+        if own_thread_only:
+            on_thread = _OnThread(threading.get_ident())
+            self._log_file.addFilter(on_thread)
+            self._rec_file.addFilter(on_thread)
         self.attach()
 
     def attach(self) -> None:
@@ -122,7 +147,8 @@ class RunLog:
         self._rec_propagate = self._rec.propagate
         self._root.setLevel(logging.INFO)
         self._root.addHandler(self._log_file)
-        self._root.addHandler(self._echo)
+        if self._echo is not None:
+            self._root.addHandler(self._echo)
         # The human executor's record (T-H2): its own stream, one `[rec]` line per tick,
         # in the file beside the run log, never in the run log.
         self._rec.propagate = False
@@ -135,7 +161,8 @@ class RunLog:
         if _attached is not self:
             return
         self._root.removeHandler(self._log_file)
-        self._root.removeHandler(self._echo)
+        if self._echo is not None:
+            self._root.removeHandler(self._echo)
         self._rec.removeHandler(self._rec_file)
         self._root.setLevel(self._root_level)
         self._rec.propagate = self._rec_propagate
@@ -164,7 +191,8 @@ class RunLog:
         self.detach()
         self._closed = True
         for handler in (self._log_file, self._echo, self._rec_file):
-            handler.close()
+            if handler is not None:
+                handler.close()
 
 
 def _min_separation_over_tick(r0, r1, h0, h1) -> float:
@@ -187,14 +215,16 @@ class SimRun:
     """
     One sim-run: from the model built from `config` at step 0 to its end, logging into `log`.
     The start line and the override lines are written before the model is built; the pair
-    is opened at the first step() or at end().
+    is opened at the first step() or at end(). `config["steps"]` is the step count the start
+    line states; None for a sim-run of the web-ui without a step limit (T-viz 1a), stated
+    `steps=none`.
     """
 
     def __init__(self, config: dict, log: RunLog):
         self.config = config
         self.log = log
         self.steps_done = 0
-        n_steps = config["steps"]
+        n_steps = "none" if config["steps"] is None else config["steps"]
         # The triple is the run's identity (T-L): the start line names the
         # RESOLVED layout, setup and scenario ids.
         _, layout_id, setup_id, scenario = resolve_triple(config)
