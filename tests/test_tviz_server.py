@@ -14,6 +14,10 @@ docs/handoffs/plan_T-viz_1a.md, sections 2 (i) and 7.
   with a task, whichever is later, read from the sim-run's own log pair.
 - The start refuses what the page cannot show.
 - The view (T-viz 1a (ii)): refused while a stepped sim-run is current.
+- Test 2 (T-viz 1a (iv); plan section 7): a domain the web-ui has never seen, under a new name, with dock_loading's
+  content and no scene appearance of its own, is listed by the catalogue with the default appearance and builds and
+  steps through the server. Its limit (P15): the new domain's object types and area ids are dock_loading's; that the
+  web-ui's code names none is the domain-word scan's (tests/test_tviz_messages.py).
 """
 
 import json
@@ -76,11 +80,11 @@ class _Server:
     """The web-ui's server as its own process, from the start's own reading of the command line (read_start), the page
     not served (an API-only server: the test reads no page)."""
 
-    def __init__(self, args):
+    def __init__(self, args, prelude=""):
         with socket.socket() as s:
             s.bind(("127.0.0.1", 0))
             self.port = s.getsockname()[1]
-        code = ("from mesa_sim.run_webui import read_start; from webui.server import serve; "
+        code = (prelude + "from mesa_sim.run_webui import read_start; from webui.server import serve; "
                 "simulator, port = read_start(%r); serve(simulator, port, None)" % ([*args, "--port", str(self.port)],))
         self.process = subprocess.Popen([PYTHON, "-c", code], cwd=ROOT, env=_env(), stderr=subprocess.PIPE)
         for _ in range(200):
@@ -116,8 +120,8 @@ class _Server:
 def server():
     started = []
 
-    def start(*args):
-        started.append(_Server(args))
+    def start(*args, prelude=""):
+        started.append(_Server(args, prelude))
         return started[-1]
     yield start
     for s in started:
@@ -237,6 +241,37 @@ def test_a_view_is_refused_while_a_stepped_sim_run_is_current(server, new_files)
     assert m.Current.model_validate_json(web.get("current")[1]).state.description == state.description
     web.stop()
     assert len(new_files()) == 2      # the stepped sim-run's pair, ended at the server's stop
+
+
+# =============================================================================
+# Test 2: a domain the web-ui has never seen
+# =============================================================================
+
+UNSEEN = "unseen_domain"
+# The registry of the server's process gains the new domain before its start reads it: dock_loading's content under a
+# name no file of the web-ui, and no domains/<name>/appearance.json, knows.
+UNSEEN_PRELUDE = ("from mesa_sim import run_config; "
+                  "run_config.DOMAIN_REGISTRY[%r] = dict(run_config.DOMAIN_REGISTRY['dock_loading']); " % UNSEEN)
+
+
+def test_a_domain_the_web_ui_has_never_seen_is_listed_built_and_stepped(server, new_files):
+    from webui.appearance import Appearance
+    assert not (ROOT / "domains" / UNSEEN).exists()
+    web = server("--domain", UNSEEN, "--scenario", "scenario_s03_02", prelude=UNSEEN_PRELUDE)
+    catalogue = m.Catalogue.model_validate_json(web.get("catalogue")[1])
+    entry = next(d for d in catalogue.domains if d.name == UNSEEN)
+    assert entry.appearance == Appearance()                 # drawn from the defaults
+    assert catalogue.default_choice.domain == UNSEEN
+    state = _choose(web, catalogue.default_choice)
+    assert state.description.run.domain == UNSEEN
+    ref = m.SimRunRef(sim_run=state.description.sim_run)
+    for k in range(20):
+        status, body = web.post("step", ref)
+        assert status == 200 and m.TickUpdate.model_validate_json(body).tick == k
+    view = web.post("view", m.ViewChoice(domain=UNSEEN, layout=state.description.run.layout, setup=None))
+    assert view[0] == 409                                   # the choices are locked after the first step
+    web.stop()
+    assert len(new_files()) == 2                            # its log pair, ended at the server's stop
 
 
 # =============================================================================
