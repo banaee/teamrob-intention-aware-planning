@@ -12,7 +12,8 @@ ccode pauses after each increment for Hadi's review in the browser. AMENDED (Had
 increments (ii) and (iii) are built in one session with no pause between them; then one pause; (iv) and (v) each in a
 session of its own.
 
-Progress: increment (i) BUILT (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, INCREMENT (i),
+Progress: increments (ii) and (iii) BUILT (ccode, 6 October 2026; design_records.md, 1a, INCREMENTS (ii) AND (iii),
+BUILT); Hadi's review of them open. Increment (i) BUILT (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, INCREMENT (i),
 BUILT, with its checks and its deviations from this plan); Hadi's review of it done (6 October 2026; design_records.md,
 "T-viz, the web-ui", 1a, HADI'S REVIEW OF INCREMENT (i); P17 to P24 below). Increments (ii) to (v) not started.
 
@@ -79,6 +80,16 @@ OF INCREMENT (i)). Increment (i) works for Hadi as a first stage; he will ask fo
 - P24. The order of the rest of 1a: (ii) and (iii) built together, no pause between them; one pause for Hadi's review;
   (iv) in a new session; then (v), polishing, from a written list Hadi gives, ccode working that list and nothing else.
   Whether a second polishing round follows after stage 1c is open.
+
+Given during the build of (ii) and (iii) (Hadi, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, THE MODE
+OF CHECKS FOR THE REST OF STAGE 1):
+
+- P25. Stage 1 is a prototype; checks of the page are reduced for the rest of stage 1. Kept: headless byte-identical
+  whenever `mesa_sim/`, `shared/`, `world/` or `domains/` changes (a difference stops the work); the test suite once at
+  the end of each increment; the page's build and type check; one look in a real browser per new feature at one window
+  size (fix what is broken, do not refine the look). Dropped or deferred: screenshot sets, the second window size,
+  saved screenshot folders; visual comparison and refinement (to (v)); page-side unit tests (deferred); the solara-ui
+  check per increment (once, before Hadi's acceptance of 1a); long record entries.
 
 ---
 
@@ -247,7 +258,8 @@ Scope:
 What Hadi sees: the whole page of 1a; the human's activity changing as the human works, is interrupted (a coffee
 break started by an event) and resumes.
 
-Checks: test 2; the domain-word scan of `webui/` and the page; screenshots of both domains, every page state. Then
+Checks: test 2; the domain-word scan of `webui/` and the page; screenshots of both domains, every page state
+(AMENDED, P25: one look in a browser per new feature, one window size; the solara-ui checked once here). Then
 Hadi's acceptance of 1a, from which the solara-ui is archived (the README and the roadmap say so). AMENDED (P24):
 Hadi's acceptance of 1a follows (v).
 
@@ -256,7 +268,7 @@ Hadi's acceptance of 1a follows (v).
 Scope: the written list Hadi gives after (iv), and nothing else; in a session of its own. Whether a second polishing
 round follows after stage 1c is open.
 
-Checks: those of section 8 that the list's items touch.
+Checks: those of section 8, as P25 reduces them, that the list's items touch.
 
 ---
 
@@ -585,6 +597,12 @@ Test 2: a domain the web-ui has never seen is drawn without a change to the web-
 ---
 
 ## 8. Checks in every increment
+
+AMENDED (Hadi, 6 October 2026, P25), from (iii) on: the list below is reduced to headless byte-identity where
+`mesa_sim/`, `shared/`, `world/` or `domains/` changes; the test suite once per increment; the page's build and type
+check; one look in a browser per new feature at one window size; the domain-word scan stays (it is in the suite). The
+screenshot sets and the second size, the saved folder, page-side unit tests and the solara-ui per increment are
+dropped or deferred (the solara-ui once before Hadi's acceptance of 1a).
 
 - Headless byte-identical where `mesa_sim/` changes ((i): `sim_run.py`; (ii): the loader's move): the four maintained
   sets (48 logs and their `.rec`) and dock_loading's scenario_s03_02, s05_02, s07_02, rerun into a scratch folder and

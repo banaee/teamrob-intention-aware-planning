@@ -1,9 +1,11 @@
 # The web-ui's page (T-viz)
 
-Stage 1a, increment (i): the page served by the web-ui's server (`webui/server.py`, started by
+Stage 1a, increments (i) to (iii): the page served by the web-ui's server (`webui/server.py`, started by
 `mesa_sim/run_webui.py`). The frame of the page for the whole of stage 1 (the selection on top; the human and the world,
-the env-pane with its control bar, the robot's mind; the plots below), a minimal choice (the domain, and a scenario on
-its reference layout), and the env-pane drawing the current sim-run tick by tick under play, pause, step and reset.
+the env-pane with its control bar, the robot's mind; the plots below); the choice by domain, layout, setup and scenario,
+a layout or a layout and setup drawn before a scenario is chosen, every run option, the choice mirrored in the address;
+the env-pane drawing the current sim-run tick by tick under play, pause, step and reset, its camera at two presets or
+moved freely.
 The plan: `docs/handoffs/plan_T-viz_1a.md`; the records: `docs/design_records.md`, "T-viz, the web-ui".
 
 ## Run it
@@ -27,6 +29,8 @@ Screenshots in the installed Google Chrome, driving a running web-ui: `npm run s
 moment after 60 steps (tilted, from above, and at 1920 wide), play until all agents have finished, and an end at a step
 limit.
 
+The page's unit tests: `npm test` (vitest).
+
 After a change of `webui/messages.py` or `webui/appearance.py`, regenerate the page's types:
 `~/python-envs/ir-nomesa-env/bin/python -m webui.schema`, then `npm run gen:types` here.
 
@@ -40,8 +44,9 @@ After a change of `webui/messages.py` or `webui/appearance.py`, regenerate the p
   scene read it.
 - `src/env-pane/`: the env-pane. `Scene.tsx` draws one tick from the run description, the tick update and the scene
   appearance (what is constant once per sim-run; the agents glide between two ticks during play); `forms.tsx` the shape
-  vocabulary; `figures.tsx` the agents; `material.ts` the flat faces and the hatching; `camera.tsx` the two views;
-  `displayPlaces.ts` where movable objects are drawn inside a fixed object.
+  vocabulary; `figures.tsx` the agents; `material.ts` the flat faces and the hatching; `camera.tsx` the two presets and the free camera;
+  `places.ts` where movable objects are drawn inside a fixed object; `look.ts` an object's look, by its type and
+  the states that hold for it.
 - `src/gen/`: the types, generated from the Python definitions (never edited by hand).
 - The scene appearance of a domain is the domain's `domains/<domain>/appearance.json` (`webui/appearance.py`), carried
   by the catalogue; a domain without one is drawn from the defaults.

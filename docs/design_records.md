@@ -5123,3 +5123,34 @@ increments of its section 2). Every proposal of the plan not named here stays pr
    pause for Hadi's review; then increment (iv) in a new session; then a new increment (v), polishing. For (v) Hadi
    gives a written list, and ccode works that list and nothing else. Whether a second polishing round follows after
    stage 1c is open.
+
+1a, THE MODE OF CHECKS FOR THE REST OF STAGE 1 (Hadi, 6 October 2026, preferred; given during the build of (ii) and
+(iii) and applied to it). Stage 1 is a prototype: Hadi will change the page layout and the design soon, so product-level
+checks of the page cost more time than they save. Kept: headless logs byte-identical whenever code under `mesa_sim/`,
+`shared/`, `world/` or `domains/` changes (a difference stops the work); the test suite once at the end of each
+increment; the page's build and type check; one look in a real browser per new feature, at one window size, to confirm
+it renders and works (what is broken is fixed, the look not refined). Dropped or deferred: screenshot sets of every
+page state, the second window size and saved screenshot folders; rounds of visual comparison and refinement (they
+belong to (v), from Hadi's list); page-side unit tests (deferred); the solara-ui check per increment (once, before
+Hadi's acceptance of 1a); long record entries (per increment: what was built, the deviations, the commit ids).
+`docs/handoffs/plan_T-viz_1a.md` is amended to match (P25, sections 2 and 8).
+
+1a, INCREMENTS (ii) AND (iii), BUILT (ccode, 6 October 2026; plan sections 2 (ii) and (iii); proposals of ccode unless
+marked preferred; Hadi's review at the pause after (iii) is open; the session's state file
+`docs/handoffs/build_T-viz_1a_state.md`).
+- (ii), commits 5f578dc, db28f6f, 0038743, e55c066, 986ded6: the loader's layout and setup parts as functions of
+  `mesa_sim/sim_model.py`; dock_loading's `space.note` renamed `notes`; the view of a layout, and of a layout and a
+  setup (`LayoutView`, `POST /api/view`, refused while a stepped sim-run is current); the notes in the catalogue; the
+  page's full selection, the run options edited by kind, lock and unlock, the address; the env-pane's header by the
+  layout's id (P20); `mesa_sim/webui_export.py` and the samples removed (P23).
+- (iii), commits 9e1bef1, e42bd2b: the free camera beside the presets; looks by state (the loaded and empty pallet, the
+  open gate) with the piece's check of the named states; display places kept, folded over every tick update, which
+  `current` now returns; the counter form's top see-through (P21).
+- Checks: headless byte-identical after each change of `mesa_sim/` and `domains/` (102 files); every offered triple
+  (1020) builds and its view equals its start; the page's offer equals P2's rule on the real catalogue; the suite 436
+  passed, 1 failed (`tests/test_tl2_discovery.py` counts 721 kitting scenarios, 722 since Hadi's 0536293; not
+  touched); the build and type check; in Chrome: the views, an option set off, the address's three cases, a reload
+  giving the same picture as the steps before it, a free angle.
+- Deviations: vitest came in (ii), not (iii), for the selection rule and the address (15 page-side tests in all,
+  written before the change of mode, kept); the deletion of `webui_export.py` landed in 0038743 with the view's
+  commit; a refusal's message is shown in at most three lines (the unknown-scenario message lists every scenario).

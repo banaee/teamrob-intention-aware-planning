@@ -612,8 +612,10 @@ Decisions
   `webui/appearance.py` with `domains/<domain>/appearance.json`, the theme `webui/page/src/theme.ts`; its look accepted by
   Hadi "for now and for stage 0", its technology the web-ui's: React, TypeScript, Vite, three.js through React Three
   Fiber and drei, uPlot planned for 1c, no UI kit). A new T-viz session reads the handoff's section "State after stage
-  0" first. Stage 1a is under way (6 October 2026): its plan `docs/handoffs/plan_T-viz_1a.md`, increment (i) built
-  (the server `webui/server.py`, the start `mesa_sim/run_webui.py`, the page's frame), Hadi's review of it open; a later
+  0" first. Stage 1a is under way (6 October 2026): its plan `docs/handoffs/plan_T-viz_1a.md`, increments (i) to
+  (iii) built (the server `webui/server.py`, the start `mesa_sim/run_webui.py`, the page's frame; the full selection,
+  the views, the address; the free camera, looks by state, display places), Hadi's review of (ii) and (iii) open; the
+  page's checks reduced for the rest of stage 1 (P25 of the plan); a later
   T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").

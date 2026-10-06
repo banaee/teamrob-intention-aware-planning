@@ -82,6 +82,10 @@ REVIEWED (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui
 increment (i) works as a first stage; the plan's P17 to P24 record the review (the panels' widths, the control bar's
 place, the env-pane's header showing the layout's id only, see-through table tops in (iii), the export module and the
 samples removed in (ii), and the order: (ii) and (iii) together, one pause, (iv), then (v) polishing from Hadi's list).
+Increments (ii) and (iii) BUILT (6 October 2026; design_records.md, 1a, INCREMENTS (ii) AND (iii), BUILT): the full
+selection with views of a layout and a setup, the run options, the address; the free camera, looks by state, display
+places kept, see-through table tops. Checks of the page reduced for the rest of stage 1 (Hadi, P25). Next: Hadi's
+review, then (iv).
 
 ### What Hadi prefers now
 
