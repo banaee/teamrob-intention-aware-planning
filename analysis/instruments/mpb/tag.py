@@ -3,6 +3,9 @@
 tag.py — the tag per task (Hadi, 5 October 2026; design_records.md, "T-F part 1", THE TAG PER TASK; glossary §7), read
 from the runs of run_set.sh, in any domain (T-K part 1, step 6; design_records.md, "T-K", STEP 6).
 
+THE ONE DEFINITION (T-viz 1a (iv), 6 October 2026): the rule below lives in world/tag.py (the tag, the recency facts,
+the stretches), which the web-ui's piece reads too; this reader parses a run's log and record and hands them to it.
+
 Each task the human performs gets one tag by the facts in force when it starts:
 - in accord: a fact holds and the human performs the task the fact makes more likely;
 - not in accord: a fact holds and the human performs another task;
@@ -51,8 +54,8 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT), str(ROOT / "analysis" / "instruments" / "common")]
 
 import separation
-from shared.knowledge import StrengthLevel
 from shared.types import Predicate
+from world.tag import Stretches, recent_tasks, tag_at
 
 COLUMNS = ["run", "scenario", "layout", "condition", "context_knowledge", "task", "start", "end", "tag", "raised",
            "lowered", "hypothesis", "adm_gate", "adm_record", "wrong_gate", "wrong_record", "viol", "near", "counted"]
@@ -85,12 +88,14 @@ def record(rec):
         top[t] = None if m[2] == "-" else m[2].split(";")[0]
         done += [(t, e[len("completed:"):]) for e in re.findall(r"completed:[^,]+\)", m[3])]
     out = []
+    stretches = Stretches()
     for t in sorted(top):
-        if top[t] is None:
+        start = stretches.at(t, top[t])
+        if start is None:
             if out and out[-1][2] is None:
                 out[-1][2] = t
             continue
-        if out and out[-1][0] == top[t] and out[-1][2] is None:
+        if out and out[-1][1] == start and out[-1][2] is None:
             continue
         if out and out[-1][2] is None:
             out[-1][2] = t
@@ -107,26 +112,22 @@ def windows(log):
 
 
 class World:
-    """The facts in force at a tick, as the declared context knowledge reads them."""
+    """The run's facts as world/tag.py reads them: the timeline's windows, the completed tasks, the recency durations
+    in ticks; the record's task names resolved to the domain's task schemas (parsing the log, here only)."""
 
     def __init__(self, domain, log, done, recency_ticks):
-        self.ck = importlib.import_module(f"domains.{domain}.registry").domain_config["context_knowledge"]
+        config = importlib.import_module(f"domains.{domain}.registry").domain_config
+        self.ck = config["context_knowledge"]
+        self.schemas = {s.name: s for s in config["register_fn"]().task_schemas()}
         self.windows = windows(log)
-        self.recency = recency_ticks
-        self.done = done
-
-    def levels(self, t):
-        predicates = {Predicate(f, ()) for f, a, e in self.windows if a <= t < e}
-        recent = [e.task for e in self.ck.entries() if e.recency is not None and any(
-            c <= t < c + self.recency[e.task.name] for c, task in self.done if _bind(task)[0] == e.task.name)]
-        return {e.task.name: self.ck.level(e.task, predicates, recent) for e in self.ck.entries()}
+        self.recency = [(e.task, recency_ticks[e.task.name]) for e in self.ck.entries()
+                        if e.recency is not None and e.task.name in recency_ticks]
+        self.done = [(c, self.schemas[_bind(task)[0]]) for c, task in done]
 
     def tag(self, task, t):
-        lv = self.levels(t)
-        raised = sorted(n for n, v in lv.items() if v is StrengthLevel.RAISED)
-        lowered = sorted(n for n, v in lv.items() if v is StrengthLevel.SUPPRESSED)
-        tag = "no fact" if not raised else "in accord" if _bind(task)[0] in raised else "not in accord"
-        return tag, raised, lowered
+        facts = {Predicate(f, ()) for f, a, e in self.windows if a <= t < e}
+        found = tag_at(self.ck, self.schemas[_bind(task)[0]], facts, recent_tasks(self.ck, self.done, self.recency, t))
+        return found.tag.value, sorted(s.name for s in found.raised), sorted(s.name for s in found.lowered)
 
 
 def run_rows(d):
