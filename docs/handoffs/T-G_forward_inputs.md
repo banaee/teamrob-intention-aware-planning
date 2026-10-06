@@ -245,7 +245,7 @@ T-K part 1: context knowledge
 │   ├─ the windows and the oracles' expectations, before the runs
 │   ├─ the runs: the idle robot (IRB), then the working robot (MPB); off, on, accord, through (772, 0 disagreements)
 │   └─ the report (analysis/kitting/tk5e/REPORT.md)
-├─ step 6  dock_loading's part .................................. on hold
+├─ step 6  dock_loading's stage 1 measured in full (568 runs) ... done (6 Oct; provisional decisions to confirm)
 └─ step 7  the close of T-K part 1 .............................. on hold
 
 then: T-G stage 2 (the full dock_loading domain)

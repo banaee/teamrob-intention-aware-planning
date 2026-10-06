@@ -548,7 +548,10 @@ Decisions
   min_separation from a wrong admission removed. The steps of T-K part 1 stand as a tree at the top of
   `docs/handoffs/T-G_forward_inputs.md`, section 5. Step 5e, context knowledge on kitting's rooms 02, 05, 06, 07 and on env_layout_19 and _20 (copies of 08 and 09 with a
   coffee machine), with 100 new scripts, is DONE (5 October 2026; analysis/kitting/tk5e/REPORT.md; design_records.md,
-  "T-K", STEP 5E): 772 runs, 0 disagreements. Steps 6 (dock_loading's part) and 7 (the close) are on hold.
+  "T-K", STEP 5E): 772 runs, 0 disagreements. Step 6, dock_loading's stage 1 measured in full in kitting's form, is DONE
+  (6 October 2026; design_records.md, "T-K", STEP 6; analysis/dock_loading/tk6/, COMPARISON.md): 568 runs, 0
+  disagreements; ccode's provisional decisions (TODO-185's reading of the tag among them) wait for Hadi. Step 7 (the
+  close) is on hold.
   T-F part 1, the conditions human-unaware and intention-unaware, is RULED (Hadi, 5 October 2026; design_decisions.md
   and design_records.md, the entry of that title, R1 to R10; glossary §9): two run options `human_aware` and
   `intention_aware`, both on by default, an option off setting the options above it off; intention-unaware is

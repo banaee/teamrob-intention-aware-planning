@@ -3981,6 +3981,26 @@ provisionally by ccode and reported for Hadi's confirmation. The tag's measures 
 columns: the gate's answer per tick and the meta-planner's decision record. ADDITION (Hadi, the same day): ccode may add
 a few new layouts (a new file with the next serial id; the three existing rooms unchanged; no A/C switch) and new setups
 where more tests need them, each with one line stating why and what it makes testable.
+STEP 6, DONE (ccode, 6 October 2026; analysis/dock_loading/tk6/: README.md the set and its rules, COMPARISON.md the
+report generated from the table). Points 1 and 2 confirmed before the authoring: the recognizer's lines are identical
+with an idle and a working robot on the 20 independent kind-3 scripts; a human-unaware robot moves as the robot alone
+on the 12 scripts that depend on the robot (the reference check applied there). Added: env_layout_05 (env_layout_03 with
+the coffee machine beside the office door: the coffee break and the office break on one shared walk), env_setup_10 and
+_11 (kind 3 on rooms 02 and 05); 52 planning scenarios (the ten planning scripts on room 02; scripts a to g in four
+rooms) and 164 copies with break_time; 568 runs (74 planning scripts in the four conditions, the copies with context
+knowledge on, the 54 recognition scenarios intention-aware off and on), every run finished, 0 disagreements with the
+oracle on 478, the 956 expectation files as committed, the reference check equal on 74. Instruments fixed for
+dock_loading: logparse, admission.py, offon.py, the reference check, actual.py's end of run (end_run), tag.py new.
+Decided by ccode, provisional, for Hadi's confirmation:
+- TODO-185: a fact that lowers a task gives no tag (the tag reads the raised level of the declared context knowledge);
+  the tasks at the suppressed level at a task's start are listed beside it (`lowered`).
+- The tag is read from the world (the timeline's windows, the recency facts of the human's actual completions in the
+  run's record), every top-of-stack stretch tagged, a task resumed after a cut tagged again at its resumption; the
+  gate's reading over the whole stretch, the decision record's before the robot's terminal decision.
+- The recognition set gets no copies with break_time (its scripts are the planning set's; point 1).
+- The windows' rules V1 to V3, KT4's edges for script f, and the dependent scripts' windows from the plain chain.
+Findings, none ruled: COMPARISON.md; the main ones in the chat report of the same day.
+Next: Hadi's confirmation of the provisional decisions; step 7 (the close of T-K part 1).
 
 
 ## T-F part 1: the conditions human-unaware and intention-unaware
