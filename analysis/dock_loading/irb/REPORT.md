@@ -1,5 +1,11 @@
 # The IRB on dock_loading: report
 
+STALE AND ITS OUTPUTS DELETED (Hadi, 6 October 2026; T-K part 1, step 6; design_records.md, "T-K", STEP 6): this set was made
+before the gate stage, the gate rulings and T-F part 1. Its outputs, expectation files and run files are deleted; the
+run files are held by commit 179d734 (`git checkout 179d734 -- configs/dock_loading`), the untracked outputs by
+/home/hadi/teamrob_tk6_handoff/dock_loading_stage1_outputs_before_tk6.tgz. Its scenarios are re-measured under the
+present gate in `analysis/dock_loading/tk6/`. This file stays as the record of stage 1.
+
 The set, its rules and its artefacts: `README.md`. The instrument: `analysis/instruments/irb/` (rules 1 to 23 in
 `analysis/kitting/irb/README.md`, 24 to 27 in the instrument's README). The expectations were committed before
 any run of the set (54edb71): `trajectory.json`, `expected.csv`, `phases.json` per scenario and `predictions.md`.

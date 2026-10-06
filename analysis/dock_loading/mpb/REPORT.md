@@ -1,5 +1,11 @@
 # The MPB on dock_loading (T-G stage 1): report
 
+STALE AND ITS OUTPUTS DELETED (Hadi, 6 October 2026; T-K part 1, step 6; design_records.md, "T-K", STEP 6): this set was made
+before the gate stage, the gate rulings and T-F part 1. Its outputs, expectation files and run files are deleted; the
+run files are held by commit 179d734 (`git checkout 179d734 -- configs/dock_loading`), the untracked outputs by
+/home/hadi/teamrob_tk6_handoff/dock_loading_stage1_outputs_before_tk6.tgz. Its scenarios are re-measured under the
+present gate in `analysis/dock_loading/tk6/`. This file stays as the record of stage 1.
+
 SUPERSEDING NOTE (Hadi, 3 Oct 2026): the results of the run files of 500 steps or more are potentially confounded by an
 undeclared weight (the hardcoded context weight multiplies coffee_break by 2.5 from step 500); they are not declared
 invalid; the recorded violations of the minimum separation at ticks 387 and 224 to 226 fall before step 500. Pointer:

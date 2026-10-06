@@ -1,5 +1,11 @@
 # The MPB on dock_loading (T-G stage 1)
 
+STALE AND ITS OUTPUTS DELETED (Hadi, 6 October 2026; T-K part 1, step 6; design_records.md, "T-K", STEP 6): this set was made
+before the gate stage, the gate rulings and T-F part 1. Its outputs, expectation files and run files are deleted; the
+run files are held by commit 179d734 (`git checkout 179d734 -- configs/dock_loading`), the untracked outputs by
+/home/hadi/teamrob_tk6_handoff/dock_loading_stage1_outputs_before_tk6.tgz. Its scenarios are re-measured under the
+present gate in `analysis/dock_loading/tk6/`. This file stays as the record of stage 1.
+
 The data and figures of this set (.json, .csv, .png) are not in git (Hadi, 2 October 2026). They are regenerated
 by the set's run script (`analysis/instruments/mpb/run.sh dock_loading`). A byte comparison uses the local copy or the outside copy,
 `/home/hadi/teamrob_analysis_2026-10-02/` (the whole of analysis/ as it was at 38d66ea).
