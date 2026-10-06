@@ -4431,6 +4431,14 @@ settle the open point of RELATIONS above.
     stage 1" under ccode's proposal; dated, left as written.
   - design_decisions.md, Phase 7's entry, SCHEDULED: "Phase 7 is T-V, track 2", still true; that it is now FW is
     recorded in the roadmap's Phase 7 section, not in the entry.
+HADI'S ANSWER ON THE CONTRADICTIONS AND THE PLACE (6 October 2026, preferred for now): "Put everything in FW, I decide
+later." The [FW] tags on T-viz stages 2 and 3, TODO-173 and TODO-186 to TODO-188 stay. No ruling is amended by this:
+A1's tag rule, the glossary's **FW** entry and A3's text on the live user as a V1 requirement stay as written. Open,
+each with "Hadi decides later", collected in TODO-190 for when Hadi draws the V1 border inside the web-ui:
+- the [FW] tags against A1's tag rule (conceptual, higher-level directions only);
+- A3's isolation of the human's choice as a V1 requirement, its live user now FW;
+- "after T-V" in the placements of track 3b and track 4;
+- the place of T-viz stage 1 in the order (ccode's proposal: in T-V's place, after T-F, before track 3b).
 
 0.1, RECORDING, DONE (ccode, 6 October 2026; no code changed). THE VERIFICATIONS of the handoff's 16.2, read at
 069282b (line numbers at that commit):

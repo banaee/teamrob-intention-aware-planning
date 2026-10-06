@@ -1296,3 +1296,6 @@ Hadi's answers to the 0.1 report (6 October 2026, preferred; design_records.md, 
 - 12.1, 13 (V1 and FW): T-viz stages 0 and 1 are in V1; stages 2 and 3 are after V1, [FW], the default until Hadi draws
   the V1 border inside the web-ui. TODO-173 (slots, section 9) is [FW]. 6.1 item 6 is unchanged: stage 0's choice of
   technology still considers the needs of stages 2 and 3.
+- On what these answers contradict, and on the place of stage 1 in the order (preferred for now): "Put everything in
+  FW, I decide later." The [FW] tags stay; no ruling is amended; the three contradictions and the place of stage 1
+  (ccode's proposal) stay open, Hadi decides later (TODO-190).

@@ -4944,3 +4944,18 @@ Raised in the design chat of 4 to 6 October 2026, no stage assigned:
   cchat).
 Hadi's global freeze button: with the clock proposed by cchat (the page requests each step) it is the pause.
 Reference: docs/handoffs/handoff_T-viz.md, sections 7.3, 7.4, 8.5, 13.4
+
+**TODO-190: The V1 border inside the web-ui: four open points (recorded, T-viz, 6 Oct 2026)** open; Hadi decides later
+Hadi, 6 October 2026 (preferred for now): "Put everything in FW, I decide later." T-viz stages 2 and 3, TODO-173 and
+TODO-186 to TODO-188 are [FW] until Hadi draws the V1 border inside the web-ui. No ruling is amended. The four points to
+settle then, each open, Hadi decides later:
+1. The [FW] tags against A1's tag rule (design_records.md, "T-G, the second domain", A1, Tags; glossary, **FW**): [FW]
+   is for conceptual, higher-level directions only, and the web-ui's stages 2 and 3 and TODO-173 are build work.
+2. A3's text (design_decisions.md, "T-G: the second domain's rulings", A3): the human's choice among applicable tasks is
+   isolated "so that a live user (T-V track 2, in V1)" can supply it, "a V1 requirement"; the live user (T-viz stage 3)
+   is now FW. The isolation is built (048a36e).
+3. Track 3b and track 4 placed "after T-V" (roadmap.md, T-D's tail lines; glossary, **T-D tail**; TODO-140, TODO-145,
+   PLACEMENT REVISED), with T-V now split into T-viz stage 1 (V1) and stage 3 (FW).
+4. The place of T-viz stage 1 in the order: ccode's proposal, in T-V's place, after T-F and before track 3b (roadmap.md,
+   the order block's line of 6 October 2026).
+Reference: design_records.md, "T-viz, the web-ui", HADI'S ANSWERS and HADI'S ANSWER ON THE CONTRADICTIONS AND THE PLACE
