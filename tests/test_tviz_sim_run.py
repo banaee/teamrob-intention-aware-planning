@@ -98,7 +98,7 @@ def test_a_sim_run_left_unended_keeps_its_own_pair(new_files):
     first = _start("scenario_s01_01")
     first.step()
     first_lines = open(first.log.log_path).read()
-    second = _start("scenario_s01_06")   # closes the first's pair where it stands
+    second = _start("scenario_s01_06")   # detaches the first's pair where it stands
     second.step()
     second.end()
     assert open(first.log.log_path).read() == first_lines
@@ -106,9 +106,29 @@ def test_a_sim_run_left_unended_keeps_its_own_pair(new_files):
     assert len(new_files()) == 4
 
 
+def test_a_displaced_sim_run_steps_again_into_its_own_pair(new_files):
+    """T-viz 0.2's fault (found in the solara-ui, fixed in 0.4): a sim-run built after another
+    used to close the other's pair, and the other's next step raised. A displaced sim-run's
+    next step attaches its own pair again; each sim-run's lines stay in its own pair."""
+    first = _start("scenario_s01_01")
+    first.step()
+    second = _start("scenario_s01_06")
+    second.step()
+    first.step()                         # raised RuntimeError before the fix
+    second.step()
+    first.end()
+    second.end()
+    first_log, second_log = open(first.log.log_path).read(), open(second.log.log_path).read()
+    assert "  step: 1: " in first_log and "  step: 1: " in second_log
+    assert "scenario_s01_06" not in first_log and "scenario_s01_01" not in second_log
+    assert first_log.rstrip("\n").endswith("[run_mesa] Headless run complete.")
+    assert "step=1 " in open(first.log.rec_path).read()
+    assert len(new_files()) == 4
+
+
 def test_a_sim_run_never_stepped_leaves_no_file(new_files):
     _start("scenario_s01_01")
-    _start("scenario_s01_06")           # the first, never stepped, is closed unopened
+    _start("scenario_s01_06")           # the first, never stepped, is detached unopened
     _start("scenario_s01_01").close()
     assert new_files() == []
 
@@ -123,7 +143,7 @@ def test_a_failed_start_writes_its_pair(new_files):
 def test_a_log_pair_takes_a_suffix_when_its_name_is_taken(new_files):
     first = RunLog()
     first.open()
-    second = RunLog()                    # closes the first
+    second = RunLog()                    # detaches the first
     second.open()
     assert first.log_path != second.log_path
     assert len(new_files()) == 4

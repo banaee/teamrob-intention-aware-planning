@@ -14,8 +14,9 @@ WHAT THIS MODULE DOES:
       executor's record, T-H2), relative to the working directory. Its lines are held in
       memory until the pair is opened, at the sim-run's first step or its end, so a model
       built and never stepped leaves no file; a name already taken gets a suffix _2, _3, ...
-      Logging is process-wide: one pair is attached at a time, and a new one closes the one
-      attached before it
+      Logging is process-wide: one pair is attached at a time. A new pair detaches the one
+      attached before it, which a later step or end of its own sim-run attaches again (T-viz
+      0.2's fault, fixed in 0.4): a sim-run's lines always go to its own pair
     - SimRun: the start line and the override lines, the model, per step the agents' lines
       and [sep], and the run's end (end_run, the end line)
     - start_sim_run: the start whose failure still writes its log pair (an empty pair on a
@@ -89,26 +90,36 @@ class RunLog:
     """
     The log pair of one sim-run. Attached at creation: from then on every line logged in the
     process goes to it, held in memory until open() creates the two files. One pair is
-    attached at a time (logging is process-wide): a new pair closes the one attached before
-    it, whose files, if opened, end where they stand. A pair never opened leaves no file; a
-    closed pair is not opened again.
+    attached at a time (logging is process-wide): attaching a pair detaches the one attached
+    before it, whose files, if opened, stay open and stop growing until its own sim-run
+    attaches it again (SimRun.step, SimRun.end). A pair never opened leaves no file. Only
+    close() ends a pair: a closed pair is not attached or opened again.
     """
 
     def __init__(self):
-        global _attached
-        if _attached is not None:
-            _attached.close()
         self.log_path: Optional[str] = None
         self.rec_path: Optional[str] = None
         self._closed = False
         self._root = logging.getLogger()
         self._rec = logging.getLogger("rec")
-        self._root_level = self._root.level
-        self._rec_propagate = self._rec.propagate
         self._log_file = _HeldFile()
         self._echo = logging.StreamHandler()   # still prints to terminal
         self._echo.setFormatter(logging.Formatter(_FORMAT))
         self._rec_file = _HeldFile()
+        self.attach()
+
+    def attach(self) -> None:
+        """Every line logged in the process goes to this pair from now on; the pair attached
+        before it is detached."""
+        global _attached
+        if self._closed:
+            raise RuntimeError("a closed log pair is not attached again")
+        if _attached is self:
+            return
+        if _attached is not None:
+            _attached.detach()
+        self._root_level = self._root.level
+        self._rec_propagate = self._rec.propagate
         self._root.setLevel(logging.INFO)
         self._root.addHandler(self._log_file)
         self._root.addHandler(self._echo)
@@ -117,6 +128,18 @@ class RunLog:
         self._rec.propagate = False
         self._rec.addHandler(self._rec_file)
         _attached = self
+
+    def detach(self) -> None:
+        """No line goes to this pair until it is attached again; its files stay as they stand."""
+        global _attached
+        if _attached is not self:
+            return
+        self._root.removeHandler(self._log_file)
+        self._root.removeHandler(self._echo)
+        self._rec.removeHandler(self._rec_file)
+        self._root.setLevel(self._root_level)
+        self._rec.propagate = self._rec_propagate
+        _attached = None
 
     def open(self) -> None:
         """Creates the two files and writes the lines held so far; nothing once opened."""
@@ -135,20 +158,13 @@ class RunLog:
         self._rec_file.open(self.rec_path)
 
     def close(self) -> None:
-        """Detaches the pair; its files, if opened, are closed as they stand."""
-        global _attached
+        """Ends the pair: detached, its files, if opened, closed as they stand."""
         if self._closed:
             return
+        self.detach()
         self._closed = True
-        self._root.removeHandler(self._log_file)
-        self._root.removeHandler(self._echo)
-        self._rec.removeHandler(self._rec_file)
         for handler in (self._log_file, self._echo, self._rec_file):
             handler.close()
-        self._root.setLevel(self._root_level)
-        self._rec.propagate = self._rec_propagate
-        if _attached is self:
-            _attached = None
 
 
 def _min_separation_over_tick(r0, r1, h0, h1) -> float:
@@ -199,6 +215,7 @@ class SimRun:
         }
 
     def step(self) -> None:
+        self.log.attach()
         self.log.open()
         model, step = self.model, self.steps_done
         model.step()
@@ -238,6 +255,7 @@ class SimRun:
         """The run's end (T-G A3): a human whose script depends on the robot states
         the entries still open; an independent script writes nothing. Then the end
         line, and the pair is closed."""
+        self.log.attach()
         self.log.open()
         for human in self.model.humans.values():
             human.end_run(int(self.model.schedule.steps))
