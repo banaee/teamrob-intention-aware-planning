@@ -451,6 +451,116 @@ def part1(rows, by):
     return out, summary_lines
 
 
+def load_full_reorder():
+    """The same 128 scenarios in the four conditions under full_reorder (run_721 to run_1232; Hadi, 6 October 2026;
+    design_records.md, "T-F part 1", THE MEASUREMENT EXTENDED BY FULL_REORDER), keyed as `load` keys single_task."""
+    by = {}
+    for r in csv.DictReader(open(RESULTS)):
+        if r["strategy"] != "full_reorder":
+            continue
+        r["done"] = r["completion"] != "unfinished"
+        for k in ("hold_ticks", "near_encounters", "viol", "recede", "stand_passing", "stand_beside", "decisions"):
+            r[k] = int(r[k])
+        r["completion"] = int(r["completion"]) if r["done"] else None
+        r["sep_min"] = float(r["sep_min"])
+        r["dir"] = HERE / "measurement" / r["scenario"] / r["run"]
+        by.setdefault(r["scenario"], {})[cond(r)] = r
+    assert all(len(v) == 4 for v in by.values()) and len(by) == 128, "128 scenarios in four conditions"
+    return by
+
+
+def order(r):
+    """The robot's executed order of tasks in a run: its task per tick (robot.json), consecutive repeats merged."""
+    out = []
+    for a in json.load(open(r["dir"] / "robot.json")):
+        if a["task"] is not None and (not out or out[-1] != a["task"]):
+            out.append(a["task"])
+    return [re.sub(r"deliver_item\(\?item=(\w+)(,\?kitting_table=(\w+))?\)", r"\1", x) for x in out]
+
+
+def full_reorder_sections(w, by, scen, finished):
+    """The sections the measurement extended by full_reorder adds (Hadi, 6 October 2026); every number under
+    single_task above is unchanged."""
+    byf = load_full_reorder()
+    finf = [s for s in scen if all(byf[s][c]["done"] for c in CONDS)]
+    fin2 = [s for s in finished if s in finf]
+    S = {"single_task": by, "full_reorder": byf}
+    w("## The measurement under full_reorder")
+    w("")
+    w("Added on 6 October 2026 (Hadi; design_records.md, \"T-F part 1\", THE MEASUREMENT EXTENDED BY FULL_REORDER): the "
+      "same 128 scenarios in the same four conditions under the strategy `full_reorder`, in which the robot orders its "
+      "whole pool at each decision (run_721 to run_1232). Debugging, not T-F part 2's evaluation. Every comparison of "
+      "conditions stays inside one strategy; every number above is the `single_task` measurement's, unchanged. "
+      "`full_reorder` logs no per-candidate hold (TODO-141); no measure below needs one.")
+    w("")
+    w(f"### The four conditions under each strategy")
+    w("")
+    w(f"Completion over the {len(fin2)} scenarios finished in all eight runs; the other measures over all 128.")
+    w("")
+    head = ["measure"] + [f"{LONG[c]}, {st_}" for c in CONDS for st_ in S]
+    rows = [["completion, mean (ticks)"] + [num(mean([S[st_][s][c]["completion"] for s in fin2])) for c in CONDS for st_ in S]]
+    for key, label in (("viol", "violation ticks, total"), ("near_encounters", "ticks below min_separation, total"),
+                       ("hold_ticks", "held ticks, total"), ("decisions", "decisions, total")):
+        rows.append([label] + [sum(S[st_][s][c][key] for s in scen) for c in CONDS for st_ in S])
+    rows.append(["runs that do not finish"] + [sum(not S[st_][s][c]["done"] for s in scen) for c in CONDS for st_ in S])
+    w(table(head, rows))
+    w("")
+    w("### The three steps under full_reorder, paired per scenario")
+    w("")
+    w(f"Over the 128 scenarios under `full_reorder` ({len(finf)} finished in all four conditions, for completion); the "
+      "same table under `single_task` is above. Negative is earlier or fewer.")
+    w("")
+    w(table(STEP_HEAD, step_rows(byf, scen, finf)))
+    w("")
+    w("### full_reorder against single_task, per condition")
+    w("")
+    w("Per scenario, the `full_reorder` run against the `single_task` run of the same condition; completion over the "
+      "scenarios finished under both. Negative is earlier or fewer under `full_reorder`.")
+    w("")
+    rr = []
+    for c in CONDS:
+        fc = [s for s in scen if by[s][c]["done"] and byf[s][c]["done"]]
+        for key, label, sc in (("completion", "completion (ticks)", fc), ("viol", "violation ticks", scen),
+                               ("near_encounters", "ticks below min_separation", scen), ("hold_ticks", "held ticks", scen)):
+            ds = [byf[s][c][key] - by[s][c][key] for s in sc]
+            word = ("earlier", "equal", "later") if key == "completion" else ("fewer", "equal", "more")
+            rr.append([LONG[c], label, len(ds), f"{sum(d < 0 for d in ds)} {word[0]} / {sum(d == 0 for d in ds)} "
+                       f"{word[1]} / {sum(d > 0 for d in ds)} {word[2]}", signed(mean(ds), 2),
+                       f"{sum(by[s][c][key] for s in sc)} → {sum(byf[s][c][key] for s in sc)}"])
+    w(table(["condition", "measure", "scenarios", "per scenario: lower / equal / higher", "mean change",
+             "total: single_task → full_reorder"], rr))
+    w("")
+    w("### Where recognition changes the robot's order of deliveries")
+    w("")
+    w("The robot's executed order of tasks (its task per tick, consecutive repeats merged; a task left and taken up "
+      "again appears twice), compared between conditions of one strategy.")
+    w("")
+    cmp_rows, lists = [], {}
+    for st_, b in S.items():
+        for a, c in (("HU", "IU"), ("IU", "OFF"), ("OFF", "ON")):
+            ch = [s for s in scen if order(b[s][a]) != order(b[s][c])]
+            lists[(st_, a, c)] = ch
+            cmp_rows.append([st_, f"{LONG[a]} → {LONG[c]}", len(scen), len(ch),
+                             sum(order(b[s][a])[:1] != order(b[s][c])[:1] for s in scen)])
+    w(table(["strategy", "conditions", "scenarios", "scenarios whose order differs", "of them the first task differs"],
+            cmp_rows))
+    w("")
+    for st_, b in S.items():
+        for a, c in (("IU", "OFF"), ("OFF", "ON")):
+            ch = lists[(st_, a, c)]
+            w(f"- {st_}, {LONG[a]} → {LONG[c]}: " + ("no scenario." if not ch else ""))
+            for s in ch:
+                w(f"  - {s} ({b[s][a]['layout']}): {', '.join(order(b[s][a]))} → {', '.join(order(b[s][c]))}; "
+                  f"completion {b[s][a]['completion']} → {b[s][c]['completion']}, violation ticks {b[s][a]['viol']} → "
+                  f"{b[s][c]['viol']}")
+    w("")
+    un = [(s, c) for s in scen for c in CONDS if not byf[s][c]["done"]]
+    w("Runs that do not finish under `full_reorder`: " + ("none." if not un else
+      "; ".join(f"{s} ({LONG[c]}, tick limit {json.load(open(byf[s][c]['dir'] / 'observed.json'))['steps']})"
+                for s, c in un) + "."))
+    w("")
+
+
 def main():
     by = load()
     scen = sorted(by)
@@ -473,7 +583,7 @@ def main():
     total_hold = {c: sum(by[s][c]["hold_ticks"] for s in scen) for c in CONDS}
 
     # ---- step 3b (part 1): computed first, placed after the step tables
-    allrows = [r for r in csv.DictReader(open(RESULTS))]
+    allrows = [r for r in csv.DictReader(open(RESULTS)) if r["strategy"] == "single_task"]   # full_reorder: its own sections
     for r in allrows:
         r["done"] = r["completion"] != "unfinished"
         for k in ("hold_ticks", "near_encounters", "viol"):
@@ -594,7 +704,7 @@ def main():
     w(f"- Every run was checked against an independent re-computation of what the robot should decide on every tick "
       f"(the test-bed's oracle): {checked} of {len(allrows)} runs checked, {dis} disagreements. In {ref_eq} of "
       f"{len(scen)} scenarios the human-unaware robot moves exactly as the robot does in the same room with no human.")
-    copies = sum(1 for r in csv.DictReader(open(RESULTS)) if int(r["run"][4:]) > 512)
+    copies = sum(1 for r in csv.DictReader(open(RESULTS)) if int(r["run"][4:]) > 512 and r["strategy"] == "single_task")
     w(f"- {copies} further runs, copies of these scenarios with a context fact in force over chosen ticks, run with "
       "context knowledge on only, are compared with their base scenarios in the section *Context knowledge with a fact "
       "in force*; the four-condition tables leave them out.")
@@ -737,6 +847,8 @@ def main():
       "This scenario is left out of every completion figure above; in the distance measures it is included, each "
       "run counted over its whole length.")
     w("")
+
+    full_reorder_sections(w, by, scen, finished)
 
     # ---- figures
     w("## The change per scenario")

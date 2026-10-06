@@ -4330,3 +4330,10 @@ rerun unless a check requires it; the same form (run files by serial, strategy a
 figure per run, the oracle's expectations committed before the runs, the human-unaware reference run per strategy);
 COMPARISON.md gains the three steps under `full_reorder` and a table of `full_reorder` against `single_task` per
 condition, its single_task numbers unchanged. TODO-141 applies.
+THE MEASUREMENT EXTENDED BY FULL_REORDER, DONE (ccode, 6 October 2026; analysis/kitting/tf1/COMPARISON.md, "The
+measurement under full_reorder"): 512 runs (run_721 to run_1232), 0 disagreements with the oracle, the 1024 expectation
+files as committed (each oracle table byte-identical to its single_task counterpart's), the 720 single_task rows of the
+result table byte-identical, every earlier line of COMPARISON.md unchanged. Not finished: scenario_s02_02 in the three
+conditions that observe the human, as under single_task (TODO-184). A measured premise: under single_task recognition
+changed the robot's order in 3 scenarios (intention-unaware → context knowledge off) and context knowledge in 1;
+under full_reorder in 1 and 3. Findings, none ruled: the report.

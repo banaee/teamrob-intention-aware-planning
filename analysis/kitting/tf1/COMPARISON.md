@@ -190,6 +190,90 @@ Over all 128 scenarios, unfinished runs included, step 1 removes 123 violation t
 
 At the end of its script the human stands still beside the robot's remaining target and stays there to the end of the run. The robots that observe the human wait for the standing human to move; each wait is as long as the human has stood so far, so the waits double. The human-unaware robot walks to its target and finishes. This scenario is left out of every completion figure above; in the distance measures it is included, each run counted over its whole length.
 
+## The measurement under full_reorder
+
+Added on 6 October 2026 (Hadi; design_records.md, "T-F part 1", THE MEASUREMENT EXTENDED BY FULL_REORDER): the same 128 scenarios in the same four conditions under the strategy `full_reorder`, in which the robot orders its whole pool at each decision (run_721 to run_1232). Debugging, not T-F part 2's evaluation. Every comparison of conditions stays inside one strategy; every number above is the `single_task` measurement's, unchanged. `full_reorder` logs no per-candidate hold (TODO-141); no measure below needs one.
+
+### The four conditions under each strategy
+
+Completion over the 127 scenarios finished in all eight runs; the other measures over all 128.
+
+| measure | human-unaware, single_task | human-unaware, full_reorder | intention-unaware, single_task | intention-unaware, full_reorder | intention-aware, context knowledge off, single_task | intention-aware, context knowledge off, full_reorder | intention-aware, context knowledge on, single_task | intention-aware, context knowledge on, full_reorder |
+|---|---|---|---|---|---|---|---|---|
+| completion, mean (ticks) | 186.4 | 179.9 | 192.3 | 183.9 | 191.4 | 183.9 | 191.1 | 183.4 |
+| violation ticks, total | 137 | 100 | 14 | 17 | 17 | 13 | 23 | 21 |
+| ticks below min_separation, total | 861 | 829 | 432 | 441 | 424 | 428 | 421 | 442 |
+| held ticks, total | 0 | 0 | 1155 | 804 | 1415 | 1153 | 1517 | 1186 |
+| decisions, total | 434 | 434 | 3098 | 3006 | 2094 | 2036 | 1864 | 1816 |
+| runs that do not finish | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 1 |
+
+### The three steps under full_reorder, paired per scenario
+
+Over the 128 scenarios under `full_reorder` (127 finished in all four conditions, for completion); the same table under `single_task` is above. Negative is earlier or fewer.
+
+| step | measure | scenarios | per scenario: lower / equal / higher | mean change | median change | scenarios that change: how many, median and range of the change | 95% interval of the mean (rooms resampled) | rooms with mean change < 0 / = 0 / > 0 | Wilcoxon p (indication only) |
+|---|---|---|---|---|---|---|---|---|---|
+| Step 1 | completion (ticks) | 127 | 0 earlier / 97 equal / 30 later | +4.02 | +0.0 | 30: median +6.5, +1 to +78 | +1.40 to +8.95 | 0 / 1 / 9 | < 0.001 |
+| Step 1 | violation ticks | 128 | 27 fewer / 100 equal / 1 more | -0.65 | +0.0 | 28: median -3.0, -7 to +1 | -1.41 to -0.25 | 8 / 2 / 0 | < 0.001 |
+| Step 1 | ticks below min_separation | 128 | 20 fewer / 101 equal / 7 more | -3.03 | +0.0 | 27: median -4.0, -294 to +4 | -9.31 to -0.35 | 7 / 2 / 1 | < 0.001 |
+| Step 2 | completion (ticks) | 127 | 11 earlier / 105 equal / 11 later | -0.04 | +0.0 | 22: median +0.0, -23 to +37 | -0.75 to +0.51 | 3 / 2 / 5 | 0.769 |
+| Step 2 | violation ticks | 128 | 5 fewer / 121 equal / 2 more | -0.03 | +0.0 | 7: median -1.0, -2 to +1 | -0.07 to +0.01 | 3 / 6 / 1 | 0.359 |
+| Step 2 | ticks below min_separation | 128 | 6 fewer / 119 equal / 3 more | -0.10 | +0.0 | 9: median -1.0, -6 to +6 | -0.29 to +0.08 | 4 / 4 / 2 | 0.309 |
+| Step 3a | completion (ticks) | 127 | 7 earlier / 115 equal / 5 later | -0.46 | +0.0 | 12: median -1.0, -24 to +12 | -1.69 to +0.13 | 3 / 4 / 3 | 0.330 |
+| Step 3a | violation ticks | 128 | 1 fewer / 122 equal / 5 more | +0.06 | +0.0 | 6: median +1.0, -1 to +3 | -0.02 to +0.21 | 1 / 7 / 2 | 0.156 |
+| Step 3a | ticks below min_separation | 128 | 2 fewer / 122 equal / 4 more | +0.11 | +0.0 | 6: median +5.0, -4 to +7 | -0.16 to +0.45 | 1 / 7 / 2 | 0.125 |
+
+### full_reorder against single_task, per condition
+
+Per scenario, the `full_reorder` run against the `single_task` run of the same condition; completion over the scenarios finished under both. Negative is earlier or fewer under `full_reorder`.
+
+| condition | measure | scenarios | per scenario: lower / equal / higher | mean change | total: single_task → full_reorder |
+|---|---|---|---|---|---|
+| human-unaware | completion (ticks) | 128 | 55 earlier / 72 equal / 1 later | -6.48 | 24099 → 23269 |
+| human-unaware | violation ticks | 128 | 13 fewer / 110 equal / 5 more | -0.29 | 137 → 100 |
+| human-unaware | ticks below min_separation | 128 | 15 fewer / 102 equal / 11 more | -0.25 | 861 → 829 |
+| human-unaware | held ticks | 128 | 0 fewer / 128 equal / 0 more | +0.00 | 0 → 0 |
+| intention-unaware | completion (ticks) | 127 | 61 earlier / 64 equal / 2 later | -8.35 | 24418 → 23358 |
+| intention-unaware | violation ticks | 128 | 3 fewer / 119 equal / 6 more | +0.02 | 14 → 17 |
+| intention-unaware | ticks below min_separation | 128 | 11 fewer / 106 equal / 11 more | +0.07 | 432 → 441 |
+| intention-unaware | held ticks | 128 | 15 fewer / 110 equal / 3 more | -2.74 | 1155 → 804 |
+| intention-aware, context knowledge off | completion (ticks) | 127 | 57 earlier / 67 equal / 3 later | -7.54 | 24311 → 23353 |
+| intention-aware, context knowledge off | violation ticks | 128 | 5 fewer / 119 equal / 4 more | -0.03 | 17 → 13 |
+| intention-aware, context knowledge off | ticks below min_separation | 128 | 11 fewer / 107 equal / 10 more | +0.03 | 424 → 428 |
+| intention-aware, context knowledge off | held ticks | 128 | 10 fewer / 113 equal / 5 more | -2.05 | 1415 → 1153 |
+| intention-aware, context knowledge on | completion (ticks) | 127 | 58 earlier / 65 equal / 4 later | -7.73 | 24276 → 23294 |
+| intention-aware, context knowledge on | violation ticks | 128 | 4 fewer / 119 equal / 5 more | -0.02 | 23 → 21 |
+| intention-aware, context knowledge on | ticks below min_separation | 128 | 8 fewer / 108 equal / 12 more | +0.16 | 421 → 442 |
+| intention-aware, context knowledge on | held ticks | 128 | 11 fewer / 112 equal / 5 more | -2.59 | 1517 → 1186 |
+
+### Where recognition changes the robot's order of deliveries
+
+The robot's executed order of tasks (its task per tick, consecutive repeats merged; a task left and taken up again appears twice), compared between conditions of one strategy.
+
+| strategy | conditions | scenarios | scenarios whose order differs | of them the first task differs |
+|---|---|---|---|---|
+| single_task | human-unaware → intention-unaware | 128 | 7 | 0 |
+| single_task | intention-unaware → intention-aware, context knowledge off | 128 | 3 | 0 |
+| single_task | intention-aware, context knowledge off → intention-aware, context knowledge on | 128 | 1 | 0 |
+| full_reorder | human-unaware → intention-unaware | 128 | 6 | 0 |
+| full_reorder | intention-unaware → intention-aware, context knowledge off | 128 | 1 | 0 |
+| full_reorder | intention-aware, context knowledge off → intention-aware, context knowledge on | 128 | 3 | 1 |
+
+- single_task, intention-unaware → intention-aware, context knowledge off: 
+  - scenario_s12_01 (env_layout_14): item_7, item_13 → item_7, item_13, item_7; completion 134 → 131, violation ticks 0 → 0
+  - scenario_s24_02 (env_layout_07): item_54, item_56, item_55 → item_54, item_55, item_56; completion 283 → 301, violation ticks 0 → 0
+  - scenario_s24_26 (env_layout_07): item_55, item_56, item_54, item_56 → item_55, item_54, item_56; completion 285 → 261, violation ticks 0 → 0
+- single_task, intention-aware, context knowledge off → intention-aware, context knowledge on: 
+  - scenario_s05_01 (env_layout_07): item_1, item_2, item_1 → item_1, item_2; completion 194 → 197, violation ticks 0 → 3
+- full_reorder, intention-unaware → intention-aware, context knowledge off: 
+  - scenario_s21_23 (env_layout_06): item_7, item_4, item_6, item_4 → item_7, item_4, item_6; completion 202 → 201, violation ticks 1 → 1
+- full_reorder, intention-aware, context knowledge off → intention-aware, context knowledge on: 
+  - scenario_s05_01 (env_layout_07): item_1, item_2, item_1 → item_2, item_1; completion 194 → 173, violation ticks 0 → 1
+  - scenario_s19_13 (env_layout_05): item_5, item_4, item_7 → item_5, item_7, item_4; completion 359 → 366, violation ticks 1 → 1
+  - scenario_s21_23 (env_layout_06): item_7, item_4, item_6 → item_7, item_4, item_6, item_4; completion 201 → 202, violation ticks 1 → 1
+
+Runs that do not finish under `full_reorder`: scenario_s02_02 (intention-unaware, tick limit 704); scenario_s02_02 (intention-aware, context knowledge off, tick limit 704); scenario_s02_02 (intention-aware, context knowledge on, tick limit 704).
+
 ## The change per scenario
 
 Each panel shows, for one step, how many scenarios change by how much. Scenarios with no change are counted in the panel's text and not drawn.
