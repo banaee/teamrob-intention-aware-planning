@@ -4001,6 +4001,14 @@ Decided by ccode, provisional, for Hadi's confirmation:
 - The windows' rules V1 to V3, KT4's edges for script f, and the dependent scripts' windows from the plain chain.
 Findings, none ruled: COMPARISON.md; the main ones in the chat report of the same day.
 Next: Hadi's confirmation of the provisional decisions; step 7 (the close of T-K part 1).
+STEP 6, FULL_REORDER (Hadi, 6 October 2026): the 74 planning scripts of step 6 are also run under `full_reorder`, in the
+same four conditions. Reason: under `single_task` an admission can change only the hold, so the set cannot show whether
+recognition changes the robot's choice or order of tasks. The ruling "single_task in every run" is extended, not
+replaced: every comparison of conditions stays inside one strategy. The same scripts, setups and layouts; no window
+copies and no recognition set; the same form (run files by serial, strategy a column of the one result table, one
+figure per run, the oracle's expectations committed before the runs, the human-unaware reference run per strategy);
+COMPARISON.md gains the three steps under `full_reorder` and a table of `full_reorder` against `single_task` per
+condition. TODO-141 applies (no per-candidate hold under `full_reorder`).
 
 
 ## T-F part 1: the conditions human-unaware and intention-unaware
