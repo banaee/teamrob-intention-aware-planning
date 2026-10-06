@@ -4465,10 +4465,10 @@ RELATIONS (ccode's reading of the records, 6 October 2026; how the records join 
       draws it from the log).
 THE DIFFERENCES between the handoff and the repo (the repo wins; a dated correction note stands at the end of the
 handoff):
-- Reference images: the handoff places them in `docs/handoffs/tviz_refs/`; commit 069282b holds them in
-  `docs/handoffs/`; Hadi's working tree has them moved to `tviz_refs/`, not committed at this step. The handoff (10.3)
-  says the folder should stay out of version control if the repository is public; the repository is public and
-  069282b, with the thirteen third-party images, is pushed. For Hadi.
+- Reference images: the handoff places them in `docs/handoffs/tviz_refs/`; commit 069282b held them in
+  `docs/handoffs/`, and Hadi's 4e71335 moved them to `tviz_refs/` during this step, so the place now agrees. The
+  handoff (10.3) says the folder should stay out of version control if the repository is public; the repository is
+  public, and both commits, with the thirteen third-party images, are pushed. For Hadi.
 - 4.4 lists T-E as a task and names T-V for track 2 only; T-E is superseded and T-V track 1 is the existing record of
   the viewer as a task (fact 1).
 - 5.4, 8.4 and 12.1: "the model already holds a path per agent (`agent.planned_path`) ... Today that path is a straight
