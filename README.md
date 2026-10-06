@@ -196,7 +196,6 @@ teamrob-intention-aware-planning/
 │   ├── run_mesa.py                 # Entry point: the headless start and the solara-ui's start
 │   ├── run_webui.py                # Entry point: the web-ui's start
 │   ├── webui_adapter.py            # Mesa's piece for the web-ui: the messages from a sim-run
-│   ├── webui_export.py             # A sim-run's messages written as files (stage 0.3; the page no longer reads them)
 │   └── mesa_configs.yaml           # Mesa-specific settings
 │
 ├── webui/                       # The web-ui (T-viz): messages, the simulator interface, the scene appearance, the server, the page

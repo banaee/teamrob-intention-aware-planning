@@ -242,11 +242,11 @@ def _webui_sources():
     return sorted(WEBUI.rglob("*.py"))
 
 
-# The page's own files (T-viz 0.3): its code, styles and configuration; not its dependencies, its build output or the
-# exported samples (data, git-ignored), nor the lock file (the dependencies' names).
+# The page's own files (T-viz 0.3): its code, styles and configuration; not its dependencies or its build output, nor
+# the lock file (the dependencies' names).
 PAGE = WEBUI / "page"
 PAGE_SUFFIXES = {".ts", ".tsx", ".mjs", ".js", ".css", ".html", ".json"}
-PAGE_SKIPPED = {"node_modules", "dist", "samples"}
+PAGE_SKIPPED = {"node_modules", "dist"}
 
 
 def _page_sources():

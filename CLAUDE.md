@@ -56,8 +56,6 @@ Relevant (read as needed):
   (T-viz 0.2)
 - `mesa_sim/webui_adapter.py`: Mesa's piece for the web-ui: the catalogue, the run description and the tick updates of
   a sim-run, read from the model only (T-viz 0.4)
-- `mesa_sim/webui_export.py`: a sim-run's run description, start tick update and scene appearance written as files for
-  the web-ui's page (T-viz 0.3); since 1a's increment (i) the page no longer reads them
 - `mesa_sim/run_webui.py`: the web-ui's start: the headless start's run file and flags, and `--port`; Mesa's piece
   handed to the web-ui's server (T-viz 1a)
 - `webui/`: the web-ui, independent of every simulator and domain: the messages (`messages.py`), the interface a

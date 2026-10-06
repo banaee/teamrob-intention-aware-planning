@@ -60,6 +60,10 @@ PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python -m mesa_sim.webui_export
 cd webui/page && npm run dev
 ```
 
+REMOVED (6 October 2026, 1a increment (ii); Hadi's review of increment (i), item 7): `mesa_sim/webui_export.py` and the
+trial's samples (`webui/page/public/samples/`); the trial page's commands above no longer run. The web-ui's start is
+below.
+
 There is no single start command with subcommands. Each start has its own command, and the README states them.
 
 Stage 1a, increment (i), built (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1a, INCREMENT (i),
