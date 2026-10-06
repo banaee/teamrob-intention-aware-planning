@@ -17,7 +17,9 @@ Its sources under configs/kitting/mpb/tk and configs/kitting/tk5e were deleted a
 5 October 2026); the run files it wrote are committed, and the sources are held by commit 362af19.
 Serials (K): run_001 onward, the four conditions of a scenario consecutive in the order above, the scenarios in the order
 above (each set sorted by id); no setting in a name.
+    make_runs.py full_reorder   the four conditions under full_reorder (Hadi, 6 October 2026), run_721 onward
 """
+import sys
 from pathlib import Path
 
 import yaml
@@ -48,7 +50,29 @@ def write(n, src, origin, label, change):
     (d / f"run_{n:03d}.yaml").write_text(text)
 
 
-if __name__ == "__main__":
+def full_reorder():
+    """The 128 scenarios' four conditions under full_reorder (Hadi, 6 October 2026; design_records.md, "T-F part 1", THE
+    MEASUREMENT EXTENDED BY FULL_REORDER; debugging, not T-F part 2): each of run_001 to run_512 copied with strategy
+    full_reorder, serials run_721 onward in the same order; nothing else changes."""
+    src = sorted(OUT.glob("*/run_*.yaml"), key=lambda p: int(p.stem[4:]))
+    src = [p for p in src if int(p.stem[4:]) <= 512]
+    assert len(src) == 512, len(src)
+    n = 720
+    for p in src:
+        n += 1
+        run = yaml.safe_load(open(p))
+        assert run["strategy"] == "single_task"
+        run["strategy"] = "full_reorder"
+        first, rest = [l for l in open(p) if l.startswith("#")][0].rstrip("\n").rstrip("."), \
+            [l for l in open(p) if l.startswith("#")][1:]
+        head = f"{first}; full_reorder, from {p.stem}.\n" + "".join(rest)
+        (p.parent / f"run_{n:03d}.yaml").write_text(head + "\n" + yaml.safe_dump(run, sort_keys=False))
+    print(f"run_721 to run_{n:03d}: {n - 720} run files under full_reorder")
+
+
+if __name__ == "__main__" and sys.argv[1:] == ["full_reorder"]:
+    full_reorder()
+elif __name__ == "__main__":
     four = sorted((CFG / "mpb").glob("*.yaml")) + sorted((CFG / "mpb" / "tk").glob("*.yaml")) + \
         sorted((CFG / "tk5e" / "mpb" / "off").glob("*.yaml"))
     plain = {p.name for p in (CFG / "tk5e" / "mpb" / "off").glob("*.yaml")}

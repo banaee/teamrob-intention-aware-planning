@@ -1,0 +1,17 @@
+# The measurement of T-F part 1 (not a baseline): scenario_s19_19, intention-unaware. From configs/kitting/tk5e/mpb/off/scenario_s19_19.yaml; full_reorder, from run_162.
+# Run: analysis/instruments/mpb/run_set.sh kitting -o analysis/kitting/tf1/measurement <this file>
+
+domain: kitting
+layout: env_layout_05
+setup: env_setup_19
+scenario: scenario_s19_19
+steps: 662
+human_aware: true
+intention_aware: false
+assignment_knowledge: true
+context_knowledge: true
+strategy: full_reorder
+gate_strategy: none
+cost_strategy: realized
+separation_stop: false
+test_level: 0.05
