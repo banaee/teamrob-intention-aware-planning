@@ -4,14 +4,17 @@
   "version": "0.3.0",
   "description": "The web-ui's page (T-viz). Stage 1a: the page served by the web-ui's server.",
   "type": "module",
-  "engines": { "node": ">=22.12.0" },
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "vite --open",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --open",
     "typecheck": "tsc --noEmit",
     "gen:types": "json2ts --unreachableDefinitions --no-additionalProperties -i src/gen/messages.schema.json -o src/gen/messages.ts",
-    "shots": "node scripts/shots.mjs"
+    "shots": "node scripts/shots.mjs",
+    "test": "vitest run"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.2.7",
@@ -30,6 +33,7 @@
     "json-schema-to-typescript": "16.0.0",
     "playwright-core": "1.63.0",
     "typescript": "5.9.3",
-    "vite": "8.3.3"
+    "vite": "8.3.3",
+    "vitest": "5.0.3"
   }
 }

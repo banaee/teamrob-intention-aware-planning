@@ -1,4 +1,3 @@
-# T-viz: dependencies, build output and the exported samples (data, written by mesa_sim/webui_export.py) stay out of git
+# T-viz: dependencies and build output stay out of git
 node_modules/
 dist/
-public/samples/

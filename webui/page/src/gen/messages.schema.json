@@ -366,7 +366,7 @@
     },
     "Current": {
       "additionalProperties": false,
-      "description": "The answer to current: the current sim-run, or None when there is none.",
+      "description": "The answer to current: the current sim-run, or the current view, or neither (both None). At most one is set.",
       "properties": {
         "state": {
           "anyOf": [
@@ -377,10 +377,21 @@
               "type": "null"
             }
           ]
+        },
+        "view": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LayoutView"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
-        "state"
+        "state",
+        "view"
       ],
       "title": "Current",
       "type": "object"
@@ -848,9 +859,20 @@
     },
     "LayoutEntry": {
       "additionalProperties": false,
+      "description": "A layout: its id, its title (stale in older layouts), and its notes, the free text of the layout file that says\nwhat the room is for (None when it has none).",
       "properties": {
         "id": {
           "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "title": {
           "type": "string"
@@ -858,9 +880,57 @@
       },
       "required": [
         "id",
+        "notes",
         "title"
       ],
       "title": "LayoutEntry",
+      "type": "object"
+    },
+    "LayoutView": {
+      "additionalProperties": false,
+      "description": "The view of a layout (the space, the areas, the fixed objects) and, with a setup chosen, of the setup at its\nstart. No sim-run, no agent, no tick.",
+      "properties": {
+        "areas": {
+          "items": {
+            "$ref": "#/$defs/Area"
+          },
+          "type": "array"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "fixed_objects": {
+          "items": {
+            "$ref": "#/$defs/FixedObject"
+          },
+          "type": "array"
+        },
+        "layout": {
+          "type": "string"
+        },
+        "setup": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SetupView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "space": {
+          "$ref": "#/$defs/Space"
+        }
+      },
+      "required": [
+        "areas",
+        "domain",
+        "fixed_objects",
+        "layout",
+        "setup",
+        "space"
+      ],
+      "title": "LayoutView",
       "type": "object"
     },
     "Left": {
@@ -1456,15 +1526,62 @@
     },
     "SetupEntry": {
       "additionalProperties": false,
+      "description": "A setup: its id and its notes, the free text of the setup file (None when it has none).",
       "properties": {
         "id": {
           "type": "string"
+        },
+        "notes": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
-        "id"
+        "id",
+        "notes"
       ],
       "title": "SetupEntry",
+      "type": "object"
+    },
+    "SetupView": {
+      "additionalProperties": false,
+      "description": "A setup's part of a view: its movable objects in the setup's order, the fixed objects that hold them at the\nstart (each with them in the setup's order), and the object states that hold at the start.",
+      "properties": {
+        "fixed_object_contents": {
+          "items": {
+            "$ref": "#/$defs/FixedObjectContents"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string"
+        },
+        "movable_objects": {
+          "items": {
+            "$ref": "#/$defs/MovableObject"
+          },
+          "type": "array"
+        },
+        "object_states": {
+          "items": {
+            "$ref": "#/$defs/ObjectState"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "fixed_object_contents",
+        "id",
+        "movable_objects",
+        "object_states"
+      ],
+      "title": "SetupView",
       "type": "object"
     },
     "ShapeKind": {
@@ -1954,6 +2071,49 @@
       ],
       "title": "UnfiredReason",
       "type": "string"
+    },
+    "ViewChoice": {
+      "additionalProperties": false,
+      "description": "The body of a view request: a layout of the domain, and optionally a setup.",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "string"
+        },
+        "setup": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "domain",
+        "layout",
+        "setup"
+      ],
+      "title": "ViewChoice",
+      "type": "object"
+    },
+    "ViewRefusal": {
+      "additionalProperties": false,
+      "description": "A view refused: a sim-run that has been stepped is current, and the choices are locked until a reset.",
+      "properties": {
+        "sim_run": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "sim_run"
+      ],
+      "title": "ViewRefusal",
+      "type": "object"
     },
     "WorldDescription": {
       "additionalProperties": false,

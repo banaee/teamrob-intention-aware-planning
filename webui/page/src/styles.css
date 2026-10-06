@@ -49,8 +49,13 @@ body {
   letter-spacing: 0.06em;
 }
 .page-toggle { margin-left: auto; flex: none; }
-.page-message {
+.page-message {                     /* a refusal's message: three lines at most, the rest scrolled (a message may list
+                                      every scenario of a domain) */
+  flex: none;
   margin: 0;
+  max-height: calc(3 * 1.45em);
+  overflow-y: auto;
+  line-height: 1.45;
   color: var(--color-humanDark);
   font-family: var(--font-mono);
   font-size: var(--type-sm);
@@ -126,6 +131,25 @@ button:disabled { cursor: default; opacity: 0.45; }
   text-align: left;
 }
 .choice small { font-family: var(--font); font-size: var(--type-xs); color: var(--color-inkFaint); }
+.choice-text {                       /* notes and descriptions: two lines, the whole when chosen */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.35;
+}
+.choice-text.is-whole { display: block; -webkit-line-clamp: unset; }
+.selection-filter {
+  margin: 0 var(--space-xs) var(--space-xs);
+  padding: 3px var(--space-sm);
+  border: var(--line-frame) solid var(--color-lineFaint);
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: var(--type-sm);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+.selection-filter:focus, .option-number:focus { outline: none; border-color: var(--color-line); }
 .choice[aria-pressed="true"] { background: var(--color-page); color: var(--color-ink); box-shadow: inset 2px 0 0 var(--color-ink); }
 .choice.is-static { cursor: default; }
 .selection.is-locked .choice[aria-pressed="true"] { box-shadow: inset 2px 0 0 var(--color-inkFaint); }
@@ -140,8 +164,31 @@ button:disabled { cursor: default; opacity: 0.45; }
   font-size: var(--type-sm);
 }
 .option dt { font-family: var(--font-mono); color: var(--color-inkSoft); }
-.option dd { margin: 0; font-family: var(--font-mono); color: var(--color-ink); white-space: nowrap; }
-.option-effect { margin-left: var(--space-sm); color: var(--color-humanDark); }
+.option { align-items: center; }
+.option dd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  font-family: var(--font-mono);
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+.option-effect { color: var(--color-humanDark); font-size: var(--type-xs); }
+.option dd button, .option dd select, .option dd input { font-family: var(--font-mono); font-size: var(--type-xs); }
+.option-switch { min-width: 40px; padding: 1px var(--space-sm); }
+.option-switch[aria-pressed="true"] { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-surface); }
+.option-switch[aria-pressed="true"]:hover:not(:disabled) { color: var(--color-surface); }
+.option dd select { padding: 1px var(--space-xs); }
+.option-number {
+  width: 64px;
+  padding: 1px var(--space-sm);
+  border: var(--line-frame) solid var(--color-lineFaint);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+.option-number::placeholder { color: var(--color-inkFaint); }
 
 /* The main row: panel 4a, the env-pane, panel 4b (a rail in 1a). */
 .main-row {

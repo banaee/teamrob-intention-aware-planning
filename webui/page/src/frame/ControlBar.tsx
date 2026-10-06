@@ -2,7 +2,8 @@
  * The control bar at the env-pane's foot (T-viz 1a): reset, step, play and pause, the speed, and the tick. The tick is
  * the run log's number of the step executed, so a moment seen here is found in the log; beside it the steps done, of
  * the step limit when one is set. It states when all agents have finished (the tick update's `run.finished_at`) and
- * why a sim-run ended. It holds no rule: what the server answers decides what is shown.
+ * why a sim-run ended. It holds no rule: what the server answers decides what is shown. Without a sim-run (a view of a
+ * layout, or a choice that was not built) every control is disabled and the bar says why (`idle`).
  */
 
 import type { EndReason, TickUpdate } from "../gen/messages";
@@ -18,8 +19,9 @@ const END_WORDS: Record<EndReason, string> = {
   server_stopped: "the server stopped",
 };
 
-export function ControlBar({ tick, limit, playing, busy, speed, onSpeed, onPlay, onPause, onStep, onReset }: {
-  tick: TickUpdate;
+export function ControlBar({ tick, idle, limit, playing, busy, speed, onSpeed, onPlay, onPause, onStep, onReset }: {
+  tick: TickUpdate | null;
+  idle: string;
   limit: number | null;
   playing: boolean;
   busy: boolean;
@@ -30,6 +32,18 @@ export function ControlBar({ tick, limit, playing, busy, speed, onSpeed, onPlay,
   onStep: () => void;
   onReset: () => void;
 }) {
+  if (tick === null) {
+    return (
+      <footer className="control-bar">
+        <div className="control-buttons">
+          <button type="button" disabled><Icon d={RESET} /> Reset</button>
+          <button type="button" disabled><Icon d={STEP} /> Step</button>
+          <button type="button" className="control-main" disabled><Icon d={PLAY} /> Play</button>
+        </div>
+        <div className="control-state"><span className="control-steps">{idle}</span></div>
+      </footer>
+    );
+  }
   const ended = tick.end !== null;
   const done = tick.tick === null ? 0 : tick.tick + 1;
   const finished = tick.run.finished_at;
@@ -37,10 +51,10 @@ export function ControlBar({ tick, limit, playing, busy, speed, onSpeed, onPlay,
     <footer className="control-bar">
       <div className="control-buttons">
         <button type="button" onClick={onReset} disabled={busy || tick.tick === null} title="Reset: back to the start">
-          <Icon d="M6 1.5a4.5 4.5 0 1 1-4.3 5.8h1.6A3 3 0 1 0 6 3v1.8L3 2.3 6 0z" /> Reset
+          <Icon d={RESET} /> Reset
         </button>
         <button type="button" onClick={onStep} disabled={busy || playing || ended} title="One step">
-          <Icon d="M1 1l6 5-6 5zM8.5 1H11v10H8.5z" /> Step
+          <Icon d={STEP} /> Step
         </button>
         {playing ? (
           <button type="button" className="control-main" onClick={onPause} title="Pause">
@@ -48,7 +62,7 @@ export function ControlBar({ tick, limit, playing, busy, speed, onSpeed, onPlay,
           </button>
         ) : (
           <button type="button" className="control-main" onClick={onPlay} disabled={busy || ended} title="Play">
-            <Icon d="M2 1l9 5-9 5z" /> Play
+            <Icon d={PLAY} /> Play
           </button>
         )}
         <label className="control-speed">
@@ -75,6 +89,10 @@ export function ControlBar({ tick, limit, playing, busy, speed, onSpeed, onPlay,
     </footer>
   );
 }
+
+const RESET = "M6 1.5a4.5 4.5 0 1 1-4.3 5.8h1.6A3 3 0 1 0 6 3v1.8L3 2.3 6 0z";
+const STEP = "M1 1l6 5-6 5zM8.5 1H11v10H8.5z";
+const PLAY = "M2 1l9 5-9 5z";
 
 /** A control's glyph, drawn on a 12 x 12 grid in the text's colour. */
 function Icon({ d }: { d: string }) {

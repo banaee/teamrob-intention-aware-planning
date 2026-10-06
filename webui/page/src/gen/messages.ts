@@ -344,11 +344,15 @@ export interface DomainEntry {
   setups: SetupEntry[];
 }
 /**
+ * A layout: its id, its title (stale in older layouts), and its notes, the free text of the layout file that says
+ * what the room is for (None when it has none).
+ *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "LayoutEntry".
  */
 export interface LayoutEntry {
   id: string;
+  notes: string | null;
   title: string;
 }
 /**
@@ -365,11 +369,14 @@ export interface ScenarioEntry {
   setup: string;
 }
 /**
+ * A setup: its id and its notes, the free text of the setup file (None when it has none).
+ *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "SetupEntry".
  */
 export interface SetupEntry {
   id: string;
+  notes: string | null;
 }
 /**
  * A run option that is on or off.
@@ -422,13 +429,14 @@ export interface LimitOption {
   name: string;
 }
 /**
- * The answer to current: the current sim-run, or None when there is none.
+ * The answer to current: the current sim-run, or the current view, or neither (both None). At most one is set.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "Current".
  */
 export interface Current {
   state: SimRunState | null;
+  view: LayoutView | null;
 }
 /**
  * A sim-run as the page needs it to draw: its run description and its latest tick update (the start's before
@@ -802,6 +810,34 @@ export interface ObjectState {
   state: string;
 }
 /**
+ * The view of a layout (the space, the areas, the fixed objects) and, with a setup chosen, of the setup at its
+ * start. No sim-run, no agent, no tick.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "LayoutView".
+ */
+export interface LayoutView {
+  areas: Area[];
+  domain: string;
+  fixed_objects: FixedObject[];
+  layout: string;
+  setup: SetupView | null;
+  space: Space;
+}
+/**
+ * A setup's part of a view: its movable objects in the setup's order, the fixed objects that hold them at the
+ * start (each with them in the setup's order), and the object states that hold at the start.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "SetupView".
+ */
+export interface SetupView {
+  fixed_object_contents: FixedObjectContents[];
+  id: string;
+  movable_objects: MovableObject[];
+  object_states: ObjectState[];
+}
+/**
  * The body of a request on one sim-run (step, reset).
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
@@ -819,5 +855,25 @@ export interface SimRunRef {
  */
 export interface StepRefusal {
   reason: StepRefusalReason;
+  sim_run: string;
+}
+/**
+ * The body of a view request: a layout of the domain, and optionally a setup.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "ViewChoice".
+ */
+export interface ViewChoice {
+  domain: string;
+  layout: string;
+  setup: string | null;
+}
+/**
+ * A view refused: a sim-run that has been stepped is current, and the choices are locked until a reset.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "ViewRefusal".
+ */
+export interface ViewRefusal {
   sim_run: string;
 }

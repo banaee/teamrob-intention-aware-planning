@@ -1,6 +1,7 @@
 /**
- * The scene of one sim-run at one tick, drawn from the run description (what is constant), the tick update (what
- * changes) and the domain's scene appearance (how things look). Three levels of presence: the space, the areas and the
+ * The scene at one moment, drawn from the room (what is constant: a sim-run's run description, or a view of a layout
+ * and a setup) and the moment (what changes: a tick update's world, or a view's start without agents), and the
+ * domain's scene appearance (how things look). Three levels of presence: the space, the areas and the
  * background objects as lines and pale faces; the active objects with a representative form and a warm tone; the
  * agents as figures in their semantic colours. The movable objects are solid ink: what can change stands out.
  *
@@ -18,7 +19,9 @@ import * as THREE from "three";
 
 import plexMono from "@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-500-normal.woff?url";
 
-import type { Appearance, Bounds, FixedObject, RunDescription, TickUpdate } from "../gen/messages";
+import type {
+  AgentTick, Appearance, Area, Bounds, Carried, FixedObject, FixedObjectContents, MovableObject, ObjectState, Space,
+} from "../gen/messages";
 import { theme } from "../theme";
 import { displayPlaces } from "./displayPlaces";
 import { carryHeight, carryOffset, FigureForm } from "./figures";
@@ -38,10 +41,29 @@ const floorPaint: Paint = {
   lineWidth: theme.line.floor,
 };
 
-export function Scene({ description, tick, appearance, glideMs }: {
-  description: RunDescription; tick: TickUpdate; appearance: Appearance; glideMs: number;
+/** What is constant in the scene: a sim-run's world, or a view's layout with the setup's movable objects. `key` names
+ * it (a sim-run, or a view), so that a new one is drawn anew. */
+export interface Room {
+  key: string;
+  space: Space;
+  areas: readonly Area[];
+  fixed_objects: readonly FixedObject[];
+  movable_objects: readonly MovableObject[];
+}
+
+/** What changes: the agents, where the movable objects are, the object states. A view's moment has no agent. */
+export interface Moment {
+  humans: readonly AgentTick[];
+  robots: readonly AgentTick[];
+  fixed_object_contents: readonly FixedObjectContents[];
+  carried: readonly Carried[];
+  object_states: readonly ObjectState[];
+}
+
+export function Scene({ room, moment, appearance, glideMs }: {
+  room: Room; moment: Moment; appearance: Appearance; glideMs: number;
 }) {
-  const world = description.world;
+  const world = room;
   const fixedById = useMemo(() => new Map(world.fixed_objects.map((f) => [f.id, f])), [world]);
   const movableById = useMemo(() => new Map(world.movable_objects.map((o) => [o.id, o])), [world]);
   const constant = useMemo(() => (
@@ -59,7 +81,7 @@ export function Scene({ description, tick, appearance, glideMs }: {
     <group>
       {constant}
 
-      {tick.world.fixed_object_contents.flatMap((contents) => {
+      {moment.fixed_object_contents.flatMap((contents) => {
         const holder = fixedById.get(contents.fixed_object);
         if (!holder) return [];
         const holderLook = fixedLook(appearance, holder.type);
@@ -75,15 +97,15 @@ export function Scene({ description, tick, appearance, glideMs }: {
         });
       })}
 
-      {[...tick.world.humans.map((a) => ({ a, figure: appearance.human, paint: paints.human, colour: theme.color.human })),
-        ...tick.world.robots.map((a) => ({ a, figure: appearance.robot, paint: paints.robot, colour: theme.color.robot }))]
+      {[...moment.humans.map((a) => ({ a, figure: appearance.human, paint: paints.human, colour: theme.color.human })),
+        ...moment.robots.map((a) => ({ a, figure: appearance.robot, paint: paints.robot, colour: theme.color.robot }))]
         .map(({ a, figure, paint, colour }) => {
           // Drawn at the group's origin; the group carries the agent to its position.
           const stance = { x: 0, y: 0, facing: a.last_motion };
-          const carried = tick.world.carried.filter((c) => c.agent === a.id).map((c) => movableById.get(c.movable_object)!);
+          const carried = moment.carried.filter((c) => c.agent === a.id).map((c) => movableById.get(c.movable_object)!);
           const hold = carryOffset(figure.figure, figure.height, a.last_motion);
           return (
-            <Gliding key={`${description.sim_run} ${a.id}`} x={a.position.x} y={a.position.y} glideMs={glideMs}>
+            <Gliding key={`${room.key} ${a.id}`} x={a.position.x} y={a.position.y} glideMs={glideMs}>
               <FigureForm figure={figure.figure} h={figure.height} stance={stance} paint={paint} />
               {carried.map((o) => {
                 const look = movableLook(appearance, o.type);
