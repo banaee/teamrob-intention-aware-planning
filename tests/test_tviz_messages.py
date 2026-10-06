@@ -11,6 +11,7 @@ import ast
 import io
 import json
 import os
+import re
 import subprocess
 import sys
 import tokenize
@@ -236,6 +237,18 @@ def _webui_sources():
     return sorted(WEBUI.rglob("*.py"))
 
 
+# The page's own files (T-viz 0.3): its code, styles and configuration; not its dependencies, its build output or the
+# exported samples (data, git-ignored), nor the lock file (the dependencies' names).
+PAGE = WEBUI / "page"
+PAGE_SUFFIXES = {".ts", ".tsx", ".mjs", ".js", ".css", ".html", ".json"}
+PAGE_SKIPPED = {"node_modules", "dist", "samples"}
+
+
+def _page_sources():
+    return sorted(p for p in PAGE.rglob("*") if p.is_file() and p.suffix in PAGE_SUFFIXES
+                  and not PAGE_SKIPPED & set(p.relative_to(PAGE).parts) and p.name != "package-lock.json")
+
+
 def test_webui_imports_no_simulator_domain_or_framework_module():
     for path in _webui_sources():
         for node in ast.walk(ast.parse(path.read_text())):
@@ -285,3 +298,13 @@ def test_webui_names_no_domain_object_type_or_area_id():
             else:
                 continue
             assert not found, f"{path.relative_to(ROOT)}:{token.start[0]} names {sorted(found)}"
+
+
+def test_the_page_names_no_domain_object_type_or_area_id():
+    words = _domain_words()
+    sources = _page_sources()
+    assert any(p.suffix == ".tsx" for p in sources)
+    for path in sources:
+        for number, line in enumerate(path.read_text().splitlines(), 1):
+            found = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", line)) & words
+            assert not found, f"{path.relative_to(ROOT)}:{number} names {sorted(found)}"
