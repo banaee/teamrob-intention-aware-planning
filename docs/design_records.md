@@ -4779,3 +4779,81 @@ the first tab's Step after the second tab opened.
   `MesaSimulator.build` creates a `RunLog`, which closed the current sim-run's pair, and a `MesaSimRun` stepped
   afterwards would have raised. The server's rules (the current sim-run ended or discarded before a build; a step on a
   sim-run that is not current refused) keep it from being stepped; since the fix it would attach its own pair again.
+
+0.3, THE STYLE TRIAL, BUILT (ccode, 6 October 2026; the plan, P1 to P8, confirmed by Hadi the same day, "Go, with (a) on
+Q1, Q2 and Q3", with six notes). The env-pane of the web-ui's page, drawing the start of one real sim-run per domain
+from saved messages, tilted and from above. Two things are decided by it: the page framework and the drawing library
+for every stage (handoff, 6.1 item 6; 10.8), and whether Hadi's style direction (handoff, 10.2, 10.5) can be produced.
+Hadi's review of the picture is open; nothing below is preferred until he says so.
+- The technology (proposed by ccode, the plan confirmed by Hadi for the trial): React 19 and TypeScript on Vite, the
+  scene in three.js through React Three Fiber and drei, every dependency pinned exactly (`webui/page/package.json` and
+  its lock file; Node.js 22.12 or later). The reasons per need, as the plan gave them: the tilted and the top view are
+  one scene and one orthographic camera in two poses; the look (flat pale faces without lights, the shaded side hatched,
+  thick outlines) is one shader material and drei's fat-line edges; a tick moves existing meshes; panels are React
+  components on the theme, no UI kit; growing plots in 1c with uPlot (named, not installed); clicking through R3F's
+  pointer events, dragging by projection onto the floor; two env-panes as two canvases or drei's `View`; the most
+  common, best-typed stack for this page. Rejected: three.js without React (panels and state by hand), Babylon.js
+  (heavier, game-oriented, no easier for this look), 2D drawing in SVG, PixiJS or Konva (two drawings, not one camera;
+  depth and height faked), Svelte or Vue with their three.js bindings (smaller ecosystems), Plotly or Solara (6.1),
+  deck.gl (maps and data layers). The page's types are generated from the Python definitions: `webui/schema.py` writes
+  the JSON Schema of the page's messages, `npm run gen:types` the TypeScript (`webui/page/src/gen/`, committed).
+- The sim-runs (P3): kitting scenario_s02_01 on env_layout_02 (every kind of kitting object, 8 items on 8 shelves);
+  dock_loading scenario_s08_01 on env_layout_03 (pallets in the truck and in every bay at the start: the display places
+  in four containers). `mesa_sim/webui_export.py` builds each through Mesa's piece, writes its run description, its
+  start tick update and its domain's scene appearance to `webui/page/public/samples/` (git-ignored), and discards the
+  sim-run unstepped (no log pair). Stage 1a's server replaces it.
+- The scene appearance (P4; Q1 to Q3 each (a); handoff, 10.6 items 1 to 3): `webui/appearance.py` defines it, a domain
+  states its values in `domains/<domain>/appearance.json` (kitting, dock_loading; not in a layout or a setup file, not a
+  world fact; the simulation never reads it). Per object type a form, a height in the layout's unit and a presence; per
+  movable type a form and a height; the human's and the robot's figure and height; a default for a type with no entry
+  and for a domain with no file.
+  - THE LIMIT OF THE SHAPE VOCABULARY (Hadi's note 3): a new domain is drawn without a code change, from defaults (every
+    fixed object a hatched block, every movable object a crate; checked: the kitting sample drawn with the default
+    appearance). A new form is web-ui code. The vocabulary names forms, never a domain's object types: block, rack,
+    counter, pad, enclosure, appliance, panel, seat, marker, barrier; crate, skid; person, cube-head robot, lift vehicle.
+    No form has a front, since the messages carry no orientation (TODO-192); the lift vehicle faces the agent's
+    `last_motion`, north before the agent has moved (a display convention).
+  - PRESENCE (Hadi's note 2): a property of the look, declared per object type in the appearance data (background or
+    active); not a world fact. Deriving it from a run's bindings (handoff, 10.6 item 4) was measured and found unstable:
+    in scenario_s08_01 the human's script binds no coffee machine (its entries are confirm_delivered_pallet(pallet_2)
+    and the closing go_to(desk)), so the coffee machine, Hadi's example of an active object, would be drawn passive,
+    while every landmark a go_to binds (desk; kitting's corner_SE) would be drawn active; and the same object type would
+    change its look from one scenario of a room to the next.
+  - Q1, how the appearance reaches the page in stage 1a, stays open (Hadi's note 1). ccode's recommendation: the
+    catalogue's per-domain entry carries it, read by the simulator's piece. In the trial it is a file beside the samples.
+- The look as built (one treatment, P6). Three levels of presence: the space, the areas and the background objects as
+  lines and pale faces (toward sketch A: thin members drawn as single strokes, open racks, see-through panes); active
+  objects in a warm neutral tone with a representative form; the agents as figures in their semantic colours (robot
+  blue, human orange), each on a faint ring of its colour. Movable objects are solid ink (image 4's cargo): what can
+  change stands out. The side away from the light is hatched in screen space; soft floor shadows. Labels: the agents in
+  white pills with a dot of their colour (sketch J, image 13); fixed objects and areas by their ids written on the floor
+  (image 4), small and light for passive things (Hadi, during the session: "they are not informative"), in the active
+  tone for active objects; an area's id in the first of its corners, farthest from the room's centre first, where it
+  covers no fixed object. One theme file, `webui/page/src/theme.ts`, holds the colours, line weights, spacing and type
+  sizes; the page's CSS reads them as variables and the scene takes its colours only from it. Light only.
+- Display places (handoff, section 9): a grid over the footprint in the order of arrival, the grid that holds the
+  objects at their own size and whose shape is nearest the footprint's, the gap shrinking to what the footprint leaves,
+  overlap only when no grid fits; contents at the form's rest height (a rack's upper board, a counter's top, the floor
+  of an enclosure or a pad). The rule and the statement that a display place is a display convention, written nowhere,
+  are in `webui/page/src/env-pane/displayPlaces.ts` and the page's README. Requirement 2 (a place kept while the object
+  stays) is stage 1a's: the trial draws one tick.
+- The checks: the screenshots of both domains in both views, in Google Chrome through `npm run shots`, at
+  `docs/handoffs/tviz_trial/` (untracked, Q3), compared with images 4 and 12 and sketch J and revised five times before
+  the report; `npm run build` passes (one script of 1.30 MB, 367 kB compressed: three.js and drei); the test suite 418
+  passed (417 before, one test added; the existing domain-word test reads string literals with `literal_eval` and
+  cannot read an f-string, so `webui/schema.py` uses none). The added test, `test_the_page_names_no_domain_object_type_or_area_id`, scans the page's own files
+  (code, styles, configuration, the generated types; not `node_modules`, `dist`, the samples or the lock file) for the
+  domain names, object types and area ids of every registered layout and setup.
+- What the library made easy: the two views by the camera alone; outlines of a set pixel width (drei's `Edges`, fat
+  lines); text lying on the floor from a bundled font; HTML labels pinned to a point of the scene. What it made hard: the
+  illustration look needed its own shader (the tones by the face's direction, the screen-space hatching); `Edges` draws
+  creases, not silhouettes, so a sphere or a cylinder's side has no outline; a thin box outlined on every edge reads as
+  a double line, so thin members became strokes; see-through faces depend on draw order; labels have no layout engine,
+  so placement is by hand.
+- Found while drawing from the messages (for the message round of 1a, nothing changed):
+  - Agents have no size in the messages; a figure's height and its ring are the appearance's.
+  - An object state cannot change a form unless the appearance maps a state to a variant (an empty pallet looks like a
+    full one; the gate's `is_open` is not drawn).
+  - An area's `label` in the layout (kitting's "southwest_storage") is not carried; the page shows the area's id.
+  - The layout's `space.name`, the env-pane's title, is stale in older layouts (env_layout_02 is titled "Kitting Domain
+    Layout 1"); a layout file question, not a message one.

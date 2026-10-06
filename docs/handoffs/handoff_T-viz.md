@@ -1327,3 +1327,17 @@ Q1 to Q9 each (a)). Section 8 is settled by 0.4 as follows; the body above is le
   the 0.4 entry; the server is not built.
 - 9: "display place" is a glossary entry (§11), with web-ui, solara-ui, screen-user, env-pane, scene, author, catalogue,
   run description and tick update (Hadi approved them, 6 October 2026, preferred).
+
+Stage 0.3, the style trial (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 0.3; Hadi confirmed the
+plan, Q1 to Q3 each (a)). The body above is left as written.
+- 10.8: the trial is built on React and TypeScript with three.js through React Three Fiber and drei (`webui/page/`),
+  the scene drawn from saved messages; Hadi's review of the picture is open.
+- 10.6 items 1 to 3: the scene appearance is `webui/appearance.py`, its values per domain in
+  `domains/<domain>/appearance.json`; a new domain is drawn from defaults, a new form is web-ui code. How it reaches
+  the page in stage 1a stays open (Q1).
+- 10.6 item 4: presence is declared per object type in the appearance data, a property of the look; deriving it from
+  a run's bindings was measured and found unstable (the 0.3 entry).
+- 10.7: the theme file is `webui/page/src/theme.ts`.
+- 9: the display places are drawn by the rule in `webui/page/src/env-pane/displayPlaces.ts`; keeping a place from tick
+  to tick is stage 1a's.
+- The screenshots are in `docs/handoffs/tviz_trial/`, on disk and untracked, beside `tviz_refs/`.
