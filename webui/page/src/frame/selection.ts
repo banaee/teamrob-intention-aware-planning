@@ -5,7 +5,9 @@
  * keeps the catalogue's order. Read from the catalogue's bindings only: nothing here knows a domain.
  */
 
-import type { DomainEntry, ScenarioEntry, SetupEntry } from "../gen/messages";
+import type { DomainEntry, ScenarioEntry, SetupEntry, SimRunChoice } from "../gen/messages";
+
+type RunOptionValue = SimRunChoice["options"][number];
 
 /** The page's choice as far as it is made. A setup needs a layout; a scenario needs a layout and a setup. */
 export interface Selection {
@@ -35,4 +37,10 @@ export function matchesFilter(scenario: ScenarioEntry, filter: string): boolean 
   const words = filter.toLowerCase().split(/\s+/).filter((w) => w.length > 0);
   const text = `${scenario.id} ${scenario.description}`.toLowerCase();
   return words.every((w) => text.includes(w));
+}
+
+/** The run options with one value changed, the others as set and in their order. The page keeps the run options it
+ * holds when the layout, the setup or the scenario changes (P13), and changes them only through this. */
+export function withOption(options: readonly RunOptionValue[], value: RunOptionValue): RunOptionValue[] {
+  return options.map((v) => (v.name === value.name ? value : v));
 }

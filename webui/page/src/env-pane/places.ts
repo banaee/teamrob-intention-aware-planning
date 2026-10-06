@@ -97,3 +97,20 @@ export function slotOf(grid: readonly Place[], number: number): Slot {
   const place = grid[number % grid.length];
   return { ...place, layer: Math.floor(number / grid.length) };
 }
+
+/** The book folded over a sequence of tick updates' contents, kept between calls: the ticks not yet folded are folded
+ * onto the previous book; another sim-run or view (`key`), or a sequence shorter than the one folded, starts anew. */
+export interface BookFold {
+  key: string;
+  folded: number;
+  book: PlaceBook;
+}
+
+export function foldBook(previous: BookFold | null, key: string,
+                         sequence: readonly (readonly FixedObjectContents[])[]): BookFold {
+  const start = previous !== null && previous.key === key && previous.folded <= sequence.length
+    ? previous : { key, folded: 0, book: EMPTY_BOOK };
+  let book = start.book;
+  for (let i = start.folded; i < sequence.length; i++) book = nextBook(book, sequence[i]);
+  return { key, folded: sequence.length, book };
+}

@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { EMPTY_BOOK, nextBook, placeGrid, slotOf } from "../src/env-pane/places";
+import { EMPTY_BOOK, foldBook, nextBook, placeGrid, slotOf } from "../src/env-pane/places";
 
 const box = (fixed_object: string, ...movable_objects: string[]) => ({ fixed_object, movable_objects });
 
@@ -54,5 +54,25 @@ describe("the book", () => {
     const fold = () => sequence.reduce(nextBook, EMPTY_BOOK);
     expect([...fold().get("s")!]).toEqual([...fold().get("s")!]);
     expect([...fold().get("s")!]).toEqual([["b", 1], ["c", 0], ["a", 2]]);
+  });
+});
+
+describe("the fold over a sim-run's tick updates", () => {
+  const sequence = [[box("s", "a", "b", "c")], [box("s", "a", "c")], [box("s", "a", "c", "d")], [box("s", "c", "d", "a")]];
+  const whole = sequence.reduce(nextBook, EMPTY_BOOK);
+
+  it("gives, one tick at a time, the book of the whole sequence at once (a reload keeps the picture)", () => {
+    let fold = null;
+    for (let n = 1; n <= sequence.length; n++) fold = foldBook(fold, "run_1", sequence.slice(0, n));
+    expect([...fold!.book.get("s")!]).toEqual([...whole.get("s")!]);
+    expect([...foldBook(null, "run_1", sequence).book.get("s")!]).toEqual([...whole.get("s")!]);
+  });
+
+  it("starts anew for another sim-run, or a shorter sequence", () => {
+    const fold = foldBook(null, "run_1", sequence);
+    const other = foldBook(fold, "run_2", [[box("s", "c", "d")]]);
+    expect([...other.book.get("s")!]).toEqual([["c", 0], ["d", 1]]);
+    const shorter = foldBook(fold, "run_1", sequence.slice(0, 1));
+    expect([...shorter.book.get("s")!]).toEqual([["a", 0], ["b", 1], ["c", 2]]);
   });
 });

@@ -30,10 +30,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { addressOf, readAddress, type RunOptionValue } from "./address";
+import { addressOf, type RunOptionValue } from "./address";
 import { api } from "./api";
 import { ControlBar, type Speed } from "./frame/ControlBar";
-import { isOffered, offeredSetups, type Selection } from "./frame/selection";
+import { type Selection, withOption } from "./frame/selection";
 import { SelectionPanel } from "./frame/SelectionPanel";
 import type {
   BuildFailure, Catalogue, LayoutView, RunDescription, ScenarioEntry, SimRunChoice, SimRunHistory, SimRunState,
@@ -41,7 +41,8 @@ import type {
 } from "./gen/messages";
 import type { View } from "./env-pane/camera";
 import { EnvPane } from "./env-pane/EnvPane";
-import { EMPTY_BOOK, nextBook, type PlaceBook } from "./env-pane/places";
+import { opening } from "./opening";
+import { type BookFold, EMPTY_BOOK, foldBook, type PlaceBook } from "./env-pane/places";
 import type { Moment, Room } from "./env-pane/Scene";
 
 const DEFAULT_SPEED: Speed = 5;
@@ -105,51 +106,41 @@ export function App() {
     return (answer.refusal as BuildFailure).message;
   }, []);
 
-  /** Opens a selection read from the address with its run options; why it could not be opened, or null. */
-  const openSelection = useCallback(async (c: Catalogue, next: Selection, stated: RunOptionValue[]) => {
-    const domain = c.domains.find((d) => d.name === next.domain)!;
-    if (next.layout === null) { setSelection(next); setShown(null); return null; }
-    if (next.scenario !== null) {
-      const scenario = domain.scenarios.find((s) => s.id === next.scenario);
-      if (scenario && !isOffered(scenario, next.layout)) {
-        return `scenario ${scenario.id} is not offered on ${next.layout} (its reference layouts: `
-          + `${scenario.reference_layouts.join(", ")})`;
-      }
-      return choose({ domain: next.domain, layout: next.layout, scenario: next.scenario, options: stated });
-    }
-    if (next.setup !== null && !offeredSetups(domain, next.layout).some((s) => s.id === next.setup)) {
-      return `setup ${next.setup} is not offered on ${next.layout}`;
-    }
-    return requestView(next);
-  }, [choose, requestView]);
-
-  // The start: the catalogue and the server's current state; a stepped sim-run wins; else the address's choice, or
-  // the catalogue's default choice.
+  // The start: the catalogue and the server's current state, and what to open on them (src/opening.ts).
   useEffect(() => {
     (async () => {
       try {
         const [c, current] = await Promise.all([api.catalogue(), api.current()]);
         setCatalogue(c);
-        if (current.state !== null && last(current.state.ticks).tick !== null) {
-          showRun(current.state);
-          setSelectionOpen(false);
-          return;
-        }
-        const address = readAddress(window.location.search, c);
+        const open = opening(c, current, window.location.search);
         let problem: string | null = null;
-        if (!address.ok) problem = address.problem;
-        else if (address.selection !== null) {
-          setOptions(address.options);
-          problem = await openSelection(c, address.selection, address.options);
+        switch (open.kind) {
+          case "current":
+            showRun(open.run);
+            setSelectionOpen(false);
+            return;
+          case "choose":
+            setOptions(open.options);
+            problem = await choose(open.choice);
+            break;
+          case "view":
+            setOptions(open.options);
+            problem = await requestView(open.selection);
+            break;
+          case "domain":
+            setOptions(open.options);
+            setSelection(open.selection);
+            return;
+          case "default":
+            problem = open.problem;
         }
+        if (open.kind !== "default" && problem === null) return;
         if (problem !== null) setMessage(`The address's choice was not opened: ${problem}. The default choice is shown.`);
-        if (problem !== null || (address.ok && address.selection === null)) {
-          const failed = await choose(c.default_choice);
-          if (failed !== null) {
-            setSelection({ domain: c.default_choice.domain, layout: null, setup: null, scenario: null });
-            setOptions([...c.default_choice.options]);
-            setMessage(`The default choice was not built: ${failed}`);
-          }
+        const failed = await choose(c.default_choice);
+        if (failed !== null) {
+          setSelection({ domain: c.default_choice.domain, layout: null, setup: null, scenario: null });
+          setOptions([...c.default_choice.options]);
+          setMessage(`The default choice was not built: ${failed}`);
         }
       } catch (e) {
         setMessage(`The server does not answer: ${(e as Error).message}`);
@@ -157,7 +148,7 @@ export function App() {
         setReady(true);
       }
     })();
-  }, [showRun, choose, openSelection]);
+  }, [showRun, choose, requestView]);
 
   // The address mirrors the choice, without a new entry in the browser's history.
   useEffect(() => {
@@ -202,7 +193,7 @@ export function App() {
   }, [selection, options, act, choose]);
 
   const onOption = useCallback((value: RunOptionValue) => {
-    const next = options.map((v) => (v.name === value.name ? value : v));
+    const next = withOption(options, value);
     setOptions(next);
     if (selection?.layout && selection.scenario) {
       void act(() => choose({ domain: selection.domain, layout: selection.layout!, scenario: selection.scenario!,
@@ -296,19 +287,13 @@ export function App() {
              object_states: setup?.object_states ?? [] };
   }, [tickNow, layoutView]);
   // The place book folded over the tick updates, one new tick at a time; anew for another sim-run or view.
-  const bookCache = useRef<{ key: string; folded: number; book: PlaceBook } | null>(null);
+  const bookFold = useRef<BookFold | null>(null);
   const book = useMemo<PlaceBook>(() => {
     if (room === null) return EMPTY_BOOK;
     const sequence = run !== null ? run.ticks.map((u) => u.world.fixed_object_contents)
       : [moment?.fixed_object_contents ?? []];
-    let cache = bookCache.current;
-    if (cache === null || cache.key !== room.key || cache.folded > sequence.length) {
-      cache = { key: room.key, folded: 0, book: EMPTY_BOOK };
-    }
-    for (let i = cache.folded; i < sequence.length; i++) cache.book = nextBook(cache.book, sequence[i]);
-    cache.folded = sequence.length;
-    bookCache.current = cache;
-    return cache.book;
+    bookFold.current = foldBook(bookFold.current, room.key, sequence);
+    return bookFold.current.book;
   }, [room, run, moment]);
 
   // The camera returns to the last preset when the layout changes.

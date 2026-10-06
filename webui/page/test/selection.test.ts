@@ -6,7 +6,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DomainEntry, ScenarioEntry } from "../src/gen/messages";
-import { isOffered, matchesFilter, offeredScenarios, offeredSetups } from "../src/frame/selection";
+import { isOffered, matchesFilter, offeredScenarios, offeredSetups, withOption } from "../src/frame/selection";
 
 const scenario = (id: string, setup: string, layouts: string[], description = ""): ScenarioEntry =>
   ({ id, setup, reference_layouts: layouts, description });
@@ -52,5 +52,13 @@ describe("the filter", () => {
     expect(matchesFilter(run1, "run_1 WALK")).toBe(true);
     expect(matchesFilter(run1, "walk tasks")).toBe(false);
     expect(matchesFilter(run2, "  two  ")).toBe(true);
+  });
+});
+
+describe("the run options", () => {
+  it("change one value at a time and keep the others as set, in their order (P13)", () => {
+    const options = [{ kind: "switch", name: "aware", value: true }, { kind: "level", name: "alpha", value: 0.05 }] as const;
+    expect(withOption([...options], { kind: "level", name: "alpha", value: 0.1 }))
+      .toEqual([{ kind: "switch", name: "aware", value: true }, { kind: "level", name: "alpha", value: 0.1 }]);
   });
 });
