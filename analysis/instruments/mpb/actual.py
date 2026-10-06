@@ -194,6 +194,11 @@ def in_process(run_file, steps, strategy, prior):
                               winner=None if r is None or r.current_task is None else _key_task(r.current_task),
                               hold=None if r is None else r.hold, horizon=None if r is None else r.horizon,
                               candidates=cands))
+    # the run's end as the headless driver states it (mesa_sim/run_mesa.py, T-G A3): a human whose script depends on
+    # the robot writes a `[human] ... open:` line per entry still open; an independent script writes nothing (T-K part
+    # 1, step 6: the recognition set's scripts that depend on the robot never close with the robot idle)
+    for hu in m.humans.values():
+        hu.end_run(int(m.schedule.steps))
     root.removeHandler(collect)
     meta_planner_module.realize = realize_orig
     return collect.lines, ticks, decisions, selection, agents, segments, m.assignment_knowledge
