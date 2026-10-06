@@ -1,0 +1,1939 @@
+{
+  "$defs": {
+    "ActionInHand": {
+      "additionalProperties": false,
+      "description": "The action the human's executor has in hand, its occurrence in the task's expansion, and its progress in\nticks.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ActionRef"
+        },
+        "done": {
+          "type": "integer"
+        },
+        "occurrence": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "action",
+        "done",
+        "occurrence",
+        "total"
+      ],
+      "title": "ActionInHand",
+      "type": "object"
+    },
+    "ActionRef": {
+      "additionalProperties": false,
+      "description": "A grounded action: its schema's name and its bindings.",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "bindings": {
+          "items": {
+            "$ref": "#/$defs/Binding"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "action",
+        "bindings"
+      ],
+      "title": "ActionRef",
+      "type": "object"
+    },
+    "AfterActionTrigger": {
+      "additionalProperties": false,
+      "description": "After the action (its schema's name) of the entry's expansion completes; `occurrence` its 0-based occurrence,\nNone when it occurs once.",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "after_action",
+          "type": "string"
+        },
+        "occurrence": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "action",
+        "kind",
+        "occurrence"
+      ],
+      "title": "AfterActionTrigger",
+      "type": "object"
+    },
+    "AgentEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "AgentEntry",
+      "type": "object"
+    },
+    "AgentTick": {
+      "additionalProperties": false,
+      "description": "An agent at the tick: its position, and the unit direction of its most recent step that moved it (None before\nit has moved), computed from its own positions.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "last_motion": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Direction"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "position": {
+          "$ref": "#/$defs/Point"
+        }
+      },
+      "required": [
+        "id",
+        "last_motion",
+        "position"
+      ],
+      "title": "AgentTick",
+      "type": "object"
+    },
+    "Appearance": {
+      "additionalProperties": false,
+      "description": "A domain's scene appearance: per object type its look; the agents' figures. Every field has a default.",
+      "properties": {
+        "default_fixed": {
+          "$ref": "#/$defs/FixedLook"
+        },
+        "default_movable": {
+          "$ref": "#/$defs/MovableLook"
+        },
+        "fixed": {
+          "additionalProperties": {
+            "$ref": "#/$defs/FixedLook"
+          },
+          "type": "object"
+        },
+        "human": {
+          "$ref": "#/$defs/FigureLook"
+        },
+        "movable": {
+          "additionalProperties": {
+            "$ref": "#/$defs/MovableLook"
+          },
+          "type": "object"
+        },
+        "robot": {
+          "$ref": "#/$defs/FigureLook"
+        }
+      },
+      "required": [
+        "default_fixed",
+        "default_movable",
+        "fixed",
+        "human",
+        "movable",
+        "robot"
+      ],
+      "title": "Appearance",
+      "type": "object"
+    },
+    "Area": {
+      "additionalProperties": false,
+      "properties": {
+        "bounds": {
+          "$ref": "#/$defs/Bounds"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bounds",
+        "id"
+      ],
+      "title": "Area",
+      "type": "object"
+    },
+    "AtBeginning": {
+      "additionalProperties": false,
+      "description": "Before the task's first action.",
+      "properties": {
+        "kind": {
+          "const": "beginning",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "AtBeginning",
+      "type": "object"
+    },
+    "AtBoundary": {
+      "additionalProperties": false,
+      "description": "After the action (its occurrence) completed.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ActionRef"
+        },
+        "kind": {
+          "const": "boundary",
+          "type": "string"
+        },
+        "occurrence": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "action",
+        "kind",
+        "occurrence"
+      ],
+      "title": "AtBoundary",
+      "type": "object"
+    },
+    "AtCut": {
+      "additionalProperties": false,
+      "description": "Inside the action (its occurrence), `done` of its ticks executed.",
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/ActionRef"
+        },
+        "done": {
+          "type": "integer"
+        },
+        "kind": {
+          "const": "cut",
+          "type": "string"
+        },
+        "occurrence": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "action",
+        "done",
+        "kind",
+        "occurrence"
+      ],
+      "title": "AtCut",
+      "type": "object"
+    },
+    "Binding": {
+      "additionalProperties": false,
+      "properties": {
+        "parameter": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "parameter",
+        "value"
+      ],
+      "title": "Binding",
+      "type": "object"
+    },
+    "Bounds": {
+      "additionalProperties": false,
+      "properties": {
+        "x_max": {
+          "type": "number"
+        },
+        "x_min": {
+          "type": "number"
+        },
+        "y_max": {
+          "type": "number"
+        },
+        "y_min": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x_max",
+        "x_min",
+        "y_max",
+        "y_min"
+      ],
+      "title": "Bounds",
+      "type": "object"
+    },
+    "Carried": {
+      "additionalProperties": false,
+      "properties": {
+        "agent": {
+          "type": "string"
+        },
+        "movable_object": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "agent",
+        "movable_object"
+      ],
+      "title": "Carried",
+      "type": "object"
+    },
+    "Catalogue": {
+      "additionalProperties": false,
+      "description": "What can be chosen: per domain its layouts, setups and scenarios, and the run options with their values and\ndefaults; `default_choice` is the run file's.",
+      "properties": {
+        "default_choice": {
+          "$ref": "#/$defs/SimRunChoice"
+        },
+        "domains": {
+          "items": {
+            "$ref": "#/$defs/DomainEntry"
+          },
+          "type": "array"
+        },
+        "run_options": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "count": "#/$defs/CountOption",
+                "level": "#/$defs/LevelOption",
+                "one_of": "#/$defs/OneOfOption",
+                "switch": "#/$defs/SwitchOption"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/SwitchOption"
+              },
+              {
+                "$ref": "#/$defs/OneOfOption"
+              },
+              {
+                "$ref": "#/$defs/LevelOption"
+              },
+              {
+                "$ref": "#/$defs/CountOption"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "default_choice",
+        "domains",
+        "run_options"
+      ],
+      "title": "Catalogue",
+      "type": "object"
+    },
+    "CountOption": {
+      "additionalProperties": false,
+      "description": "A run option that is a whole number, at least `minimum`.",
+      "properties": {
+        "default": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "count",
+          "type": "string"
+        },
+        "minimum": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "default",
+        "description",
+        "kind",
+        "minimum",
+        "name"
+      ],
+      "title": "CountOption",
+      "type": "object"
+    },
+    "CountValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "count",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "title": "CountValue",
+      "type": "object"
+    },
+    "DecisionRefusalReason": {
+      "enum": [
+        "stack_full",
+        "empty_stack"
+      ],
+      "title": "DecisionRefusalReason",
+      "type": "string"
+    },
+    "Direction": {
+      "additionalProperties": false,
+      "description": "A unit direction.",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "Direction",
+      "type": "object"
+    },
+    "DomainEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "layouts": {
+          "items": {
+            "$ref": "#/$defs/LayoutEntry"
+          },
+          "type": "array"
+        },
+        "name": {
+          "type": "string"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/$defs/ScenarioEntry"
+          },
+          "type": "array"
+        },
+        "setups": {
+          "items": {
+            "$ref": "#/$defs/SetupEntry"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "layouts",
+        "name",
+        "scenarios",
+        "setups"
+      ],
+      "title": "DomainEntry",
+      "type": "object"
+    },
+    "DropDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "drop",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "DropDecision",
+      "type": "object"
+    },
+    "DuringActionTrigger": {
+      "additionalProperties": false,
+      "description": "A cut `time` (as written, ISO-8601) into the action.",
+      "properties": {
+        "action": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "during_action",
+          "type": "string"
+        },
+        "occurrence": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "time": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "action",
+        "kind",
+        "occurrence",
+        "time"
+      ],
+      "title": "DuringActionTrigger",
+      "type": "object"
+    },
+    "EndReason": {
+      "enum": [
+        "steps_reached",
+        "reset",
+        "choice_changed",
+        "server_stopped"
+      ],
+      "title": "EndReason",
+      "type": "string"
+    },
+    "Entered": {
+      "additionalProperties": false,
+      "description": "A script entry's task pushed on the empty stack.",
+      "properties": {
+        "kind": {
+          "const": "entered",
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "kind",
+        "task"
+      ],
+      "title": "Entered",
+      "type": "object"
+    },
+    "EntryPart": {
+      "enum": [
+        "ordinary",
+        "repeatable",
+        "closing"
+      ],
+      "title": "EntryPart",
+      "type": "string"
+    },
+    "EntryPosition": {
+      "additionalProperties": false,
+      "description": "Which entry of the script: its part and its index there.",
+      "properties": {
+        "index": {
+          "type": "integer"
+        },
+        "part": {
+          "$ref": "#/$defs/EntryPart"
+        }
+      },
+      "required": [
+        "index",
+        "part"
+      ],
+      "title": "EntryPosition",
+      "type": "object"
+    },
+    "Event": {
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "discriminator": {
+            "mapping": {
+              "drop": "#/$defs/DropDecision",
+              "start": "#/$defs/StartDecision"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/StartDecision"
+            },
+            {
+              "$ref": "#/$defs/DropDecision"
+            }
+          ]
+        },
+        "trigger": {
+          "discriminator": {
+            "mapping": {
+              "after_action": "#/$defs/AfterActionTrigger",
+              "during_action": "#/$defs/DuringActionTrigger",
+              "now": "#/$defs/NowTrigger"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/AfterActionTrigger"
+            },
+            {
+              "$ref": "#/$defs/DuringActionTrigger"
+            },
+            {
+              "$ref": "#/$defs/NowTrigger"
+            }
+          ]
+        }
+      },
+      "required": [
+        "decision",
+        "trigger"
+      ],
+      "title": "Event",
+      "type": "object"
+    },
+    "Extent": {
+      "additionalProperties": false,
+      "description": "A size: the extent along x and along y.",
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "Extent",
+      "type": "object"
+    },
+    "Figure": {
+      "description": "The figures of the agents.",
+      "enum": [
+        "person",
+        "cube_head_robot",
+        "lift_vehicle"
+      ],
+      "title": "Figure",
+      "type": "string"
+    },
+    "FigureLook": {
+      "additionalProperties": false,
+      "properties": {
+        "figure": {
+          "$ref": "#/$defs/Figure"
+        },
+        "height": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "figure",
+        "height"
+      ],
+      "title": "FigureLook",
+      "type": "object"
+    },
+    "FixedLook": {
+      "additionalProperties": false,
+      "properties": {
+        "height": {
+          "type": "number"
+        },
+        "presence": {
+          "$ref": "#/$defs/Presence"
+        },
+        "shape": {
+          "$ref": "#/$defs/ShapeKind"
+        }
+      },
+      "required": [
+        "height",
+        "presence",
+        "shape"
+      ],
+      "title": "FixedLook",
+      "type": "object"
+    },
+    "FixedObject": {
+      "additionalProperties": false,
+      "description": "A fixed object of the layout, at its position for the whole sim-run (an override applied).",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/Point"
+        },
+        "size": {
+          "$ref": "#/$defs/Extent"
+        },
+        "subtype": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "position",
+        "size",
+        "subtype",
+        "type"
+      ],
+      "title": "FixedObject",
+      "type": "object"
+    },
+    "FixedObjectContents": {
+      "additionalProperties": false,
+      "description": "A fixed object that holds movable objects at the tick, with them in their order of arrival (at the start, the\nsetup's order; two arriving on one tick, the setup's order).",
+      "properties": {
+        "fixed_object": {
+          "type": "string"
+        },
+        "movable_objects": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "fixed_object",
+        "movable_objects"
+      ],
+      "title": "FixedObjectContents",
+      "type": "object"
+    },
+    "HumanActivity": {
+      "additionalProperties": false,
+      "description": "What a human's executor is doing at the tick, from its record: the stack, top first; the action in hand; the\nstack's transitions on the tick; the script's entries still open (ordinary, then closing).",
+      "properties": {
+        "action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ActionInHand"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "human": {
+          "type": "string"
+        },
+        "open_entries": {
+          "items": {
+            "$ref": "#/$defs/EntryPosition"
+          },
+          "type": "array"
+        },
+        "stack": {
+          "items": {
+            "$ref": "#/$defs/TaskRef"
+          },
+          "type": "array"
+        },
+        "transitions": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "entered": "#/$defs/Entered",
+                "left": "#/$defs/Left",
+                "refused": "#/$defs/Refused",
+                "resumed": "#/$defs/Resumed",
+                "started": "#/$defs/Started",
+                "still_open": "#/$defs/StillOpen",
+                "unfired": "#/$defs/Unfired"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/Entered"
+              },
+              {
+                "$ref": "#/$defs/Started"
+              },
+              {
+                "$ref": "#/$defs/Resumed"
+              },
+              {
+                "$ref": "#/$defs/Left"
+              },
+              {
+                "$ref": "#/$defs/Refused"
+              },
+              {
+                "$ref": "#/$defs/Unfired"
+              },
+              {
+                "$ref": "#/$defs/StillOpen"
+              }
+            ]
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "action",
+        "human",
+        "open_entries",
+        "stack",
+        "transitions"
+      ],
+      "title": "HumanActivity",
+      "type": "object"
+    },
+    "HumanScript": {
+      "additionalProperties": false,
+      "description": "A human's script: the ordinary entries of the priority list in written order, its repeatable entries, its\nclosing part, and whether it depends on the robot.",
+      "properties": {
+        "closing": {
+          "items": {
+            "$ref": "#/$defs/ScriptEntry"
+          },
+          "type": "array"
+        },
+        "dependence": {
+          "$ref": "#/$defs/ScriptDependence"
+        },
+        "entries": {
+          "items": {
+            "$ref": "#/$defs/ScriptEntry"
+          },
+          "type": "array"
+        },
+        "human": {
+          "type": "string"
+        },
+        "repeatable": {
+          "items": {
+            "$ref": "#/$defs/RepeatableEntry"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "closing",
+        "dependence",
+        "entries",
+        "human",
+        "repeatable"
+      ],
+      "title": "HumanScript",
+      "type": "object"
+    },
+    "LayoutEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title"
+      ],
+      "title": "LayoutEntry",
+      "type": "object"
+    },
+    "Left": {
+      "additionalProperties": false,
+      "description": "A task left the top of the stack, or was pushed down (suspended).",
+      "properties": {
+        "kind": {
+          "const": "left",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/Outcome"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "kind",
+        "outcome",
+        "task"
+      ],
+      "title": "Left",
+      "type": "object"
+    },
+    "LevelOption": {
+      "additionalProperties": false,
+      "description": "A run option that is a number strictly between 0 and 1.",
+      "properties": {
+        "default": {
+          "type": "number"
+        },
+        "description": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "level",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "default",
+        "description",
+        "kind",
+        "name"
+      ],
+      "title": "LevelOption",
+      "type": "object"
+    },
+    "LevelValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "level",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "title": "LevelValue",
+      "type": "object"
+    },
+    "MovableLook": {
+      "additionalProperties": false,
+      "properties": {
+        "height": {
+          "type": "number"
+        },
+        "shape": {
+          "$ref": "#/$defs/MovableShape"
+        }
+      },
+      "required": [
+        "height",
+        "shape"
+      ],
+      "title": "MovableLook",
+      "type": "object"
+    },
+    "MovableObject": {
+      "additionalProperties": false,
+      "description": "A movable object of the setup: its home container and, where the domain determines one, its designated\ndestination. Where it is at a tick is the tick update's.",
+      "properties": {
+        "destination": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "home_container": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "size": {
+          "$ref": "#/$defs/Extent"
+        },
+        "subtype": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "destination",
+        "home_container",
+        "id",
+        "size",
+        "subtype",
+        "type"
+      ],
+      "title": "MovableObject",
+      "type": "object"
+    },
+    "MovableShape": {
+      "description": "The forms of a movable object.",
+      "enum": [
+        "crate",
+        "skid"
+      ],
+      "title": "MovableShape",
+      "type": "string"
+    },
+    "NowTrigger": {
+      "additionalProperties": false,
+      "description": "A live event, fired on the tick it is applied.",
+      "properties": {
+        "kind": {
+          "const": "now",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "NowTrigger",
+      "type": "object"
+    },
+    "ObjectState": {
+      "additionalProperties": false,
+      "description": "A declared state that holds; `object` None for a fact about no object.",
+      "properties": {
+        "object": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "object",
+        "state"
+      ],
+      "title": "ObjectState",
+      "type": "object"
+    },
+    "OneOfOption": {
+      "additionalProperties": false,
+      "description": "A run option that takes one value of a closed list.",
+      "properties": {
+        "default": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "one_of",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "default",
+        "description",
+        "kind",
+        "name",
+        "values"
+      ],
+      "title": "OneOfOption",
+      "type": "object"
+    },
+    "OneOfValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "one_of",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "title": "OneOfValue",
+      "type": "object"
+    },
+    "Outcome": {
+      "enum": [
+        "completed",
+        "suspended",
+        "abandoned",
+        "infeasible"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "Point": {
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "x",
+        "y"
+      ],
+      "title": "Point",
+      "type": "object"
+    },
+    "Presence": {
+      "enum": [
+        "background",
+        "active"
+      ],
+      "title": "Presence",
+      "type": "string"
+    },
+    "Refused": {
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "discriminator": {
+            "mapping": {
+              "drop": "#/$defs/DropDecision",
+              "start": "#/$defs/StartDecision"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/StartDecision"
+            },
+            {
+              "$ref": "#/$defs/DropDecision"
+            }
+          ]
+        },
+        "kind": {
+          "const": "refused",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/DecisionRefusalReason"
+        }
+      },
+      "required": [
+        "decision",
+        "kind",
+        "reason"
+      ],
+      "title": "Refused",
+      "type": "object"
+    },
+    "RepeatableEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "task"
+      ],
+      "title": "RepeatableEntry",
+      "type": "object"
+    },
+    "Resumed": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "resumed",
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "kind",
+        "task"
+      ],
+      "title": "Resumed",
+      "type": "object"
+    },
+    "RunDescription": {
+      "additionalProperties": false,
+      "description": "Everything constant in one sim-run, sent when its model is built: the triple, the run options as the\nscreen-user stated them and as the model applies them (an option set off by another shows here), and the world.",
+      "properties": {
+        "effective": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "count": "#/$defs/CountValue",
+                "level": "#/$defs/LevelValue",
+                "one_of": "#/$defs/OneOfValue",
+                "switch": "#/$defs/SwitchValue"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/SwitchValue"
+              },
+              {
+                "$ref": "#/$defs/OneOfValue"
+              },
+              {
+                "$ref": "#/$defs/LevelValue"
+              },
+              {
+                "$ref": "#/$defs/CountValue"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "run": {
+          "$ref": "#/$defs/RunTriple"
+        },
+        "sim_run": {
+          "type": "string"
+        },
+        "stated": {
+          "$ref": "#/$defs/SimRunChoice"
+        },
+        "world": {
+          "$ref": "#/$defs/WorldDescription"
+        }
+      },
+      "required": [
+        "effective",
+        "run",
+        "sim_run",
+        "stated",
+        "world"
+      ],
+      "title": "RunDescription",
+      "type": "object"
+    },
+    "RunEnd": {
+      "additionalProperties": false,
+      "description": "The sim-run's end: why, and the entries still open of each script that depends on the robot.",
+      "properties": {
+        "reason": {
+          "$ref": "#/$defs/EndReason"
+        },
+        "still_open": {
+          "items": {
+            "$ref": "#/$defs/StillOpenEntry"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "reason",
+        "still_open"
+      ],
+      "title": "RunEnd",
+      "type": "object"
+    },
+    "RunTriple": {
+      "additionalProperties": false,
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "string"
+        },
+        "scenario": {
+          "type": "string"
+        },
+        "setup": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "domain",
+        "layout",
+        "scenario",
+        "setup"
+      ],
+      "title": "RunTriple",
+      "type": "object"
+    },
+    "ScenarioEntry": {
+      "additionalProperties": false,
+      "description": "A scenario with its two bindings: the one setup it binds and its reference layouts (the first is the one a\nrun takes when it names no layout). A run on another layout of the domain is valid and never a baseline.",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "reference_layouts": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "setup": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "id",
+        "reference_layouts",
+        "setup"
+      ],
+      "title": "ScenarioEntry",
+      "type": "object"
+    },
+    "ScriptDependence": {
+      "enum": [
+        "independent",
+        "on_robot"
+      ],
+      "title": "ScriptDependence",
+      "type": "string"
+    },
+    "ScriptEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "events": {
+          "items": {
+            "$ref": "#/$defs/Event"
+          },
+          "type": "array"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "events",
+        "task"
+      ],
+      "title": "ScriptEntry",
+      "type": "object"
+    },
+    "SetupEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id"
+      ],
+      "title": "SetupEntry",
+      "type": "object"
+    },
+    "ShapeKind": {
+      "description": "The forms of a fixed object, drawn over its footprint.",
+      "enum": [
+        "block",
+        "rack",
+        "counter",
+        "pad",
+        "enclosure",
+        "appliance",
+        "panel",
+        "seat",
+        "marker",
+        "barrier"
+      ],
+      "title": "ShapeKind",
+      "type": "string"
+    },
+    "SimRunChoice": {
+      "additionalProperties": false,
+      "description": "The screen-user's choice of a sim-run: the domain, the layout, the scenario (its setup is the scenario's) and\na value for every run option the catalogue declares.",
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "string"
+        },
+        "options": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "count": "#/$defs/CountValue",
+                "level": "#/$defs/LevelValue",
+                "one_of": "#/$defs/OneOfValue",
+                "switch": "#/$defs/SwitchValue"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/SwitchValue"
+              },
+              {
+                "$ref": "#/$defs/OneOfValue"
+              },
+              {
+                "$ref": "#/$defs/LevelValue"
+              },
+              {
+                "$ref": "#/$defs/CountValue"
+              }
+            ]
+          },
+          "type": "array"
+        },
+        "scenario": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "domain",
+        "layout",
+        "options",
+        "scenario"
+      ],
+      "title": "SimRunChoice",
+      "type": "object"
+    },
+    "Space": {
+      "additionalProperties": false,
+      "properties": {
+        "bounds": {
+          "$ref": "#/$defs/Bounds"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bounds",
+        "title"
+      ],
+      "title": "Space",
+      "type": "object"
+    },
+    "StartDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "start",
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "kind",
+        "task"
+      ],
+      "title": "StartDecision",
+      "type": "object"
+    },
+    "Started": {
+      "additionalProperties": false,
+      "description": "A task pushed on the stack by an event; `where` on the task below it, None on an empty stack.",
+      "properties": {
+        "kind": {
+          "const": "started",
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        },
+        "trigger": {
+          "discriminator": {
+            "mapping": {
+              "after_action": "#/$defs/AfterActionTrigger",
+              "during_action": "#/$defs/DuringActionTrigger",
+              "now": "#/$defs/NowTrigger"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/AfterActionTrigger"
+            },
+            {
+              "$ref": "#/$defs/DuringActionTrigger"
+            },
+            {
+              "$ref": "#/$defs/NowTrigger"
+            }
+          ]
+        },
+        "where": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "beginning": "#/$defs/AtBeginning",
+                  "boundary": "#/$defs/AtBoundary",
+                  "cut": "#/$defs/AtCut"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/AtBoundary"
+                },
+                {
+                  "$ref": "#/$defs/AtBeginning"
+                },
+                {
+                  "$ref": "#/$defs/AtCut"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "task",
+        "trigger",
+        "where"
+      ],
+      "title": "Started",
+      "type": "object"
+    },
+    "StillOpen": {
+      "additionalProperties": false,
+      "description": "An entry still open where the script stops being followed (a script that depends on the robot).",
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/EntryPosition"
+        },
+        "kind": {
+          "const": "still_open",
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "entry",
+        "kind",
+        "task"
+      ],
+      "title": "StillOpen",
+      "type": "object"
+    },
+    "StillOpenEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/EntryPosition"
+        },
+        "human": {
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "entry",
+        "human",
+        "task"
+      ],
+      "title": "StillOpenEntry",
+      "type": "object"
+    },
+    "SwitchOption": {
+      "additionalProperties": false,
+      "description": "A run option that is on or off.",
+      "properties": {
+        "default": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": "string"
+        },
+        "kind": {
+          "const": "switch",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "default",
+        "description",
+        "kind",
+        "name"
+      ],
+      "title": "SwitchOption",
+      "type": "object"
+    },
+    "SwitchValue": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "switch",
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "value"
+      ],
+      "title": "SwitchValue",
+      "type": "object"
+    },
+    "TaskRef": {
+      "additionalProperties": false,
+      "description": "A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the\nlogs show.",
+      "properties": {
+        "bindings": {
+          "items": {
+            "$ref": "#/$defs/Binding"
+          },
+          "type": "array"
+        },
+        "label": {
+          "type": "string"
+        },
+        "task": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "bindings",
+        "label",
+        "task"
+      ],
+      "title": "TaskRef",
+      "type": "object"
+    },
+    "TickUpdate": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RunEnd"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sim_run": {
+          "type": "string"
+        },
+        "tick": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "world": {
+          "$ref": "#/$defs/WorldTick"
+        }
+      },
+      "required": [
+        "end",
+        "sim_run",
+        "tick",
+        "world"
+      ],
+      "title": "TickUpdate",
+      "type": "object"
+    },
+    "TimelineInForce": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/TimelineSource"
+        },
+        "windows": {
+          "items": {
+            "$ref": "#/$defs/TimelineWindow"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "source",
+        "windows"
+      ],
+      "title": "TimelineInForce",
+      "type": "object"
+    },
+    "TimelineSource": {
+      "enum": [
+        "scenario",
+        "setup",
+        "none"
+      ],
+      "title": "TimelineSource",
+      "type": "string"
+    },
+    "TimelineWindow": {
+      "additionalProperties": false,
+      "description": "A timeline fact holds on the ticks [start, until); `until` None: to the run's end.",
+      "properties": {
+        "fact": {
+          "type": "string"
+        },
+        "start": {
+          "type": "integer"
+        },
+        "until": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "fact",
+        "start",
+        "until"
+      ],
+      "title": "TimelineWindow",
+      "type": "object"
+    },
+    "Unfired": {
+      "additionalProperties": false,
+      "properties": {
+        "event": {
+          "$ref": "#/$defs/Event"
+        },
+        "kind": {
+          "const": "unfired",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/UnfiredReason"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskRef"
+        }
+      },
+      "required": [
+        "event",
+        "kind",
+        "reason",
+        "task"
+      ],
+      "title": "Unfired",
+      "type": "object"
+    },
+    "UnfiredReason": {
+      "enum": [
+        "anchor_absent",
+        "anchor_ambiguous",
+        "anchor_out_of_range",
+        "never_reached",
+        "past_action"
+      ],
+      "title": "UnfiredReason",
+      "type": "string"
+    },
+    "WorldDescription": {
+      "additionalProperties": false,
+      "properties": {
+        "areas": {
+          "items": {
+            "$ref": "#/$defs/Area"
+          },
+          "type": "array"
+        },
+        "fixed_objects": {
+          "items": {
+            "$ref": "#/$defs/FixedObject"
+          },
+          "type": "array"
+        },
+        "humans": {
+          "items": {
+            "$ref": "#/$defs/AgentEntry"
+          },
+          "type": "array"
+        },
+        "movable_objects": {
+          "items": {
+            "$ref": "#/$defs/MovableObject"
+          },
+          "type": "array"
+        },
+        "robots": {
+          "items": {
+            "$ref": "#/$defs/AgentEntry"
+          },
+          "type": "array"
+        },
+        "scripts": {
+          "items": {
+            "$ref": "#/$defs/HumanScript"
+          },
+          "type": "array"
+        },
+        "space": {
+          "$ref": "#/$defs/Space"
+        },
+        "timeline": {
+          "$ref": "#/$defs/TimelineInForce"
+        }
+      },
+      "required": [
+        "areas",
+        "fixed_objects",
+        "humans",
+        "movable_objects",
+        "robots",
+        "scripts",
+        "space",
+        "timeline"
+      ],
+      "title": "WorldDescription",
+      "type": "object"
+    },
+    "WorldTick": {
+      "additionalProperties": false,
+      "description": "The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.",
+      "properties": {
+        "activity": {
+          "items": {
+            "$ref": "#/$defs/HumanActivity"
+          },
+          "type": "array"
+        },
+        "carried": {
+          "items": {
+            "$ref": "#/$defs/Carried"
+          },
+          "type": "array"
+        },
+        "fixed_object_contents": {
+          "items": {
+            "$ref": "#/$defs/FixedObjectContents"
+          },
+          "type": "array"
+        },
+        "humans": {
+          "items": {
+            "$ref": "#/$defs/AgentTick"
+          },
+          "type": "array"
+        },
+        "object_states": {
+          "items": {
+            "$ref": "#/$defs/ObjectState"
+          },
+          "type": "array"
+        },
+        "robots": {
+          "items": {
+            "$ref": "#/$defs/AgentTick"
+          },
+          "type": "array"
+        },
+        "timeline_facts": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "activity",
+        "carried",
+        "fixed_object_contents",
+        "humans",
+        "object_states",
+        "robots",
+        "timeline_facts"
+      ],
+      "title": "WorldTick",
+      "type": "object"
+    }
+  },
+  "title": "WebUiMessages"
+}

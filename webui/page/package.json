@@ -1,0 +1,35 @@
+{
+  "name": "teamrob-webui-page",
+  "private": true,
+  "version": "0.3.0",
+  "description": "The web-ui's page (T-viz). Stage 0.3: the env-pane's style trial, drawn from saved messages.",
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "vite --open",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --open",
+    "typecheck": "tsc --noEmit",
+    "gen:types": "json2ts --unreachableDefinitions --no-additionalProperties -i src/gen/messages.schema.json -o src/gen/messages.ts",
+    "shots": "node scripts/shots.mjs"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "5.2.7",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@react-three/drei": "10.7.9",
+    "@react-three/fiber": "9.8.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@types/three": "0.186.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "json-schema-to-typescript": "16.0.0",
+    "playwright-core": "1.63.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.3"
+  }
+}

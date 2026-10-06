@@ -69,3 +69,6 @@ analysis/**/measures.md
 # T-viz reference images: third-party pictures, inspiration only, kept on disk and out of version control
 # (docs/handoffs/handoff_T-viz.md, 10.3; Hadi, 6 October 2026)
 docs/handoffs/tviz_refs/
+
+# T-viz 0.3: the style trial's screenshots (webui/page: npm run shots), kept on disk, untracked (Hadi, 6 October 2026, Q3)
+docs/handoffs/tviz_trial/

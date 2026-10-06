@@ -1,0 +1,121 @@
+/* The page's stylesheet. Every value is a variable of the theme (src/theme.ts, applyTheme). */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font);
+  font-size: var(--type-md);
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  height: 100%;
+  padding: var(--space-xl);
+}
+
+.page-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-lg);
+}
+
+.page-title { font-weight: var(--weight-medium); font-size: var(--type-lg); }
+.page-note { color: var(--color-inkFaint); font-size: var(--type-sm); }
+.page-error { color: var(--color-humanDark); font-family: var(--font-mono); font-size: var(--type-sm); }
+
+.page-choice {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-inkSoft);
+  font-size: var(--type-sm);
+}
+
+select, button { font: inherit; color: inherit; }
+
+select {
+  background: var(--color-surface);
+  border: var(--line-frame) solid var(--color-lineFaint);
+  border-radius: var(--radius-frame);
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.env-pane {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: var(--line-frame) solid var(--color-lineFaint);
+  border-radius: var(--radius-frame);
+  overflow: hidden;
+}
+
+.env-pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: var(--line-frame) solid var(--color-lineFaint);
+}
+
+.env-pane-title { display: flex; align-items: baseline; gap: var(--space-md); min-width: 0; }
+.env-pane-name { font-weight: var(--weight-medium); white-space: nowrap; }
+.env-pane-run {
+  color: var(--color-inkFaint);
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.env-pane-scene { position: relative; flex: 1; min-height: 0; }
+
+.segmented {
+  display: inline-flex;
+  border: var(--line-frame) solid var(--color-lineFaint);
+  border-radius: var(--radius-pill);
+  padding: 2px;
+  flex: none;
+}
+
+.segmented button {
+  border: 0;
+  background: transparent;
+  border-radius: var(--radius-pill);
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--type-sm);
+  color: var(--color-inkSoft);
+  cursor: pointer;
+}
+
+.segmented button[aria-pressed="true"] { background: var(--color-ink); color: var(--color-surface); }
+
+.scene-pill-anchor { pointer-events: none; }
+
+.scene-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px var(--space-sm) 2px 6px;
+  background: var(--color-surface);
+  border: var(--line-frame) solid var(--color-lineFaint);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  color: var(--color-inkSoft);
+  white-space: nowrap;
+  transform: translateY(calc(-50% - 18px));   /* above the point it names, which stays visible from above */
+}
+
+.scene-pill-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
