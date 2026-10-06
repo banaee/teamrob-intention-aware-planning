@@ -79,6 +79,14 @@ solara run mesa_sim/run_mesa.py -- --domain kitting --scenario scenario_s01_01
   carries every run option.
 - Every layout's notes say first what the room is for.
 
+### Stage 1b, built (ccode, 6 October 2026)
+
+Panel 4b is built: the robot's five blocks (body, belief, admission, projection, decision), the messages' `robots`
+section, `RobotAgent.last_decision` for readers; design_records.md, "T-viz, the web-ui", 1b, THE RIGHT PANEL, BUILT,
+with ccode's design decisions and five readings marked provisional and raised to Hadi; the plan
+`docs/handoffs/plan_T-viz_1b.md`; the state file `docs/handoffs/build_T-viz_1b_state.md`. Hadi's review is open. Next:
+stage 1c (plots over ticks), then 1d and 1e (paths on the floor).
+
 ### What stage 1b starts from
 
 - The panels' roles and panel 4a's content above. The right panel's content (the robot's body and its mind) is decided

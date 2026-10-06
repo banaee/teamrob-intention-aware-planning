@@ -51,6 +51,7 @@ web-ui", 1a blocks.
 ## Next
 
 - Stage 1b, when Hadi asks: the robot's panel (its body and its mind), its content decided with Hadi first.
+  DONE (6 October 2026): built; its state file is `docs/handoffs/build_T-viz_1b_state.md`.
 
 ## Decisions taken on the way
 

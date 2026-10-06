@@ -311,7 +311,7 @@ Decisions
   TODO-47 part of it; kitting's part without a departure, dock_loading's may use the unmonitored office (Hadi, 1 Oct
   2026); before track 3b it measures without knowing that the adaptive branches fire under conflict); T-viz stage 1
   (the web-ui's first version; T-V track 1, the viewer, which was T-E; in T-V's place, proposed by ccode, 6 Oct 2026);
-  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 is closed (6 Oct 2026); stage 1a is closed (6 Oct 2026); stage 1b when Hadi asks.
+  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 is closed (6 Oct 2026); stage 1a is closed (6 Oct 2026); stage 1b is built (6 Oct 2026; panel 4b, Hadi's review open); stage 1's order 1b, 1c, 1d, 1e.
   FW: the 4D detour strategy, T-S (ROS/PRIEST, Phase 6), T-K's later directions, and T-viz stages 2 and 3 (stage 3 is
   T-V track 2, Phase 7; the default until Hadi draws the V1 border inside the web-ui).
   V1 and FW (Hadi, 1 Oct 2026, amended by Hadi 3 Oct 2026 and 6 Oct 2026 for T-viz; design_decisions.md, "T-G: the second
@@ -620,8 +620,11 @@ Decisions
   solara-ui is not archived, an alternative start kept running with a light check (after a change to code it uses: it
   starts and one sim-run takes a few steps without an error, in one domain; none after a change to the page alone). The
   web-ui's logic is tested, its look is not (the plan's P25, corrected). A new T-viz session reads the handoff's section
-  "State after stage 1a" first. Next: stage 1b (the robot's panel, its body and its mind), its content decided with Hadi
-  before it is planned; a later T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
+  "State after stage 1a" first. Stage 1b is BUILT (6 October 2026; design_records.md, "T-viz, the
+  web-ui", 1b, THE RIGHT PANEL, BUILT): panel 4b in five blocks (body, belief, admission, projection, decision), the
+  messages' `robots` section, `RobotAgent.last_decision` for readers; five readings provisional, raised to Hadi; his
+  review open. Stage 1's order is 1b, 1c, 1d, 1e (1d, 1e: paths as stripes on the floor; TODO-197). Next: 1c; a later
+  T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").
 - `shared/meta_planner.py`: blocks B1 (human projection), B2 (`b2a`), B3 (selection on realized

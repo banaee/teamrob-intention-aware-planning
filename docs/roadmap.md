@@ -879,6 +879,8 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     the robot's projection of the human drawn the same way (TODO-197 answered). Open: whether the polishing round comes
     after 1c or after 1e. ASKED FOR (Hadi, 6 October 2026): stage 1b, planned briefly and built without a pause
     (`docs/handoffs/plan_T-viz_1b.md`).
+    BUILT (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1b, THE RIGHT PANEL, BUILT): panel 4b, the
+    messages' robot section, five readings provisional and raised to Hadi; Hadi's review open. Next within T-viz: 1c.
   - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
     editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
     each saved as a new artefact; 2.4 sim-runs side by side.

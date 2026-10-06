@@ -5285,3 +5285,70 @@ with the task of stage 1b; records only, no code changed).
    section of the messages.
    TODO-197 (whether and which paths the scene shows) is answered by 1d and 1e. Open: whether the polishing round
    comes after 1c or after 1e.
+
+1b, THE RIGHT PANEL, BUILT (ccode, 6 October 2026; `docs/handoffs/plan_T-viz_1b.md`, planned and built in one session
+without a pause, as the task asked; Hadi's mode for 1b: web design details are ccode's, recorded as "decided by ccode";
+a conceptual reading of the robot's mind that the records do not settle is built as judged closest to the records,
+marked "provisional, raised to Hadi" below; nothing marked preferred is Hadi's review yet).
+- The model: `RobotAgent.last_decision` (`DecisionTaken`: the tick, the trigger decision, the human projection and the
+  meta-planner's result step() already holds), for readers; nothing in the loop reads it (b69d9b6). No change to the
+  recognizer, the gate, the projection, the meta-planner or the executor.
+- The messages: the run description's and the tick update's `robots` (`RobotDescription`, `RobotTick`: the body, the
+  belief, the gate's answer at the tick, the last decision with the projection it rested on), beside `world`, each
+  with an empty default; every value typed (enums for the trigger, the cause, the gate's answer, adequacy, warrant,
+  rank, level, lifecycle, finding, the fallback's form, the change of task).
+- Mesa's piece reads the robot after each step: the belief (`RobotAgent.belief`), the gate's answer from its one home
+  (`MetaPlanner._clears_gate`, as the test-beds ask it), after `none(no_human)` asked first; the last decision; the
+  executor's cursor, progress and hold; the memory's recency facts. The trigger's reason, a string in shared/types.py,
+  is translated by a closed table; an unknown one stops the piece.
+- The page: panel 4b (`src/frame/RobotPanel.tsx`, its reading `src/frame/robot.ts`) in the rail's place.
+- Checks: headless byte-identical after the model change (the four maintained sets and dock_loading's three runs, 102
+  files); `tests/test_tviz_robot.py`, the values the panel receives equal the run log's at every tick on kitting
+  scenario_s05_02 and dock_loading scenario_s07_07 (each an admission, refusals, fallback projections, holds, a
+  retraction), kitting scenario_s10_14 (a timeline fact, a raised level), scenario_s05_02 intention-unaware and
+  scenario_s07_07 human-unaware: the recognizer's lines, the gate derived from the logged values in the gate's order,
+  every decision's trigger, cause, admission, projection's kind, winner, queue and hold, a fallback's end where
+  projection_expired fires, `[meta-b3]`'s T_h, the hold against the `[hold]` lines, the body against the step lines;
+  vitest 38 (6 new); the page's build and type check; the suite; one look in Chrome at 1440 wide (env-pane 684 px,
+  no console error); the solara-ui's light check (it serves; a sim-run steps).
+DECIDED BY CCODE (web design and naming):
+- Panel 4b is 340 px wide (260 px under 1200 px); panel 4a keeps 360 px; the rail and its styles are gone.
+- The robot's id heads the panel with the robot's colour; the five blocks under the headings Body, Belief, Admission,
+  Projection, Decision, in Hadi's order.
+- Body: the task, the action at the plan's cursor with a progress bar ("not begun" at 0 of 0), then "this tick" (the
+  microaction), "carries" (from the world's `carried`), "hold" (stood of planned ticks, the deciding tick).
+- Belief: one row per live hypothesis, highest belief first, ties by key; a bar with θ as a thin mark; the value to 3
+  decimals; under it adequacy, warrant ("warranted", "no warrant"), "outranked" only when outranked, S and the prior to 3
+  decimals; the leader in the robot's colour; then the levels, the memory's recent tasks, the count of hypotheses not
+  live and the assigned tasks it is told.
+- A hypothesis is written by its values, as panel 4a writes a task (`deliver_item(item_5)`); its key travels as data.
+- Admission: "passes" or "refused" with a short phrase, the leader and its belief, the log's code small beside it; a
+  note that the gate is asked at a decision and which hypothesis the last decision rests on.
+- Projection: a pill "admitted" or "fallback"; an admitted projection lists its plan's actions; a fallback reads "the
+  human stays where it was seen" or "walks straight on", for its span, to its end tick; ticks past the projection's end
+  say it ran out; a fractional tick to one decimal.
+- Decision: the last decision's tick, trigger in words and cause, the log's codes small; task (starts, continues,
+  switches to, all its tasks are complete), hold, queue, admission; then the five before it, newest first.
+- Conditions: a grey note under the robot's id for intention-unaware and human-unaware; a block that does not apply
+  says "does not apply".
+- The message fields for the gate's answer are named `gate_answer`, and the scan for domain words (tests/
+  test_tviz_messages.py) admits "gate" as a framework term (the confidence gate; also dock_loading's object type) in a
+  name or in prose, still refusing it as a string literal on its own, the form a dependence on the object type takes.
+- The tick update grows from about 1.3 KB to about 3.5 KB (kitting scenario_s01_06): noted, with open item 10.
+PROVISIONAL, RAISED TO HADI (conceptual readings the records do not settle; each built as judged closest to them):
+1. The belief block shows the belief over the live hypotheses (`BeliefState.belief`, the value the gate compares with
+   θ, AM42), not the reported distribution with the floor and the pins (`distribution`, the `[IR-dist]` line).
+   Example: kitting scenario_s05_02, tick 71: deliver_item(item_5) 0.999 shown, 0.995 in `[IR-dist]`.
+2. The admission block states the gate's answer at every tick, though the gate is asked only at a decision and on the
+   entering side of recognition_changed; it can read "refused" while the decision still rests on an admitted hypothesis
+   (retention by identity, D2). Example: kitting scenario_s05_02, tick 24: refused, the leader outranked, while the
+   decision of tick 0 rests on deliver_item(item_5).
+3. "The projection in use" is the last decision's projection, kept until the next decision, also past its end (an
+   admitted projection past T_h, P3) and after the robot's pool is empty (no trigger is evaluated then). Example:
+   kitting scenario_s01_06, tick 119: the admitted projection of tick 84 ended at 118.6; the panel shows it, "ran out".
+4. The body's action is the action at the plan's cursor; on an acknowledgement tick the executor's `current_action`
+   (the step line's) still names the action just completed. Example: kitting scenario_s05_02, tick 38: the step line
+   says move_to, the panel pick_up, not begun.
+5. The fallback's form (standing, moving) is read from the projection's segment (it moves or not), not from the
+   perceived displacement; a moving human whose ray is blocked at once would read "stays where it was seen". No instance
+   in kitting scenario_s05_02, s01_06, s04_01 or dock_loading scenario_s07_07, s03_02.
