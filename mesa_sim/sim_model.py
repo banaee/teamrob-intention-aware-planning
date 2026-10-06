@@ -18,6 +18,10 @@ WHAT THIS MODULE DOES:
     - Instantiates env objects as plain dataclasses (not Mesa agents)
     - Spawns HumanAgent and RobotAgent via sim_agents.py
     - Runs schedule.step() each tick
+    - Holds the loader's layout part and setup part as functions (read_layout,
+      read_setup_objects, declared_states, read_setup_states), which the
+      web-ui's view of a layout, or of a layout and a setup, calls too
+      (mesa_sim/webui_adapter.py, T-viz 1a)
 
 WHAT THIS MODULE DOES NOT DO:
     - No WorldStateManager — ground truth lives in env_objects
@@ -30,7 +34,7 @@ COORDINATE SYSTEM:
 
 import json
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Dict, FrozenSet, List, Optional, Sequence, Set, Tuple
 
 from shared.knowledge import ContextKnowledge, StateDeclaration, Tree, TaskModel
 from shared.planner import AdaptivePlanner
@@ -87,7 +91,248 @@ class SimObject:
                                  # designated table), a fact of the station.
                                  # Required for the types the domain resolves
                                  # through "destination_of"; never mutated.
-                                 
+
+
+# =============================================================================
+# The loader's parts (T-viz 1a): the layout's part and the setup's part of a
+# run, read and checked by functions that SimModel calls and that the web-ui's
+# view of a layout, or of a layout and a setup, calls too (mesa_sim/
+# webui_adapter.py), so that the view shows what a model built on them holds.
+# Each call returns new objects; nothing here is a model's state.
+# =============================================================================
+
+@dataclass
+class LayoutPart:
+    """The layout's part of a run (the room): the space's bounds and its
+    title, the declared areas in declaration order, and the fixed objects in
+    the layout's order."""
+    x_min: float
+    x_max: float
+    y_min: float
+    y_max: float
+    display_name: str
+    areas: Tuple[Area, ...]
+    fixed_objects: Dict[str, SimObject]
+
+
+def read_layout(env_layout: dict, layout_path: str) -> LayoutPart:
+    """
+    The layout as read (overrides applied by the caller): the space, centred
+    on (0, 0); the declared areas (A9), in declaration order, which the
+    boundary rule reads (shared/types.area_at); the fixed objects (shelves,
+    gates, tables, machines...). A layout entry has a "position" and no
+    "initial_container" — each an error naming the layout.
+    """
+    space_config = env_layout["space"]
+    env_width = space_config["width"]
+    env_height = space_config["height"]
+    areas = tuple(
+        Area(id=a["id"], x_min=a["bounds"]["x_min"], x_max=a["bounds"]["x_max"],
+             y_min=a["bounds"]["y_min"], y_max=a["bounds"]["y_max"])
+        for a in env_layout.get("areas", [])
+    )
+    layout_objects = env_layout.get("env_objects", [])
+    for obj in layout_objects:
+        if "initial_container" in obj:
+            raise ValueError(
+                f"layout '{layout_path}': object '{obj['id']}' declares "
+                f"\"initial_container\"; a movable object belongs to the setup"
+            )
+        if "position" not in obj:
+            raise ValueError(
+                f"layout '{layout_path}': object '{obj['id']}' has no \"position\""
+            )
+    fixed_objects: Dict[str, SimObject] = {}
+    for obj in layout_objects:
+        fixed_objects[obj["id"]] = SimObject(
+            obj_id=obj["id"],
+            type=obj["type"],
+            position=tuple(obj["position"]),
+            size=tuple(obj["size"]),
+            subtype=obj.get("subtype"),
+            is_portable=False,  # direct-position objects are not portable
+        )
+    return LayoutPart(x_min=-env_width / 2, x_max=env_width / 2, y_min=-env_height / 2, y_max=env_height / 2,
+                      display_name=space_config.get("name", "TeamRob Simulation"), areas=areas,
+                      fixed_objects=fixed_objects)
+
+
+def read_setup_objects(setup_objects: list, fixed_objects: Dict[str, SimObject],
+                       types_with_destination: Dict[str, FrozenSet[str]],
+                       layout_path: str, setup_path: str) -> Dict[str, SimObject]:
+    """
+    The setup's movable objects (items, pallets) in the setup's order, each
+    at its home container, whose position it takes. A setup entry has an
+    "initial_container", which names an object of the layout; every object of
+    a type the domain resolves through "destination_of" declares its
+    destination; a movable object's subtype equals its home container's and
+    its destination's where they carry one — each an error naming the
+    artefact and the mismatch. The checks read the fixed objects and the
+    movable objects together, as one registry.
+    """
+    for obj in setup_objects:
+        if "initial_container" not in obj:
+            raise ValueError(
+                f"setup '{setup_path}': object '{obj['id']}' has no "
+                f"\"initial_container\"; a fixed object belongs to the layout"
+            )
+
+    objects: Dict[str, SimObject] = dict(fixed_objects)
+    movable_objects: Dict[str, SimObject] = {}
+    for obj in setup_objects:
+        container_id = obj["initial_container"]
+        container = fixed_objects.get(container_id)
+        if container is None:
+            raise ValueError(
+                f"setup '{setup_path}': object '{obj['id']}' has home container "
+                f"'{container_id}', which is not an object of layout '{layout_path}'"
+            )
+        movable = SimObject(
+            obj_id=obj["id"],
+            type=obj["type"],
+            position=container.position,
+            size=tuple(obj["size"]),
+            subtype=obj.get("subtype"),
+            held_by=None,
+            at_location=container_id,
+            is_portable=True,  # items/pallets are portable, even if not currently held
+            home_container=container_id,   # set once at load time, never mutated afterward
+            destination=obj.get("destination"),   # likewise
+        )
+        objects[obj["id"]] = movable
+        movable_objects[obj["id"]] = movable
+
+    # Every object of a type the domain resolves through "destination_of"
+    # declares its destination, naming an object of the layout of a type
+    # the domain declares for it (T-B1a; T-G A5: one of the declared
+    # destination types). An error, not a default.
+    for obj_id, obj in objects.items():
+        if obj.type not in types_with_destination:
+            continue
+        dest_types = types_with_destination[obj.type]
+        if obj.destination is None:
+            raise ValueError(
+                f"setup '{setup_path}': {obj.type} '{obj_id}' declares no "
+                f"\"destination\" (the domain determines one for type '{obj.type}')"
+            )
+        dest = fixed_objects.get(obj.destination)
+        if dest is None:
+            raise ValueError(
+                f"setup '{setup_path}': {obj.type} '{obj_id}' has destination "
+                f"'{obj.destination}', which is not an object of layout '{layout_path}'"
+            )
+        if dest.type not in dest_types:
+            raise ValueError(
+                f"setup '{setup_path}': {obj.type} '{obj_id}' has destination "
+                f"'{obj.destination}' of type '{dest.type}', but the domain declares for "
+                f"type '{obj.type}' the destination types {sorted(dest_types)}"
+            )
+
+    # A movable object's subtype is checked against its destination's and
+    # its home container's, where the fixed object carries one (design
+    # decisions, "subtype is a stated fact of an object"). An object
+    # without a subtype is not checked. The robot does not read subtype.
+    for obj_id, obj in objects.items():
+        if not obj.is_portable or obj.subtype is None:
+            continue
+        for role, container_id in (("home container", obj.home_container),
+                                   ("destination", obj.destination)):
+            container = objects.get(container_id) if container_id is not None else None
+            if container is None or container.subtype is None:
+                continue
+            if container.subtype != obj.subtype:
+                raise ValueError(
+                    f"setup '{setup_path}': {obj.type} '{obj_id}' of subtype '{obj.subtype}' has {role} "
+                    f"'{container_id}' of subtype '{container.subtype}'; the two subtypes must be equal"
+                )
+    return movable_objects
+
+
+def declared_states(state_declarations: Sequence[StateDeclaration],
+                    timeline_declarations: Sequence[StateDeclaration]
+                    ) -> Tuple[Dict[str, StateDeclaration], Dict[str, StateDeclaration]]:
+    """
+    The domain's object states (T-G A5) and its timeline facts (T-K part 1,
+    P3, X5), each by name. The timeline facts are declared in their own list,
+    so the loader can refuse them where AM20, AM50, AM52 and AM54 forbid them.
+    A name declared twice, or a timeline fact about an object type, is an error.
+    """
+    states: Dict[str, StateDeclaration] = {}
+    for declaration in state_declarations:
+        if declaration.name in states:
+            raise ValueError(f"the domain declares the state '{declaration.name}' twice")
+        states[declaration.name] = declaration
+    timeline_facts: Dict[str, StateDeclaration] = {}
+    for declaration in timeline_declarations:
+        if declaration.object_type is not None:
+            raise ValueError(f"the domain declares the timeline fact '{declaration.name}' about type "
+                             f"'{declaration.object_type}'; a timeline fact is a fact about no object")
+        if declaration.name in timeline_facts or declaration.name in states:
+            raise ValueError(f"the domain declares '{declaration.name}' twice (as a timeline fact and a state, or "
+                             f"twice as a timeline fact)")
+        timeline_facts[declaration.name] = declaration
+    return states, timeline_facts
+
+
+def state_fact(name: str, obj_id: Optional[str], objects: Dict[str, SimObject],
+               states: Dict[str, StateDeclaration], timeline_facts: Dict[str, StateDeclaration]) -> Predicate:
+    """
+    The state fact `name` about `obj_id` (None: about no object), validated
+    against the declarations: the name is declared; a state about an
+    object of a type names an existing object of that type; a state about
+    no object names none.
+    """
+    if name in timeline_facts:
+        raise ValueError(f"'{name}' is a timeline fact: it is stated by a timeline only (AM50; a fact that holds "
+                         f"from the start is a window from tick 0)")
+    declaration = states.get(name)
+    if declaration is None:
+        raise ValueError(f"'{name}' is not a state the domain declares ({sorted(states)})")
+    if declaration.object_type is None:
+        if obj_id is not None:
+            raise ValueError(f"the state '{name}' is a fact about no object, but names '{obj_id}'")
+        return Predicate(name, ())
+    if obj_id is None:
+        raise ValueError(f"the state '{name}' is about an object of type '{declaration.object_type}', but names none")
+    obj = objects.get(obj_id)
+    if obj is None:
+        raise ValueError(f"the state '{name}' names '{obj_id}', which is not an object of this run")
+    if obj.type != declaration.object_type:
+        raise ValueError(
+            f"the state '{name}' names '{obj_id}' of type '{obj.type}', but is declared for type "
+            f"'{declaration.object_type}'"
+        )
+    return Predicate(name, (Const(obj_id),))
+
+
+def read_setup_states(entries: list, setup_path: str, objects: Dict[str, SimObject],
+                      states: Dict[str, StateDeclaration],
+                      timeline_facts: Dict[str, StateDeclaration]) -> Set[Predicate]:
+    """
+    The setup's "states" block: one entry per fact that holds at the start,
+    {"state": <declared name>, "object": <object id>}, the object omitted
+    for a fact about no object. A declared state not listed does not hold.
+    Each entry is validated (state_fact); an entry with another key, or
+    listed twice, is an error naming the setup.
+    """
+    facts: Set[Predicate] = set()
+    for entry in entries:
+        unknown = set(entry) - {"state", "object"}
+        if "state" not in entry or unknown:
+            raise ValueError(
+                f"setup '{setup_path}': states entry {entry} is not of the form "
+                f"{{\"state\": <name>, \"object\": <object id>}} (\"object\" omitted for a fact about no object)"
+            )
+        try:
+            fact = state_fact(entry["state"], entry.get("object"), objects, states, timeline_facts)
+        except ValueError as e:
+            raise ValueError(f"setup '{setup_path}': {e}") from e
+        if fact in facts:
+            raise ValueError(f"setup '{setup_path}': the state {fact} is listed twice")
+        facts.add(fact)
+    return facts
+
+
 # =============================================================================
 # SimModel
 # =============================================================================
@@ -180,20 +425,20 @@ class SimModel(model.Model):
         # artefacts as read, before anything below validates or builds them.
         scenario = apply_overrides(overrides, scenario, env_layout, env_setup, layout_path, setup_path)
 
+        # The layout's part (read_layout): the space, the areas, the fixed objects
+        layout = read_layout(env_layout, layout_path)
+
         # ------------------------------------------------------------------
         # Space
         # ------------------------------------------------------------------
-        space_config = env_layout["space"]
-        env_width = space_config["width"]
-        env_height = space_config["height"]
         self.space = space.ContinuousSpace(
-            x_min=-env_width / 2,
-            x_max=env_width / 2,
-            y_min=-env_height / 2,
-            y_max=env_height / 2,
+            x_min=layout.x_min,
+            x_max=layout.x_max,
+            y_min=layout.y_min,
+            y_max=layout.y_max,
             torus=False,
         )
-        self.env_display_name = space_config.get("name", "TeamRob Simulation")
+        self.env_display_name = layout.display_name
         
 
         # ------------------------------------------------------------------
@@ -205,11 +450,7 @@ class SimModel(model.Model):
         # The declared areas (A9), in declaration order: the boundary rule
         # reads the order (shared/types.area_at)
         # ------------------------------------------------------------------
-        self.areas: Tuple[Area, ...] = tuple(
-            Area(id=a["id"], x_min=a["bounds"]["x_min"], x_max=a["bounds"]["x_max"],
-                 y_min=a["bounds"]["y_min"], y_max=a["bounds"]["y_max"])
-            for a in env_layout.get("areas", [])
-        )
+        self.areas: Tuple[Area, ...] = layout.areas
 
         # ------------------------------------------------------------------
         # The two knowledge objects (T-H): the world's tree, loaded once, which
@@ -226,34 +467,30 @@ class SimModel(model.Model):
         self.objects: Dict[str, SimObject] = {}
         self._objects_by_type: Dict[str, List[str]] = {}
 
-        self._init_objects(env_layout.get("env_objects", []), env_setup.get("env_objects", []),
-                           layout_path, setup_path)
+        # The layout's fixed objects, then the setup's movable objects
+        # (read_setup_objects), as before the split (T-L, stage 1)
+        self.objects.update(layout.fixed_objects)
+        self.objects.update(read_setup_objects(env_setup.get("env_objects", []), layout.fixed_objects,
+                                               self.tree.get_types_with_destination(), layout_path, setup_path))
+
+        # Build type → instance-ids registry, feeds IR's hypothesis space
+        for obj_id, obj in self.objects.items():
+            self._objects_by_type.setdefault(obj.type, []).append(obj_id)
 
         # ------------------------------------------------------------------
         # The object states (T-G A5): the domain declares them, the setup
         # states which hold at the start, the environment holds the true facts
         # (state_facts), emitted to every WorldState by the builder
         # ------------------------------------------------------------------
-        self.state_declarations: Dict[str, StateDeclaration] = {}
-        for declaration in state_declarations:
-            if declaration.name in self.state_declarations:
-                raise ValueError(f"the domain declares the state '{declaration.name}' twice")
-            self.state_declarations[declaration.name] = declaration
-        # The timeline facts (T-K part 1, P3, X5): declared in their own list, so
-        # the loader can refuse them where AM20, AM50, AM52 and AM54 forbid them.
-        self.timeline_declarations: Dict[str, StateDeclaration] = {}
-        for declaration in timeline_declarations:
-            if declaration.object_type is not None:
-                raise ValueError(f"the domain declares the timeline fact '{declaration.name}' about type "
-                                 f"'{declaration.object_type}'; a timeline fact is a fact about no object")
-            if declaration.name in self.timeline_declarations or declaration.name in self.state_declarations:
-                raise ValueError(f"the domain declares '{declaration.name}' twice (as a timeline fact and a state, or "
-                                 f"twice as a timeline fact)")
-            self.timeline_declarations[declaration.name] = declaration
+        # The timeline facts (T-K part 1, P3, X5) in their own list (declared_states).
+        self.state_declarations: Dict[str, StateDeclaration]
+        self.timeline_declarations: Dict[str, StateDeclaration]
+        self.state_declarations, self.timeline_declarations = declared_states(state_declarations,
+                                                                              timeline_declarations)
         self._check_declared_effects()
         self._check_no_schema_reads_a_timeline_fact()
-        self.state_facts: Set[Predicate] = set()
-        self._init_states(env_setup.get("states", []), setup_path)
+        self.state_facts: Set[Predicate] = read_setup_states(env_setup.get("states", []), setup_path, self.objects,
+                                                             self.state_declarations, self.timeline_declarations)
         # The timeline in force (AM40): the scenario's own if it states one, else
         # the setup's default, else none; applied by the builder as a function of
         # the tick (P2). One resolution, here; AM41's override (TODO-177) becomes
@@ -310,147 +547,8 @@ class SimModel(model.Model):
         self.datacollector.collect(self)
 
     # =========================================================================
-    # Initialization helpers
-    # =========================================================================
-
-    def _init_objects(self, layout_objects: list, setup_objects: list,
-                      layout_path: str, setup_path: str):
-        """
-        Unified loader for all env_objects entries. Two passes, as before the
-        split (T-L, stage 1): the layout's fixed objects first (shelves, gates,
-        tables, machines...), then the setup's movable objects (items,
-        pallets), whose position is derived from their home container.
-        A layout entry has a "position" and no "initial_container"; a setup
-        entry has an "initial_container"; every home container named by the
-        setup is an object of the layout — each an error naming the artefact
-        and the mismatch.
-        """
-        for obj in layout_objects:
-            if "initial_container" in obj:
-                raise ValueError(
-                    f"layout '{layout_path}': object '{obj['id']}' declares "
-                    f"\"initial_container\"; a movable object belongs to the setup"
-                )
-            if "position" not in obj:
-                raise ValueError(
-                    f"layout '{layout_path}': object '{obj['id']}' has no \"position\""
-                )
-        for obj in setup_objects:
-            if "initial_container" not in obj:
-                raise ValueError(
-                    f"setup '{setup_path}': object '{obj['id']}' has no "
-                    f"\"initial_container\"; a fixed object belongs to the layout"
-                )
-
-        for obj in layout_objects:
-            self.objects[obj["id"]] = SimObject(
-                obj_id=obj["id"],
-                type=obj["type"],
-                position=tuple(obj["position"]),
-                size=tuple(obj["size"]),
-                subtype=obj.get("subtype"),
-                is_portable=False,  # direct-position objects are not portable
-            )
-
-        layout_ids = {obj["id"] for obj in layout_objects}
-
-        for obj in setup_objects:
-            container_id = obj["initial_container"]
-            container = self.objects.get(container_id) if container_id in layout_ids else None
-            if container is None:
-                raise ValueError(
-                    f"setup '{setup_path}': object '{obj['id']}' has home container "
-                    f"'{container_id}', which is not an object of layout '{layout_path}'"
-                )
-            self.objects[obj["id"]] = SimObject(
-                obj_id=obj["id"],
-                type=obj["type"],
-                position=container.position,
-                size=tuple(obj["size"]),
-                subtype=obj.get("subtype"),
-                held_by=None,
-                at_location=container_id,
-                is_portable=True,  # items/pallets are portable, even if not currently held
-                home_container=container_id,   # set once at load time, never mutated afterward
-                destination=obj.get("destination"),   # likewise
-            )
-            # print(f"Loaded portable object {obj['id']} with home_container {container_id}")
-
-        # Every object of a type the domain resolves through "destination_of"
-        # declares its destination, naming an object of the layout of a type
-        # the domain declares for it (T-B1a; T-G A5: one of the declared
-        # destination types). An error, not a default.
-        types_with_destination = self.tree.get_types_with_destination()
-        for obj_id, obj in self.objects.items():
-            if obj.type not in types_with_destination:
-                continue
-            dest_types = types_with_destination[obj.type]
-            if obj.destination is None:
-                raise ValueError(
-                    f"setup '{setup_path}': {obj.type} '{obj_id}' declares no "
-                    f"\"destination\" (the domain determines one for type '{obj.type}')"
-                )
-            dest = self.objects.get(obj.destination) if obj.destination in layout_ids else None
-            if dest is None:
-                raise ValueError(
-                    f"setup '{setup_path}': {obj.type} '{obj_id}' has destination "
-                    f"'{obj.destination}', which is not an object of layout '{layout_path}'"
-                )
-            if dest.type not in dest_types:
-                raise ValueError(
-                    f"setup '{setup_path}': {obj.type} '{obj_id}' has destination "
-                    f"'{obj.destination}' of type '{dest.type}', but the domain declares for "
-                    f"type '{obj.type}' the destination types {sorted(dest_types)}"
-                )
-
-        # A movable object's subtype is checked against its destination's and
-        # its home container's, where the fixed object carries one (design
-        # decisions, "subtype is a stated fact of an object"). An object
-        # without a subtype is not checked. The robot does not read subtype.
-        for obj_id, obj in self.objects.items():
-            if not obj.is_portable or obj.subtype is None:
-                continue
-            for role, container_id in (("home container", obj.home_container),
-                                       ("destination", obj.destination)):
-                container = self.objects.get(container_id) if container_id is not None else None
-                if container is None or container.subtype is None:
-                    continue
-                if container.subtype != obj.subtype:
-                    raise ValueError(
-                        f"setup '{setup_path}': {obj.type} '{obj_id}' of subtype '{obj.subtype}' has {role} "
-                        f"'{container_id}' of subtype '{container.subtype}'; the two subtypes must be equal"
-                    )
-
-        # Build type → instance-ids registry, feeds IR's hypothesis space
-        for obj_id, obj in self.objects.items():
-            self._objects_by_type.setdefault(obj.type, []).append(obj_id)
-
-    # =========================================================================
     # The object states (T-G A5)
     # =========================================================================
-
-    def _init_states(self, entries: list, setup_path: str):
-        """
-        The setup's "states" block: one entry per fact that holds at the start,
-        {"state": <declared name>, "object": <object id>}, the object omitted
-        for a fact about no object. A declared state not listed does not hold.
-        Each entry is validated (_state_fact); an entry with another key, or
-        listed twice, is an error naming the setup.
-        """
-        for entry in entries:
-            unknown = set(entry) - {"state", "object"}
-            if "state" not in entry or unknown:
-                raise ValueError(
-                    f"setup '{setup_path}': states entry {entry} is not of the form "
-                    f"{{\"state\": <name>, \"object\": <object id>}} (\"object\" omitted for a fact about no object)"
-                )
-            try:
-                fact = self._state_fact(entry["state"], entry.get("object"))
-            except ValueError as e:
-                raise ValueError(f"setup '{setup_path}': {e}") from e
-            if fact in self.state_facts:
-                raise ValueError(f"setup '{setup_path}': the state {fact} is listed twice")
-            self.state_facts.add(fact)
 
     def _setup_timeline(self, env_setup: dict, setup_path: str) -> Optional[Timeline]:
         """
@@ -530,33 +628,8 @@ class SimModel(model.Model):
                                          f"fact '{guard.name}'; no condition of a schema reads a timeline fact")
 
     def _state_fact(self, name: str, obj_id: Optional[str]) -> Predicate:
-        """
-        The state fact `name` about `obj_id` (None: about no object), validated
-        against the declarations: the name is declared; a state about an
-        object of a type names an existing object of that type; a state about
-        no object names none.
-        """
-        if name in self.timeline_declarations:
-            raise ValueError(f"'{name}' is a timeline fact: it is stated by a timeline only (AM50; a fact that holds "
-                             f"from the start is a window from tick 0)")
-        declaration = self.state_declarations.get(name)
-        if declaration is None:
-            raise ValueError(f"'{name}' is not a state the domain declares ({sorted(self.state_declarations)})")
-        if declaration.object_type is None:
-            if obj_id is not None:
-                raise ValueError(f"the state '{name}' is a fact about no object, but names '{obj_id}'")
-            return Predicate(name, ())
-        if obj_id is None:
-            raise ValueError(f"the state '{name}' is about an object of type '{declaration.object_type}', but names none")
-        obj = self.objects.get(obj_id)
-        if obj is None:
-            raise ValueError(f"the state '{name}' names '{obj_id}', which is not an object of this run")
-        if obj.type != declaration.object_type:
-            raise ValueError(
-                f"the state '{name}' names '{obj_id}' of type '{obj.type}', but is declared for type "
-                f"'{declaration.object_type}'"
-            )
-        return Predicate(name, (Const(obj_id),))
+        """The state fact `name` about `obj_id`, validated against this run's declarations and objects (state_fact)."""
+        return state_fact(name, obj_id, self.objects, self.state_declarations, self.timeline_declarations)
 
     def _check_declared_effects(self):
         """
