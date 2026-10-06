@@ -50,6 +50,17 @@ Relevant (read as needed):
   the load-time replay) and its record (`world/record.py`)
 - `mesa_sim/*.py` (top level only); `mesa_sim/viz/` only for visualization or when grepping
   for readers of a field
+- `mesa_sim/run_config.py`: the run configuration (run file, flags, or any mapping) read and checked, and the
+  `SimModel` built from it; one definition for every start (T-viz 0.2)
+- `mesa_sim/sim_run.py`: one sim-run: the model stepped, its log pair (`.log` and `.rec`) and the run-level lines
+  (T-viz 0.2)
+- `mesa_sim/webui_adapter.py`: Mesa's piece for the web-ui: the catalogue, the run description and the tick updates of
+  a sim-run, read from the model only (T-viz 0.4)
+- `mesa_sim/webui_export.py`: a sim-run's run description, start tick update and scene appearance written as files for
+  the web-ui's page, until stage 1a's server (T-viz 0.3)
+- `webui/`: the web-ui, independent of every simulator and domain: the messages (`messages.py`), the interface a
+  simulator's piece implements (`simulator.py`), the scene appearance (`appearance.py`), the page's schema
+  (`schema.py`), and the page (`page/`: React, TypeScript, Vite, three.js; `node_modules/` is not read)
 - `domains/kitting/`: the active domain (`domains/kitting/script.py`: the call forms a scenario is written in, T-H3).
   T-L stage 2: `layouts/` and `setups/` hold the layout and setup files (setups under their final ids
   `env_setup_NN`; env_setup3 and env_setup5 merged into env_setup_01 and env_setup_03; layouts under `env_layout_KK`
