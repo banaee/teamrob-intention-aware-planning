@@ -62,6 +62,11 @@ export const theme = {
    * (the dataviz validator: lightness, chroma, adjacent CVD ΔE 6.4, legal with the labels and tooltips the page has). */
   task: ["#7d8a00", "#0e8fb3", "#4a3aa7", "#b5591e", "#e87ba4", "#008300", "#c2185b", "#1baf7a", "#eda100", "#e34948"],
   taskOther: "#B9BDCB",
+  /** Panel 4c's task colours (T-viz 1c, the two versions; the bottom panel only until Hadi chooses): dusty tones of
+   * middle lightness, drawn mostly as light tints (bands) and as lines only for a hypothesis that has led, so that few
+   * colours show at once and the panel sits with the right panel's tinted blocks. Every further task `taskSoftOther`. */
+  taskSoft: ["#4E8F8B", "#8A6FB0", "#C08A3E", "#6E8F4E", "#B0607A", "#5A7FB0", "#9A7B5F", "#4F6D8A"],
+  taskSoftOther: "#A3A8B8",
   opacity: {
     shadow: 0.10,
     agentRing: 0.12,
@@ -92,7 +97,7 @@ export const theme = {
   type: {
     family: "'IBM Plex Sans', system-ui, sans-serif",
     mono: "'IBM Plex Mono', ui-monospace, monospace",
-    size: { xs: 10, sm: 11, md: 13, lg: 15, xl: 18 },        // px
+    size: { xs: 10, sm: 11, md: 13, lg: 15, xl: 18, xxl: 24 },   // px; xxl: panel 4c's large numbers (T-viz 1c)
     weight: { regular: 400, medium: 500 },
   },
   scene: {                    // in the layout's unit, on the floor

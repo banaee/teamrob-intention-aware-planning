@@ -56,6 +56,7 @@ import type { Moment, Room } from "./env-pane/Scene";
 import { foldLanes, type Lanes } from "./plots/lanes";
 import { PlotPanel } from "./plots/PlotPanel";
 import { viewedTicks } from "./plots/past";
+import { theme } from "./theme";
 
 const DEFAULT_SPEED: Speed = 5;
 
@@ -334,6 +335,9 @@ export function App() {
     return laneFold.current;
   }, [run]);
   const colours = useMemo(() => (description === null ? NO_COLOURS : taskColours(description)), [description]);
+  // panel 4c's colours: the soft palette, in the bottom panel only until Hadi chooses between its two versions
+  const plotColours = useMemo(() => (description === null ? NO_COLOURS
+    : taskColours(description, theme.taskSoft, theme.taskSoftOther)), [description]);
 
   // The camera returns to the last preset when the layout changes.
   const shownLayout = shown === null ? null : shown.kind === "run" ? shown.description.run.layout : shown.view.layout;
@@ -385,7 +389,7 @@ export function App() {
         <RobotPanel robots={run?.description.robots ?? []} ticks={run?.built ? shownTicks : null} colours={colours} />
       </div>
 
-      <PlotPanel lanes={lanes} colours={colours} viewed={viewed} onView={onView} />
+      <PlotPanel lanes={lanes} colours={plotColours} viewed={viewed} onView={onView} />
     </main>
   );
 }

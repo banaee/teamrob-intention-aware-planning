@@ -54,3 +54,20 @@ describe("one colour per task", () => {
     expect(colourOf(colours, "unknown()")).toBe(theme.taskOther);
   });
 });
+
+// Both versions' clicks map a pointer's x to a tick by one function over the version's geometry (src/plots/look.ts).
+import { geometry, SPEC_A, SPEC_B, tickOf, xOf } from "../src/plots/look";
+import type { Lanes } from "../src/plots/lanes";
+
+describe("a click maps to its tick in both versions", () => {
+  const lanes = { key: "k", length: 137, humans: [], robots: [], facts: [], pairs: [] } as unknown as Lanes;
+  for (const [name, spec] of [["A", SPEC_A], ["B", SPEC_B]] as const) {
+    it(`version ${name}`, () => {
+      const g = geometry(lanes, 1888, spec);
+      const end = axisEnd(lanes.length);
+      for (let t = 0; t < lanes.length; t++) expect(tickOf(g, end, lanes.length, xOf(g, end, t + 0.5))).toBe(t);
+      expect(tickOf(g, end, lanes.length, g.x0 - 1)).toBeNull();
+      expect(tickOf(g, end, lanes.length, g.x1 - 1)).toBe(lanes.length - 1);   // past the latest tick: the latest
+    });
+  }
+});

@@ -74,3 +74,5 @@ docs/handoffs/tviz_refs/
 docs/handoffs/tviz_trial/
 # T-viz 1a: the screenshots of each increment (webui/page: npm run shots), kept on disk, untracked as 0.3's
 docs/handoffs/tviz_1a/
+# T-viz 1c: the screenshots of panel 4c's two versions, kept on disk, untracked as 1a's
+docs/handoffs/tviz_1c/

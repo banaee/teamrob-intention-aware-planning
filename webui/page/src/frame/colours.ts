@@ -18,7 +18,8 @@ export type TaskColours = ReadonlyMap<string, string>;
 
 export const NO_COLOURS: TaskColours = new Map();
 
-export function taskColours(description: RunDescription): TaskColours {
+export function taskColours(description: RunDescription, palette: readonly string[] = theme.task,
+                            other: string = theme.taskOther): TaskColours {
   const order: string[] = [];
   const add = (identity: string) => { if (!order.includes(identity)) order.push(identity); };
   const entry = (e: ScriptEntry) => {
@@ -32,7 +33,7 @@ export function taskColours(description: RunDescription): TaskColours {
   }
   for (const robot of description.robots) for (const t of robot.assigned) add(t.identity);
   for (const robot of description.robots) for (const h of robot.hypotheses) add(h.key);
-  return new Map(order.map((identity, i) => [identity, theme.task[i] ?? theme.taskOther]));
+  return new Map(order.map((identity, i) => [identity, palette[i] ?? other]));
 }
 
 /** The colour of a task or a hypothesis by its identity; `taskOther` for one the description does not name. */

@@ -349,8 +349,9 @@ button:disabled { cursor: default; opacity: 0.45; }
 }
 .strip { flex: none; height: 32px; }
 
-/* Panel 4c, the plots over the ticks (T-viz 1c): one canvas of five lanes under the main row; its height is the
-   lanes'. A hairline and a tooltip follow the pointer; a click shows that tick in the whole page. */
+/* Panel 4c, the plots over the ticks (T-viz 1c): its lanes as soft tinted boxes (src/plots/look.ts), drawn by version A
+   (canvas) or B (product dashboard cards, Recharts); a hairline and a tooltip follow the pointer; a click shows that tick in the whole page;
+   a small switch at its foot chooses the version. */
 .plots {
   flex: none;
   padding: var(--space-sm) var(--space-md) var(--space-xs);
@@ -360,19 +361,75 @@ button:disabled { cursor: default; opacity: 0.45; }
 }
 .plots-empty { display: flex; align-items: center; justify-content: center; height: 32px; padding: 0; border-style: dashed;
   color: var(--color-inkFaint); font-size: var(--type-xs); letter-spacing: 0.04em; }
-.plots-box { position: relative; cursor: crosshair; }
-.plots-canvas { display: block; }
+.plots-box { position: relative; cursor: pointer; }
+.plots-canvas, .plots-svg { display: block; }
 .plots-wait { position: absolute; left: 50%; top: 40%; color: var(--color-inkFaint); font-size: var(--type-xs); }
-.plots-hair { position: absolute; top: 6px; width: 1px; background: var(--color-inkSoft); pointer-events: none; }
+.plots-hair { position: absolute; width: 1px; background: var(--color-inkFaint); pointer-events: none; }
 .plots-tip {
-  position: absolute; z-index: 2; pointer-events: none;
-  max-width: 420px; padding: var(--space-xs) var(--space-sm);
-  background: var(--color-surface); border: var(--line-frame) solid var(--color-lineFaint);
-  border-radius: 6px; box-shadow: 0 2px 8px rgba(30, 34, 48, 0.12);
-  font-size: var(--type-xs); line-height: 1.45; color: var(--color-ink);
+  position: absolute; z-index: 2; pointer-events: none; min-width: 180px; max-width: 460px; padding: 6px 10px 7px;
+  background: var(--color-surface); border: var(--line-frame) solid color-mix(in srgb, var(--color-lineFaint) 60%, transparent);
+  border-radius: 8px; box-shadow: 0 12px 28px rgba(30, 34, 48, 0.12), 0 2px 6px rgba(30, 34, 48, 0.06);
+  font-size: var(--type-xs); line-height: 1.5; color: var(--color-ink);
 }
-.plots-tip > div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.plots-tip > div > span { display: inline-block; min-width: 64px; color: var(--color-inkFaint); }
+.plots-tip-head { margin-bottom: 4px; padding-bottom: 4px; border-bottom: var(--line-frame) solid
+  color-mix(in srgb, var(--color-lineFaint) 60%, transparent); font-weight: var(--weight-medium); }
+.plots-tip-row { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.plots-tip-row i { flex: none; width: 8px; height: 8px; border-radius: 2px; }
+.plots-tip-row span { color: var(--color-inkSoft); }
+.plots-tip-row b { margin-left: auto; padding-left: 12px; font-weight: var(--weight-medium); font-variant-numeric: tabular-nums;
+  overflow: hidden; text-overflow: ellipsis; }
+.plots-switch {
+  position: absolute; right: 2px; bottom: -2px; display: flex; padding: 2px; gap: 2px;
+  background: var(--color-page); border-radius: var(--radius-pill);
+}
+.plots-switch button {
+  min-width: 22px; padding: 0 6px; border: 0; border-radius: var(--radius-pill); background: transparent;
+  font-size: var(--type-xs); line-height: 16px; color: var(--color-inkFaint); cursor: pointer;
+}
+.plots-switch button.is-on { background: var(--color-surface); color: var(--color-ink); box-shadow: 0 1px 2px rgba(30, 34, 48, 0.12); }
+
+/* Panel 4c, version B: ReUI's look in a light scheme (src/plots/PlotsB.tsx): cards as shadcn cards (white, rounded, a
+   fine ring, a faint shadow) with a header column in the tint of the right panel's matching block; soft rounded shapes
+   that grow by a CSS transition; Recharts areas with a fading gradient; a large number and a muted line in the header. */
+.pb { position: relative; font-size: var(--type-xs); }
+.pb-card {
+  position: absolute; box-sizing: border-box; overflow: hidden; border-radius: 12px; background: var(--color-surface);
+  box-shadow: 0 0 0 1px rgba(30, 34, 48, 0.08), 0 1px 2px rgba(30, 34, 48, 0.05);
+}
+.pb-head { position: absolute; left: 0; top: 0; bottom: 0; box-sizing: border-box; }
+.pb-head-row { position: absolute; left: 14px; right: 12px; display: flex; flex-direction: column; gap: 1px; padding-top: 8px; }
+.pb-head-title { display: flex; align-items: center; gap: 6px; min-height: 16px; }
+.pb-head-title span { font-size: var(--type-sm); font-weight: var(--weight-medium); color: var(--color-ink); text-transform: capitalize; }
+.pb-head-title em { font-style: normal; font-weight: var(--weight-medium); padding: 0 6px; border-radius: 6px; line-height: 16px; }
+.pb-head-row strong { font-size: var(--type-xxl); font-weight: var(--weight-medium); line-height: 1.1; letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums; }
+.pb-head-row small { color: var(--color-inkSoft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--type-xs); }
+.pb-lane { position: absolute; }
+.pb-band {
+  position: absolute; top: 0; bottom: 0; box-sizing: border-box; border-radius: 8px; padding: 0 9px;
+  display: flex; align-items: center; overflow: hidden; white-space: nowrap; font-weight: var(--weight-medium);
+  transition: width 160ms ease-out;
+}
+.pb-band > span { overflow: hidden; text-overflow: ellipsis; }
+.pb-strip { position: absolute; left: 7px; right: 7px; bottom: 3px; height: 2px; border-radius: 1px; opacity: 0.85; }
+.pb-robot .pb-band { top: 5px; }
+.pb-hold {
+  position: absolute; top: 5px; bottom: 0; border-radius: 8px; transition: width 160ms ease-out;
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--color-robotDark) 38%, transparent) 0 1px,
+                                        transparent 1px 6px);
+}
+.pb-decision { position: absolute; top: 0; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%;
+  background: var(--color-robotDark); box-shadow: 0 0 0 1.5px #FFFFFF; }
+.pb-held { position: absolute; top: 0; height: 3px; border-radius: 2px; opacity: 0.9; transition: width 160ms ease-out; }
+.pb-off { display: flex; align-items: center; padding-left: 4px; color: var(--color-inkFaint); }
+.pb-chart { position: absolute; transition: clip-path 160ms ease-out; }
+.pb-guides { position: absolute; overflow: visible; pointer-events: none; }
+.pb-chart svg { overflow: visible; }
+.pb-axis { position: absolute; transform: translateX(-50%); color: var(--color-inkFaint); font-variant-numeric: tabular-nums; }
+.pb-now { position: absolute; width: 1px; background: color-mix(in srgb, var(--color-ink) 35%, transparent); pointer-events: none; }
+.pb-viewed { position: absolute; width: 2px; margin-left: -1px; background: var(--color-past); pointer-events: none; }
+.pb-viewed-tick { position: absolute; transform: translateX(-50%); padding: 0 7px; border-radius: 999px;
+  background: var(--color-past); color: #FFFFFF; font-weight: var(--weight-medium); line-height: 16px; }
 
 /* A task's colour across the page (T-viz 1c), a small square before its text. */
 .task-swatch { display: inline-block; flex: none; width: 8px; height: 8px; margin-right: 4px; border-radius: 2px;
