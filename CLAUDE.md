@@ -311,7 +311,7 @@ Decisions
   TODO-47 part of it; kitting's part without a departure, dock_loading's may use the unmonitored office (Hadi, 1 Oct
   2026); before track 3b it measures without knowing that the adaptive branches fire under conflict); T-viz stage 1
   (the web-ui's first version; T-V track 1, the viewer, which was T-E; in T-V's place, proposed by ccode, 6 Oct 2026);
-  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 is closed (6 Oct 2026); stage 1a is closed (6 Oct 2026); stage 1b is built (6 Oct 2026; panel 4b, reviewed 7 Oct 2026); stage 1c is built (7 Oct 2026; panel 4c, the past view, one colour per task; version A chosen and rebuilt with S, the finding and dragged borders; Hadi's review open); stage 1's order 1b, 1c, 1d, 1e.
+  track 3b (TODO-145); T-K part 2 (degrees) at the end of the V1 queue. T-viz stage 0 is closed (6 Oct 2026); stage 1a is closed (6 Oct 2026); stage 1b is built (6 Oct 2026; panel 4b, reviewed 7 Oct 2026); stage 1c is built (7 Oct 2026; panel 4c, the past view, one colour per task; version A chosen and rebuilt with S, the finding and dragged borders; Hadi's review open); stages 1d and 1e are built together (7 Oct 2026; the paths on the floor: the robot's plan and the human's real path as dashed lines, the robot's expectation of the human as a stripe, three switches; Hadi's review open); stage 1's order 1b, 1c, 1d, 1e.
   FW: the 4D detour strategy, T-S (ROS/PRIEST, Phase 6), T-K's later directions, and T-viz stages 2 and 3 (stage 3 is
   T-V track 2, Phase 7; the default until Hadi draws the V1 border inside the web-ui).
   V1 and FW (Hadi, 1 Oct 2026, amended by Hadi 3 Oct 2026 and 6 Oct 2026 for T-viz; design_decisions.md, "T-G: the second
@@ -625,7 +625,10 @@ Decisions
   messages' `robots` section, `RobotAgent.last_decision` for readers; five readings provisional, raised to Hadi; his
   review open. Stage 1c is BUILT (7 October 2026; design_records.md, "T-viz, the web-ui", 1c, THE BOTTOM PANEL, BUILT): panel
   4c in five lanes, drawn by the page's own canvas; the past view; one colour per task; `WorldTick.separations` and
-  `TaskRef.identity` in the messages; Hadi's review open. Stage 1's order is 1b, 1c, 1d, 1e (1d, 1e: paths as stripes on the floor; TODO-197). Next: 1d; a later
+  `TaskRef.identity` in the messages; Hadi's review open. Stages 1d and 1e are BUILT together (7 October 2026;
+  design_records.md, "T-viz, the web-ui", 1d AND 1e, THE PATHS ON THE FLOOR, BUILT): `WorldTick.walks_ahead`,
+  `RobotTick.walks_ahead` and `projection_ahead`, the drawing layer `webui/page/src/env-pane/Paths.tsx`, three switches;
+  Hadi's review open. Next: the polishing round, from Hadi's list; a later
   T-viz stage starts only when Hadi asks for it. T-viz is the name for all web-ui work (Hadi, 6 October 2026, preferred): T-V track 1 is
   T-viz stage 1, T-V track 2 (Phase 7, live events) is T-viz stage 3; stages 2 and 3 are [FW] for now. "T-V" and "the
   viewer and the demonstration" above read as those T-viz stages (docs/rename_table.md, "Task names").

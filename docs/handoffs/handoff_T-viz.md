@@ -104,6 +104,17 @@ panel 4a in cards, the soft colours across the page), built the same day (design
 The look is judged at 2560 x 1440 (Hadi), the page usable at 1920 x 1080. Next: Hadi's review; then 1d and 1e (paths on
 the floor); the polishing round (open).
 
+### Stages 1d and 1e, built (ccode, 7 October 2026)
+
+The paths on the floor, built together (Hadi's preferences: design_records.md, "T-viz, the web-ui", 1d AND 1e, THE PATHS
+ON THE FLOOR): the robot's own plan and the human's real path as thin dashed lines in the agent's colour, a mark at each
+walk's end; the robot's expectation of the human as a wide light stripe below them, filled for an admitted task, hatched
+for the fallback projection, a stand a disc; only what lies ahead; three switches in the env-pane's header. The messages
+gained `WorldTick.walks_ahead` and `RobotTick.walks_ahead`, `projection_ahead`, derived by Mesa's piece from the plans as
+actions. The record of the build, ccode's decisions and two readings provisional and raised to Hadi: design_records.md,
+1d AND 1e, THE PATHS ON THE FLOOR, BUILT; the plan `docs/handoffs/plan_T-viz_1d_1e.md`; the state file
+`docs/handoffs/build_T-viz_1d_1e_state.md`. Stage 1 is built. Next: Hadi's review; the polishing round (open).
+
 ### What stage 1b starts from
 
 - The panels' roles and panel 4a's content above. The right panel's content (the robot's body and its mind) is decided

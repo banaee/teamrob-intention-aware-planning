@@ -5645,3 +5645,58 @@ intention-unaware: only the fallback kind); the look flat on the floor, under th
 theme, judged at 2560 x 1440. The mode (as for 1b and 1c): a short plan (`docs/handoffs/plan_T-viz_1d_1e.md`), then the
 build without a pause; design details ccode's, recorded as "decided by ccode"; a conceptual reading of the core
 algorithm built as judged closest to the records and marked "provisional, raised to Hadi".
+
+1d AND 1e, THE PATHS ON THE FLOOR, BUILT (ccode, 7 October 2026; `docs/handoffs/plan_T-viz_1d_1e.md`, planned and built
+in one session without a pause, as the task asked; Hadi's review open).
+- Verified first: the human's later walk actions of the current task are available before the human reaches them (the
+  stack machine's top frame holds its whole expansion, `Frame.actions`, from its (re-)expansion on). One exception: while
+  a cut action is finished on a resumption (`Frame.finishing`) only that action is known, the task being expanded again
+  after it; then only it is drawn. Example: kitting scenario_s09_13, ticks 107 to the carry's end (the carry is the
+  task's last walk, so nothing is missing there).
+- The messages (90a6a12): `Walk` (start, end, target), `HumanWalks`; `WorldTick.walks_ahead`, the human's walks ahead, a
+  world fact; `MovingSegment` and `StationarySegment` (a union by kind); `RobotTick.walks_ahead`, the robot's own walks
+  ahead, and `RobotTick.projection_ahead`, the part of its last decision's projection of the human still ahead, its kind
+  `decision.projection`'s. Mesa's piece derives them from the plans as actions and only reads: the walk in hand from
+  the body's own queue (expanded where the walk began), a later walk by the body's own `walk_positions` from where the
+  walk before it stops, toward the target's present position; the projection's segments with an end after
+  τ = tick − decision + 1 on its clock, one under way cut at its position at τ. No change to the recognizer, the gate,
+  the projection, the meta-planner or the executor.
+- The page (3189877): `src/env-pane/paths.ts` (the reading, the line's points, the stripe's triangles, the switches'
+  memory) and `src/env-pane/Paths.tsx` (the drawing); three switches in the env-pane's header; the canvas asks for a
+  stencil buffer.
+- Checks: headless byte-identical, B1 equals B0 on 150 files (the four maintained sets with their figures, which equal
+  the baselines on disk, 96 logs and record streams, and dock_loading's scenario_s03_02, s05_02, s07_02);
+  `tests/test_tviz_paths.py` on kitting scenario_s05_02, dock_loading scenario_s07_07, scenario_s05_02 intention-unaware,
+  scenario_s07_07 human-unaware, scenario_s09_13: every walk starts at the agent or where the one before stops and ends
+  within the `at` radius of its target, on the line toward it; the human's walks at every tick agree with the logged
+  positions in the following ticks while the task on top runs on (the end reached when it completes), the robot's
+  while its plan runs on; the expectation's kind and end equal the log's ([meta-proj], [meta-b3]'s T_h) at every tick,
+  human-unaware none, intention-unaware only fallbacks; two deliberate faults made it fail (tried). The suite 455 passed;
+  vitest 56; the page's build and type check; in Chrome at 2560 x 1440 play at 5 ticks per second gave 5.08 ticks per
+  second with no long task both while the agents walk (dock_loading scenario_s07_07 from its start) and with 2000 ticks
+  held; the past view shows the clicked tick's drawings and sends no request. The solara-ui uses none of the changed
+  code: no light check.
+- Screenshot: `docs/handoffs/tviz_1d/page_2560x1440_kitting_s05_02_tick8.png` (untracked, .gitignore).
+DECIDED BY CCODE:
+- A walk ends where the body's walk stops, its first step within the `at` radius of the target, not at the target's
+  centre: the line shows where the agent will stand, and the next walk starts there.
+- The lines run from the far end back to the agent, so their dashes stay put on the floor while the agent walks; 2 px,
+  dashes 12 and gaps 8 in the layout's unit; a mark at each walk's end, a dot of radius 6 in a white rim of 2.5.
+- The stripe as wide as the human's floor ring (its diameter), so that a human where expected has its ring in the
+  stripe; filled at 0.16 of the human's colour (admitted); hatched in screen space, 1.2 px lines every 6 px at 0.42 over
+  a ground of 0.05 (fallback), no outline; a stand a disc of 0.75 of the stripe's width, consecutive stands at one place
+  one disc; drawn once per pixel through the stencil, so its overlapping pieces are one even tint.
+- Heights: the stripe at 0.25, the lines at 0.32, the marks at 0.34 above the floor: over the floor's dots and shadows,
+  under the agents' rings, the floor's text and every object.
+- The switches "Robot plan", "Human path", "Expectation", each a pill with a swatch of its drawing, between the layout's
+  id and the two views; on by default; remembered in the browser.
+- The completion latencies of the projection (a stationary segment per priced standing) are stands like any other.
+PROVISIONAL, RAISED TO HADI (conceptual readings the records do not settle; each built as judged closest to them):
+1. "Only what lies ahead" of the expectation is read on the decision's projection clock: the stripe starts where the
+   projection has the human at the tick, not at the human. Where the human is slower or faster than projected, or does
+   something else, the stripe's start leaves the human. Example: kitting scenario_s05_02, tick 39: the stripe of the
+   admitted projection of tick 0 starts 179 from the human.
+2. A projection past its end draws nothing, though panel 4b keeps showing it ("ran out", 1b's point 3). Example: kitting
+   scenario_s05_02, tick 143: the fallback of tick 141 has run out.
+FOUND: where a walk goes back along the walk before it (the robot to a shelf and back to the table), the two dashed lines
+overlap and read as a solid line. Example: kitting scenario_s05_02, tick 8, the robot's plan.
