@@ -1,0 +1,413 @@
+{
+  "space": {
+    "width": 1000,
+    "height": 1000,
+    "name": "env_layout_100",
+    "units": "cm",
+    "notes": "The IRB's enlarged room (IRB.4b): env_layout_10 unchanged (see its notes) plus a second table and a third shelf. kitting_table_1 at (350, 420) on the north wall, bearing 0 deg from kitting_table_0 (46.3 deg from its nearest target, shelf_2); shelf_3 at (-420, 300) on the west wall, 320 cm above shelf_1, bearing -164.1 deg (30.4 deg from shelf_1, 62.3 deg from coffee_machine_0). The human of the IRB.3b scripts never comes within 221 cm of shelf_3 or 253 cm of kitting_table_1. shelf_3's place was chosen for observability, by a criterion stated before any run: on the walk to item_1, the rival delivery of item_3 is refuted (S < alpha) after the first quarter of the walk and before the arrival; at (-420, -220), 10.4 deg, it was not (the refutation fell after the grasp); (-420, 300) is the first place up the west wall that meets it."
+  },
+  "areas": [
+    {
+      "id": "zone_NW",
+      "bounds": {
+        "x_min": -500,
+        "x_max": 0,
+        "y_min": 0,
+        "y_max": 500
+      },
+      "label": "northwest_work"
+    },
+    {
+      "id": "zone_NE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 500,
+        "y_min": 0,
+        "y_max": 500
+      },
+      "label": "northeast_work"
+    },
+    {
+      "id": "zone_SW",
+      "bounds": {
+        "x_min": -500,
+        "x_max": 0,
+        "y_min": -500,
+        "y_max": 0
+      },
+      "label": "southwest_storage"
+    },
+    {
+      "id": "zone_SE",
+      "bounds": {
+        "x_min": 0,
+        "x_max": 500,
+        "y_min": -500,
+        "y_max": 0
+      },
+      "label": "southeast_storage"
+    }
+  ],
+  "env_objects": [
+    {
+      "id": "kitting_table_0",
+      "type": "kitting_table",
+      "position": [
+        5,
+        450
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "notes": "Top centre, (0.50 W, 0.08 H). The human starts here."
+    },
+    {
+      "id": "kitting_table_1",
+      "type": "kitting_table",
+      "position": [
+        0,
+        -450
+      ],
+      "size": [
+        200,
+        100
+      ],
+      "notes": "IRB.4b: the north wall, east of kitting_table_0; the misdelivery's table (scenario_s09_08). No item is designated to it."
+    },
+    {
+      "id": "shelf_1",
+      "type": "shelf",
+      "position": [
+        -470,
+        355
+      ],
+      "size": [
+        60,
+        60
+      ],
+      "slots": 2,
+      "notes": "The west shelf, (0.08 W, 0.52 H). Symmetric to shelf_2 about the table's x."
+    },
+    {
+      "id": "shelf_2",
+      "type": "shelf",
+      "position": [
+        -470,
+        250
+      ],
+      "size": [
+        60,
+        60
+      ],
+      "slots": 2,
+      "notes": "The east shelf, (0.92 W, 0.52 H). Symmetric to shelf_1 about the table's x."
+    },
+    {
+      "id": "shelf_3",
+      "type": "shelf",
+      "position": [
+        -470,
+        145
+      ],
+      "size": [
+        60,
+        60
+      ],
+      "slots": 2,
+      "notes": "IRB.4b: the west wall, 320 cm above shelf_1; from kitting_table_0 its bearing (-164.1 deg) is 30.4 deg from shelf_1's. Placed for observability (the walk to item_1 separates from the walk to item_3 within the walk), not for a belief or finding value."
+    },
+    {
+      "id": "shelf_4",
+      "type": "shelf",
+      "position": [
+        -470,
+        50
+      ],
+      "size": [
+        60,
+        60
+      ],
+      "slots": 2,
+      "notes": "IRB.4b: the east wall, 320 cm above shelf_2; from kitting_table_0 its bearing (164.1 deg) is 30.4 deg from shelf_2's. Placed for observability (the walk to item_2 separates from the walk to item_4 within the walk), not for a belief or finding value."
+    },
+    {
+      "id": "shelf_5",
+      "type": "shelf",
+      "position": [
+        -470,
+        -50
+      ],
+      "size": [
+        60,
+        60
+      ],
+      "slots": 2,
+      "notes": "IRB.4b: the south wall, centred; from kitting_table_0 its bearing (180 deg) is 30.4 deg from shelf_1's. Placed for observability (the walk to item_1 separates from the walk to item_5 within the walk), not for a belief or finding value."
+    },
+    {
+      "id": "shelf_6",
+      "type": "shelf",
+      "position": [
+        -470,
+        -150
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_7",
+      "type": "shelf",
+      "position": [
+        -470,
+        -250
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_8",
+      "type": "shelf",
+      "position": [
+        -470,
+        -345
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_9",
+      "type": "shelf",
+      "position": [
+        470,
+        350
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_10",
+      "type": "shelf",
+      "position": [
+        470,
+        250
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_11",
+      "type": "shelf",
+      "position": [
+        470,
+        150
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_12",
+      "type": "shelf",
+      "position": [
+        470,
+        55
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_13",
+      "type": "shelf",
+      "position": [
+        470,
+        -50
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_14",
+      "type": "shelf",
+      "position": [
+        470,
+        -150
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_15",
+      "type": "shelf",
+      "position": [
+        470,
+        -245
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_16",
+      "type": "shelf",
+      "position": [
+        470,
+        -350
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_17",
+      "type": "shelf",
+      "position": [
+        -350,
+        470
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_18",
+      "type": "shelf",
+      "position": [
+        -250,
+        470
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_19",
+      "type": "shelf",
+      "position": [
+        250,
+        470
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_20",
+      "type": "shelf",
+      "position": [
+        350,
+        470
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_21",
+      "type": "shelf",
+      "position": [
+        -350,
+        -470
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_22",
+      "type": "shelf",
+      "position": [
+        -250,
+        -470
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_23",
+      "type": "shelf",
+      "position": [
+        250,
+        -470
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "shelf_24",
+      "type": "shelf",
+      "position": [
+        355,
+        -470
+      ],
+      "size": [
+        60,
+        60
+      ]
+    },
+    {
+      "id": "ac_switch_0",
+      "type": "ac_switch",
+      "position": [
+        -490,
+        -490
+      ],
+      "size": [
+        20,
+        20
+      ]
+    },
+    {
+      "id": "coffee_machine_1",
+      "type": "coffee_machine",
+      "position": [
+        -150,
+        -350
+      ],
+      "size": [
+        50,
+        50
+      ]
+    },
+    {
+      "id": "corner_SE",
+      "type": "landmark",
+      "position": [
+        490,
+        -490
+      ],
+      "size": [
+        20,
+        20
+      ]
+    }
+  ]
+}
