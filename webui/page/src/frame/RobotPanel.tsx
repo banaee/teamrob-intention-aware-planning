@@ -1,26 +1,29 @@
 /**
- * Panel 4b, the robot at the tick (T-viz 1b; docs/handoffs/plan_T-viz_1b.md). Per robot, under its id in the robot's
- * colour, five blocks in the order of the chain from recognition to planning (Hadi, 6 October 2026, preferred):
- *   (1) Body: its task, the action at its plan's cursor with its progress, the microaction of the tick, what it carries,
- *       a hold in progress;
- *   (2) Belief: the belief over the live hypotheses, highest first, θ marked, with each hypothesis's adequacy, warrant,
- *       rank, tail probability and prior; the levels and recency facts with context knowledge on;
- *   (3) Admission: the gate's answer for the leader at the tick, and the hypothesis the last decision rests on;
- *   (4) Projection: what the last decision expected the human to do;
- *   (5) Decision: the last decision, then the ones before it.
+ * Panel 4b, the robot at the tick (T-viz 1b; docs/handoffs/plan_T-viz_1b.md; Hadi's review, 7 October 2026). Read at a
+ * glance during play: short labels and values, no sentences. Per robot, under its id in the robot's colour:
+ *   Body: its task, the action at its plan's cursor with its progress, the microaction of the tick, what it carries, a
+ *   hold in progress;
+ *   Intention recognition, the recognizer's outputs, each named: the leader, the adequacy finding, the lifecycle, an
+ *   episode boundary; the belief over the live hypotheses as a bar chart with θ marked, each hypothesis keeping its row,
+ *   with its hypothesis adequacy, observation warrant, evidence rank, tail probability S and prior; the levels; and,
+ *   marked as an input, the memory's recency facts;
+ *   Planning, what the meta-planner does with them: admission (what it holds since its last decision; the gate's answer
+ *   at the tick), projection (the last decision's), decision (the last, then the ones before it).
  * The page decides nothing: every answer is the robot's, as the simulator's side sends it (src/frame/robot.ts).
  */
 
+import { useMemo } from "react";
+
 import type {
-  Carried, DecisionMade, RobotBelief, RobotDescription, RobotTick, TickUpdate,
+  Carried, DecisionMade, HypothesisBelief, RobotBelief, RobotDescription, RobotTick, TickUpdate,
 } from "../gen/messages";
 import { actionText, taskText } from "./activity";
 import {
-  admissionText, CAUSE_PHRASE, CHANGE_PHRASE, conditionNote, GATE_PHRASE, keyText, liveRows, recentDecisions,
-  tickText, TRIGGER_PHRASE,
+  admissionText, beliefRows, CAUSE_SHORT, CHANGE_SHORT, GATE_SHORT, held, keyText, recentDecisions, tickText,
+  TRIGGER_SHORT,
 } from "./robot";
 
-const RECENT = 5;
+const EARLIER = 3;
 
 export function RobotPanel({ robots, ticks }: {
   robots: readonly RobotDescription[]; ticks: readonly TickUpdate[] | null;
@@ -29,12 +32,11 @@ export function RobotPanel({ robots, ticks }: {
   return (
     <aside className="panel panel-robot" aria-label="The robot: its body and its mind">
       <h2 className="panel-title">The robot</h2>
-      {now === null || robots.length === 0 ? (
-        <p className="panel-later">No sim-run: what the robot believes and decides shows once a scenario is chosen.</p>
-      ) : robots.map((robot) => {
-        const tick = now.robots.find((r) => r.robot === robot.robot);
-        return tick ? <Robot key={robot.robot} robot={robot} tick={tick} now={now} ticks={ticks!} /> : null;
-      })}
+      {now === null || robots.length === 0 ? <p className="panel-later">no sim-run</p>
+        : robots.map((robot) => {
+          const tick = now.robots.find((r) => r.robot === robot.robot);
+          return tick ? <Robot key={robot.robot} robot={robot} tick={tick} now={now} ticks={ticks!} /> : null;
+        })}
     </aside>
   );
 }
@@ -42,202 +44,187 @@ export function RobotPanel({ robots, ticks }: {
 function Robot({ robot, tick, now, ticks }: {
   robot: RobotDescription; tick: RobotTick; now: TickUpdate; ticks: readonly TickUpdate[];
 }) {
-  const note = conditionNote(robot.condition);
-  const started = now.tick !== null;
+  const rows = useMemo(() => beliefRows(ticks, robot.robot), [ticks, robot.robot]);
+  const aware = robot.condition === "intention-aware";
+  const human = robot.condition !== "human-unaware";
   return (
     <section className="robot">
-      <h3 className="human-id"><span className="panel-dot robot-dot" />{robot.robot}</h3>
-      {note !== null && <p className="robot-condition">{note}</p>}
+      <h3 className="human-id">
+        <span className="panel-dot robot-dot" />{robot.robot}
+        {!aware && <span className="robot-chip">{robot.condition}</span>}
+      </h3>
       <Body tick={tick} carried={now.world.carried.filter((c) => c.agent === robot.robot)} />
-      <h4 className="human-heading">Belief <small>over the human's tasks</small></h4>
-      {robot.condition !== "intention-aware" ? <p className="human-none">does not apply</p>
-        : tick.belief === null ? <p className="human-none">{started ? "no belief" : "no observation yet"}</p>
-        : <Belief robot={robot} belief={tick.belief} />}
-      <h4 className="human-heading">Admission <small>θ = {robot.theta}</small></h4>
-      <Admission robot={robot} tick={tick} started={started} />
-      <h4 className="human-heading">Projection <small>of the human, the last decision's</small></h4>
-      <Projection robot={robot} decision={tick.decision} now={now.tick} />
-      <h4 className="human-heading">Decision</h4>
-      <Decisions robot={robot} decision={tick.decision} ticks={ticks} />
+
+      <div className="robot-part part-recognition">
+        <h4 className="part-title">Intention recognition <small>the recognizer's outputs</small></h4>
+        {!aware ? <p className="human-none">off</p>
+          : tick.belief === null ? <p className="human-none">{now.tick === null ? "no observation yet" : "none"}</p>
+          : <Recognition robot={robot} belief={tick.belief} rows={rows} />}
+      </div>
+
+      <div className="robot-part part-planning">
+        <h4 className="part-title">Planning <small>what the meta-planner does with them</small></h4>
+        <h5 className="robot-heading">Admission</h5>
+        {!human ? <p className="human-none">off</p> : <Admission robot={robot} tick={tick} started={now.tick !== null} />}
+        <h5 className="robot-heading">Projection</h5>
+        {!human ? <p className="human-none">off</p>
+          : <Projection robot={robot} decision={tick.decision} now={now.tick} />}
+        <h5 className="robot-heading">Decision</h5>
+        <Decisions robot={robot} decision={tick.decision} ticks={ticks} />
+      </div>
     </section>
   );
 }
 
-/** (1) The body. */
+function Facts({ items }: { items: readonly [string, React.ReactNode][] }) {
+  return (
+    <dl className="robot-facts">
+      {items.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}
+    </dl>
+  );
+}
+
 function Body({ tick, carried }: { tick: RobotTick; carried: readonly Carried[] }) {
   const { task, action, microaction, hold, finished } = tick.body;
   return (
     <>
-      <h4 className="human-heading">Body</h4>
-      {finished ? <p className="human-none">all its tasks are complete; it still observes</p> : (
-        <p className="human-of">task <span className="human-task">{task === null ? "none" : taskText(task)}</span></p>
-      )}
-      {action !== null && (
-        <>
-          <p className="human-action">{actionText(action.action)}</p>
-          <div className="human-progress">
+      <h5 className="robot-heading">Body</h5>
+      <Facts items={[
+        ["task", finished ? "all done" : task === null ? "none" : <span className="human-task">{taskText(task)}</span>],
+        ["action", action === null ? "none" : (
+          <span className="robot-action">
+            <span className="human-task">{actionText(action.action)}</span>
             <span className="human-bar robot-bar" aria-hidden>
               <span style={{ width: `${action.total > 0 ? (100 * action.done) / action.total : 0}%` }} />
             </span>
-            <span className="human-ticks">
-              {action.total === 0 ? "not begun" : `${action.done} of ${action.total} ticks`}
-            </span>
-          </div>
-        </>
-      )}
-      <dl className="robot-facts">
-        <div><dt>this tick</dt><dd>{microaction ?? "no microaction"}</dd></div>
-        <div><dt>carries</dt><dd>{carried.length === 0 ? "nothing" : carried.map((c) => c.movable_object).join(", ")}</dd></div>
-        <div><dt>hold</dt><dd>{hold === null ? "none" : (
-          <span className="robot-hold">stood {hold.stood} of {hold.planned} ticks, decided at tick {hold.decided_at}</span>
-        )}</dd></div>
-      </dl>
+            <span className="human-ticks">{action.done}/{action.total}</span>
+          </span>
+        )],
+        ["this tick", microaction ?? "–"],
+        ["carries", carried.length === 0 ? "–" : carried.map((c) => c.movable_object).join(", ")],
+        ["hold", hold === null ? "–" : <span className="robot-hold">{hold.stood}/{hold.planned} · from {hold.decided_at}</span>],
+      ]} />
     </>
   );
 }
 
-/** (2) The belief over the live hypotheses. */
-function Belief({ robot, belief }: { robot: RobotDescription; belief: RobotBelief }) {
-  const rows = liveRows(belief);
-  const notLive = robot.hypotheses.length - belief.live.length;
+/** The recognizer's outputs at the tick. */
+function Recognition({ robot, belief, rows }: { robot: RobotDescription; belief: RobotBelief; rows: readonly string[] }) {
+  const live = new Map(belief.live.map((h) => [h.key, h]));
+  const prior = robot.context_knowledge;
   return (
     <>
-      <p className="robot-summary">
-        {belief.lifecycle === "exhausted" ? "exhausted: no hypothesis is live"
-          : <>finding <b>{belief.finding}</b></>}
-        {belief.boundary && <span className="robot-flag">episode boundary</span>}
-      </p>
-      <ol className="belief">
-        {rows.map((h) => (
-          <li key={h.key} className={h.key === belief.leader ? "is-leader" : undefined}>
-            <div className="belief-head">
-              <span className="human-task">{keyText(robot, h.key)}</span>
-              <span className="belief-value">{h.belief.toFixed(3)}</span>
-            </div>
-            <span className="belief-bar" aria-hidden>
-              <span style={{ width: `${100 * h.belief}%` }} />
-              <i style={{ left: `${100 * robot.theta}%` }} />
-            </span>
-            <div className="belief-marks">
-              <span className={`mark-${h.adequacy}`}>{h.adequacy.replace("_", " ")}</span>
-              <span className={h.warrant === "observation" ? "" : "mark-faint"}>
-                {h.warrant === "observation" ? "warranted" : "no warrant"}</span>
-              {h.rank === "outranked" && <span className="mark-outranked">outranked</span>}
-              {h.tail !== null && <span title="tail probability of the adequacy test">S {h.tail.toFixed(3)}</span>}
-              {h.prior !== null && <span title="prior from context knowledge">prior {h.prior.toFixed(3)}</span>}
-            </div>
-          </li>
-        ))}
-      </ol>
+      <Facts items={[
+        ["leader", belief.leader === null ? "–" : <span className="human-task">{keyText(robot, belief.leader)}</span>],
+        ["finding", belief.finding ?? "–"],
+        ["lifecycle", <>{belief.lifecycle}{belief.boundary && <span className="robot-chip">episode boundary</span>}</>],
+      ]} />
+      <div className={`chart${prior ? " with-prior" : ""}`} role="table" aria-label="belief over the live hypotheses">
+        <div className="chart-row chart-head" role="row">
+          <span>belief <small>θ {robot.theta}</small></span><span />
+          <span title="hypothesis adequacy">adeq</span><span title="observation warrant">warr</span>
+          <span title="evidence rank: outranked">rank</span><span title="tail probability S">S</span>
+          {prior && <span title="prior from context knowledge">prior</span>}
+        </div>
+        {rows.map((key) => <ChartRow key={key} label={keyText(robot, key)} h={live.get(key) ?? null}
+                                     leader={key === belief.leader} theta={robot.theta} prior={prior} />)}
+      </div>
       {belief.levels.length > 0 && (
-        <p className="robot-note">levels: {belief.levels.map((l) => `${l.task} ${l.level}`).join(", ")}</p>
+        <Facts items={[["levels", belief.levels.map((l) => `${l.task} ${l.level}`).join(" · ")]]} />
       )}
-      {robot.context_knowledge && (
-        <p className="robot-note">recently completed (its memory): {belief.recent.length === 0 ? "none"
-          : belief.recent.join(", ")}</p>
+      {prior && (
+        <Facts items={[["memory", <span title="an input of the recognizer: the memory of observed completions">
+          recent: {belief.recent.length === 0 ? "–" : belief.recent.join(", ")} <small>(input)</small></span>]]} />
       )}
-      <p className="robot-note">
-        {notLive > 0 && <>{notLive} other {notLive === 1 ? "hypothesis is" : "hypotheses are"} not live. </>}
-        {robot.known_assigned === null ? "It is not told the human's assigned tasks."
-          : `It is told the human's assigned tasks: ${robot.known_assigned.map(taskText).join(", ") || "none"}.`}
-      </p>
     </>
   );
 }
 
-/** (3) The gate's answer at the tick, and what the last decision rests on. */
-function Admission({ robot, tick, started }: { robot: RobotDescription; tick: RobotTick; started: boolean }) {
-  if (robot.condition === "human-unaware") return <p className="human-none">does not apply</p>;
-  const leader = tick.belief?.leader ?? null;
-  const rests = tick.decision?.projection.kind === "admitted" ? tick.decision.projection.hypothesis : null;
+const ADEQUACY = { adequate: "✓", inadequate: "✗", no_observation: "·" } as const;
+
+function ChartRow({ label, h, leader, theta, prior }: {
+  label: string; h: HypothesisBelief | null; leader: boolean; theta: number; prior: boolean;
+}) {
   return (
-    <>
-      {!started ? <p className="human-none">no observation yet</p> : (
-        <p className={`robot-gate ${tick.gate_answer === "clears" ? "is-clear" : "is-refused"}`}>
-          {tick.gate_answer === "clears" ? "passes" : "refused"}: {GATE_PHRASE[tick.gate_answer]}
-          {leader !== null && tick.belief !== null && <> ({keyText(robot, leader)}, {tick.belief.confidence.toFixed(3)})</>}
-          <code>{tick.gate_answer}</code>
-        </p>
-      )}
-      <p className="robot-note">
-        The gate is asked at a decision; this is its answer now.
-        {tick.decision !== null && (rests === null ? " The last decision rests on no admitted hypothesis."
-          : <> The last decision rests on <span className="human-task">{keyText(robot, rests)}</span>.</>)}
-      </p>
-    </>
+    <div className={`chart-row${leader ? " is-leader" : ""}${h === null ? " is-dead" : ""}`} role="row"
+         title={h === null ? `${label}: not live` : label}>
+      <span className="chart-label human-task">{label}</span>
+      <span className="chart-bar" aria-hidden>
+        <span style={{ width: `${h === null ? 0 : 100 * h.belief}%` }} />
+        <i style={{ left: `${100 * theta}%` }} />
+      </span>
+      <span className="chart-value">{h === null ? "–" : h.belief.toFixed(2)}</span>
+      <span className={h === null ? "" : `mark-${h.adequacy}`}>{h === null ? "" : ADEQUACY[h.adequacy]}</span>
+      <span className={h?.warrant === "observation" ? "mark-adequate" : "mark-faint"}>
+        {h === null ? "" : h.warrant === "observation" ? "✓" : "·"}</span>
+      <span className="mark-outranked">{h?.rank === "outranked" ? "↓" : ""}</span>
+      <span>{h === null || h.tail === null ? "" : h.tail.toFixed(2)}</span>
+      {prior && <span>{h === null || h.prior === null ? "" : h.prior.toFixed(2)}</span>}
+    </div>
   );
 }
 
-/** (4) What the last decision expected the human to do. */
+/** Admission: (a) what the robot holds since its last decision; (b) the gate's answer at this tick. */
+function Admission({ robot, tick, started }: { robot: RobotDescription; tick: RobotTick; started: boolean }) {
+  const h = held(tick.decision);
+  return (
+    <Facts items={[
+      ["held", h === null ? "–" : <>
+        {h.hypothesis === null ? "nothing admitted" : <span className="human-task">{keyText(robot, h.hypothesis)}</span>}
+        <small> · since {h.since}</small></>],
+      ["gate now", !started ? "–" : (
+        <span className={tick.gate_answer === "clears" ? "robot-pass" : undefined}>
+          <span className="robot-nowrap">{GATE_SHORT[tick.gate_answer]}</span><code>{tick.gate_answer}</code></span>
+      )],
+    ]} />
+  );
+}
+
 function Projection({ robot, decision, now }: {
   robot: RobotDescription; decision: DecisionMade | null; now: number | null;
 }) {
-  if (robot.condition === "human-unaware") return <p className="human-none">does not apply</p>;
-  if (decision === null) return <p className="human-none">no decision yet</p>;
+  if (decision === null) return <p className="human-none">–</p>;
   const p = decision.projection;
-  const over = now !== null && p.kind !== "none" && now > p.until;
-  if (p.kind === "none") {
-    return <p className="robot-proj">{p.reason === "no_human" ? "none: no human observed"
-      : "none: no previous observation of the human (unassessed)"}</p>;
-  }
+  if (p.kind === "none") return <Facts items={[["kind", p.reason === "no_human" ? "none · no human" : "none · unassessed"]]} />;
+  const over = now !== null && now > p.until;
+  const end = <>to {tickText(p.until)}{over && <span className="robot-chip">ran out</span>}</>;
   if (p.kind === "fallback") {
-    return (
-      <>
-        <p className="robot-proj"><span className="robot-kind">fallback</span>
-          {p.mode === "standing" ? "the human stays where it was seen" : "the human walks straight on"},
-          for {tickText(p.span)} ticks, to tick {tickText(p.until)}</p>
-        <p className="robot-note">
-          {over ? `Ran out after tick ${tickText(p.until)}. ` : ""}
-          From tick {decision.tick}, admission refused: {GATE_PHRASE[decision.gate_answer]}.
-          After its end the decision is taken again (the fallback projection ran out), unless another trigger fires
-          first.
-        </p>
-      </>
-    );
+    return <Facts items={[["fallback", <>{p.mode} · {tickText(p.span)} ticks · {end}</>]]} />;
   }
   return (
-    <>
-      <p className="robot-proj"><span className="robot-kind robot-kind-admitted">admitted</span>
-        <span className="human-task">{keyText(robot, p.hypothesis)}</span>, to tick {tickText(p.until)}</p>
-      <ol className="robot-plan">
-        {p.plan.map((a, i) => <li key={i} className="human-task">{actionText(a)}</li>)}
-      </ol>
-      <p className="robot-note">From tick {decision.tick}.{over
-        ? ` Ran out after tick ${tickText(p.until)}: nothing past its end is assessed.` : ""}</p>
-    </>
+    <Facts items={[
+      ["admitted", <><span className="human-task">{keyText(robot, p.hypothesis)}</span> · {end}</>],
+      ["plan", <span className="human-task">{p.plan.map((a) => actionText(a)).join(" › ")}</span>],
+    ]} />
   );
 }
 
-/** (5) The last decision, then the ones before it. */
 function Decisions({ robot, decision, ticks }: {
   robot: RobotDescription; decision: DecisionMade | null; ticks: readonly TickUpdate[];
 }) {
-  if (decision === null) return <p className="human-none">no decision yet</p>;
-  const earlier = recentDecisions(ticks, robot.robot, RECENT + 1).filter((d) => d.tick !== decision.tick).slice(0, RECENT);
+  if (decision === null) return <p className="human-none">–</p>;
+  const earlier = recentDecisions(ticks, robot.robot, EARLIER + 1).filter((d) => d.tick !== decision.tick)
+    .slice(0, EARLIER);
+  const task = (d: DecisionMade) => d.chosen === null ? CHANGE_SHORT.finishes
+    : <>{CHANGE_SHORT[d.change]} <span className="human-task">{taskText(d.chosen)}</span></>;
   return (
     <>
-      <p className="robot-decision">
-        <span className="human-tick">tick {decision.tick}</span> {TRIGGER_PHRASE[decision.trigger]}
-        {decision.cause !== null && <>: {CAUSE_PHRASE[decision.cause]}</>}
-        <code>{decision.trigger}{decision.cause !== null ? ` ${decision.cause}` : ""}</code>
-      </p>
-      <dl className="robot-facts">
-        <div><dt>task</dt><dd>{decision.chosen === null ? CHANGE_PHRASE.finishes : (
-          <>{CHANGE_PHRASE[decision.change]} <span className="human-task">{taskText(decision.chosen)}</span></>
-        )}</dd></div>
-        <div><dt>hold</dt><dd>{decision.hold === 0 ? "none" : `${decision.hold} ticks`}</dd></div>
-        <div><dt>queue</dt><dd>{decision.queue.length === 0 ? "empty"
-          : decision.queue.map((t) => taskText(t)).join(", ")}</dd></div>
-        <div><dt>admission</dt><dd>{robot.condition === "human-unaware" ? "does not apply" : admissionText(decision)}</dd></div>
-      </dl>
+      <Facts items={[
+        ["tick", <>{decision.tick} · {TRIGGER_SHORT[decision.trigger]}{decision.cause !== null
+          && ` · ${CAUSE_SHORT[decision.cause]}`}</>],
+        ["task", task(decision)],
+        ["hold", decision.hold === 0 ? "–" : `${decision.hold} ticks`],
+        ["queue", decision.queue.length === 0 ? "–"
+          : <span className="human-task">{decision.queue.map((t) => taskText(t)).join(", ")}</span>],
+        ["admission", robot.condition === "human-unaware" ? "off" : admissionText(decision)],
+      ]} />
       {earlier.length > 0 && (
         <ol className="human-changes robot-earlier">
           {earlier.map((d) => (
             <li key={d.tick}>
-              <span className="human-tick">tick {d.tick}</span>
-              <span>{TRIGGER_PHRASE[d.trigger]}{d.cause !== null ? ` (${d.cause})` : ""}: {d.chosen === null
-                ? "finished" : <>{CHANGE_PHRASE[d.change]} <span className="human-task">{taskText(d.chosen)}</span></>}
-                {d.hold > 0 ? `, hold ${d.hold}` : ""}</span>
+              <span className="human-tick">{d.tick}</span>
+              <span>{TRIGGER_SHORT[d.trigger]}{d.cause !== null ? ` · ${CAUSE_SHORT[d.cause]}` : ""} · {task(d)}
+                {d.hold > 0 ? ` · hold ${d.hold}` : ""}</span>
             </li>
           ))}
         </ol>
