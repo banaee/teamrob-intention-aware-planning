@@ -2,7 +2,8 @@
 
 What the kitting scenarios contain, as the registry loads them at commit 10da064 (7 October 2026): the room, the
 shift, the two task pools, the human's script, its events and deviations, and the timeline of context facts. Counts
-only; nothing is run. Asked for by Hadi, 7 October 2026.
+only; nothing is run. Asked for by Hadi, 7 October 2026. What the scenarios perform when run (ticks per task, the
+recognizer's leader, the robot's deliveries): `performance.md`, beside this file.
 
 Reproduce from the repository root:
 
