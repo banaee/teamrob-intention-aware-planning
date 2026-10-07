@@ -4,10 +4,24 @@ The slides of the TeamRob demo day's talk, as an HTML deck: reveal.js over slide
 the web-ui page's own code (`webui/page/src`), imported directly, so that a change of the web-ui's look reaches the
 slides without a second edit. A trial: one slide, its structure replaceable.
 
-Slide 1: the robot's figure as the env-pane draws it in the tilted view (`env-pane/figures.tsx`, its paint, material
-and the env-pane's camera), in kitting's scene appearance (`domains/kitting/appearance.json`, read at build time). The
-type's family, weights and colours are the web-ui's theme (`webui/page/src/theme.ts`); its sizes are the deck's own.
-"Anton" is the robot's name in the talk only.
+Slide 1, two steps (a click or the clicker's key advances, PageUp or the left arrow goes back): the robot's figure as
+the env-pane draws it in the tilted view (`env-pane/figures.tsx`, its paint and material, the env-pane's camera); then
+the same figure in kitting's env_layout_01, drawn by the env-pane's own `Scene` (fixed objects only), the view moving
+back in about one second until the whole room shows as the env-pane frames it. The type's family, weights and colours
+are the web-ui's theme (`webui/page/src/theme.ts`); its sizes are the deck's own. "Anton" is the robot's name in the
+talk only.
+
+## The recorded room
+
+The deck needs no server: what the web-ui's server would send for the view of a layout (the domain's scene appearance
+from the catalogue, and the view of the layout without a setup) is recorded once, by the same piece of code that feeds
+the web-ui (`mesa_sim/webui_adapter.py`), into `data/<domain>_<layout>.json`. Record it again after the layout file or
+the domain's `appearance.json` changes, then build:
+
+```bash
+# from the repository's root
+PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python presentation/scripts/record_view.py kitting env_layout_01
+```
 
 ## Build and start
 
@@ -28,11 +42,16 @@ While working on the slides: `npm run dev` (http://127.0.0.1:5174/).
 - `npm run pins` (run by `build` and `dev`): every package the deck shares with `webui/page` is pinned to the same
   version in both; a difference stops the build.
 - `npm run shots` (with `npm run preview` running): each slide at 2560 x 1440 and 1920 x 1080 in the installed Google
-  Chrome, written to `shots/` (untracked); it fails on a page error or on any request that leaves the local server.
+  Chrome, each step (a click; one shot halfway through the view's movement) and back to the first, written to `shots/`
+  (untracked); it fails on a page error or on any request that leaves the local server.
 
 ## How it is put together
 
 - `vite.config.ts`: `dedupe` makes the web-ui's modules use the deck's own React, three and R3F (one copy of each).
 - `src/Deck.tsx`: reveal.js with its own layout off (`disableLayout`); `src/deck.css` sizes a 16:9 stage in the unit
   `--u` (1/1920 of the stage), so a canvas is never scaled by CSS and renders sharp at both screen sizes.
-- `src/scene/FigureAlone.tsx`: one figure alone, through the env-pane's own camera; `src/slides/`: one file per slide.
+- `src/Deck.tsx`: a slide's step is a reveal fragment; `useShown` tells a slide whether its fragment is shown.
+- `src/scene/RobotInRoom.tsx`: one canvas; the env-pane's `FramingCamera` framing a box that moves from the robot's ring
+  to the room; the env-pane's `Scene` with a moment without agents (as the web-ui draws a layout's view); the figure
+  drawn beside it; a veil in the slide's ground over the room and under the robot, fading out as the view moves back.
+- `src/slides/`: one file per slide.

@@ -40,7 +40,7 @@ body, .reveal-viewport {      /* reveal's viewport class sets its own ground and
   align-items: center;
 }
 
-/* Slide 1: the line above the figure. */
+/* Slide 1: the lines above the figure. */
 .s01-text {
   margin: 0;
   font-size: calc(72 * var(--u));
@@ -48,4 +48,5 @@ body, .reveal-viewport {      /* reveal's viewport class sets its own ground and
   line-height: 1.2;
 }
 
-.figure-alone { width: 100%; flex: 1; min-height: 0; }
+/* A 3D scene's canvas: it takes no pointer (a click goes to the deck, a drag never turns the view). */
+.scene-canvas { width: 100%; flex: 1; min-height: 0; pointer-events: none; }

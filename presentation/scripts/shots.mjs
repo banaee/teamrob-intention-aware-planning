@@ -3,9 +3,11 @@
 // A blocked request or a page error stops the script: the built deck must load nothing from outside. Warnings are
 // printed only (three.js 0.186 warns that R3F uses its deprecated Clock).
 //
-//   npm run preview &   then   npm run shots -- [--url http://127.0.0.1:4173] [--slides 1]
+//   npm run preview &   then   npm run shots -- [--url http://127.0.0.1:4173] [--slides 1] [--steps 2]
 //
-// Writes shots/slide<n>_<width>x<height>.png (untracked).
+// Per slide, each step: the first at load, every further one after a mouse click (with one shot halfway through the
+// view's movement), then back to the first with the clicker's PageUp key. Writes
+// shots/slide<n>_<step>_<width>x<height>.png (untracked).
 
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -20,6 +22,7 @@ const { values } = parseArgs({
     url: { type: "string", default: "http://127.0.0.1:4173" },
     out: { type: "string", default: resolve(here, "../shots") },
     slides: { type: "string", default: "1" },
+    steps: { type: "string", default: "2" },
   },
 });
 mkdirSync(values.out, { recursive: true });
@@ -47,9 +50,22 @@ for (const [width, height] of SIZES) {
     await page.waitForSelector("section.present canvas");
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(1200);      // the first frames
-    const file = resolve(values.out, `slide${n}_${width}x${height}.png`);
-    await page.screenshot({ path: file });
-    console.log(`[shots] ${file}`);
+    const shot = async (step) => {
+      const file = resolve(values.out, `slide${n}_${step}_${width}x${height}.png`);
+      await page.screenshot({ path: file });
+      console.log(`[shots] ${file}`);
+    };
+    await shot("step1");
+    for (let s = 2; s <= Number(values.steps); s++) {
+      await page.mouse.click(width / 2, height / 2);
+      await page.waitForTimeout(450);
+      await shot(`step${s}_moving`);
+      await page.waitForTimeout(1200);
+      await shot(`step${s}`);
+    }
+    for (let s = Number(values.steps); s > 1; s--) await page.keyboard.press("PageUp");
+    await page.waitForTimeout(1600);
+    await shot("back_to_step1");
   }
   await page.close();
 }
