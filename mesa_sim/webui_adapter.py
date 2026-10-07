@@ -37,6 +37,11 @@ WHAT THIS MODULE DOES:
       the last decision (RobotAgent.last_decision) with the projection it rested on; the recency facts of its memory of
       observed completions. It keeps each robot's last decision and the hold's ticks stood, as it keeps the order of
       arrival
+    - Derives, per tick (T-viz 1d and 1e), what lies ahead of the agents, from the model's plans as actions (the model
+      holds no list of points): the walks ahead of each human (the walk actions of the task on top of its stack, from
+      the action in hand on, as its executor expanded them) and of each robot (the walk actions of its plan from the
+      cursor on), each as the body's own walk takes it (action_decomposer.walk_positions, toward the target's present
+      position); and the part of the robot's last decision's projection of the human still ahead at the tick
 
 WHAT THIS MODULE DOES NOT DO:
     - No rule of the web-ui (which sim-run is current, the end at the configured steps, the lock): the server's
@@ -57,10 +62,12 @@ from typing import Callable, Dict, List, Optional, Tuple
 from mesa_sim.run_config import (BOOL_OPTIONS, DOMAIN_REGISTRY, EXPERIMENT_CONFIG_PATH, ONE_OF_OPTIONS,
                                  OPTION_DEFAULTS, RUN_OPTIONS, load_experiment, resolve_triple, run_configuration,
                                  user_args_parser)
-from mesa_sim.action_decomposer import _parse_duration_to_steps
+from mesa_sim.action_decomposer import (_get_step_size, _parse_duration_to_steps, _resolve_movement_target,
+                                        walk_positions)
 from mesa_sim.sim_model import (SimModel, SimObject, declared_states, read_layout, read_setup_objects,
                                 read_setup_states)
 from mesa_sim.sim_run import RunLog, SimRun
+from mesa_sim.world_state_builder import within_proximity
 from shared.meta_planner import GateOutcome
 from shared.types import (AdequacyFinding, AfterAction, DuringAction, Drop, Event, EvidenceRank, GroundedAction,
                           HypothesisAdequacy, Now, ObservationWarrant, RecognitionChange, RecognizerLifecycle,
@@ -488,6 +495,68 @@ def _movable_object(obj: SimObject) -> msg.MovableObject:
                              home_container=obj.home_container, destination=obj.destination)
 
 
+def _walks(actions, start: Tuple[float, float], model, executor) -> Tuple[msg.Walk, ...]:
+    """The walks of `actions` in order, the first from `start` (the agent's position; `actions[0]` the action in hand):
+    each walk action (its schema names a movement target) as the body's walk takes it, in a straight line toward its
+    target's present position, to where the body stops, its first step within the `at` radius (T-viz 1d). The walk in
+    hand, once the body has expanded it, is the steps left in the body's queue (`executor`'s, expanded where the walk
+    began; the body stops at the radius, short of the queue's end); a walk not yet expanded is the body's own expansion from where the walk before it stops
+    (action_decomposer.walk_positions, with the body's step). A walk with no step (the agent within the `at` radius
+    already), or whose target has no position, has none; an action that is no walk leaves the agent where it is."""
+    step = _get_step_size(model)
+    position, walks = start, []
+    for i, action in enumerate(actions):
+        key = action.schema.movement_target_key
+        if key is None:
+            continue
+        target = _resolve_movement_target(action, model)
+        queue = executor.microaction_queue if i == 0 else []
+        if target is None or within_proximity(position, target):
+            positions = []
+        elif queue:
+            positions = []
+            for microaction in queue:
+                positions.append(microaction.params["target_pos"])
+                if within_proximity(positions[-1], target):
+                    break
+        else:
+            positions = walk_positions(position, target, step)
+        if positions:
+            end = (float(positions[-1][0]), float(positions[-1][1]))
+            walks.append(msg.Walk(start=_point(position), end=_point(end), target=action.bindings[key]))
+            position = end
+    return tuple(walks)
+
+
+def _projection_ahead(decided, tick: Optional[int]) -> Tuple[msg.ProjectedPart, ...]:
+    """The segments of the projection `decided` rested on (None: none) still ahead at the end of `tick` (T-viz 1e): on
+    the decision's projection clock, step s ends world tick decision - 1 + s, so `tick - decision + 1` steps have
+    elapsed; a segment ending by then is behind; a moving segment under way starts where the projection has the agent
+    then (linear in step-time, the Segment's own assumption); consecutive stationary segments at one place are one.
+    Each part's end on the world's clock."""
+    if tick is None or decided is None or decided.projection is None:
+        return ()
+    elapsed = tick - decided.tick + 1
+    parts: List[msg.ProjectedPart] = []
+    for seg in (seg for entry in decided.projection.entries for seg in entry.segments):
+        if seg.end_step <= elapsed:
+            continue
+        until = decided.tick - 1 + float(seg.end_step)
+        (x0, y0), (x1, y1) = seg.start_pos, seg.end_pos
+        if (x0, y0) == (x1, y1):
+            position = _point((x0, y0))
+            if parts and isinstance(parts[-1], msg.StationarySegment) and parts[-1].position == position:
+                parts[-1] = parts[-1].model_copy(update={"until": until})
+            else:
+                parts.append(msg.StationarySegment(position=position, until=until))
+            continue
+        if seg.start_step < elapsed:
+            k = (elapsed - seg.start_step) / (seg.end_step - seg.start_step)
+            x0, y0 = x0 + k * (x1 - x0), y0 + k * (y1 - y0)
+        parts.append(msg.MovingSegment(start=_point((x0, y0)), end=_point((x1, y1)), until=until))
+    return tuple(parts)
+
+
 def _object_states(facts) -> Tuple[msg.ObjectState, ...]:
     """The object states that hold, in the order of their names and arguments."""
     return tuple(msg.ObjectState(state=p.name, object=p.args[0].value if p.args else None)
@@ -673,7 +742,25 @@ class MesaSimRun:
             timeline_facts=tuple(sorted(p.name for p in model.timeline.facts_at(0 if tick is None else tick))),
             activity=tuple(self._activity(hid, human, tick) for hid, human in model.humans.items()),
             separations=() if tick is None else self._separations(),
+            walks_ahead=tuple(msg.HumanWalks(human=hid, walks=self._human_walks(hid, human))
+                              for hid, human in model.humans.items()),
         )
+
+    def _human_walks(self, hid: str, human) -> Tuple[msg.Walk, ...]:
+        """The human's walks ahead (T-viz 1d), read from its stack machine: the task on top, its action in hand and
+        the actions after it in its expansion; while a cut action is being finished only that action (the task is
+        expanded again after it); none with an empty stack or a task not yet expanded."""
+        machine = human.machine
+        if machine is None or not machine.stack:
+            return ()
+        top = machine.stack[-1]
+        if top.finishing is not None:
+            actions = [top.finishing.action]
+        elif top.actions is not None:
+            actions = top.actions[top.index:]
+        else:
+            actions = []
+        return _walks(actions, self._positions[hid], self._model, human.executor)
 
     def _separations(self) -> Tuple[msg.Separation, ...]:
         """The robot-human distance of the step just executed (T-viz 1c): the values its [sep] lines printed, kept by
@@ -758,9 +845,14 @@ class MesaSimRun:
         decided = robot.last_decision
         if tick is not None and decided is not None and decided.tick == tick:
             self._decisions[rid] = self._decision(robot, decided, gate, belief, before)
+        executor = robot.executor
+        plan = executor.current_plan
         return msg.RobotTick(robot=rid, body=self._body(rid, robot, tick),
                              belief=None if robot.belief is None else self._belief(robot, tick),
-                             gate_answer=gate, decision=self._decisions[rid])
+                             gate_answer=gate, decision=self._decisions[rid],
+                             walks_ahead=() if plan is None else _walks(plan.actions[executor.action_index:],
+                                                                        self._positions[rid], self._model, executor),
+                             projection_ahead=_projection_ahead(decided, tick))
 
     def _body(self, rid: str, robot, tick: Optional[int]) -> msg.RobotBody:
         """The body: the task its last decision chose, while it runs; the action at the plan's cursor and its

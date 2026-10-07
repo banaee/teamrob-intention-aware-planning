@@ -41,6 +41,11 @@ SECTIONS:
     T-viz 1c (panel 4c, the plots over the ticks): every task carries its identity (`TaskRef.identity`), by which the
     page gives one colour per task; the world at a tick carries the robot-human distance (`WorldTick.separations`). The
     plots read the tick updates the page holds; nothing else is added for them.
+    T-viz 1d and 1e (the paths on the floor): what lies ahead of the agents, derived by the simulator's side from the
+    walk actions of their current tasks and from the projection the robot's last decision rests on; the page computes
+    no path. The human's walks ahead are a world fact (`WorldTick.walks_ahead`: the robot does not know them); the
+    robot's own walks ahead and the part of its projection of the human still ahead are its section's
+    (`RobotTick.walks_ahead`, `RobotTick.projection_ahead`).
 
 THE STEP LIMIT (T-viz 1a):
     A sim-run in the web-ui has a step limit only when one is set (LimitOption); without one it ends by reset, by a
@@ -327,6 +332,48 @@ class EventPosition(Message):
 
 
 # =============================================================================
+# What lies ahead (T-viz 1d and 1e): walks and the projection's segments, on the floor
+# =============================================================================
+
+class Walk(Message):
+    """A walk ahead of an agent: one walk action of its current task (an action whose schema names a movement target),
+    from `start` in a straight line to `end`. `start`: the agent's position for the walk in hand, else where the walk
+    before it stops; `end`: where the body's walk stops (its first step within the `at` radius of the target's
+    position); `target`: the object the walk action heads for. A walk the body has completed has none."""
+    start: Point
+    end: Point
+    target: str
+
+
+class HumanWalks(Message):
+    """A human's walks ahead at the tick, in order: the walk actions of the task on top of its stack from the action
+    in hand on, as its executor has expanded them (only the action in hand while a cut action is being finished: the
+    task is expanded again after it)."""
+    human: str
+    walks: tuple[Walk, ...]
+
+
+class MovingSegment(Message):
+    """A moving segment of a projection still ahead: from `start` (where the projection has the agent at the tick, for
+    the segment under way) to `end`; `until`: the tick it ends, on the world's clock (fractional)."""
+    kind: Literal["moving"] = "moving"
+    start: Point
+    end: Point
+    until: float
+
+
+class StationarySegment(Message):
+    """A stationary segment of a projection still ahead (a stand): the agent expected at `position` until `until`, on
+    the world's clock (fractional); consecutive ones at one place are one."""
+    kind: Literal["stationary"] = "stationary"
+    position: Point
+    until: float
+
+
+ProjectedPart = Annotated[Union[MovingSegment, StationarySegment], Field(discriminator="kind")]
+
+
+# =============================================================================
 # The robot's section (T-viz 1b): its body and its mind, beside the world
 # =============================================================================
 
@@ -551,12 +598,17 @@ class RobotTick(Message):
     """A robot at the tick: its body; its belief (None while the recognizer has produced none: intention-unaware,
     human-unaware, or before the first step); the gate's answer for the leader at the tick (the gate is asked at a
     decision; this is what it would answer now); and its last decision, kept on every tick after it (None before the
-    first). The hypothesis a decision rests on (the decision record) is its admitted projection's."""
+    first). The hypothesis a decision rests on (the decision record) is its admitted projection's.
+    T-viz 1d and 1e: `walks_ahead`, the robot's own walks ahead (the walk actions of its plan from its cursor on);
+    `projection_ahead`, the segments of its last decision's projection of the human still ahead at the tick, in order
+    (its kind is `decision.projection`'s; empty with no projection, and past its end)."""
     robot: str
     body: RobotBody
     belief: Optional[RobotBelief]
     gate_answer: Gate
     decision: Optional[DecisionMade]
+    walks_ahead: tuple[Walk, ...] = ()
+    projection_ahead: tuple[ProjectedPart, ...] = ()
 
 
 # =============================================================================
@@ -826,7 +878,8 @@ class HumanActivity(Message):
 
 class WorldTick(Message):
     """The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.
-    `separations` (T-viz 1c): per robot and human, after a step; empty at the start."""
+    `separations` (T-viz 1c): per robot and human, after a step; empty at the start. `walks_ahead` (T-viz 1d): per
+    human, its walks ahead, a world fact the robot does not know."""
     humans: tuple[AgentTick, ...]
     robots: tuple[AgentTick, ...]
     fixed_object_contents: tuple[FixedObjectContents, ...]
@@ -835,6 +888,7 @@ class WorldTick(Message):
     timeline_facts: tuple[str, ...]
     activity: tuple[HumanActivity, ...]
     separations: tuple[Separation, ...] = ()
+    walks_ahead: tuple[HumanWalks, ...] = ()
 
 
 class EndReason(str, Enum):

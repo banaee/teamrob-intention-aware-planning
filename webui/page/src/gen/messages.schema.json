@@ -1160,6 +1160,27 @@
       "title": "HumanScript",
       "type": "object"
     },
+    "HumanWalks": {
+      "additionalProperties": false,
+      "description": "A human's walks ahead at the tick, in order: the walk actions of the task on top of its stack from the action\nin hand on, as its executor has expanded them (only the action in hand while a cut action is being finished: the\ntask is expanded again after it).",
+      "properties": {
+        "human": {
+          "type": "string"
+        },
+        "walks": {
+          "items": {
+            "$ref": "#/$defs/Walk"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "human",
+        "walks"
+      ],
+      "title": "HumanWalks",
+      "type": "object"
+    },
     "Hypothesis": {
       "additionalProperties": false,
       "description": "A hypothesis of the robot's hypothesis space: its key (the label the logs and the belief use) and the task it\nnames, by its schema's name and its bindings.",
@@ -1597,6 +1618,33 @@
         "states"
       ],
       "title": "MovableTypeLook",
+      "type": "object"
+    },
+    "MovingSegment": {
+      "additionalProperties": false,
+      "description": "A moving segment of a projection still ahead: from `start` (where the projection has the agent at the tick, for\nthe segment under way) to `end`; `until`: the tick it ends, on the world's clock (fractional).",
+      "properties": {
+        "end": {
+          "$ref": "#/$defs/Point"
+        },
+        "kind": {
+          "const": "moving",
+          "type": "string"
+        },
+        "start": {
+          "$ref": "#/$defs/Point"
+        },
+        "until": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "end",
+        "kind",
+        "start",
+        "until"
+      ],
+      "title": "MovingSegment",
       "type": "object"
     },
     "NoProjection": {
@@ -2062,7 +2110,7 @@
     },
     "RobotTick": {
       "additionalProperties": false,
-      "description": "A robot at the tick: its body; its belief (None while the recognizer has produced none: intention-unaware,\nhuman-unaware, or before the first step); the gate's answer for the leader at the tick (the gate is asked at a\ndecision; this is what it would answer now); and its last decision, kept on every tick after it (None before the\nfirst). The hypothesis a decision rests on (the decision record) is its admitted projection's.",
+      "description": "A robot at the tick: its body; its belief (None while the recognizer has produced none: intention-unaware,\nhuman-unaware, or before the first step); the gate's answer for the leader at the tick (the gate is asked at a\ndecision; this is what it would answer now); and its last decision, kept on every tick after it (None before the\nfirst). The hypothesis a decision rests on (the decision record) is its admitted projection's.\nT-viz 1d and 1e: `walks_ahead`, the robot's own walks ahead (the walk actions of its plan from its cursor on);\n`projection_ahead`, the segments of its last decision's projection of the human still ahead at the tick, in order\n(its kind is `decision.projection`'s; empty with no projection, and past its end).",
       "properties": {
         "belief": {
           "anyOf": [
@@ -2090,8 +2138,34 @@
         "gate_answer": {
           "$ref": "#/$defs/Gate"
         },
+        "projection_ahead": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "moving": "#/$defs/MovingSegment",
+                "stationary": "#/$defs/StationarySegment"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/MovingSegment"
+              },
+              {
+                "$ref": "#/$defs/StationarySegment"
+              }
+            ]
+          },
+          "type": "array"
+        },
         "robot": {
           "type": "string"
+        },
+        "walks_ahead": {
+          "items": {
+            "$ref": "#/$defs/Walk"
+          },
+          "type": "array"
         }
       },
       "required": [
@@ -2099,7 +2173,9 @@
         "body",
         "decision",
         "gate_answer",
-        "robot"
+        "projection_ahead",
+        "robot",
+        "walks_ahead"
       ],
       "title": "RobotTick",
       "type": "object"
@@ -2617,6 +2693,29 @@
       "title": "Started",
       "type": "object"
     },
+    "StationarySegment": {
+      "additionalProperties": false,
+      "description": "A stationary segment of a projection still ahead (a stand): the agent expected at `position` until `until`, on\nthe world's clock (fractional); consecutive ones at one place are one.",
+      "properties": {
+        "kind": {
+          "const": "stationary",
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/Point"
+        },
+        "until": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "kind",
+        "position",
+        "until"
+      ],
+      "title": "StationarySegment",
+      "type": "object"
+    },
     "StepRefusal": {
       "additionalProperties": false,
       "description": "A step or a reset refused: the sim-run is not the current one, it has ended (a step only), or a step of it is\nunder way.",
@@ -3039,6 +3138,28 @@
       "title": "ViewRefusal",
       "type": "object"
     },
+    "Walk": {
+      "additionalProperties": false,
+      "description": "A walk ahead of an agent: one walk action of its current task (an action whose schema names a movement target),\nfrom `start` in a straight line to `end`. `start`: the agent's position for the walk in hand, else where the walk\nbefore it stops; `end`: where the body's walk stops (its first step within the `at` radius of the target's\nposition); `target`: the object the walk action heads for. A walk the body has completed has none.",
+      "properties": {
+        "end": {
+          "$ref": "#/$defs/Point"
+        },
+        "start": {
+          "$ref": "#/$defs/Point"
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "end",
+        "start",
+        "target"
+      ],
+      "title": "Walk",
+      "type": "object"
+    },
     "Warrant": {
       "enum": [
         "observation",
@@ -3108,7 +3229,7 @@
     },
     "WorldTick": {
       "additionalProperties": false,
-      "description": "The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.\n`separations` (T-viz 1c): per robot and human, after a step; empty at the start.",
+      "description": "The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.\n`separations` (T-viz 1c): per robot and human, after a step; empty at the start. `walks_ahead` (T-viz 1d): per\nhuman, its walks ahead, a world fact the robot does not know.",
       "properties": {
         "activity": {
           "items": {
@@ -3157,6 +3278,12 @@
             "type": "string"
           },
           "type": "array"
+        },
+        "walks_ahead": {
+          "items": {
+            "$ref": "#/$defs/HumanWalks"
+          },
+          "type": "array"
         }
       },
       "required": [
@@ -3167,7 +3294,8 @@
         "object_states",
         "robots",
         "separations",
-        "timeline_facts"
+        "timeline_facts",
+        "walks_ahead"
       ],
       "title": "WorldTick",
       "type": "object"

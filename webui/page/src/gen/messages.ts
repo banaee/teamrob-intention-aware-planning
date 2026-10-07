@@ -873,6 +873,9 @@ export interface EntryPosition {
  * human-unaware, or before the first step); the gate's answer for the leader at the tick (the gate is asked at a
  * decision; this is what it would answer now); and its last decision, kept on every tick after it (None before the
  * first). The hypothesis a decision rests on (the decision record) is its admitted projection's.
+ * T-viz 1d and 1e: `walks_ahead`, the robot's own walks ahead (the walk actions of its plan from its cursor on);
+ * `projection_ahead`, the segments of its last decision's projection of the human still ahead at the tick, in order
+ * (its kind is `decision.projection`'s; empty with no projection, and past its end).
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "RobotTick".
@@ -882,7 +885,9 @@ export interface RobotTick {
   body: RobotBody;
   decision: DecisionMade | null;
   gate_answer: Gate;
+  projection_ahead: (MovingSegment | StationarySegment)[];
   robot: string;
+  walks_ahead: Walk[];
 }
 /**
  * The recognizer's outputs at the tick: the leader (None when exhausted) and its belief, the lifecycle, the
@@ -1012,6 +1017,45 @@ export interface NoProjection {
   reason: NoProjectionReason;
 }
 /**
+ * A moving segment of a projection still ahead: from `start` (where the projection has the agent at the tick, for
+ * the segment under way) to `end`; `until`: the tick it ends, on the world's clock (fractional).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "MovingSegment".
+ */
+export interface MovingSegment {
+  end: Point;
+  kind: "moving";
+  start: Point;
+  until: number;
+}
+/**
+ * A stationary segment of a projection still ahead (a stand): the agent expected at `position` until `until`, on
+ * the world's clock (fractional); consecutive ones at one place are one.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "StationarySegment".
+ */
+export interface StationarySegment {
+  kind: "stationary";
+  position: Point;
+  until: number;
+}
+/**
+ * A walk ahead of an agent: one walk action of its current task (an action whose schema names a movement target),
+ * from `start` in a straight line to `end`. `start`: the agent's position for the walk in hand, else where the walk
+ * before it stops; `end`: where the body's walk stops (its first step within the `at` radius of the target's
+ * position); `target`: the object the walk action heads for. A walk the body has completed has none.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Walk".
+ */
+export interface Walk {
+  end: Point;
+  start: Point;
+  target: string;
+}
+/**
  * The facts of the sim-run at the tick that are neither the world's nor the robot's mind's. `finished_at`: the
  * first tick at which every human's script had ended (every entry closed, the stack empty) and every robot's task
  * pool was empty (the tick of its empty-pool log line); None before. Once set, it is kept.
@@ -1024,7 +1068,8 @@ export interface RunTick {
 }
 /**
  * The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.
- * `separations` (T-viz 1c): per robot and human, after a step; empty at the start.
+ * `separations` (T-viz 1c): per robot and human, after a step; empty at the start. `walks_ahead` (T-viz 1d): per
+ * human, its walks ahead, a world fact the robot does not know.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "WorldTick".
@@ -1038,6 +1083,7 @@ export interface WorldTick {
   robots: AgentTick[];
   separations: Separation[];
   timeline_facts: string[];
+  walks_ahead: HumanWalks[];
 }
 /**
  * What a human's executor is doing at the tick, from its record: the stack, top first; the action in hand; the
@@ -1194,6 +1240,18 @@ export interface Separation {
   human: string;
   minimum: number;
   robot: string;
+}
+/**
+ * A human's walks ahead at the tick, in order: the walk actions of the task on top of its stack from the action
+ * in hand on, as its executor has expanded them (only the action in hand while a cut action is being finished: the
+ * task is expanded again after it).
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "HumanWalks".
+ */
+export interface HumanWalks {
+  human: string;
+  walks: Walk[];
 }
 /**
  * The view of a layout (the space, the areas, the fixed objects) and, with a setup chosen, of the setup at its
