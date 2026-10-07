@@ -5700,3 +5700,19 @@ PROVISIONAL, RAISED TO HADI (conceptual readings the records do not settle; each
    scenario_s05_02, tick 143: the fallback of tick 141 has run out.
 FOUND: where a walk goes back along the walk before it (the robot to a shelf and back to the table), the two dashed lines
 overlap and read as a solid line. Example: kitting scenario_s05_02, tick 8, the robot's plan.
+
+1d AND 1e, HADI'S FOLLOW-UP (Hadi, 7 October 2026, preferred; after he saw the page; recorded by ccode the same day,
+before any code of it). It amends 1d AND 1e, THE PATHS ON THE FLOOR, items 2 and 5.
+1. Colour. What the robot thinks about the human is drawn in blue, not orange. The rule: blue is everything of the
+   robot, what it will do and what it thinks; orange is the human's reality. The wide light stripe of the robot's
+   prediction of the human is blue in both kinds (filled; outlined or hatched). The human's real path stays a thin
+   dashed orange line, the robot's own plan a thin dashed blue line. The two blue drawings are kept apart by form: the
+   robot's plan is thin, dashed and starts at the robot; the prediction is wide, light and starts where the robot
+   places the human.
+2. Switches. Each kind of prediction gets its own switch: four switches in the scene's header.
+3. Names on the page, for a lay viewer: "Prediction from intention", the robot has recognised the human's task and
+   predicts its path; "Prediction from motion", the robot only continues the human's present movement. The four
+   switches read: Robot's plan, Human's real path, Prediction from intention, Prediction from motion. The same two names
+   wherever the page names these two kinds, the right panel included, so that the scene and the panel say the same.
+   THE MAPPING (the glossary's terms unchanged; the page's names are labels for viewers): "Prediction from intention" is
+   the admitted projection (the plan of the admitted hypothesis), "Prediction from motion" is the fallback projection.
