@@ -5583,3 +5583,36 @@ Additions:
     (this completes 1c, THE BOTTOM PANEL, item 4).
 Kept: short labels, no full sentences; the click on an earlier tick; the page's theme; no change to the scene, to the
 selection or to the content of the side panels.
+BUILT (ccode, 7 October 2026; a6f79c8; Hadi's review open). Version B, the A | B switch and Recharts removed. The look
+judged at 2560 x 1440, 100% zoom (Hadi's correction of the reference size, the same day); the page usable at 1920 x 1080.
+Screenshot: `docs/handoffs/tviz_1c/page_2560x1440_kitting_s05_02_tick120.png` (untracked).
+- 1 to 6: no glow and no shadow on a line (the dot at the shown tick a colour in a white ring); each lane a box in one
+  light-blue tint (the robot's light tone, its left edge in that tone) with a header column at its left: the title in
+  small capitals, a small number (15 px; the leading belief, its S, the present distance), a muted line; the task bands
+  in the soft colours; no grid lines; a legend at the belief plot's top right (each hypothesis that has led, its colour
+  and its name; "others" in grey).
+- 7, 8: S per hypothesis (a member of the adequacy test; else a gap), the hypotheses that have led in their colours, the
+  others grey, α dotted; the finding per tick as a strip (adequate white, unresolved light grey, unexplained soft red,
+  exhausted dark grey, the analyses' figure's meanings in the page's tones), its word at the shown tick beside the title.
+  Order: human, belief, S, finding, context, robot, distance. No message added: S, the finding and the lifecycle are the
+  robot section's already (`RobotBelief`).
+- 9: three borders dragged (src/frame/Splitter.tsx, src/frame/layout.ts): between panel 4a and the env-pane, between the
+  env-pane and panel 4b, and above panel 4c; a double click returns a border to its default; the sizes are remembered in
+  the browser. Panel 4c fits its lanes (at most 55% of the window) until its border is dragged, then keeps that height and
+  scrolls inside; the upper row keeps at least 320 px, beyond which the page scrolls.
+- 10: panel 4a in panel 4b's form: cards "Now" (action in hand, stack), "The human's script", "Switches and
+  resumptions" in the human's light tone, "The world's context" neutral; the content unchanged.
+- 11: the soft colours (theme.taskSoft, eight hues, then a neutral grey) for every task across the page; the strong
+  palette removed.
+- Checks: the S and finding lanes equal the run log's `[IR]` at every tick on the five reference runs
+  (tests/test_tviz_plots.py through webui/page/test/lanes.log.test.ts), the view of an earlier tick unchanged (the same
+  test); vitest 48 (the click mapping at two widths, the borders' bounds and defaults); the suite 450 passed; the build
+  and type check; in Chrome the three borders dragged, kept after a reload and reset by a double click, a click on an
+  earlier tick with no request sent; 2000 ticks held, play at 5 ticks per second: 5.1 ticks per second, no long task, at
+  2560 x 1440 and at 1920 x 1080. No simulator code changed.
+- Found and fixed: with S the canvas has twice the lines, and the browser's GPU rasteriser stalled about a second a few
+  times in ten seconds of play (measured against the version before, which had none); the canvas is drawn by the CPU
+  rasteriser (`willReadFrequently`), and re-allocated only when its size changes.
+DECIDED BY CCODE: the header column 172 px; the number 15 px; the panel fitted to its lanes by default, at most 55% of
+the window; the borders' bounds (side panels 240 to 640 px; the plots at least 120 px); the finding's word beside the
+title rather than a number; the card titles of panel 4a ("Now" new, the others the former headings).

@@ -99,7 +99,10 @@ Design_records.md, "T-viz, the web-ui", 1c blocks (Hadi's preferences; BUILT, wi
 readings provisional and raised to Hadi); the plan `docs/handoffs/plan_T-viz_1c.md`; the state file
 `docs/handoffs/build_T-viz_1c_state.md`. Hadi reviewed it (7 October 2026): the panel in two versions for his choice, A the
 page's own drawing restyled, B the ReUI look on Recharts, built the same day (design_records.md, 1c, THE TWO VERSIONS OF
-THE BOTTOM PANEL, BUILT). Next: Hadi's choice; then 1d and 1e (paths on the floor); the polishing round (open).
+THE BOTTOM PANEL, BUILT). Hadi chose version A with changes and additions (S and the finding, one tint, dragged borders,
+panel 4a in cards, the soft colours across the page), built the same day (design_records.md, 1c, HADI'S CHOICE: VERSION A).
+The look is judged at 2560 x 1440 (Hadi), the page usable at 1920 x 1080. Next: Hadi's review; then 1d and 1e (paths on
+the floor); the polishing round (open).
 
 ### What stage 1b starts from
 

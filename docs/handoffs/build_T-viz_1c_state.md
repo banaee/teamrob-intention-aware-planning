@@ -19,13 +19,18 @@ web-ui", 1c blocks.
 - Hadi's review of 1c recorded (0942d69); the two versions of panel 4c built (19d62e1): A the page's own canvas, B the
   ReUI look on Recharts; the A/B switch at the panel's foot; screenshots in docs/handoffs/tviz_1c/ (untracked).
 
+- Hadi chose version A (b85616c, recorded; a choice of B given before it was withdrawn): built (a6f79c8): S and the
+  finding under the belief, one tint, header columns, a legend, no grid, the soft colours across the page, panel 4a in
+  cards, three dragged borders; screenshot docs/handoffs/tviz_1c/page_2560x1440_kitting_s05_02_tick120.png. The look is
+  judged at 2560 x 1440 (Hadi), usable at 1920 x 1080.
+
 ## In progress
 
-- None. Hadi chooses between versions A and B; then the soft task colours reach the side panels (a later step).
+- None. Hadi's review of the build.
 
 ## Next
 
-- Hadi's choice between A and B; the side panels' task colours after it; then 1d and 1e; the polishing round (open).
+- Hadi's review; then 1d and 1e; the polishing round (open).
 
 ## Decisions taken on the way
 
@@ -35,3 +40,8 @@ web-ui", 1c blocks.
   log pair".
 - ECharts and visx were started and removed on Hadi's word; Motion was tried and removed (slower steps at 2000 ticks).
 - In Chrome, an SVG filter on a Recharts area, and Recharts' own animation across a gap, each leave a stale curve.
+- A canvas redrawn each tick with many-segment lines stalls Chrome's GPU rasteriser (seen in headless Chrome with software
+  GL): `getContext("2d", { willReadFrequently: true })` draws it on the CPU, without stalls.
+- The scan for domain words reads comments too: "item" (a kitting object type) cannot be written in the page, not even
+  "item 9" of a ruling; write "point 9".
+- An untracked domains/kitting/layouts/env_layout_00.json appeared during the session (not ccode's); left untouched.
