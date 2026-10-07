@@ -5434,3 +5434,69 @@ before any code of it).
 The mode of 1c (as for 1b): a short plan (`docs/handoffs/plan_T-viz_1c.md`), then the build without a pause; web
 design details are ccode's, recorded as "decided by ccode"; a conceptual reading of the core algorithm the records do
 not settle is built as judged closest to them and marked "provisional, raised to Hadi".
+
+1c, THE BOTTOM PANEL, BUILT (ccode, 7 October 2026; `docs/handoffs/plan_T-viz_1c.md`, planned and built in one session
+without a pause, as the task asked; Hadi's review open).
+- The messages (a859c55): `WorldTick.separations`, per robot and human the two values the `[sep]` line prints
+  (`SimRun.separation` keeps them; the piece reads them, nothing is computed twice) and `below`, the minimum under the
+  robot's min_separation as the analyses count it; `TaskRef.identity`, the task's identity by task equality (its schema
+  and goal bindings, `goal_bindings`), the form of a hypothesis key. No change to the recognizer, the gate, the
+  projection, the meta-planner or the executor.
+- The page (07bf71f): panel 4c (`src/plots/PlotPanel.tsx`, its reading `src/plots/lanes.ts`), the past view
+  (`src/plots/past.ts`, App.tsx, the control bar), one colour per task (`src/frame/colours.ts`) in the lanes, the right
+  panel's belief chart and the left panel's script, stack and action in hand.
+- Checks (56c7e2c): headless byte-identical, B1 equals B0 on 102 files (the four maintained sets, which equal the
+  baselines on disk, and dock_loading's scenario_s03_02, s05_02, s07_02); `tests/test_tviz_plots.py`: the distance and
+  the identity the page receives equal the log and task equality, and the page's own lane reading, run under vitest on
+  each sim-run's tick updates, equals the run log's values at every tick (kitting scenario_s05_02, scenario_s10_14,
+  scenario_s05_02 intention-unaware; dock_loading scenario_s07_07, scenario_s07_07 human-unaware), the lanes folded one
+  tick at a time equal the lanes folded at once, and the view of tick k equals what the page held at tick k (the tick
+  updates and the place book); a wrong log value makes it fail (tried). The suite 450 passed; vitest 44 (5 more under
+  the Python test); the page's build and type check; one look in Chrome at 1440 wide (kitting scenario_s05_02 and
+  scenario_s10_14, dock_loading scenario_s07_07 human-unaware): a click in the past sends no request and leaves the log
+  pair's checksums unchanged, a step returns to the latest tick, no console error; play at 5 ticks per second with 2000
+  ticks held kept 5.2 ticks per second with no long task on the main thread (headless Chrome, software rendering); the
+  solara-ui's light check (it serves; a sim-run steps).
+- The per-hypothesis belief over the live hypotheses is not in the run log (only the leader's confidence, the live set
+  and `[IR-dist]`, the reported distribution with the floor and the pins): the test compares what the log holds (the
+  live set, the leader, its confidence, the values summing to 1).
+DECIDED BY CCODE:
+- What draws the plots: the page's own canvas drawing, no plotting library; uPlot, planned for 1c in stage 0, is not
+  taken. Reason: the lanes are mostly bands and marks on one shared axis with one hairline, one click and the past view
+  across all five; one canvas does that without syncing five charts, and draws with the theme's colours, line weights,
+  opacities and type (`src/theme.ts`: `task`, `taskOther`, `past`, `below`, `separation`, `line.plot*`,
+  `opacity.plot*`). Nothing is rendered by Python; no Plotly (Hadi's double check, 7 October 2026).
+- Lane order and content as Hadi's items 1 and 2; lane titles "human's task", "robot's belief", "context", "robot's
+  task", "distance" in a 156 px gutter with the agent's or the fact's id; the panel's height is its lanes' (236 px with
+  one human, one robot and no timeline fact).
+- Lane 1: a band per stretch of the stack's top (a new band where the tag's stretch begins anew), the task's text
+  inside where it fits; the tag as a 3 px strip under the band in the tag's colour. Lane 2: lines in the task's colour,
+  a hypothesis that has led at some tick 2 px, the others 1 px at 0.45; θ dashed; the held admission as a 3 px strip
+  along the lane's top in the held hypothesis's colour; the latest leader named at its line's end. Lane 3: a grey band
+  per fact with its name. Lane 4: a band per task, a hold (`body.hold`, panel 4b's) as a dark 4 px strip under it, a
+  ▾ at each decision. Lane 5: the continuous minimum over the tick, 0 to 4 × min_separation (above drawn at the top),
+  min_separation dashed, the ticks below shaded.
+- The axis from 0 to the next multiple of 100 ticks past the latest (cchat's fixed portions, taken). The latest tick a
+  1 px line through all lanes; the viewed tick a 2 px line in the past colour, "viewing k" on the axis. A hairline and a
+  tooltip (tick, the human's task and tag, the top three hypotheses, held, context, the robot's task and hold, a
+  decision's trigger and cause, the distance) follow the pointer.
+- The colours: fixed from the run description, the human's script first (entries in written order with the tasks
+  their events start, the repeatable entries, the closing part), then the robot's assigned tasks, then the hypotheses
+  in the recognizer's order; ten hues (validated with the dataviz validator: adjacent CVD ΔE 6.4, legal with the labels
+  and tooltips), every further task one neutral grey. A robot's own task has the colour of that task wherever it shows,
+  also where a hypothesis names the same task (one colour per task, read literally).
+- The past view: a click on the latest tick returns to it; the control bar shows "viewing tick k · sim-run at tick n"
+  with a "latest" button in place of its other notes; the scene does not glide in the past view; reset or a new choice
+  clears it.
+- Conditions: lane 2 a short row "off · intention-unaware" or "off · human-unaware"; lane 5's line labelled "min sep 50 ·
+  not kept" when human-unaware.
+PROVISIONAL, RAISED TO HADI (conceptual readings the records do not settle; each built as judged closest to them):
+1. Lane 5 draws the continuous minimum over the tick (`[sep]`'s `min`), not the distance at the tick's end (`dist`),
+   and marks a tick below min_separation by that minimum, as the analyses' figures and counts do; the tooltip gives
+   both. Example: kitting scenario_s05_02, tick 30: min 31.62 (drawn, below), dist 42.43.
+2. In a human-unaware sim-run lane 5 still draws min_separation, labelled "not kept": the human-unaware robot neither
+   plans around the human nor stops for it (T-F part 1: the condition covers the mind and the separation stop), so the
+   line is a reference, not the robot's. Example: dock_loading scenario_s07_07 human-unaware, tick 60.
+FOUND (for the polishing round): with the note "all agents have finished" the control bar's tick text is cut at four
+digits at 1440 wide (kitting scenario_s05_02 past tick 2000); a task's text in a light band (pink, aqua) is white on a
+light hue.

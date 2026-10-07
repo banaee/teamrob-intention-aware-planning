@@ -89,6 +89,17 @@ with ccode's design decisions and five readings marked provisional and raised to
 recognizer's outputs; planning), short labels, admission as "held" and "gate now", the belief as a bar chart whose
 rows keep their place; built the same day. Next: stage 1c (plots over ticks), then 1d and 1e (paths on the floor).
 
+### Stage 1c, built (ccode, 7 October 2026)
+
+Panel 4c is built: five lanes on one tick axis (the human's task with its tag, the robot's belief with θ and what it
+holds, context, the robot's task with holds and decisions, distance), drawn by the page's own canvas in the theme's
+colours, line weights and type; one colour per task across the page; a click on the plot shows an earlier tick in the
+whole page, for display only (TODO-189's item). The messages gained `WorldTick.separations` and `TaskRef.identity`.
+Design_records.md, "T-viz, the web-ui", 1c blocks (Hadi's preferences; BUILT, with ccode's design decisions and two
+readings provisional and raised to Hadi); the plan `docs/handoffs/plan_T-viz_1c.md`; the state file
+`docs/handoffs/build_T-viz_1c_state.md`. Hadi's review open. Next: 1d and 1e (paths on the floor); the polishing round
+after 1c or after 1e (open).
+
 ### What stage 1b starts from
 
 - The panels' roles and panel 4a's content above. The right panel's content (the robot's body and its mind) is decided
@@ -119,7 +130,8 @@ rows keep their place; built the same day. Next: stage 1c (plots over ticks), th
    top. Whether a second polishing round follows: open.
 2. The right panel's content (stage 1b), and paths in the scene (TODO-197, stage 1b). DECIDED (6 October 2026): the
    five blocks above; paths in stages 1d and 1e.
-3. Panel 4c: the plots, the robot-human distance, the timeline facts' subplot (stage 1c).
+3. Panel 4c: the plots, the robot-human distance, the timeline facts' subplot (stage 1c). BUILT (7 October 2026),
+   Hadi's review open.
 4. The tag for a fact that lowers a task (TODO-185): Hadi.
 5. The stale layout titles themselves: Hadi, whenever the layout files are next touched (with item 1).
 6. Whether the domain declares its container types, so that an empty container is known: when a stage needs it.

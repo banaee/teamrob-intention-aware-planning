@@ -886,6 +886,9 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     admission, context, the robot's task with holds and decisions, distance with min_separation); one colour per task
     across the page; a click on the plot shows an earlier tick, for display only (TODO-189's item taken out); planned
     briefly and built without a pause (`docs/handoffs/plan_T-viz_1c.md`).
+    BUILT (ccode, 7 October 2026; design_records.md, "T-viz, the web-ui", 1c, THE BOTTOM PANEL, BUILT): panel 4c drawn by
+    the page's own canvas, the past view, one colour per task; two readings provisional and raised to Hadi; Hadi's
+    review open. Next within T-viz: 1d.
   - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
     editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
     each saved as a new artefact; 2.4 sim-runs side by side.
