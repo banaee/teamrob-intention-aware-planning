@@ -1,4 +1,6 @@
-# The deck: dependencies, build output and screenshots stay out of git
+# The deck: dependencies, build output, the recordings (made by every build, scripts/record.mjs) and screenshots stay
+# out of git
 node_modules/
 dist/
+data/
 shots/

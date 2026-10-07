@@ -14,14 +14,14 @@ talk only.
 ## The recorded room
 
 The deck needs no server: what the web-ui's server would send for the view of a layout (the domain's scene appearance
-from the catalogue, and the view of the layout without a setup) is recorded once, by the same piece of code that feeds
-the web-ui (`mesa_sim/webui_adapter.py`), into `data/<domain>_<layout>.json`. Record it again after the layout file or
-the domain's `appearance.json` changes, then build:
+from the catalogue, and the view of the layout without a setup) is recorded by the same piece of code that feeds the
+web-ui (`mesa_sim/webui_adapter.py`; `scripts/record_view.py`) into `data/<domain>_<layout>.json` (untracked).
+`npm run build` and `npm run dev` record it again every time, from the original files (`scripts/record.mjs`), so a
+changed layout or look reaches the slide with one build. The old recording is deleted first; if the recording cannot
+run, the build stops with a message and nothing is built.
 
-```bash
-# from the repository's root
-PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python presentation/scripts/record_view.py kitting env_layout_01
-```
+The Python environment: `TEAMROB_PYTHON` if set, else `~/python-envs/ir-nomesa-env/bin/python` (the repository's
+working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm run build`.
 
 ## Build and start
 
@@ -30,7 +30,7 @@ Needs Node.js 22.12 or later. Install once, with network; then nothing is loaded
 ```bash
 cd presentation
 npm ci            # once, with network
-npm run build     # after a change of the slides or of the web-ui page's sources
+npm run build     # after a change of the slides, the web-ui page's sources, a layout or a look
 npm run preview   # the deck at http://127.0.0.1:4173/ (offline); F for fullscreen, Esc for the overview
 ```
 

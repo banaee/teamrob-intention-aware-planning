@@ -9,8 +9,9 @@
   },
   "scripts": {
     "pins": "node scripts/pins.mjs",
-    "dev": "npm run pins && vite --open",
-    "build": "npm run pins && tsc --noEmit && vite build",
+    "record": "node scripts/record.mjs",
+    "dev": "npm run pins && npm run record && vite --open",
+    "build": "npm run pins && npm run record && tsc --noEmit && vite build",
     "preview": "vite preview --open",
     "typecheck": "tsc --noEmit",
     "shots": "node scripts/shots.mjs"

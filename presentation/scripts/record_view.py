@@ -1,11 +1,11 @@
-"""Records what the web-ui's server would send for the view of a layout, once, into a data file of the deck, so that the
+"""Records what the web-ui's server would send for the view of a layout into a data file of the deck, so that the
 deck needs no server at talk time: the domain's scene appearance (the catalogue's) and the view of the layout (no
 setup). The same piece of code feeds the web-ui (mesa_sim/webui_adapter.py, MesaSimulator); this script only calls it.
 
     PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python presentation/scripts/record_view.py kitting env_layout_01
 
-Writes presentation/data/<domain>_<layout>.json. Run it again after the layout file or the domain's appearance.json
-changes.
+Writes presentation/data/<domain>_<layout>.json. The deck's build runs it (scripts/record.mjs) every time, from the
+original files.
 """
 
 import json
