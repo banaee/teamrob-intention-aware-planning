@@ -292,10 +292,12 @@ def _domain_words():
     return words
 
 
-# Framework terms that are also an object type of a domain (T-viz 1b): "gate", the confidence gate (glossary; panel 4b's
-# admission block) and dock_loading's gate. Such a term may name a field or stand in prose; a string literal that is the
-# term alone, the form a dependence on the object type takes, is still refused.
-FRAMEWORK_TERMS = {"gate"}
+# The one exception, and only this word (preferred, Hadi, 7 October 2026): "gate" is the framework's own term for the
+# admission gate (glossary; panel 4b's admission block) and collides with dock_loading's object type `gate`. It may name
+# a field or stand in prose; a string literal that is the word alone, the form a dependence on the object type takes,
+# is still refused. No other word is excepted.
+GATE = "gate"
+FRAMEWORK_TERMS = {GATE}
 
 
 def test_webui_names_no_domain_object_type_or_area_id():

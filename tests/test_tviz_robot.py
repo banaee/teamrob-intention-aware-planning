@@ -8,7 +8,9 @@ run file's options); a timeline fact in force (kitting scenario_s10_14); the rob
 
 The log is read independently of the piece: the recognizer's lines ([IR], [IR-rank], [IR-context]), the gate derived
 from the logged values in the gate's order (MetaPlanner._clears_gate's: θ, the leader's adequacy, its warrant, its
-rank), the decisions ([meta-trig], [meta-proj], [meta], [meta-b3], [hold]) and the body's step line.
+rank), the decisions ([meta-trig], [meta-proj], [meta], [meta-b3], [hold]) and the body's step line. The admission
+block's two items (Hadi, 7 October 2026): what the robot holds since its last decision, against the decision record
+the log's last [meta-proj] states, and the gate's answer at the tick, against the derivation above.
 """
 
 import ast
@@ -211,6 +213,7 @@ def test_the_robot_the_page_receives_is_the_logs(domain, scenario, changed, new_
     assert start.belief is None and start.decision is None
     shown, stood = _holds(log, last)
     previous = None
+    record = None       # the decision record as the log states it: the last admission's tick and what it admitted
     for update in updates[1:]:
         t, r = update.tick, update.robots[0]
 
@@ -275,6 +278,13 @@ def test_the_robot_the_page_receives_is_the_logs(domain, scenario, changed, new_
             previous = d
         else:
             assert d is previous, t
+
+        # admission's two items (Hadi, 7 October 2026): what the robot holds since its last decision (the record), and
+        # the gate's answer at the tick (above)
+        if t in log["proj"]:
+            record = (t, log["ir"][t]["leader"] if log["proj"][t].startswith("built ") else None)
+        held = None if d is None else (d.tick, d.projection.hypothesis if d.projection.kind == "admitted" else None)
+        assert held == record, t
 
         # the body
         body, line = r.body, log["body"][t]
