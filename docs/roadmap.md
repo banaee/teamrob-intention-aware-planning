@@ -881,6 +881,11 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     (`docs/handoffs/plan_T-viz_1b.md`).
     BUILT (ccode, 6 October 2026; design_records.md, "T-viz, the web-ui", 1b, THE RIGHT PANEL, BUILT): panel 4b, the
     messages' robot section, five readings provisional and raised to Hadi; Hadi's review open. Next within T-viz: 1c.
+    ASKED FOR (Hadi, 7 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1c, THE BOTTOM PANEL): stage 1c,
+    panel 4c in five lanes on one tick axis (the human's task with its tag, the robot's belief with θ and the held
+    admission, context, the robot's task with holds and decisions, distance with min_separation); one colour per task
+    across the page; a click on the plot shows an earlier tick, for display only (TODO-189's item taken out); planned
+    briefly and built without a pause (`docs/handoffs/plan_T-viz_1c.md`).
   - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
     editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
     each saved as a new artefact; 2.4 sim-runs side by side.
@@ -890,7 +895,8 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     default until Hadi draws the V1 border inside the web-ui. Stage 0's choice of technology still considers stages 2
     and 3 (handoff, 6.1, item 6: chosen for the full target, not for the first increment).
   - Unassigned (TODO-189): inspecting an object during a pause; an automatic pause at an event of the robot's
-    cognition; moving back along the ticks; replay without Mesa; saving the page's choice as a run file.
+    cognition; replay without Mesa; saving the page's choice as a run file. (Moving back along the ticks for display:
+    stage 1c, Hadi, 7 October 2026.)
   - Relations (Hadi, 6 October 2026, preferred; design_records.md, "T-viz, the web-ui", HADI'S ANSWERS): T-viz is the
     name for all web-ui work. T-V track 1 (what the viewer shows; T-E as originally defined) is carried out as T-viz
     stage 1, track 2 is T-viz stage 3. T-L's run-file panel is the solara-ui's form of T-L ruling 7; the web-ui has

@@ -5406,3 +5406,31 @@ DECIDED BY CCODE:
 - The memory's recency facts are shown in the recognition part as "memory … (input)": the memory of observed
   completions is a component of its own (AM30) that hands the recognizer its recency facts, an input, not an output.
 - The last decision and the three before it (five before the review).
+
+1c, THE BOTTOM PANEL (Hadi, 7 October 2026, preferred; recorded by ccode the same day, with the task of stage 1c,
+before any code of it).
+1. Panel 4c, the bottom panel, shows five lanes on one tick axis, in this order: (1) the human's task: a band per task
+   the human performs (the truth), with the tag per task (in accord, not in accord, no fact) where it applies; (2) the
+   robot's belief: one line per hypothesis, the threshold, and a marked span where the robot holds an admitted task;
+   (3) context: a band per timeline fact while it holds, hidden when the sim-run has none; (4) the robot's task: a band
+   per task, with holds marked and a mark at each decision; (5) distance: the distance between robot and human, the
+   minimum separation, and the ticks below it marked. Reason: a viewer of a demonstration asks what the human was
+   really doing, what the robot believed and when it became sure, and what the robot did about it and whether it was
+   safe.
+2. Left out for now: the tail probability S, the finding, the warrant rows, the gate's answer per tick. Reason: they
+   serve the developer, and the per-run figures of the analyses keep them.
+3. The plots are drawn from the tick updates the page already holds and grow by one tick per step. Nothing is read
+   from logs. A reload restores them.
+4. One colour per task across the whole page: the same task has the same colour in lanes 1 and 2, in the belief chart
+   of the right panel and in the script list of the left panel. Reason: the viewer sees without reading whether the
+   highest belief line has the colour of the truth band.
+5. A vertical line marks the current tick through all lanes.
+6. A click on the plot shows an earlier tick: the click pauses play, and the scene and both side panels show the
+   clicked tick; the page states clearly that it shows the past (for example "viewing tick 24, the sim-run is at tick
+   211"); play or step returns to the latest tick and continues; the sim-run never goes back and its log is not
+   affected. This takes "moving back along the ticks" out of TODO-189's items without a stage, for display only.
+7. Proposed by cchat, ccode's to decide as design: the tick axis extends in fixed portions and is not rescaled at every
+   tick; the distance is sent by the simulator's side as the value the run log prints, and the page computes none.
+The mode of 1c (as for 1b): a short plan (`docs/handoffs/plan_T-viz_1c.md`), then the build without a pause; web
+design details are ccode's, recorded as "decided by ccode"; a conceptual reading of the core algorithm the records do
+not settle is built as judged closest to them and marked "provisional, raised to Hadi".

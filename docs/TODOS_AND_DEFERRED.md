@@ -4975,6 +4975,10 @@ Hadi's global freeze button: with the clock proposed by cchat (the page requests
 UPDATED (T-viz 1a, 6 October 2026): the page's choice is mirrored in its address (a bookmark reopens a choice at its
 start); the address is not a run file, so the last item stays open. The page holds every tick update of a sim-run
 (`current` answers with them), which moving back along the ticks would read.
+UPDATED (Hadi, 7 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1c, THE BOTTOM PANEL, item 6): moving
+back along the ticks for display is taken out of this list without a stage: in stage 1c a click on panel 4c's plot
+shows an earlier tick (the scene and both side panels), play or step returns to the latest tick; the sim-run never goes
+back and its log is not affected. The other items stay open, with no stage.
 Reference: docs/handoffs/handoff_T-viz.md, sections 7.3, 7.4, 8.5, 13.4
 
 **TODO-190: The V1 border inside the web-ui: four open points (recorded, T-viz, 6 Oct 2026)** open; Hadi decides later
