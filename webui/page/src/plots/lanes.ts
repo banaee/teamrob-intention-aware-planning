@@ -6,7 +6,9 @@
  *
  *   (1) the human's task: the task on top of the human's stack (the truth) and its tag per task;
  *   (2) the robot's belief: the recognizer's belief over the live hypotheses, and what the robot holds since its last
- *       decision (the hypothesis that decision admitted, panel 4b's "held");
+ *       decision (the hypothesis that decision admitted, panel 4b's "held"); beside it the recognizer's other outputs
+ *       the analyses' figures show, the tail probability S per hypothesis (a member of the adequacy test) and the
+ *       finding per tick, or the exhausted state (Hadi, 7 October 2026);
  *   (3) context: whether each timeline fact holds;
  *   (4) the robot's task: its task, a hold in progress, the decision taken on the tick;
  *   (5) distance: the robot-human distance over the tick, as the run log's [sep] line states it.
@@ -170,6 +172,35 @@ export function beliefLines(lane: RobotLane, length: number): Map<string, (numbe
     }
   }
   return out;
+}
+
+/** Per hypothesis of the robot's hypothesis space, its tail probability S at each tick it is a member of the adequacy
+ * test, else null. */
+export function tailLines(lane: RobotLane, length: number): Map<string, (number | null)[]> {
+  const out = new Map<string, (number | null)[]>(lane.robot.hypotheses.map((h) => [h.key, new Array(length).fill(null)]));
+  for (let t = 0; t < length; t++) {
+    for (const h of lane.belief[t]?.live ?? []) {
+      if (h.tail === null) continue;
+      if (!out.has(h.key)) out.set(h.key, new Array(length).fill(null));
+      out.get(h.key)![t] = h.tail;
+    }
+  }
+  return out;
+}
+
+/** The recognizer's state at a tick as the analyses' figures show it: the adequacy finding while the lifecycle is live,
+ * "exhausted" when it is exhausted; null where the recognizer gave no output. */
+export type FindingState = "unresolved" | "adequate" | "unexplained" | "exhausted";
+
+export function findingAt(lane: RobotLane, t: number): FindingState | null {
+  const b = lane.belief[t];
+  if (!b) return null;
+  if (b.lifecycle === "exhausted") return "exhausted";
+  return b.finding;
+}
+
+export function findingBands(lane: RobotLane, length: number): Band<FindingState>[] {
+  return bands(Array.from({ length }, (_, t) => findingAt(lane, t)), length, (a, b) => a === b);
 }
 
 /** The tick axis, from tick 0 to the next multiple of `portion` past the latest tick: it extends in fixed portions

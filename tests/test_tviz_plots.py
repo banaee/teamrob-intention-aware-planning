@@ -14,7 +14,8 @@ scenario_s05_02 intention-unaware and dock_loading scenario_s07_07 human-unaware
   independently of the piece, are written to a temporary folder; the page's own reading (webui/page/src/plots/lanes.ts)
   then runs on them under vitest (webui/page/test/lanes.log.test.ts) and compares at every tick: the human's task (the
   [rec] stack's top) and its tag (the analyses' tag reader), the belief (the live hypotheses, the leader and its
-  confidence of [IR]), what the robot holds (the decision record of the last [meta-proj]), the decisions ([meta-trig]),
+  confidence of [IR]), the tail probability S of every member and the finding, or the exhausted state ([IR]; T-viz 1c,
+  Hadi's choice, items 7 and 8), what the robot holds (the decision record of the last [meta-proj]), the decisions ([meta-trig]),
   the robot's task (the step line), the holds ([hold]), the timeline facts (the timeline line's windows) and the
   distance ([sep]).
 """
@@ -112,7 +113,8 @@ def _pairs(text, sep="  "):
     return dict(item.rsplit("=", 1) for item in text.split(sep) if item)
 
 
-IR = re.compile(r"^\[IR\] step=(\d+) most_likely=(\S+) confidence=([\d.]+) .* warrant=\[(.*)\]$")
+IR = re.compile(r"^\[IR\] step=(\d+) most_likely=(\S+) confidence=([\d.]+) lifecycle=(\w+)( finding=(\w+))?"
+                r"( leader_adequacy=(\w+))? tails=\[(.*?)\] warrant=\[(.*)\]$")
 TRIG = re.compile(r"^\[meta-trig\] step=(\d+) trigger=(\w+)( cause=(\w+))?$")
 BODY = re.compile(r"^  step: (\d+): \[(\w+)\] task=(\S+) ")
 SEP = re.compile(r"^\[sep\] step=(\d+) (\w+)-(\w+) dist=(\S+) min=(\S+)$")
@@ -132,7 +134,9 @@ def _expected(log_path, rec_path, domain, model, robot, human, last):
         elif line.startswith("[run_mesa] timeline "):
             windows = [(f, int(a), None if b == "end" else int(b)) for f, a, b in WINDOW.findall(line)]
         elif (g := IR.match(line)):
-            exp["belief"][int(g[1])] = dict(leader=g[2], confidence=g[3], live=sorted(_pairs(g[4])))
+            # the finding as the analyses' figures show it: the finding while live, else the exhausted state
+            exp["belief"][int(g[1])] = dict(leader=g[2], confidence=g[3], live=sorted(_pairs(g[10])), tails=_pairs(g[9]),
+                                            state=g[6] if g[4] == "live" else "exhausted")
         elif (g := TRIG.match(line)):
             step = int(g[1])
             if g[2] != "none":

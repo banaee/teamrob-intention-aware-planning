@@ -1,18 +1,14 @@
 /**
- * Panel 4c's look, shared by its two versions (T-viz 1c; Hadi, 7 October 2026, preferred: version A the page's own
- * drawing, version B drawn with a chart library; Hadi chooses between them). Both draw the same lanes (src/plots/lanes.ts)
- * on the same geometry, so that they differ in drawing only, and a click maps to a tick by one function.
+ * Panel 4c's look (T-viz 1c; Hadi, 7 October 2026, preferred: version A, the page's own drawing, with his changes): the
+ * geometry the canvas draws on (src/plots/draw.ts), the colours, and the tooltip's rows.
  *
- * The geometry: each lane is a soft tinted box, as the right panel's blocks are: the human's task warm (the human's
- * light tone), the robot's belief in the recognition tint (the robot's light tone, as panel 4b's "Intention
- * recognition"), the robot's task in the planning tone (the robot's colour, as "Planning"), context and distance
- * neutral. A short title in small capitals sits at the box's left; the plot area starts after it, at one x for every
- * box, so that one tick is one x through all lanes; a column at the box's right holds a large number where it helps
- * (the leading belief, the present distance). The axis' few numbers under the last box. Much empty space, few labels,
- * as a product dashboard's cards (Hadi, 7 October 2026).
- *
- * Few colours: a task's colour (theme.taskSoft) shows as a light tint in a band, and as a line only for a hypothesis
- * that has led; the other hypotheses are thin grey lines.
+ * Each lane is a soft box in one tint for all, the very light blue of the robot's light tone (as panel 4b's "Intention
+ * recognition"), with that tone as its left edge. A box's header column at its left holds the lane's title, a small number
+ * where it helps (the leading belief, its S, the present distance) and a muted line; the plot area starts after it, at
+ * one x for every box, so that one tick is one x through all lanes. The lanes, in Hadi's order: the human's task; the
+ * recognizer's outputs together (belief, S, finding); context; the robot's task; distance. The axis' few numbers under
+ * the last box. No grid lines; few colours: a task's colour (theme.taskSoft) shows as a light tint in a band, and as a
+ * line only for a hypothesis that has led; the other hypotheses are thin grey lines.
  */
 
 import type { TaskColours } from "../frame/colours";
@@ -20,73 +16,60 @@ import { keyText } from "../frame/robot";
 import { taskText } from "../frame/activity";
 import { CAUSE_SHORT, TRIGGER_SHORT } from "../frame/robot";
 import { theme } from "../theme";
-import type { FactLane, HumanLane, Lanes, PairLane, RobotLane } from "./lanes";
+import { type FactLane, findingAt, type FindingState, type HumanLane, type Lanes, type PairLane, type RobotLane } from "./lanes";
 
 export const PAD = 2;          // px: the boxes' outer margin in the canvas
-export const LABEL = 84;       // px: the title column inside a box
-export const BIG = 156;        // px: the box's right column, for a large number, to the right of the plot area
-export const GAP = 10;         // px: between boxes
+export const LABEL = 172;      // px: a box's header column, to the left of the plot area
+export const RIGHT = 16;       // px: the box's padding to the right of the plot area
+export const GAP = 8;          // px: between boxes
 export const AXIS = 22;        // px: the axis' numbers under the last box
 export const ACCENT = 3;       // px: a box's left edge, as the right panel's blocks have
 export const RADIUS = 10;
+export const HEADER = 0.30;    // the header column's tint: a little deeper than the box
 
 export const BAND = 20;
-export const BELIEF = 96;
-export const BELIEF_TOP = 11;  // px: the belief's 1 below the row's top, the held admission's strip above it
+export const BELIEF = 92;
+export const BELIEF_TOP = 9;   // px: the belief's 1 below the row's top, the held admission's strip above it
+export const TAIL = 64;
+export const FINDING = 12;
 export const FACT = 16;
 export const ROBOT = 24;
-export const DISTANCE = 60;
+export const DISTANCE = 56;
 export const ROW_GAP = 4;
 export const BOX_PAD = 9;      // px: above and below the rows inside a box
 export const SCALE = 4;        // the distance lane reaches SCALE × min_separation; a larger distance at its top
 
-/** A version's proportions: the title column, the right column, the space between and inside boxes, the rows' heights. */
-export interface Spec {
-  label: number;
-  big: number;
-  right: number;
-  gap: number;
-  boxPad: number;
-  band: number;
-  belief: number;
-  fact: number;
-  robot: number;
-  distance: number;
-}
+/** The finding's colours, as the analyses' figures show the states (analysis/instruments/irb/plot.py, BAND): adequate
+ * nearly white, unresolved a light grey, unexplained red, exhausted a dark grey; softened to the page's tones. */
+export const FINDING_COLOUR: Record<FindingState, string> = {
+  adequate: "#FFFFFF",
+  unresolved: "#D5D8E2",
+  unexplained: "#E9A19D",
+  exhausted: "#8C92A6",
+};
 
-export const SPEC_A: Spec = { label: LABEL, big: BIG, right: 0, gap: GAP, boxPad: BOX_PAD, band: BAND, belief: BELIEF,
-                              fact: FACT, robot: ROBOT, distance: DISTANCE };
-/** Version B: a card's header column at the left (its title, a large number, a muted line), the plot to its right. */
-export const SPEC_B: Spec = { label: 196, big: 0, right: 18, gap: 8, boxPad: 10, band: 28, belief: 92, fact: 18, robot: 32,
-                              distance: 62 };
-
-export type Tone = "human" | "recognition" | "planning" | "neutral";
-
-/** A box's fill and its left edge, from the theme, as the right panel's blocks. */
-export function toneOf(tone: Tone): { fill: string; edge: string; title: string } {
+/** The one box: its fill, its left edge, its header column's tint, its title's colour. */
+export function box(): { fill: string; edge: string; header: string; title: string } {
   const c = theme.color;
-  switch (tone) {
-    case "human": return { fill: mix(c.humanLight, "#FFFFFF", 0.82), edge: c.humanLight, title: c.humanDark };
-    case "recognition": return { fill: mix(c.robotLight, "#FFFFFF", 0.86), edge: c.robotLight, title: c.robotDark };
-    case "planning": return { fill: c.page, edge: c.robot, title: c.robotDark };
-    case "neutral": return { fill: c.page, edge: c.lineFaint, title: c.inkSoft };
-  }
+  const fill = mix(c.robotLight, "#FFFFFF", 0.86);
+  return { fill, edge: c.robotLight, header: mix(c.robotLight, "#FFFFFF", 0.86 - HEADER * 0.86 * 0.25), title: c.robotDark };
 }
 
 export type Row =
   | { kind: "human"; lane: HumanLane; y: number; h: number }
   | { kind: "belief"; lane: RobotLane; y: number; h: number; off: boolean }
+  | { kind: "tail"; lane: RobotLane; y: number; h: number; off: boolean }
+  | { kind: "finding"; lane: RobotLane; y: number; h: number; off: boolean }
   | { kind: "fact"; lane: FactLane; y: number; h: number }
   | { kind: "robot"; lane: RobotLane; y: number; h: number }
   | { kind: "distance"; lane: PairLane; y: number; h: number; minSep: number };
 
 export interface Box {
   title: string;
-  tone: Tone;
   y: number;
   h: number;
   rows: Row[];
-  /** A row's own name beside it, only where the box holds more than one row (two humans, two robots, two facts). */
+  /** A row's own name in the header, only where the box holds more than one row (two humans, two robots, two facts). */
   named: boolean;
 }
 
@@ -101,34 +84,31 @@ export interface Geometry {
   axisY: number;
 }
 
-export function geometry(lanes: Lanes, width: number, spec: Spec = SPEC_A): Geometry {
+export function geometry(lanes: Lanes, width: number): Geometry {
   const boxes: Box[] = [];
   let y = PAD;
-  const box = <T,>(title: string, tone: Tone, elements: readonly T[], height: (e: T) => number,
-                   row: (e: T, y: number, h: number) => Row) => {
+  const add = <T,>(title: string, elements: readonly T[], height: (e: T) => number, row: (e: T, y: number, h: number) => Row) => {
     if (elements.length === 0) return;
     const rows: Row[] = [];
-    let at = y + spec.boxPad;
+    let at = y + BOX_PAD;
     for (const e of elements) { const h = height(e); rows.push(row(e, at, h)); at += h + ROW_GAP; }
-    const h = at - ROW_GAP + spec.boxPad - y;
-    boxes.push({ title, tone, y, h, rows, named: elements.length > 1 });
-    y += h + spec.gap;
+    const h = at - ROW_GAP + BOX_PAD - y;
+    boxes.push({ title, y, h, rows, named: elements.length > 1 });
+    y += h + GAP;
   };
-  box("human", "human", lanes.humans, () => spec.band, (lane, y, h) => ({ kind: "human", lane, y, h }));
-  box("belief", "recognition", lanes.robots, (l) => (aware(l) ? spec.belief : spec.band),
-      (lane, y, h) => ({ kind: "belief", lane, y, h, off: !aware(lane) }));
-  box("context", "neutral", lanes.facts, () => spec.fact, (lane, y, h) => ({ kind: "fact", lane, y, h }));
-  box("robot", "planning", lanes.robots, () => spec.robot, (lane, y, h) => ({ kind: "robot", lane, y, h }));
-  box("distance", "neutral", lanes.pairs, () => spec.distance, (lane, y, h) => ({
+  const on = (l: RobotLane) => l.robot.condition === "intention-aware";
+  add("human", lanes.humans, () => BAND, (lane, y, h) => ({ kind: "human", lane, y, h }));
+  add("belief", lanes.robots, (l) => (on(l) ? BELIEF : BAND), (lane, y, h) => ({ kind: "belief", lane, y, h, off: !on(lane) }));
+  add("S", lanes.robots, (l) => (on(l) ? TAIL : BAND), (lane, y, h) => ({ kind: "tail", lane, y, h, off: !on(lane) }));
+  add("finding", lanes.robots, (l) => (on(l) ? FINDING : BAND), (lane, y, h) => ({ kind: "finding", lane, y, h, off: !on(lane) }));
+  add("context", lanes.facts, () => FACT, (lane, y, h) => ({ kind: "fact", lane, y, h }));
+  add("robot", lanes.robots, () => ROBOT, (lane, y, h) => ({ kind: "robot", lane, y, h }));
+  add("distance", lanes.pairs, () => DISTANCE, (lane, y, h) => ({
     kind: "distance", lane, y, h, minSep: lanes.robots.find((r) => r.robot.robot === lane.robot)!.robot.min_separation,
   }));
-  const axisY = y - spec.gap + 6;
-  const x0 = PAD + spec.label;
-  return { width, height: axisY + AXIS - 6, boxes, x0, x1: Math.max(x0 + 1, width - PAD - spec.big - spec.right), axisY };
-}
-
-function aware(lane: RobotLane): boolean {
-  return lane.robot.condition === "intention-aware";
+  const axisY = y - GAP + 6;
+  const x0 = PAD + LABEL;
+  return { width, height: axisY + AXIS - 6, boxes, x0, x1: Math.max(x0 + 1, width - PAD - RIGHT), axisY };
 }
 
 /** The x of a tick's left edge, and of its middle, on the axis from 0 to `end`. */
@@ -136,7 +116,7 @@ export function xOf(g: Geometry, end: number, t: number): number {
   return g.x0 + (t / end) * (g.x1 - g.x0);
 }
 
-/** The tick under an x of the plot area, among the ticks held; null outside it. Both versions' clicks read it. */
+/** The tick under an x of the plot area, among the ticks held; null outside it: what a click shows. */
 export function tickOf(g: Geometry, end: number, length: number, x: number): number | null {
   if (x < g.x0 || x > g.x1 || length === 0) return null;
   return Math.min(length - 1, Math.max(0, Math.floor(((x - g.x0) / (g.x1 - g.x0)) * end)));
@@ -182,7 +162,7 @@ export function bandFill(colour: string): string { return mix(colour, "#FFFFFF",
 export function bandText(colour: string): string { return mix(colour, theme.color.ink, 0.45); }
 
 // =============================================================================
-// The tooltip's rows: the tick's values, short (both versions)
+// The tooltip's rows: the tick's values, short
 // =============================================================================
 
 /** A row of the tooltip: a short label, its value, and the colour square of the task it names (null: none). */
@@ -206,6 +186,10 @@ export function tipRows(lanes: Lanes, t: number, colours: TaskColours): TipRow[]
         rows.push({ label: keyText(r.robot, x.key), value: x.belief.toFixed(2), colour: softOf(colours, x.key) });
       }
     } else if (r.robot.condition !== "intention-aware") rows.push({ label: "belief", value: "off", colour: null });
+    const lead = b === null || b.leader === null ? undefined : b.live.find((x) => x.key === b.leader);
+    if (lead !== undefined && lead.tail !== null) rows.push({ label: "S", value: lead.tail.toFixed(2), colour: null });
+    const finding = findingAt(r, t);
+    if (finding !== null) rows.push({ label: "finding", value: finding, colour: null });
     const held = r.held[t];
     if (held !== null) rows.push({ label: "held", value: keyText(r.robot, held), colour: softOf(colours, held) });
   }

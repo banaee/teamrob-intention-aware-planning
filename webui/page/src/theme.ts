@@ -57,14 +57,10 @@ export const theme = {
     below: "#F6C9C4",
     separation: "#C2413B",
   },
-  /** One colour per task (T-viz 1c): the first ten tasks of a sim-run, in a fixed order (src/frame/colours.ts), get
-   * these hues; every further task the neutral `taskOther`. Validated as a categorical palette on the light surface
-   * (the dataviz validator: lightness, chroma, adjacent CVD ΔE 6.4, legal with the labels and tooltips the page has). */
-  task: ["#7d8a00", "#0e8fb3", "#4a3aa7", "#b5591e", "#e87ba4", "#008300", "#c2185b", "#1baf7a", "#eda100", "#e34948"],
-  taskOther: "#B9BDCB",
-  /** Panel 4c's task colours (T-viz 1c, the two versions; the bottom panel only until Hadi chooses): dusty tones of
-   * middle lightness, drawn mostly as light tints (bands) and as lines only for a hypothesis that has led, so that few
-   * colours show at once and the panel sits with the right panel's tinted blocks. Every further task `taskSoftOther`. */
+  /** One colour per task across the page (T-viz 1c; Hadi, 7 October 2026: the soft colours): dusty tones of middle
+   * lightness, drawn mostly as light tints and as lines only for a hypothesis that has led, so that few colours show at
+   * once. The first eight tasks of a sim-run in a fixed order (src/frame/colours.ts); every further task
+   * `taskSoftOther`. */
   taskSoft: ["#4E8F8B", "#8A6FB0", "#C08A3E", "#6E8F4E", "#B0607A", "#5A7FB0", "#9A7B5F", "#4F6D8A"],
   taskSoftOther: "#A3A8B8",
   opacity: {

@@ -6,7 +6,11 @@
  *   selection       domain, layout, setup, scenario, run options (open before the first step, folded after it)
  *   main row        panel 4a (the human and the world) | the env-pane with its control bar | panel 4b (the robot: its
  *                   body and its mind, T-viz 1b)
- *   panel 4c        plots over ticks (T-viz 1c): five lanes on one tick axis (src/plots/PlotPanel.tsx)
+ *   panel 4c        plots over ticks (T-viz 1c): seven lanes on one tick axis (src/plots/PlotPanel.tsx)
+ *
+ * The borders between the side panels and the env-pane, and between the upper row and panel 4c, are dragged to change
+ * the panels' sizes (T-viz 1c, point 9; src/frame/Splitter.tsx, src/frame/layout.ts); when the content does not fit, the
+ * page scrolls.
  *
  * The page's states (section 5): nothing chosen; a layout's view; a layout and setup's view; a start (unlocked); a
  * sim-run stepped (locked); ended. A layout chosen asks for its view, a setup its view with the setup's objects (P3,
@@ -40,6 +44,8 @@ import { addressOf, type RunOptionValue } from "./address";
 import { api } from "./api";
 import { NO_COLOURS, taskColours } from "./frame/colours";
 import { ControlBar, type Speed } from "./frame/ControlBar";
+import { BOUNDS, bounded, defaults, type Layout, remember, remembered } from "./frame/layout";
+import { Splitter } from "./frame/Splitter";
 import { type Selection, withOption } from "./frame/selection";
 import { HumanPanel } from "./frame/HumanPanel";
 import { RobotPanel } from "./frame/RobotPanel";
@@ -56,7 +62,6 @@ import type { Moment, Room } from "./env-pane/Scene";
 import { foldLanes, type Lanes } from "./plots/lanes";
 import { PlotPanel } from "./plots/PlotPanel";
 import { viewedTicks } from "./plots/past";
-import { theme } from "./theme";
 
 const DEFAULT_SPEED: Speed = 5;
 
@@ -89,6 +94,11 @@ export function App() {
   const [selectionOpen, setSelectionOpen] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [viewed, setViewed] = useState<number | null>(null);   // an earlier tick shown (the past view), or the latest
+  const [layout, setLayout] = useState<Layout>(remembered);
+  const plotsRef = useRef<HTMLDivElement>(null);
+  const resize = useCallback((change: Partial<Layout>) => {
+    setLayout((l) => { const next = { ...l, ...change }; remember(next); return next; });
+  }, []);
   const playingRef = useRef(false);
   const speedRef = useRef<Speed>(DEFAULT_SPEED);
   speedRef.current = speed;
@@ -335,9 +345,6 @@ export function App() {
     return laneFold.current;
   }, [run]);
   const colours = useMemo(() => (description === null ? NO_COLOURS : taskColours(description)), [description]);
-  // panel 4c's colours: the soft palette, in the bottom panel only until Hadi chooses between its two versions
-  const plotColours = useMemo(() => (description === null ? NO_COLOURS
-    : taskColours(description, theme.taskSoft, theme.taskSoftOther)), [description]);
 
   // The camera returns to the last preset when the layout changes.
   const shownLayout = shown === null ? null : shown.kind === "run" ? shown.description.run.layout : shown.view.layout;
@@ -369,10 +376,13 @@ export function App() {
       )}
       {message && <p className="page-message" role="status">{message}</p>}
 
-      <div className="main-row">
+      <div className="main-row" style={{ gridTemplateColumns: `${layout.left}px 12px minmax(0, 1fr) 12px ${layout.right}px` }}>
         <HumanPanel humans={run?.description.world.humans.map((h) => h.id) ?? []}
                     scripts={run?.description.world.scripts ?? []} ticks={run?.built ? shownTicks : null}
                     colours={colours} />
+        <Splitter axis="x" label="The left panel's width" size={{ value: () => layout.left, sign: 1 }}
+                  onSize={(v) => resize({ left: bounded(v, BOUNDS.left.min, BOUNDS.left.max) })}
+                  onReset={() => resize({ left: defaults().left })} />
         {shown && room && moment && appearance ? (
           <EnvPane layout={shownLayout!} room={room} moment={moment} book={bookShown} appearance={appearance} view={view}
                    free={free} onView={(v) => { setView(v); setFree(false); }} onFree={() => setFree(true)}
@@ -386,10 +396,19 @@ export function App() {
             {catalogue ? "Choose a layout" : "Connecting to the server"}
           </section>
         )}
+        <Splitter axis="x" label="The right panel's width" size={{ value: () => layout.right, sign: -1 }}
+                  onSize={(v) => resize({ right: bounded(v, BOUNDS.right.min, BOUNDS.right.max) })}
+                  onReset={() => resize({ right: defaults().right })} />
         <RobotPanel robots={run?.description.robots ?? []} ticks={run?.built ? shownTicks : null} colours={colours} />
       </div>
 
-      <PlotPanel lanes={lanes} colours={plotColours} viewed={viewed} onView={onView} />
+      <Splitter axis="y" label="The plots' height"
+                size={{ value: () => plotsRef.current?.offsetHeight ?? BOUNDS.bottom.min, sign: -1 }}
+                onSize={(v) => resize({ bottom: bounded(v, BOUNDS.bottom.min, Math.max(BOUNDS.bottom.min, window.innerHeight - 160)) })}
+                onReset={() => resize({ bottom: defaults().bottom })} />
+      <div ref={plotsRef} className="plots-frame">
+        <PlotPanel lanes={lanes} colours={colours} viewed={viewed} onView={onView} height={layout.bottom} />
+      </div>
     </main>
   );
 }

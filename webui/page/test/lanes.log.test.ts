@@ -9,12 +9,12 @@ import { describe, expect, it } from "vitest";
 
 import type { RunDescription, TickUpdate } from "../src/gen/messages";
 import { foldBook } from "../src/env-pane/places";
-import { foldLanes, humanBands, robotBands, trueBands, type Lanes } from "../src/plots/lanes";
+import { findingAt, foldLanes, humanBands, robotBands, tailLines, trueBands, type Lanes } from "../src/plots/lanes";
 import { viewedTicks } from "../src/plots/past";
 
 interface Expected {
   human: Record<string, { task: string | null; tag: string | null }>;
-  belief: Record<string, { leader: string; confidence: string; live: string[] } | null>;
+  belief: Record<string, { leader: string; confidence: string; live: string[]; tails: Record<string, string>; state: string } | null>;
   held: Record<string, string | null>;
   decision: Record<string, { trigger: string; cause: string | null } | null>;
   task: Record<string, string | null>;
@@ -55,6 +55,7 @@ describe.skipIf(cases.length === 0)("the lanes are the run log's", () => {
       const [robot] = all.robots;
       const [pair] = all.pairs;
       expect(all.facts.map((f) => f.fact).sort()).toEqual(e.fact_rows);
+      const tails = tailLines(robot, all.length);
       for (let t = 0; t < all.length; t++) {
         const k = String(t);
         const at = `${c.name}, tick ${t}`;
@@ -72,6 +73,11 @@ describe.skipIf(cases.length === 0)("the lanes are the run log's", () => {
           expect(b!.live.find((h) => h.key === b!.leader)!.belief.toFixed(3), at).toBe(ir.confidence);
           expect(b!.live.reduce((s, h) => s + h.belief, 0), at).toBeCloseTo(1, 9);
         }
+        // (2b) S per hypothesis, a member of the adequacy test; (2c) the finding, or the exhausted state
+        const members: Record<string, string> = {};
+        for (const [key, line] of tails) if (line[t] !== null) members[key] = line[t]!.toFixed(4);
+        expect(members, at).toEqual(ir === null ? {} : ir.tails);
+        expect(findingAt(robot, t), at).toBe(ir === null ? null : ir.state);
         expect(robot.held[t], at).toBe(e.held[k]);
         // (3) context
         expect(all.facts.filter((f) => f.holds[t]).map((f) => f.fact).sort(), at).toEqual(e.facts[k]);

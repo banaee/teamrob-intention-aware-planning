@@ -1,44 +1,38 @@
 /**
- * Panel 4c, the plots over the ticks (T-viz 1c; docs/handoffs/plan_T-viz_1c.md; Hadi, 7 October 2026, preferred): five
- * lanes on one tick axis, in Hadi's order: the human's task with its tag per task; the robot's belief with θ and what it
- * holds since its last decision; context (absent when the sim-run's timeline has no window); the robot's task with its
- * holds and decisions; the robot-human distance with min_separation, the ticks below it shaded.
+ * Panel 4c, the plots over the ticks (T-viz 1c; Hadi, 7 October 2026, preferred: version A, the page's own drawing, with
+ * his changes): seven lanes on one tick axis, in Hadi's order: the human's task with its tag per task; the recognizer's
+ * outputs together, the belief (θ, what the robot holds since its last decision, a legend), the tail probability S (α)
+ * and the finding; context (absent when the sim-run's timeline has no window); the robot's task with its holds and
+ * decisions; the robot-human distance with min_separation, the ticks below it shaded. Drawn on one canvas
+ * (src/plots/draw.ts) over the geometry of src/plots/look.ts.
  *
- * Two versions, for Hadi to choose between (T-viz 1c, HADI'S REVIEW AND TWO VERSIONS): A, the page's own drawing on a
- * canvas (src/plots/drawA.ts); B, a product dashboard's cards with Recharts (src/plots/PlotsB.tsx). Both draw the same lanes on the same
- * geometry (src/plots/look.ts); a small switch at the panel's foot chooses one, remembered in this browser. A vertical
- * line marks the latest tick; hovering shows the tick's values; a click shows that tick in the whole page (the past view,
- * App.tsx), a click on the latest tick returns to it. The page computes nothing: every value is the tick updates'.
+ * A vertical line marks the latest tick; hovering shows the tick's values; a click shows that tick in the whole page (the
+ * past view, App.tsx), a click on the latest tick returns to it. The panel fits its lanes (up to FIT of the window) until
+ * the screen-user drags the border above it (App.tsx); then it keeps that height, and lanes taller than it scroll inside
+ * it. The page computes nothing: every value is the
+ * tick updates'.
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { TaskColours } from "../frame/colours";
-import { drawA } from "./drawA";
+import { draw } from "./draw";
 import { axisEnd, type Lanes } from "./lanes";
-import { geometry, SPEC_A, SPEC_B, tickOf, tipRows, xOf } from "./look";
-import { PlotsB } from "./PlotsB";
+import { FIT } from "../frame/layout";
+import { geometry, tickOf, tipRows, xOf } from "./look";
 
-export type Version = "A" | "B";
-
-const KEY = "tviz.plots.version";
-
-function remembered(): Version {
-  try { return window.localStorage.getItem(KEY) === "B" ? "B" : "A"; } catch { return "A"; }
-}
-
-export function PlotPanel({ lanes, colours, viewed, onView }: {
+export function PlotPanel({ lanes, colours, viewed, onView, height }: {
   lanes: Lanes | null; colours: TaskColours; viewed: number | null; onView: (tick: number | null) => void;
+  height: number | null;
 }) {
   const box = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [width, setWidth] = useState(0);
-  const [version, setVersion] = useState<Version>(remembered);
   const [hover, setHover] = useState<{ t: number; x: number; y: number } | null>(null);
   const length = lanes?.length ?? 0;
   const end = axisEnd(length);
-  const g = useMemo(() => (lanes === null || width === 0 ? null
-    : geometry(lanes, width, version === "A" ? SPEC_A : SPEC_B)), [lanes, width, version]);
+  const sized = height === null ? { maxHeight: `${FIT * 100}vh` } : { height };
+  const g = useMemo(() => (lanes === null || width === 0 ? null : geometry(lanes, width)), [lanes, width]);
 
   useEffect(() => {
     const el = box.current;
@@ -51,23 +45,21 @@ export function PlotPanel({ lanes, colours, viewed, onView }: {
 
   useEffect(() => {
     const el = canvas.current;
-    if (version !== "A" || el === null || lanes === null || g === null) return;
+    if (el === null || lanes === null || g === null) return;
     const dpr = window.devicePixelRatio || 1;
-    el.width = Math.round(g.width * dpr);
-    el.height = Math.round(g.height * dpr);
-    const ctx = el.getContext("2d")!;
+    // the canvas is re-allocated only when its size changes: a re-allocation each tick stalls the browser's renderer
+    const w = Math.round(g.width * dpr), h = Math.round(g.height * dpr);
+    if (el.width !== w) el.width = w;
+    if (el.height !== h) el.height = h;
+    // drawn by the CPU rasteriser: many-segment lines, redrawn each tick, stall a GPU-rasterised canvas
+    const ctx = el.getContext("2d", { willReadFrequently: true })!;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    drawA(ctx, g, lanes, colours, end, viewed);
-  }, [version, lanes, g, colours, end, viewed]);
-
-  const choose = (v: Version) => {
-    setVersion(v);
-    try { window.localStorage.setItem(KEY, v); } catch { /* a private window keeps it for the page's life */ }
-  };
+    draw(ctx, g, lanes, colours, end, viewed);
+  }, [lanes, g, colours, end, viewed]);
 
   if (lanes === null) {
     return (
-      <aside className="plots plots-empty" aria-label="Plots over ticks">
+      <aside className="plots plots-empty" aria-label="Plots over ticks" style={height === null ? { height: 32 } : { height }}>
         <span>plots over ticks</span>
       </aside>
     );
@@ -78,7 +70,7 @@ export function PlotPanel({ lanes, colours, viewed, onView }: {
     return tickOf(g, end, length, clientX - rect.left);
   };
   return (
-    <aside className="plots" aria-label="Plots over ticks">
+    <aside className="plots" aria-label="Plots over ticks" style={sized}>
       <div ref={box} className="plots-box" style={{ height: g?.height ?? 120 }}
            onMouseMove={(e) => {
              const t = at(e.clientX);
@@ -90,10 +82,8 @@ export function PlotPanel({ lanes, colours, viewed, onView }: {
              const t = at(e.clientX);
              if (t !== null) onView(t === length - 1 ? null : t);
            }}>
-        {g !== null && (version === "A"
-          ? <canvas ref={canvas} className="plots-canvas" style={{ width: g.width, height: g.height }}
-                    role="img" aria-label={`Plots over ticks 0 to ${length - 1}`} />
-          : <PlotsB g={g} lanes={lanes} length={length} colours={colours} end={end} viewed={viewed} />)}
+        {g !== null && <canvas ref={canvas} className="plots-canvas" style={{ width: g.width, height: g.height }}
+                               role="img" aria-label={`Plots over ticks 0 to ${length - 1}`} />}
         {length === 0 && <span className="plots-wait">no tick yet</span>}
         {hover !== null && g !== null && (
           <>
@@ -102,12 +92,6 @@ export function PlotPanel({ lanes, colours, viewed, onView }: {
             <Tip lanes={lanes} colours={colours} t={hover.t} left={hover.x} top={hover.y} wide={g.width} />
           </>
         )}
-        <div className="plots-switch" role="group" aria-label="Plots version" onClick={(e) => e.stopPropagation()}>
-          {(["A", "B"] as const).map((v) => (
-            <button key={v} type="button" className={v === version ? "is-on" : undefined} onClick={() => choose(v)}
-                    title={v === "A" ? "Version A: the page's own drawing" : "Version B: drawn with Recharts"}>{v}</button>
-          ))}
-        </div>
       </div>
     </aside>
   );

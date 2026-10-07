@@ -6,6 +6,8 @@
  *       entry, each with its state by colour and its tag; ◀ on the line in progress (src/frame/script.ts);
  *   (B) the last switches of the stack and resumptions, newest first, each with its tick.
  * Then (D) the world's context now: the timeline facts in force and the object states that hold.
+ * T-viz 1c (Hadi, 7 October 2026, point 10): in panel 4b's form, grouped cards with a title each: Now (A), the human's
+ * script (C), switches and resumptions (B), the world's context (D); the content unchanged.
  * Tasks are written by their values (P31). The tag per task (in accord, not in accord, no fact) is computed on the
  * simulator's side (world/tag.py) and only shown here. A task's swatch is its colour across the page (T-viz 1c,
  * src/frame/colours.ts).
@@ -56,7 +58,9 @@ function Human({ id, activity, script, ticks, colours }: {
     <section className="human">
       <h3 className="human-id"><span className="panel-dot" />{id}</h3>
 
-      <h4 className="human-heading">Action in hand</h4>
+      <div className="robot-part part-human">
+      <h4 className="part-title">Now</h4>
+      <h5 className="robot-heading">Action in hand</h5>
       {action === null ? (
         <p className="human-none">{top === null ? "none: no task" : "none: the human waits"}</p>
       ) : (
@@ -75,7 +79,7 @@ function Human({ id, activity, script, ticks, colours }: {
           <TagMark tagged={activity.tag} /></p>
       )}
 
-      <h4 className="human-heading">Stack</h4>
+      <h5 className="robot-heading">Stack</h5>
       {activity.stack.length === 0 ? <p className="human-none">no task</p> : (
         <ol className="human-stack">
           {stackLines(activity).map(({ task, suspended }, i) => (
@@ -87,14 +91,18 @@ function Human({ id, activity, script, ticks, colours }: {
         </ol>
       )}
 
+      </div>
+
       {script !== null && <Script script={script} lines={lines} colours={colours} />}
 
-      <h4 className="human-heading">Switches and resumptions</h4>
+      <div className="robot-part part-human">
+      <h4 className="part-title">Switches and resumptions</h4>
       {changes.length === 0 ? <p className="human-none">none yet</p> : (
         <ol className="human-changes">
           {changes.map((c, i) => <ChangeLine key={i} change={c} />)}
         </ol>
       )}
+      </div>
     </section>
   );
 }
@@ -108,8 +116,8 @@ function Script({ script, lines, colours }: { script: HumanScript; lines: readon
   }, [current]);
   const parts = { ordinary: "", repeatable: "repeatable", closing: "closing" } as const;
   return (
-    <>
-      <h4 className="human-heading">The human's script <small>the robot does not know it</small></h4>
+    <div className="robot-part part-human">
+      <h4 className="part-title">The human's script <small>the robot does not know it</small></h4>
       {script.dependence === "on_robot" && (
         <p className="human-note">The written priority order, not the order of execution: what the human can do
           depends on the robot.</p>
@@ -145,7 +153,7 @@ function Script({ script, lines, colours }: { script: HumanScript; lines: readon
           );
         })}
       </ol>
-    </>
+    </div>
   );
 }
 
@@ -171,12 +179,12 @@ function Context({ update }: { update: TickUpdate }) {
     if (s.object !== null) byState.get(s.state)!.push(s.object);
   }
   return (
-    <section className="human">
-      <h3 className="human-id">The world's context</h3>
-      <h4 className="human-heading">Timeline facts</h4>
+    <div className="robot-part part-world">
+      <h4 className="part-title">The world's context</h4>
+      <h5 className="robot-heading">Timeline facts</h5>
       {facts.length === 0 ? <p className="human-none">no timeline fact in force</p>
         : <p className="context-facts">{facts.map((f) => <span key={f} className="context-fact">{f}</span>)}</p>}
-      <h4 className="human-heading">Object states</h4>
+      <h5 className="robot-heading">Object states</h5>
       {byState.size === 0 ? <p className="human-none">no object state holds</p> : (
         <dl className="context-states">
           {[...byState].map(([state, objects]) => (
@@ -184,7 +192,7 @@ function Context({ update }: { update: TickUpdate }) {
           ))}
         </dl>
       )}
-    </section>
+    </div>
   );
 }
 

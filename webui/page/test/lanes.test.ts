@@ -44,30 +44,42 @@ describe("one colour per task", () => {
 
   it("in the script's order, then the robot's tasks, then the hypotheses", () => {
     expect([...colours.keys()].slice(0, 6)).toEqual(["x(1)", "y()", "x(2)", "z()", "x(3)", "x(0)"]);
-    expect(colours.get("x(1)")).toBe(theme.task[0]);
-    expect(colours.get("x(3)")).toBe(theme.task[4]);
+    expect(colours.get("x(1)")).toBe(theme.taskSoft[0]);
+    expect(colours.get("x(3)")).toBe(theme.taskSoft[4]);
   });
-  it("one hue per task for the first ten, the neutral grey after them and for a task not named", () => {
+  it("one soft hue per task for the first eight, the neutral grey after them and for a task not named", () => {
     const hues = [...colours.values()];
-    expect(new Set(hues.slice(0, 10)).size).toBe(10);
-    expect(hues.slice(10).every((h) => h === theme.taskOther)).toBe(true);
-    expect(colourOf(colours, "unknown()")).toBe(theme.taskOther);
+    expect(new Set(hues.slice(0, 8)).size).toBe(8);
+    expect(hues.slice(8).every((h) => h === theme.taskSoftOther)).toBe(true);
+    expect(colourOf(colours, "unknown()")).toBe(theme.taskSoftOther);
   });
 });
 
-// Both versions' clicks map a pointer's x to a tick by one function over the version's geometry (src/plots/look.ts).
-import { geometry, SPEC_A, SPEC_B, tickOf, xOf } from "../src/plots/look";
+// A click maps a pointer's x to a tick by one function over the panel's geometry (src/plots/look.ts).
+import { geometry, tickOf, xOf } from "../src/plots/look";
 import type { Lanes } from "../src/plots/lanes";
+import { BOUNDS, bounded, defaults } from "../src/frame/layout";
 
-describe("a click maps to its tick in both versions", () => {
+describe("a click maps to its tick", () => {
   const lanes = { key: "k", length: 137, humans: [], robots: [], facts: [], pairs: [] } as unknown as Lanes;
-  for (const [name, spec] of [["A", SPEC_A], ["B", SPEC_B]] as const) {
-    it(`version ${name}`, () => {
-      const g = geometry(lanes, 1888, spec);
+  for (const width of [1888, 2528]) {
+    it(`at ${width} px`, () => {
+      const g = geometry(lanes, width);
       const end = axisEnd(lanes.length);
       for (let t = 0; t < lanes.length; t++) expect(tickOf(g, end, lanes.length, xOf(g, end, t + 0.5))).toBe(t);
       expect(tickOf(g, end, lanes.length, g.x0 - 1)).toBeNull();
       expect(tickOf(g, end, lanes.length, g.x1 - 1)).toBe(lanes.length - 1);   // past the latest tick: the latest
     });
   }
+});
+
+describe("the dragged borders", () => {
+  it("keep each size within its bounds", () => {
+    expect(bounded(100, BOUNDS.left.min, BOUNDS.left.max)).toBe(BOUNDS.left.min);
+    expect(bounded(5000, BOUNDS.right.min, BOUNDS.right.max)).toBe(BOUNDS.right.max);
+    expect(bounded(400.6, BOUNDS.left.min, BOUNDS.left.max)).toBe(401);
+  });
+  it("start from the defaults: the side panels as before, the plots fitted to their lanes", () => {
+    expect(defaults()).toEqual({ left: 360, right: 340, bottom: null });
+  });
 });
