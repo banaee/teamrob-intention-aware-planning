@@ -23,6 +23,14 @@ export const GATE_SHORT: Record<Gate, string> = {
   "none(leader_outranked)": "leader outranked",
 };
 
+/** The two kinds of the robot's projection of the human, named for a lay viewer wherever the page names them, the
+ * scene's switches and panel 4b alike (Hadi, 7 October 2026, preferred): the admitted projection is the prediction
+ * from intention, the fallback projection the prediction from motion. Labels only: the glossary's terms are unchanged. */
+export const PREDICTION: Record<"admitted" | "fallback", string> = {
+  admitted: "Prediction from intention",
+  fallback: "Prediction from motion",
+};
+
 export const TRIGGER_SHORT: Record<TriggerKind, string> = {
   no_current_task: "no current task",
   recognition_changed: "recognition changed",

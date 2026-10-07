@@ -43,15 +43,17 @@ export function aheadOf(update: TickUpdate): Ahead {
   };
 }
 
-/** Which of the three drawings are shown: the robot's plan, the human's real path, the robot's expectation. */
+/** Which of the four drawings are shown: the robot's plan, the human's real path, and the robot's prediction of the
+ * human by its kind: from intention (the admitted projection), from motion (the fallback projection). */
 export interface PathsShown {
   plan: boolean;
   path: boolean;
-  expectation: boolean;
+  intention: boolean;
+  motion: boolean;
 }
 
 const SHOWN_KEY = "tviz.pathsShown";
-export const ALL_SHOWN: PathsShown = { plan: true, path: true, expectation: true };
+export const ALL_SHOWN: PathsShown = { plan: true, path: true, intention: true, motion: true };
 
 type Store = Pick<Storage, "getItem" | "setItem">;
 
@@ -60,7 +62,7 @@ export function readShown(store: Store | null = globalStore()): PathsShown {
   try {
     const saved = JSON.parse(store?.getItem(SHOWN_KEY) ?? "null") as Partial<PathsShown> | null;
     const read = (key: keyof PathsShown) => (typeof saved?.[key] === "boolean" ? saved[key] : ALL_SHOWN[key]);
-    return { plan: read("plan"), path: read("path"), expectation: read("expectation") };
+    return { plan: read("plan"), path: read("path"), intention: read("intention"), motion: read("motion") };
   } catch {
     return ALL_SHOWN;
   }

@@ -71,8 +71,8 @@ export const theme = {
     plotFaint: 0.45,          // panel 4c (T-viz 1c): a belief line of a hypothesis that has never led
     plotFact: 0.75,           // panel 4c: a timeline fact's band
     plotHold: 0.85,           // panel 4c: a hold's strip
-    expectationFill: 0.16,    // the scene (T-viz 1e): the robot's expectation of the human, an admitted task's plan
-    expectationHatch: 0.42,   // the fallback projection: its hatching
+    expectationFill: 0.16,    // the scene (T-viz 1e): the robot's prediction of the human from intention, in its colour
+    expectationHatch: 0.42,   // the prediction from motion: its hatching
     expectationHatchFill: 0.05,   // and its faint ground
   },
   line: {                     // px

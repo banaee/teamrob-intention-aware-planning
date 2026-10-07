@@ -3,11 +3,15 @@
  * 1d AND 1e, THE PATHS ON THE FLOOR). Colour says whose movement it is; form says what kind of knowledge it is:
  *   - the robot's own plan: a thin dashed line in the robot's colour;
  *   - the human's real path, which the robot does not know: a thin dashed line in the human's colour;
- *   - the robot's expectation of the human: a wide, light stripe in the human's colour, below the lines; filled for the
- *     plan of an admitted task, hatched for the fallback projection; a stand in it a disc at its place.
+ *   - the robot's prediction of the human: a wide, light stripe in the robot's colour, below the lines, starting where
+ *     the robot places the human; filled for the prediction from intention (the admitted projection), hatched for the
+ *     prediction from motion (the fallback projection); a stand in it a disc at its place.
+ * Blue is everything of the robot, what it will do and what it thinks; orange is the human's reality (Hadi, 7 October
+ * 2026, preferred). The robot's two blue drawings differ by form: its plan thin, dashed, from the robot; its prediction
+ * wide and light, from where it places the human.
  * Only what lies ahead is drawn: a line starts at the agent and ends with a small mark at each walk's end. Flat on the
- * floor, under the objects and the agents (depth-tested, just above the floor's own marks). Each drawing is shown by its
- * switch in the env-pane's header.
+ * floor, under the objects and the agents (depth-tested, just above the floor's own marks). Each drawing, each kind of
+ * prediction apart, is shown by its switch in the env-pane's header.
  *
  * The stripe's pieces (a band per moving segment, its round ends, the discs of stands) overlap; each pixel of one
  * robot's stripe is tinted once, through the stencil, so the stripe is one even tint.
@@ -32,7 +36,7 @@ const MARK_LIFT = 0.34;
 export function Paths({ ahead, shown, stripeWidth }: { ahead: Ahead; shown: PathsShown; stripeWidth: number }) {
   return (
     <group>
-      {shown.expectation && ahead.robots.map((r, i) => r.expectation && (
+      {ahead.robots.map((r, i) => r.expectation && shown[r.expectation.kind === "admitted" ? "intention" : "motion"] && (
         <Stripe key={r.robot} expectation={r.expectation} width={stripeWidth} stencil={i + 1} />
       ))}
       {shown.plan && ahead.robots.map((r) => (
@@ -115,7 +119,7 @@ function stripeMaterial(kind: Expectation["kind"], stencil: number): THREE.Shade
     vertexShader: stripeVertex,
     fragmentShader: stripeFragment,
     uniforms: {
-      uColour: { value: new THREE.Color(theme.color.human) },
+      uColour: { value: new THREE.Color(theme.color.robot) },
       uFill: { value: hatched ? theme.opacity.expectationHatchFill : theme.opacity.expectationFill },
       uHatch: { value: hatched ? theme.opacity.expectationHatch : 0 },
       uSpacing: { value: theme.scene.expectationHatchSpacing },

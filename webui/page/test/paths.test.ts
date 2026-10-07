@@ -100,8 +100,8 @@ describe("the switches' memory", () => {
   it("shows every drawing where nothing is remembered, and what was left otherwise", () => {
     const s = store();
     expect(readShown(s)).toEqual(ALL_SHOWN);
-    saveShown({ plan: true, path: false, expectation: true }, s);
-    expect(readShown(s)).toEqual({ plan: true, path: false, expectation: true });
+    saveShown({ plan: true, path: false, intention: true, motion: false }, s);
+    expect(readShown(s)).toEqual({ plan: true, path: false, intention: true, motion: false });
   });
 
   it("reads a damaged memory as every drawing shown", () => {

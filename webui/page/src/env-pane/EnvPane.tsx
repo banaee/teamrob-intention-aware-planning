@@ -5,9 +5,10 @@
  * a setup; and, at its foot, the control bar the page passes in (it acts on what the env-pane shows). While the camera
  * is moved freely (`free`) neither preset shows pressed; a preset puts it back.
  *
- * Three switches in the header (T-viz 1d and 1e; Hadi, 7 October 2026, preferred), one per drawing on the floor: the
- * robot's plan, the human's real path, the robot's expectation of the human; each a small pill with a swatch of its
- * drawing, on by default, remembered in the browser.
+ * Four switches in the header (T-viz 1d and 1e; Hadi, 7 October 2026, preferred), one per drawing on the floor: the
+ * robot's plan, the human's real path, and the robot's prediction of the human by its kind (from intention, from
+ * motion; src/frame/robot.ts, PREDICTION); each a small pill with a swatch of its drawing, on by default, remembered in
+ * the browser.
  */
 
 import { Canvas, useThree } from "@react-three/fiber";
@@ -18,6 +19,7 @@ import { FramingCamera, type View } from "./camera";
 import { setPixelRatio } from "./material";
 import { type Ahead, type PathsShown, readShown, saveShown } from "./paths";
 import type { PlaceBook } from "./places";
+import { PREDICTION } from "../frame/robot";
 import { theme } from "../theme";
 import { type Moment, type Room, Scene } from "./Scene";
 
@@ -93,20 +95,35 @@ function LineSwatch({ colour }: { colour: string }) {
   );
 }
 
-function StripeSwatch() {
+/** A short stripe of the robot's prediction: filled (from intention) or hatched (from motion). */
+function StripeSwatch({ hatched }: { hatched: boolean }) {
+  const c = theme.color.robot;
   return (
     <svg className="path-swatch" width="22" height="10" viewBox="0 0 22 10" aria-hidden="true">
-      <rect x="1" y="1" width="20" height="8" rx="4" fill={theme.color.human} fillOpacity={0.22} />
+      {hatched && (
+        <defs>
+          <clipPath id="path-swatch-stripe"><rect x="1" y="1" width="20" height="8" rx="4" /></clipPath>
+        </defs>
+      )}
+      <rect x="1" y="1" width="20" height="8" rx="4" fill={c} fillOpacity={hatched ? 0.06 : 0.22} />
+      {hatched && (
+        <g clipPath="url(#path-swatch-stripe)" stroke={c} strokeOpacity={0.6} strokeWidth="1">
+          {[-6, -2, 2, 6, 10, 14, 18, 22].map((x) => <line key={x} x1={x} y1="10" x2={x + 8} y2="0" />)}
+        </g>
+      )}
     </svg>
   );
 }
 
 const SWITCHES: { key: keyof PathsShown; label: string; title: string; swatch: ReactNode }[] = [
-  { key: "plan", label: "Robot plan", title: "The robot's own walks ahead", swatch: <LineSwatch colour={theme.color.robot} /> },
-  { key: "path", label: "Human path", title: "The human's real walks ahead, which the robot does not know",
+  { key: "plan", label: "Robot's plan", title: "Where the robot will walk", swatch: <LineSwatch colour={theme.color.robot} /> },
+  { key: "path", label: "Human's real path", title: "Where the human will really walk, which the robot does not know",
     swatch: <LineSwatch colour={theme.color.human} /> },
-  { key: "expectation", label: "Expectation", title: "The robot's expectation of the human: filled for an admitted task, hatched for the fallback projection",
-    swatch: <StripeSwatch /> },
+  { key: "intention", label: PREDICTION.admitted,
+    title: "The robot has recognised the human's task and predicts the human's path",
+    swatch: <StripeSwatch hatched={false} /> },
+  { key: "motion", label: PREDICTION.fallback, title: "The robot only continues the human's present movement",
+    swatch: <StripeSwatch hatched /> },
 ];
 
 /** The hatching's spacing in device pixels. */

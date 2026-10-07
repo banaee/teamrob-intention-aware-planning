@@ -21,8 +21,8 @@ import type {
 import { actionText, taskText } from "./activity";
 import { colourOf, type TaskColours } from "./colours";
 import {
-  admissionText, beliefRows, CAUSE_SHORT, CHANGE_SHORT, GATE_SHORT, held, keyText, recentDecisions, tickText,
-  TRIGGER_SHORT,
+  admissionText, beliefRows, CAUSE_SHORT, CHANGE_SHORT, GATE_SHORT, held, keyText, PREDICTION, recentDecisions,
+  tickText, TRIGGER_SHORT,
 } from "./robot";
 
 const EARLIER = 3;
@@ -195,11 +195,12 @@ function Projection({ robot, decision, now }: {
   const over = now !== null && now > p.until;
   const end = <>to {tickText(p.until)}{over && <span className="robot-chip">ran out</span>}</>;
   if (p.kind === "fallback") {
-    return <Facts items={[["fallback", <>{p.mode} · {tickText(p.span)} ticks · {end}</>]]} />;
+    return <Facts items={[["kind", PREDICTION.fallback], ["motion", <>{p.mode} · {tickText(p.span)} ticks · {end}</>]]} />;
   }
   return (
     <Facts items={[
-      ["admitted", <><span className="human-task">{keyText(robot, p.hypothesis)}</span> · {end}</>],
+      ["kind", PREDICTION.admitted],
+      ["task", <><span className="human-task">{keyText(robot, p.hypothesis)}</span> · {end}</>],
       ["plan", <span className="human-task">{p.plan.map((a) => actionText(a)).join(" › ")}</span>],
     ]} />
   );
