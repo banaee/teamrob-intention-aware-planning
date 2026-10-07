@@ -349,6 +349,44 @@ button:disabled { cursor: default; opacity: 0.45; }
 }
 .strip { flex: none; height: 32px; }
 
+/* Panel 4c, the plots over the ticks (T-viz 1c): one canvas of five lanes under the main row; its height is the
+   lanes'. A hairline and a tooltip follow the pointer; a click shows that tick in the whole page. */
+.plots {
+  flex: none;
+  padding: var(--space-sm) var(--space-md) var(--space-xs);
+  background: var(--color-surface);
+  border: var(--line-frame) solid var(--color-lineFaint);
+  border-radius: var(--radius-frame);
+}
+.plots-empty { display: flex; align-items: center; justify-content: center; height: 32px; padding: 0; border-style: dashed;
+  color: var(--color-inkFaint); font-size: var(--type-xs); letter-spacing: 0.04em; }
+.plots-box { position: relative; cursor: crosshair; }
+.plots-canvas { display: block; }
+.plots-wait { position: absolute; left: 50%; top: 40%; color: var(--color-inkFaint); font-size: var(--type-xs); }
+.plots-hair { position: absolute; top: 6px; width: 1px; background: var(--color-inkSoft); pointer-events: none; }
+.plots-tip {
+  position: absolute; z-index: 2; pointer-events: none;
+  max-width: 420px; padding: var(--space-xs) var(--space-sm);
+  background: var(--color-surface); border: var(--line-frame) solid var(--color-lineFaint);
+  border-radius: 6px; box-shadow: 0 2px 8px rgba(30, 34, 48, 0.12);
+  font-size: var(--type-xs); line-height: 1.45; color: var(--color-ink);
+}
+.plots-tip > div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.plots-tip > div > span { display: inline-block; min-width: 64px; color: var(--color-inkFaint); }
+
+/* A task's colour across the page (T-viz 1c), a small square before its text. */
+.task-swatch { display: inline-block; flex: none; width: 8px; height: 8px; margin-right: 4px; border-radius: 2px;
+  vertical-align: baseline; }
+
+/* The past view's note in the control bar (T-viz 1c). */
+.control-past {
+  display: inline-flex; align-items: center; gap: var(--space-sm);
+  padding: 2px var(--space-sm); border-radius: var(--radius-pill);
+  background: var(--color-pastLight); color: var(--color-past); font-weight: var(--weight-medium);
+  font-size: var(--type-xs); white-space: nowrap;
+}
+.control-past button { font-size: var(--type-xs); padding: 0 var(--space-sm); }
+
 select, button { font: inherit; }
 
 select {

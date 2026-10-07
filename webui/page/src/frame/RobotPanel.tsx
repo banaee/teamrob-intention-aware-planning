@@ -9,7 +9,8 @@
  *   marked as an input, the memory's recency facts;
  *   Planning, what the meta-planner does with them: admission (what it holds since its last decision; the gate's answer
  *   at the tick), projection (the last decision's), decision (the last, then the ones before it).
- * The page decides nothing: every answer is the robot's, as the simulator's side sends it (src/frame/robot.ts).
+ * The page decides nothing: every answer is the robot's, as the simulator's side sends it (src/frame/robot.ts). Each
+ * bar of the belief chart has its task's colour, the colour the task has across the page (T-viz 1c, src/frame/colours.ts).
  */
 
 import { useMemo } from "react";
@@ -18,6 +19,7 @@ import type {
   Carried, DecisionMade, HypothesisBelief, RobotBelief, RobotDescription, RobotTick, TickUpdate,
 } from "../gen/messages";
 import { actionText, taskText } from "./activity";
+import { colourOf, type TaskColours } from "./colours";
 import {
   admissionText, beliefRows, CAUSE_SHORT, CHANGE_SHORT, GATE_SHORT, held, keyText, recentDecisions, tickText,
   TRIGGER_SHORT,
@@ -25,8 +27,8 @@ import {
 
 const EARLIER = 3;
 
-export function RobotPanel({ robots, ticks }: {
-  robots: readonly RobotDescription[]; ticks: readonly TickUpdate[] | null;
+export function RobotPanel({ robots, ticks, colours }: {
+  robots: readonly RobotDescription[]; ticks: readonly TickUpdate[] | null; colours: TaskColours;
 }) {
   const now = ticks === null ? null : ticks[ticks.length - 1];
   return (
@@ -35,14 +37,15 @@ export function RobotPanel({ robots, ticks }: {
       {now === null || robots.length === 0 ? <p className="panel-later">no sim-run</p>
         : robots.map((robot) => {
           const tick = now.robots.find((r) => r.robot === robot.robot);
-          return tick ? <Robot key={robot.robot} robot={robot} tick={tick} now={now} ticks={ticks!} /> : null;
+          return tick ? <Robot key={robot.robot} robot={robot} tick={tick} now={now} ticks={ticks!} colours={colours} />
+            : null;
         })}
     </aside>
   );
 }
 
-function Robot({ robot, tick, now, ticks }: {
-  robot: RobotDescription; tick: RobotTick; now: TickUpdate; ticks: readonly TickUpdate[];
+function Robot({ robot, tick, now, ticks, colours }: {
+  robot: RobotDescription; tick: RobotTick; now: TickUpdate; ticks: readonly TickUpdate[]; colours: TaskColours;
 }) {
   const rows = useMemo(() => beliefRows(ticks, robot.robot), [ticks, robot.robot]);
   const aware = robot.condition === "intention-aware";
@@ -59,7 +62,7 @@ function Robot({ robot, tick, now, ticks }: {
         <h4 className="part-title">Intention recognition <small>the recognizer's outputs</small></h4>
         {!aware ? <p className="human-none">off</p>
           : tick.belief === null ? <p className="human-none">{now.tick === null ? "no observation yet" : "none"}</p>
-          : <Recognition robot={robot} belief={tick.belief} rows={rows} />}
+          : <Recognition robot={robot} belief={tick.belief} rows={rows} colours={colours} />}
       </div>
 
       <div className="robot-part part-planning">
@@ -109,7 +112,9 @@ function Body({ tick, carried }: { tick: RobotTick; carried: readonly Carried[] 
 }
 
 /** The recognizer's outputs at the tick. */
-function Recognition({ robot, belief, rows }: { robot: RobotDescription; belief: RobotBelief; rows: readonly string[] }) {
+function Recognition({ robot, belief, rows, colours }: {
+  robot: RobotDescription; belief: RobotBelief; rows: readonly string[]; colours: TaskColours;
+}) {
   const live = new Map(belief.live.map((h) => [h.key, h]));
   const prior = robot.context_knowledge;
   return (
@@ -127,7 +132,8 @@ function Recognition({ robot, belief, rows }: { robot: RobotDescription; belief:
           {prior && <span title="prior from context knowledge">prior</span>}
         </div>
         {rows.map((key) => <ChartRow key={key} label={keyText(robot, key)} h={live.get(key) ?? null}
-                                     leader={key === belief.leader} theta={robot.theta} prior={prior} />)}
+                                     leader={key === belief.leader} theta={robot.theta} prior={prior}
+                                     colour={colourOf(colours, key)} />)}
       </div>
       {belief.levels.length > 0 && (
         <Facts items={[["levels", belief.levels.map((l) => `${l.task} ${l.level}`).join(" · ")]]} />
@@ -142,15 +148,15 @@ function Recognition({ robot, belief, rows }: { robot: RobotDescription; belief:
 
 const ADEQUACY = { adequate: "✓", inadequate: "✗", no_observation: "·" } as const;
 
-function ChartRow({ label, h, leader, theta, prior }: {
-  label: string; h: HypothesisBelief | null; leader: boolean; theta: number; prior: boolean;
+function ChartRow({ label, h, leader, theta, prior, colour }: {
+  label: string; h: HypothesisBelief | null; leader: boolean; theta: number; prior: boolean; colour: string;
 }) {
   return (
     <div className={`chart-row${leader ? " is-leader" : ""}${h === null ? " is-dead" : ""}`} role="row"
          title={h === null ? `${label}: not live` : label}>
-      <span className="chart-label human-task">{label}</span>
+      <span className="chart-label human-task"><i className="task-swatch" style={{ background: colour }} />{label}</span>
       <span className="chart-bar" aria-hidden>
-        <span style={{ width: `${h === null ? 0 : 100 * h.belief}%` }} />
+        <span style={{ width: `${h === null ? 0 : 100 * h.belief}%`, background: colour }} />
         <i style={{ left: `${100 * theta}%` }} />
       </span>
       <span className="chart-value">{h === null ? "–" : h.belief.toFixed(2)}</span>

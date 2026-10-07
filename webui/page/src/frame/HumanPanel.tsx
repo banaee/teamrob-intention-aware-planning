@@ -7,19 +7,21 @@
  *   (B) the last switches of the stack and resumptions, newest first, each with its tick.
  * Then (D) the world's context now: the timeline facts in force and the object states that hold.
  * Tasks are written by their values (P31). The tag per task (in accord, not in accord, no fact) is computed on the
- * simulator's side (world/tag.py) and only shown here.
+ * simulator's side (world/tag.py) and only shown here. A task's swatch is its colour across the page (T-viz 1c,
+ * src/frame/colours.ts).
  */
 
 import { useEffect, useMemo, useRef } from "react";
 
 import type { HumanActivity, HumanScript, TaskTagged, TickUpdate } from "../gen/messages";
 import { actionText, type Change, recentChanges, stackLines, taskText, whereText } from "./activity";
+import { type TaskColours, taskColour } from "./colours";
 import { type ScriptLine, scriptLines } from "./script";
 
 const RECENT = 5;
 
-export function HumanPanel({ humans, scripts, ticks }: {
-  humans: readonly string[]; scripts: readonly HumanScript[]; ticks: readonly TickUpdate[] | null;
+export function HumanPanel({ humans, scripts, ticks, colours }: {
+  humans: readonly string[]; scripts: readonly HumanScript[]; ticks: readonly TickUpdate[] | null; colours: TaskColours;
 }) {
   const now = ticks === null ? null : ticks[ticks.length - 1];
   return (
@@ -32,7 +34,8 @@ export function HumanPanel({ humans, scripts, ticks }: {
           {humans.map((id) => {
             const activity = now.world.activity.find((a) => a.human === id);
             const script = scripts.find((s) => s.human === id);
-            return activity ? <Human key={id} id={id} activity={activity} script={script ?? null} ticks={ticks!} />
+            return activity ? <Human key={id} id={id} activity={activity} script={script ?? null} ticks={ticks!}
+                                     colours={colours} />
               : null;
           })}
           <Context update={now} />
@@ -42,8 +45,8 @@ export function HumanPanel({ humans, scripts, ticks }: {
   );
 }
 
-function Human({ id, activity, script, ticks }: {
-  id: string; activity: HumanActivity; script: HumanScript | null; ticks: readonly TickUpdate[];
+function Human({ id, activity, script, ticks, colours }: {
+  id: string; activity: HumanActivity; script: HumanScript | null; ticks: readonly TickUpdate[]; colours: TaskColours;
 }) {
   const changes = useMemo(() => recentChanges(ticks, id, RECENT), [ticks, id]);
   const lines = useMemo(() => (script === null ? [] : scriptLines(script, ticks)), [script, ticks]);
@@ -68,7 +71,8 @@ function Human({ id, activity, script, ticks }: {
         </>
       )}
       {top !== null && (
-        <p className="human-of">of <span className="human-task">{taskText(top)}</span> <TagMark tagged={activity.tag} /></p>
+        <p className="human-of">of <span className="human-task"><Swatch colour={taskColour(colours, top)} />{taskText(top)}</span>{" "}
+          <TagMark tagged={activity.tag} /></p>
       )}
 
       <h4 className="human-heading">Stack</h4>
@@ -76,14 +80,14 @@ function Human({ id, activity, script, ticks }: {
         <ol className="human-stack">
           {stackLines(activity).map(({ task, suspended }, i) => (
             <li key={i} className={suspended ? "is-suspended" : undefined}>
-              <span className="human-task">{taskText(task)}</span>
+              <span className="human-task"><Swatch colour={taskColour(colours, task)} />{taskText(task)}</span>
               <span className="human-state">{suspended ? "suspended" : "in progress"}</span>
             </li>
           ))}
         </ol>
       )}
 
-      {script !== null && <Script script={script} lines={lines} />}
+      {script !== null && <Script script={script} lines={lines} colours={colours} />}
 
       <h4 className="human-heading">Switches and resumptions</h4>
       {changes.length === 0 ? <p className="human-none">none yet</p> : (
@@ -96,7 +100,7 @@ function Human({ id, activity, script, ticks }: {
 }
 
 /** (C) The human's script: the robot does not know it. A long script scrolls, the line in progress kept in view. */
-function Script({ script, lines }: { script: HumanScript; lines: readonly ScriptLine[] }) {
+function Script({ script, lines, colours }: { script: HumanScript; lines: readonly ScriptLine[]; colours: TaskColours }) {
   const list = useRef<HTMLOListElement>(null);
   const current = lines.findIndex((l) => l.state === "in progress");
   useEffect(() => {
@@ -125,7 +129,8 @@ function Script({ script, lines }: { script: HumanScript; lines: readonly Script
               <span className="script-dot" aria-hidden />
               <span className="script-text">
                 {part && <span className="script-part">{part} </span>}
-                <span className="human-task">{label}</span>
+                <span className="human-task">
+                  {line.task !== null && <Swatch colour={taskColour(colours, line.task)} />}{label}</span>
                 {line.state === "in progress" && <span className="script-mark"> ◀</span>}
                 <span className="script-state">
                   {" "}{line.state}
@@ -142,6 +147,11 @@ function Script({ script, lines }: { script: HumanScript; lines: readonly Script
       </ol>
     </>
   );
+}
+
+/** A task's colour across the page, a small square before its text. */
+function Swatch({ colour }: { colour: string }) {
+  return <i className="task-swatch" style={{ background: colour }} aria-hidden />;
 }
 
 /** The tag per task in plain words, in its own colour; its raising facts' tasks as a hint. */

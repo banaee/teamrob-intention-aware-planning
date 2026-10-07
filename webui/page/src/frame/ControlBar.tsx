@@ -2,7 +2,9 @@
  * The control bar at the env-pane's foot (T-viz 1a): reset, step, play and pause, the speed, and the tick. The tick is
  * the run log's number of the step executed, so a moment seen here is found in the log; beside it the steps done, of
  * the step limit when one is set. It states when all agents have finished (the tick update's `run.finished_at`) and
- * why a sim-run ended. It holds no rule: what the server answers decides what is shown. Without a sim-run (a view of a
+ * why a sim-run ended. In the past view (T-viz 1c) it states the tick shown beside the sim-run's latest, with a button
+ * back to the latest; step and play also return to it first (App.tsx). It holds no rule: what the server answers
+ * decides what is shown. Without a sim-run (a view of a
  * layout, or a choice that was not built) every control is disabled and the bar says why (`idle`).
  */
 
@@ -19,10 +21,13 @@ const END_WORDS: Record<EndReason, string> = {
   server_stopped: "the server stopped",
 };
 
-export function ControlBar({ tick, idle, limit, playing, busy, speed, onSpeed, onPlay, onPause, onStep, onReset }: {
+export function ControlBar({ tick, idle, limit, viewed, onLatest, playing, busy, speed, onSpeed, onPlay, onPause, onStep,
+                             onReset }: {
   tick: TickUpdate | null;
   idle: string;
   limit: number | null;
+  viewed: number | null;
+  onLatest: () => void;
   playing: boolean;
   busy: boolean;
   speed: Speed;
@@ -72,14 +77,20 @@ export function ControlBar({ tick, idle, limit, playing, busy, speed, onSpeed, o
         </label>
       </div>
       <div className="control-state">
-        {finished !== null && <span className="control-note">All agents have finished at tick {finished}</span>}
-        {ended && <span className="control-note control-ended">Ended at tick {tick.tick}: {END_WORDS[tick.end!.reason]}</span>}
-        <span className="control-tick">
+        {viewed !== null && (
+          <span className="control-past" role="status">
+            viewing tick {viewed} · sim-run at tick {tick.tick}
+            <button type="button" onClick={onLatest} title="Back to the latest tick">latest</button>
+          </span>
+        )}
+        {viewed === null && finished !== null && <span className="control-note">All agents have finished at tick {finished}</span>}
+        {viewed === null && ended && <span className="control-note control-ended">Ended at tick {tick.tick}: {END_WORDS[tick.end!.reason]}</span>}
+        {viewed === null && <span className="control-tick">
           {tick.tick === null ? "start" : `tick ${tick.tick}`}
           <span className="control-steps">
             {" · "}{done}{limit === null ? "" : ` of ${limit}`} steps
           </span>
-        </span>
+        </span>}
         {limit !== null && (
           <span className="control-progress" aria-hidden>
             <span style={{ width: `${Math.min(100, (100 * done) / limit)}%` }} />

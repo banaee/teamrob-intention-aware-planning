@@ -51,12 +51,25 @@ export const theme = {
     tagAccord: "#2F7F86",
     tagNotAccord: "#B5652A",
     tagNoFact: "#9097AB",
+    // Panel 4c (T-viz 1c): the viewed earlier tick, the distance below min_separation and its line.
+    past: "#C27C0E",
+    pastLight: "#FBF1DF",
+    below: "#F6C9C4",
+    separation: "#C2413B",
   },
+  /** One colour per task (T-viz 1c): the first ten tasks of a sim-run, in a fixed order (src/frame/colours.ts), get
+   * these hues; every further task the neutral `taskOther`. Validated as a categorical palette on the light surface
+   * (the dataviz validator: lightness, chroma, adjacent CVD ΔE 6.4, legal with the labels and tooltips the page has). */
+  task: ["#7d8a00", "#0e8fb3", "#4a3aa7", "#b5591e", "#e87ba4", "#008300", "#c2185b", "#1baf7a", "#eda100", "#e34948"],
+  taskOther: "#B9BDCB",
   opacity: {
     shadow: 0.10,
     agentRing: 0.12,
     barrierFace: 0.35,
     counterTop: 0.4,          // a counter's top, see-through so that an agent at it is not hidden (T-viz 1a (iii))
+    plotFaint: 0.45,          // panel 4c (T-viz 1c): a belief line of a hypothesis that has never led
+    plotFact: 0.75,           // panel 4c: a timeline fact's band
+    plotHold: 0.85,           // panel 4c: a hold's strip
   },
   line: {                     // px
     object: 1.3,
@@ -64,6 +77,11 @@ export const theme = {
     floor: 1.1,
     area: 1.0,
     movable: 1.0,
+    plot: 1.25,               // panel 4c (T-viz 1c): the distance
+    plotLead: 2,              // a belief line of a hypothesis that has led
+    plotFaint: 1,             // the other belief lines
+    guide: 1,                 // θ, min_separation, the axis, the latest tick
+    viewed: 2,                // the viewed earlier tick
   },
   hatch: {                    // px, in screen space
     spacing: 4,

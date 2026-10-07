@@ -6,7 +6,7 @@
  *   selection       domain, layout, setup, scenario, run options (open before the first step, folded after it)
  *   main row        panel 4a (the human and the world) | the env-pane with its control bar | panel 4b (the robot: its
  *                   body and its mind, T-viz 1b)
- *   panel 4c        plots over ticks (stage 1c), a strip in 1a
+ *   panel 4c        plots over ticks (T-viz 1c): five lanes on one tick axis (src/plots/PlotPanel.tsx)
  *
  * The page's states (section 5): nothing chosen; a layout's view; a layout and setup's view; a start (unlocked); a
  * sim-run stepped (locked); ended. A layout chosen asks for its view, a setup its view with the setup's objects (P3,
@@ -23,6 +23,12 @@
  * The camera is the screen-user's own: moved freely it stays through the ticks, a reset and a change of scenario on
  * the same layout, and returns to the last preset when the layout changes.
  *
+ * The past view (T-viz 1c; Hadi, 7 October 2026, preferred): a click on panel 4c pauses play and shows an earlier tick
+ * k; the env-pane and both side panels then read the tick updates up to k (the prefix the page held when the sim-run
+ * was at k), the control bar says so, and play or step first returns to the latest tick. No request goes to the
+ * server: the sim-run never goes back and its log pair is not touched. One colour per task across the page, fixed
+ * from the run description (src/frame/colours.ts).
+ *
  * The page holds no simulation logic and no rule between run options: it asks the server (src/api.ts) and draws the
  * answers. Play requests one step after another; it pauses by itself on the tick at which all agents have finished
  * (the tick update's `run.finished_at`), and step and play go on from there.
@@ -32,6 +38,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { addressOf, type RunOptionValue } from "./address";
 import { api } from "./api";
+import { NO_COLOURS, taskColours } from "./frame/colours";
 import { ControlBar, type Speed } from "./frame/ControlBar";
 import { type Selection, withOption } from "./frame/selection";
 import { HumanPanel } from "./frame/HumanPanel";
@@ -46,6 +53,9 @@ import { EnvPane } from "./env-pane/EnvPane";
 import { opening } from "./opening";
 import { type BookFold, EMPTY_BOOK, foldBook, type PlaceBook } from "./env-pane/places";
 import type { Moment, Room } from "./env-pane/Scene";
+import { foldLanes, type Lanes } from "./plots/lanes";
+import { PlotPanel } from "./plots/PlotPanel";
+import { viewedTicks } from "./plots/past";
 
 const DEFAULT_SPEED: Speed = 5;
 
@@ -77,6 +87,7 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [selectionOpen, setSelectionOpen] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
+  const [viewed, setViewed] = useState<number | null>(null);   // an earlier tick shown (the past view), or the latest
   const playingRef = useRef(false);
   const speedRef = useRef<Speed>(DEFAULT_SPEED);
   speedRef.current = speed;
@@ -84,6 +95,7 @@ export function App() {
   const showRun = useCallback((run: SimRunState | SimRunHistory) => {
     const ticks = "ticks" in run ? [...run.ticks] : [run.tick];
     setShown({ kind: "run", description: run.description, ticks, built: true });
+    setViewed(null);
     setSelection(selectionOf(run.description));
     setOptions([...run.description.stated.options]);
   }, []);
@@ -224,15 +236,23 @@ export function App() {
 
   const onStep = useCallback(async () => {
     if (!run) return;
+    setViewed(null);
     setBusy(true);
     try { await stepOnce(run.description.sim_run); } finally { setBusy(false); }
   }, [run, stepOnce]);
 
   const onPause = useCallback(() => { playingRef.current = false; setPlaying(false); }, []);
 
+  /** The past view: a tick shown, play paused; null returns to the latest tick. */
+  const onView = useCallback((tick: number | null) => {
+    if (tick !== null) { playingRef.current = false; setPlaying(false); }
+    setViewed(tick);
+  }, []);
+
   const onPlay = useCallback(async () => {
     if (!run || playingRef.current) return;
     const simRun = run.description.sim_run;
+    setViewed(null);
     playingRef.current = true;
     setPlaying(true);
     while (playingRef.current) {
@@ -263,6 +283,9 @@ export function App() {
   }, [run, showRun]);
 
   const tickNow = run === null ? null : last(run.ticks);
+  // What the env-pane and the side panels read: the tick updates up to the viewed tick, or all of them.
+  const shownTicks = useMemo(() => (run === null ? null : viewedTicks(run.ticks, viewed)), [run, viewed]);
+  const tickShown = shownTicks === null ? null : last(shownTicks);
   const locked = tickNow !== null && tickNow.tick !== null;
   const domain = catalogue?.domains.find((d) => d.name === selection?.domain) ?? null;
   const shownDomain = shown === null ? null
@@ -270,7 +293,7 @@ export function App() {
   const appearance = catalogue?.domains.find((d) => d.name === shownDomain)?.appearance ?? null;
   const limitValue = run?.description.effective.find((v) => v.kind === "limit");
   const limit = limitValue?.kind === "limit" ? limitValue.value : null;
-  const glideMs = playing && speed !== 0 ? 1000 / speed : 0;
+  const glideMs = playing && speed !== 0 && viewed === null ? 1000 / speed : 0;
 
   const description = run?.description ?? null;
   const layoutView = shown?.kind === "view" ? shown.view : null;
@@ -282,12 +305,12 @@ export function App() {
              movable_objects: layoutView.setup?.movable_objects ?? [] };
   }, [description, layoutView]);
   const moment = useMemo<Moment | null>(() => {
-    if (tickNow !== null) return tickNow.world;
+    if (tickShown !== null) return tickShown.world;
     if (layoutView === null) return null;
     const setup = layoutView.setup;
     return { humans: [], robots: [], carried: [], fixed_object_contents: setup?.fixed_object_contents ?? [],
              object_states: setup?.object_states ?? [] };
-  }, [tickNow, layoutView]);
+  }, [tickShown, layoutView]);
   // The place book folded over the tick updates, one new tick at a time; anew for another sim-run or view.
   const bookFold = useRef<BookFold | null>(null);
   const book = useMemo<PlaceBook>(() => {
@@ -297,6 +320,20 @@ export function App() {
     bookFold.current = foldBook(bookFold.current, room.key, sequence);
     return bookFold.current.book;
   }, [room, run, moment]);
+  // In the past view, the place book folded over the prefix: the book the page held when the sim-run was there.
+  const bookShown = useMemo<PlaceBook>(() => {
+    if (room === null || run === null || viewed === null || shownTicks === null) return book;
+    return foldBook(null, room.key, shownTicks.map((u) => u.world.fixed_object_contents)).book;
+  }, [room, run, viewed, shownTicks, book]);
+
+  // Panel 4c's lanes, folded one tick update at a time; one colour per task, fixed from the run description.
+  const laneFold = useRef<Lanes | null>(null);
+  const lanes = useMemo<Lanes | null>(() => {
+    if (run === null || !run.built) return null;
+    laneFold.current = foldLanes(laneFold.current, run.description, run.ticks);
+    return laneFold.current;
+  }, [run]);
+  const colours = useMemo(() => (description === null ? NO_COLOURS : taskColours(description)), [description]);
 
   // The camera returns to the last preset when the layout changes.
   const shownLayout = shown === null ? null : shown.kind === "run" ? shown.description.run.layout : shown.view.layout;
@@ -330,12 +367,14 @@ export function App() {
 
       <div className="main-row">
         <HumanPanel humans={run?.description.world.humans.map((h) => h.id) ?? []}
-                    scripts={run?.description.world.scripts ?? []} ticks={run?.built ? run.ticks : null} />
+                    scripts={run?.description.world.scripts ?? []} ticks={run?.built ? shownTicks : null}
+                    colours={colours} />
         {shown && room && moment && appearance ? (
-          <EnvPane layout={shownLayout!} room={room} moment={moment} book={book} appearance={appearance} view={view}
+          <EnvPane layout={shownLayout!} room={room} moment={moment} book={bookShown} appearance={appearance} view={view}
                    free={free} onView={(v) => { setView(v); setFree(false); }} onFree={() => setFree(true)}
                    glideMs={glideMs}
                    controls={<ControlBar tick={run?.built ? tickNow : null} idle={idle} limit={limit}
+                                         viewed={run?.built ? viewed : null} onLatest={() => setViewed(null)}
                                          playing={playing} busy={busy} speed={speed} onSpeed={setSpeed}
                                          onPlay={onPlay} onPause={onPause} onStep={onStep} onReset={onReset} />} />
         ) : (
@@ -343,12 +382,10 @@ export function App() {
             {catalogue ? "Choose a layout" : "Connecting to the server"}
           </section>
         )}
-        <RobotPanel robots={run?.description.robots ?? []} ticks={run?.built ? run.ticks : null} />
+        <RobotPanel robots={run?.description.robots ?? []} ticks={run?.built ? shownTicks : null} colours={colours} />
       </div>
 
-      <aside className="strip" aria-label="Plots over ticks">
-        <span className="strip-title">Plots over ticks · stage 1c</span>
-      </aside>
+      <PlotPanel lanes={lanes} colours={colours} viewed={viewed} onView={onView} />
     </main>
   );
 }
