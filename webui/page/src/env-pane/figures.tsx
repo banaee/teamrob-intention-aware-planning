@@ -35,8 +35,13 @@ export function carryOffset(figure: Figure, h: number, facing: Direction | null)
   return { x: f.x * reach, y: f.y * reach };
 }
 
+/** The radius of the faint ring a figure stands on. */
+export function ringRadius(figure: Figure, h: number): number {
+  return figure === "lift_vehicle" ? 0.62 * h : 0.32 * h;
+}
+
 export function FigureForm({ figure, h, stance, paint }: { figure: Figure; h: number; stance: Stance; paint: Paint }) {
-  const ringR = figure === "lift_vehicle" ? 0.62 * h : 0.32 * h;
+  const ringR = ringRadius(figure, h);
   const ring = useMemo(() => disc(ringR), [ringR]);
   return (
     <group>

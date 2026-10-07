@@ -21,6 +21,9 @@ const shared = {
   uPixelRatio: { value: 1 },
 };
 
+/** The device's pixel ratio as a uniform, for another material hatched in screen space (src/env-pane/Paths.tsx). */
+export const pixelRatioUniform = shared.uPixelRatio;
+
 /** The hatching's spacing follows the device's pixels; set once per frame size. */
 export function setPixelRatio(ratio: number): void {
   shared.uPixelRatio.value = ratio;

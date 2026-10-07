@@ -59,6 +59,7 @@ import { EnvPane } from "./env-pane/EnvPane";
 import { opening } from "./opening";
 import { type BookFold, EMPTY_BOOK, foldBook, type PlaceBook } from "./env-pane/places";
 import type { Moment, Room } from "./env-pane/Scene";
+import { aheadOf, NO_AHEAD } from "./env-pane/paths";
 import { foldLanes, type Lanes } from "./plots/lanes";
 import { PlotPanel } from "./plots/PlotPanel";
 import { viewedTicks } from "./plots/past";
@@ -322,6 +323,8 @@ export function App() {
     return { humans: [], robots: [], carried: [], fixed_object_contents: setup?.fixed_object_contents ?? [],
              object_states: setup?.object_states ?? [] };
   }, [tickShown, layoutView]);
+  // What lies ahead of the agents at the tick shown (T-viz 1d and 1e): the tick update's, so the past view shows its own.
+  const ahead = useMemo(() => (tickShown === null ? NO_AHEAD : aheadOf(tickShown)), [tickShown]);
   // The place book folded over the tick updates, one new tick at a time; anew for another sim-run or view.
   const bookFold = useRef<BookFold | null>(null);
   const book = useMemo<PlaceBook>(() => {
@@ -386,7 +389,7 @@ export function App() {
         {shown && room && moment && appearance ? (
           <EnvPane layout={shownLayout!} room={room} moment={moment} book={bookShown} appearance={appearance} view={view}
                    free={free} onView={(v) => { setView(v); setFree(false); }} onFree={() => setFree(true)}
-                   glideMs={glideMs}
+                   glideMs={glideMs} ahead={ahead}
                    controls={<ControlBar tick={run?.built ? tickNow : null} idle={idle} limit={limit}
                                          viewed={run?.built ? viewed : null} onLatest={() => setViewed(null)}
                                          playing={playing} busy={busy} speed={speed} onSpeed={setSpeed}

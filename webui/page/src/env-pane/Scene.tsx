@@ -14,6 +14,9 @@
  * position to the tick's over `glideMs` (during play), or is put there at once (`glideMs` 0: paused, or a step), so
  * that a paused scene shows exactly the tick's positions. It turns at once to its last motion.
  *
+ * What lies ahead of the agents (T-viz 1d and 1e) is drawn on the floor by src/env-pane/Paths.tsx, from the tick
+ * update's walks ahead and projection ahead (`ahead`), each drawing shown by its switch (`shown`).
+ *
  * Nothing here names a domain, an object type or an area id: they arrive as data.
  */
 
@@ -30,7 +33,9 @@ import type {
 import { theme } from "../theme";
 import { heldBy, statesHeld } from "./look";
 import { type Place, type PlaceBook, placeGrid, slotOf } from "./places";
-import { carryHeight, carryOffset, FigureForm } from "./figures";
+import { carryHeight, carryOffset, FigureForm, ringRadius } from "./figures";
+import type { Ahead, PathsShown } from "./paths";
+import { Paths } from "./Paths";
 import { FixedForm, MovableForm, restHeight } from "./forms";
 import { fixedLook, movableLook } from "./look";
 import { at, Block, type Paint, paints, SoftShadow } from "./solids";
@@ -66,8 +71,9 @@ export interface Moment {
   object_states: readonly ObjectState[];
 }
 
-export function Scene({ room, moment, book, appearance, glideMs }: {
-  room: Room; moment: Moment; book: PlaceBook; appearance: Appearance; glideMs: number;
+export function Scene({ room, moment, book, appearance, glideMs, ahead, shown }: {
+  room: Room; moment: Moment; book: PlaceBook; appearance: Appearance; glideMs: number; ahead: Ahead;
+  shown: PathsShown;
 }) {
   const world = room;
   const fixedById = useMemo(() => new Map(world.fixed_objects.map((f) => [f.id, f])), [world]);
@@ -107,9 +113,15 @@ export function Scene({ room, moment, book, appearance, glideMs }: {
       : [entry.height, ...entry.states.map((s) => s.look.height)];
   })), [world, appearance]);
 
+  // The robot's expectation of the human as wide as the human's ring: where the human is where expected, its ring lies
+  // in the stripe.
+  const stripeWidth = 2 * ringRadius(appearance.human.figure, appearance.human.height);
+
   return (
     <group>
       {constant}
+
+      <Paths ahead={ahead} shown={shown} stripeWidth={stripeWidth} />
 
       {moment.fixed_object_contents.flatMap((contents) => {
         const holder = fixedById.get(contents.fixed_object);

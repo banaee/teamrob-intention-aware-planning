@@ -71,6 +71,9 @@ export const theme = {
     plotFaint: 0.45,          // panel 4c (T-viz 1c): a belief line of a hypothesis that has never led
     plotFact: 0.75,           // panel 4c: a timeline fact's band
     plotHold: 0.85,           // panel 4c: a hold's strip
+    expectationFill: 0.16,    // the scene (T-viz 1e): the robot's expectation of the human, an admitted task's plan
+    expectationHatch: 0.42,   // the fallback projection: its hatching
+    expectationHatchFill: 0.05,   // and its faint ground
   },
   line: {                     // px
     object: 1.3,
@@ -83,6 +86,7 @@ export const theme = {
     plotFaint: 1,             // the other belief lines
     guide: 1,                 // θ, min_separation, the axis, the latest tick
     viewed: 2,                // the viewed earlier tick
+    path: 2,                  // the scene (T-viz 1d): a dashed line of walks ahead
   },
   hatch: {                    // px, in screen space
     spacing: 4,
@@ -101,6 +105,13 @@ export const theme = {
     passiveLabel: 13,         // a background object's id
     activeLabel: 18,          // an active object's id
     gridStep: 100,
+    pathDash: 12,             // T-viz 1d: a walks ahead line's dashes and gaps
+    pathGap: 8,
+    pathMark: 6,              // a walk's end: a dot of this radius
+    pathMarkRim: 2.5,         // in a white rim
+    expectationStand: 0.75,   // T-viz 1e: a stand's disc, its radius as a share of the stripe's width
+    expectationHatchSpacing: 6,   // px, in screen space
+    expectationHatchWidth: 1.2,   // px
   },
 } as const;
 
