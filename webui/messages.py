@@ -31,13 +31,16 @@ THE TERMS:
     convention, not a world fact, and is written nowhere.
 
 SECTIONS:
-    The run description and the tick update hold the world under `world`. Stage 1b adds the robot's mind beside it,
-    stage 1c the plots, each as a new field with an empty default; nothing defined here changes. The world's
+    The run description and the tick update hold the world under `world`. Stage 1b adds the robot's mind beside it, as
+    a new field with an empty default; stage 1c adds a field to TaskRef and one to WorldTick (below). The world's
     vocabulary and the mind's stay in separate sections. The tick update's `run` (T-viz 1a) holds the facts of the
     sim-run that are neither the world's nor the robot's mind's: the tick at which every agent had finished.
     T-viz 1b: `robots`, per robot, in the run description what is constant of its mind (RobotDescription) and in the
     tick update its body and its mind at the tick (RobotTick): the action at its plan's cursor, a hold; the belief; the
     gate's answer; the last decision and the projection it rested on. Its position and what it carries stay in `world`.
+    T-viz 1c (panel 4c, the plots over the ticks): every task carries its identity (`TaskRef.identity`), by which the
+    page gives one colour per task; the world at a tick carries the robot-human distance (`WorldTick.separations`). The
+    plots read the tick updates the page holds; nothing else is added for them.
 
 THE STEP LIMIT (T-viz 1a):
     A sim-run in the web-ui has a step limit only when one is set (LimitOption); without one it ends by reset, by a
@@ -224,10 +227,14 @@ class Binding(Message):
 
 class TaskRef(Message):
     """A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the
-    logs show."""
+    logs show. `identity` (T-viz 1c): the task's identity in the framework's sense (task equality: the schema and its
+    goal bindings, without a determined or a duration binding), written as a hypothesis key is written, so that it
+    equals the key of the hypothesis that names the task (`Hypothesis.key`). Two tasks are the same task exactly when
+    their identities are equal."""
     task: str
     bindings: tuple[Binding, ...]
     label: str
+    identity: str
 
 
 class ActionRef(Message):
@@ -661,6 +668,18 @@ class Carried(Message):
     movable_object: str
 
 
+class Separation(Message):
+    """The distance between a robot and a human over the tick, the values the run log's `[sep]` line prints:
+    `distance` at the end of the tick, `minimum` the continuous minimum over the tick (both agents moving in a straight
+    line from their previous positions); `below`: the minimum lies under the robot's min_separation (the analyses'
+    count of ticks below it). In the layout's unit."""
+    robot: str
+    human: str
+    distance: float
+    minimum: float
+    below: bool
+
+
 class ObjectState(Message):
     """A declared state that holds; `object` None for a fact about no object."""
     state: str
@@ -806,7 +825,8 @@ class HumanActivity(Message):
 
 
 class WorldTick(Message):
-    """The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`."""
+    """The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.
+    `separations` (T-viz 1c): per robot and human, after a step; empty at the start."""
     humans: tuple[AgentTick, ...]
     robots: tuple[AgentTick, ...]
     fixed_object_contents: tuple[FixedObjectContents, ...]
@@ -814,6 +834,7 @@ class WorldTick(Message):
     object_states: tuple[ObjectState, ...]
     timeline_facts: tuple[str, ...]
     activity: tuple[HumanActivity, ...]
+    separations: tuple[Separation, ...] = ()
 
 
 class EndReason(str, Enum):

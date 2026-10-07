@@ -18,6 +18,8 @@ WHAT THIS MODULE DOES:
     - MesaSimRun: one sim-run; per step its tick update; its end and its discard
     - A sim-run's log pair takes only the lines of the thread the server calls it on, and does not echo to the
       terminal (webui/simulator.py, ONE THREAD; mesa_sim/sim_run.py, RunLog)
+    - Reads, per step, the robot-human distance the sim-run's [sep] lines printed (T-viz 1c), and gives every task its
+      identity (task equality), by which the page colours it
     - Reads, per tick, the first tick at which every agent had finished (the tick update's `run`, T-viz 1a): every
       human's script ended (every entry closed, the stack empty) and every robot's task pool empty
     - Keeps per sim-run what the model does not hold and a page reload must not lose: the order in which movable
@@ -62,8 +64,8 @@ from mesa_sim.sim_run import RunLog, SimRun
 from shared.meta_planner import GateOutcome
 from shared.types import (AdequacyFinding, AfterAction, DuringAction, Drop, Event, EvidenceRank, GroundedAction,
                           HypothesisAdequacy, Now, ObservationWarrant, RecognitionChange, RecognizerLifecycle,
-                          ScriptDependence, Start, StrengthLevel, TaskInstance, TimelineSource, Trigger, same_task,
-                          task_instance_key)
+                          ScriptDependence, Start, StrengthLevel, TaskInstance, TimelineSource, Trigger, goal_bindings,
+                          same_task, task_instance_key)
 from world import record as rec
 from world.queries import truth_at
 from world.tag import Stretches, recent_tasks, tag_at
@@ -338,10 +340,13 @@ class MesaSimulator:
 # =============================================================================
 
 def _task_ref(task: TaskInstance) -> msg.TaskRef:
+    """A task; its identity (T-viz 1c) the key of the task its goal bindings name (task equality, same_task), the
+    form of a hypothesis key."""
     return msg.TaskRef(task=task.schema.name,
                        bindings=tuple(msg.Binding(parameter=var.name, value=const.value)
                                       for var, const in task.bindings.items()),
-                       label=task_instance_key(task))
+                       label=task_instance_key(task),
+                       identity=task_instance_key(TaskInstance(schema=task.schema, bindings=goal_bindings(task))))
 
 
 def _action_ref(action: GroundedAction) -> msg.ActionRef:
@@ -667,7 +672,16 @@ class MesaSimRun:
             object_states=_object_states(model.state_facts),
             timeline_facts=tuple(sorted(p.name for p in model.timeline.facts_at(0 if tick is None else tick))),
             activity=tuple(self._activity(hid, human, tick) for hid, human in model.humans.items()),
+            separations=() if tick is None else self._separations(),
         )
+
+    def _separations(self) -> Tuple[msg.Separation, ...]:
+        """The robot-human distance of the step just executed (T-viz 1c): the values its [sep] lines printed, kept by
+        the sim-run; below the robot's min_separation (its meta-planner's) as the analyses count it, by the minimum."""
+        robots = self._model.robots
+        return tuple(msg.Separation(robot=rid, human=hid, distance=dist, minimum=minimum,
+                                    below=minimum < float(robots[rid].meta_planner.min_separation))
+                     for (rid, hid), (dist, minimum) in self._run.separation.items())
 
     def _activity(self, hid: str, human, tick: Optional[int]) -> msg.HumanActivity:
         machine, record, side = human.machine, human.record, self._sides[hid]

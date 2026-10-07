@@ -639,13 +639,17 @@ export interface RobotDescription {
 }
 /**
  * A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the
- * logs show.
+ * logs show. `identity` (T-viz 1c): the task's identity in the framework's sense (task equality: the schema and its
+ * goal bindings, without a determined or a duration binding), written as a hypothesis key is written, so that it
+ * equals the key of the hypothesis that names the task (`Hypothesis.key`). Two tasks are the same task exactly when
+ * their identities are equal.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "TaskRef".
  */
 export interface TaskRef {
   bindings: Binding[];
+  identity: string;
   label: string;
   task: string;
 }
@@ -1020,6 +1024,7 @@ export interface RunTick {
 }
 /**
  * The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.
+ * `separations` (T-viz 1c): per robot and human, after a step; empty at the start.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "WorldTick".
@@ -1031,6 +1036,7 @@ export interface WorldTick {
   humans: AgentTick[];
   object_states: ObjectState[];
   robots: AgentTick[];
+  separations: Separation[];
   timeline_facts: string[];
 }
 /**
@@ -1172,6 +1178,22 @@ export interface FixedObjectContents {
 export interface ObjectState {
   object: string | null;
   state: string;
+}
+/**
+ * The distance between a robot and a human over the tick, the values the run log's `[sep]` line prints:
+ * `distance` at the end of the tick, `minimum` the continuous minimum over the tick (both agents moving in a straight
+ * line from their previous positions); `below`: the minimum lies under the robot's min_separation (the analyses'
+ * count of ticks below it). In the layout's unit.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Separation".
+ */
+export interface Separation {
+  below: boolean;
+  distance: number;
+  human: string;
+  minimum: number;
+  robot: string;
 }
 /**
  * The view of a layout (the space, the areas, the fixed objects) and, with a setup chosen, of the setup at its

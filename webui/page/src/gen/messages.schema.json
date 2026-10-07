@@ -2290,6 +2290,36 @@
       "title": "ScriptEntry",
       "type": "object"
     },
+    "Separation": {
+      "additionalProperties": false,
+      "description": "The distance between a robot and a human over the tick, the values the run log's `[sep]` line prints:\n`distance` at the end of the tick, `minimum` the continuous minimum over the tick (both agents moving in a straight\nline from their previous positions); `below`: the minimum lies under the robot's min_separation (the analyses'\ncount of ticks below it). In the layout's unit.",
+      "properties": {
+        "below": {
+          "type": "boolean"
+        },
+        "distance": {
+          "type": "number"
+        },
+        "human": {
+          "type": "string"
+        },
+        "minimum": {
+          "type": "number"
+        },
+        "robot": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "below",
+        "distance",
+        "human",
+        "minimum",
+        "robot"
+      ],
+      "title": "Separation",
+      "type": "object"
+    },
     "SetupEntry": {
       "additionalProperties": false,
       "description": "A setup: its id and its notes, the free text of the setup file (None when it has none).",
@@ -2748,13 +2778,16 @@
     },
     "TaskRef": {
       "additionalProperties": false,
-      "description": "A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the\nlogs show.",
+      "description": "A task instance: its schema's name and its bindings; `label` is the framework's derived label, the text the\nlogs show. `identity` (T-viz 1c): the task's identity in the framework's sense (task equality: the schema and its\ngoal bindings, without a determined or a duration binding), written as a hypothesis key is written, so that it\nequals the key of the hypothesis that names the task (`Hypothesis.key`). Two tasks are the same task exactly when\ntheir identities are equal.",
       "properties": {
         "bindings": {
           "items": {
             "$ref": "#/$defs/Binding"
           },
           "type": "array"
+        },
+        "identity": {
+          "type": "string"
         },
         "label": {
           "type": "string"
@@ -2765,6 +2798,7 @@
       },
       "required": [
         "bindings",
+        "identity",
         "label",
         "task"
       ],
@@ -3074,7 +3108,7 @@
     },
     "WorldTick": {
       "additionalProperties": false,
-      "description": "The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.",
+      "description": "The world at the tick. Every movable object is in exactly one of `fixed_object_contents` and `carried`.\n`separations` (T-viz 1c): per robot and human, after a step; empty at the start.",
       "properties": {
         "activity": {
           "items": {
@@ -3112,6 +3146,12 @@
           },
           "type": "array"
         },
+        "separations": {
+          "items": {
+            "$ref": "#/$defs/Separation"
+          },
+          "type": "array"
+        },
         "timeline_facts": {
           "items": {
             "type": "string"
@@ -3126,6 +3166,7 @@
         "humans",
         "object_states",
         "robots",
+        "separations",
         "timeline_facts"
       ],
       "title": "WorldTick",

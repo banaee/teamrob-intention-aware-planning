@@ -21,7 +21,8 @@ WHAT THIS MODULE DOES:
       echo to the terminal: the web-ui's server makes every call into a sim-run on one thread,
       and the lines of the server and of its libraries, logged on other threads, stay out
     - SimRun: the start line and the override lines, the model, per step the agents' lines
-      and [sep], and the run's end (end_run, the end line)
+      and [sep], and the run's end (end_run, the end line); the values the last [sep] lines
+      printed kept for readers (`separation`, T-viz 1c: the web-ui's distance lane)
     - start_sim_run: the start whose failure still writes its log pair (an empty pair on a
       flag error, the lines before the error on a failed build), so the newest pair in logs/
       is always the last start's
@@ -243,6 +244,10 @@ class SimRun:
             (rid, hid): (tuple(map(float, robot.pos)), tuple(map(float, human.pos)))
             for rid, robot in self.model.robots.items() for hid, human in self.model.humans.items()
         }
+        # The values the last step's [sep] lines printed, per (robot, human): the sampled
+        # distance and the continuous minimum (T-viz 1c). Kept for readers; nothing in the run
+        # reads them. Empty before the first step.
+        self.separation: Dict[Tuple[str, str], Tuple[float, float]] = {}
 
     def step(self) -> None:
         self.log.attach()
@@ -277,8 +282,10 @@ class SimRun:
                 r1 = tuple(map(float, robot.pos)); h1 = tuple(map(float, human.pos))
                 r0, h0 = self._prev_pos[(rid, hid)]
                 sep = float(np.hypot(r1[0] - h1[0], r1[1] - h1[1]))
+                minimum = _min_separation_over_tick(r0, r1, h0, h1)
                 logging.info(f"[sep] step={step} {rid}-{hid} dist={sep:.2f} "
-                             f"min={_min_separation_over_tick(r0, r1, h0, h1):.2f}")
+                             f"min={minimum:.2f}")
+                self.separation[(rid, hid)] = (sep, minimum)
                 self._prev_pos[(rid, hid)] = (r1, h1)
 
     def end(self) -> None:
