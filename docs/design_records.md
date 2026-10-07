@@ -5616,3 +5616,32 @@ Screenshot: `docs/handoffs/tviz_1c/page_2560x1440_kitting_s05_02_tick120.png` (u
 DECIDED BY CCODE: the header column 172 px; the number 15 px; the panel fitted to its lanes by default, at most 55% of
 the window; the borders' bounds (side panels 240 to 640 px; the plots at least 120 px); the finding's word beside the
 title rather than a number; the card titles of panel 4a ("Now" new, the others the former headings).
+
+1d AND 1e, THE PATHS ON THE FLOOR (Hadi, 7 October 2026, preferred; recorded by ccode the same day, with the task of
+stages 1d and 1e, before any code of them). It replaces the form of 1b, THE RIGHT PANEL'S CONTENT AND STAGES 1d AND 1e,
+item 2 (wide, semi-transparent stripes for both), which was a first try with the form open.
+1. Stages 1d and 1e are built together, because they share one drawing layer and one addition to the messages.
+2. The scheme. Colour says whose movement it is; form says what kind of knowledge it is.
+   - The robot's own plan: blue, a thin dashed line in a strong colour.
+   - The human's real path, which the robot does not know: orange, a thin dashed line in a strong colour.
+   - The robot's expectation of the human: orange, a wide, light, transparent stripe, drawn below the lines.
+   Reason: the thin orange line lies on the wide orange stripe. Where the robot's recognition is right, the line runs
+   inside the stripe; where it is wrong, the two point to different places. A viewer sees it without reading a panel.
+3. The two kinds of expectation look different: the plan of an admitted task is a filled light stripe; the fallback
+   projection is an outline or a hatched stripe. Reason: the viewer sees when the robot knows the task and when it only
+   extrapolates.
+4. Only what lies ahead is drawn. A line starts at the agent and ends with a small mark at its target; the part already
+   walked disappears.
+5. Three small switches in the scene's header, one for each of the three drawings of item 2. Reason: a demonstration
+   can show the scene clean first, then the real paths, then the robot's expectation; and the scene does not get
+   crowded.
+The task's requirements, recorded with it: the model holds each plan as actions and no list of points; the simulator's
+side derives the straight segments from the walk actions of the current task and sends them, the page computes no path;
+the human's real path is a world fact and goes into `world`, the robot's own plan and its expectation of the human into
+the robot's section; the expectation is the projection the robot's last decision rests on, the one panel 4b's
+projection block shows, a stand in it drawn as a mark at its place; the simulator's piece only reads; the view of an
+earlier tick shows the drawings of that tick; each run condition shown truthfully (human-unaware: no expectation;
+intention-unaware: only the fallback kind); the look flat on the floor, under the objects and the agents, in the page's
+theme, judged at 2560 x 1440. The mode (as for 1b and 1c): a short plan (`docs/handoffs/plan_T-viz_1d_1e.md`), then the
+build without a pause; design details ccode's, recorded as "decided by ccode"; a conceptual reading of the core
+algorithm built as judged closest to the records and marked "provisional, raised to Hadi".

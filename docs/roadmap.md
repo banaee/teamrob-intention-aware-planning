@@ -889,6 +889,11 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     BUILT (ccode, 7 October 2026; design_records.md, "T-viz, the web-ui", 1c, THE BOTTOM PANEL, BUILT): panel 4c drawn by
     the page's own canvas, the past view, one colour per task; two readings provisional and raised to Hadi; Hadi's
     review open. Next within T-viz: 1d.
+    ASKED FOR (Hadi, 7 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1d AND 1e, THE PATHS ON THE
+    FLOOR): stages 1d and 1e built together, one drawing layer: the robot's own plan a thin dashed blue line, the human's
+    real path a thin dashed orange line, the robot's expectation of the human a wide light orange stripe below them
+    (filled for an admitted task's plan, hatched or outlined for the fallback projection); only what lies ahead; three
+    switches in the scene's header; planned briefly and built without a pause (`docs/handoffs/plan_T-viz_1d_1e.md`).
   - Stage 2, editing and comparison [FW] (open questions recorded, decided when reached, TODO-186, TODO-187): 2.1
     editing layouts, 2.2 editing setups, 2.3 editing scenarios (the human's script, the timeline of context facts),
     each saved as a new artefact; 2.4 sim-runs side by side.

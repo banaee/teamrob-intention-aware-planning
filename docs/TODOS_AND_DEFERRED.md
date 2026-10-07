@@ -5076,3 +5076,7 @@ and of the robot as wide, semi-transparent stripes on the floor (the walk segmen
 robot's projection of the human (the admitted task's plan or the fallback projection) in the same way. The simulator's
 side derives the segments, the page computes none; the human's real movement is a world fact, the robot's plan and its
 projection belong to the robot's section of the messages (proposed by cchat). Stage 1b draws no path.
+THE FORM (Hadi, 7 October 2026, preferred; design_records.md, "T-viz, the web-ui", 1d AND 1e, THE PATHS ON THE
+FLOOR): 1d and 1e built together; the robot's plan and the human's real path thin dashed lines in the agent's colour,
+the robot's expectation of the human a wide light stripe below them, filled (admitted) or hatched (fallback); only what
+lies ahead; three switches in the scene's header.
