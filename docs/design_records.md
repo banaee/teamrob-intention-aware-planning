@@ -5553,3 +5553,33 @@ day, before any code of it).
   No simulator code changed.
 DECIDED BY CCODE: the soft palette (eight dusty tones, theme.taskSoft); the gradient only under the leader at the shown
 tick (two fills mixed muddily); the large numbers' tick is the shown one (the viewed tick in the past view).
+
+1c, HADI'S CHOICE: VERSION A, WITH CHANGES AND ADDITIONS (Hadi, 7 October 2026, preferred; recorded by ccode the same
+day, before any code of it; it replaces a choice of version B given earlier the same day, which Hadi withdrew before
+anything of it was recorded or built).
+Hadi chooses version A of the bottom panel (ccode's own drawing, restyled). Version B, the A | B switch and the chart
+library that only version B used are removed. Changes to version A:
+1. No glow and no shadow on the chart lines.
+2. The numbers sit on the left side of each plot in a container, as version B had them, and are smaller than now.
+3. One tint for all plots: the very light blue of the belief plot; no separate colour per plot.
+4. Tasks stay colour coded, in the soft colours.
+5. No grid lines in the plots.
+6. A legend in the belief plot: which colour is which hypothesis.
+Additions:
+7. A plot of the tail probability S per hypothesis, with the line for the test level α; the hypotheses in the colours of
+   the belief plot.
+8. A plot of the finding per tick (unresolved, adequate, unexplained, and the exhausted state as the analyses' figures
+   show it). 7 and 8 stand directly under the belief plot, so that the recognizer's outputs stand together: belief, S,
+   finding; then context, the robot's task, distance; the human's task stays first. Reason: Hadi reads these two rows in
+   the analyses' figures and wants them in the page. The warrant rows and the gate's answer per tick stay out for now
+   (this amends 1c, THE BOTTOM PANEL, item 2, for S and the finding).
+9. Resizable borders: the screen-user drags the borders between the panels to change their sizes, at least the border
+   between the upper row (the side panels and the scene) and the bottom panel. Purpose: with seven plots the bottom panel
+   needs more height, and scrolling alone would move the scene out of view while one looks at the lower plots. The page
+   may also scroll when the content still does not fit. The form is ccode's.
+10. The left panel (the human) gets the right panel's style: grouped cards with a title each, not one long list; its
+    content does not change.
+11. The soft task colours replace the strong ones in both side panels too, so that a task has one colour across the page
+    (this completes 1c, THE BOTTOM PANEL, item 4).
+Kept: short labels, no full sentences; the click on an earlier tick; the page's theme; no change to the scene, to the
+selection or to the content of the side panels.
