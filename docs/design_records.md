@@ -5500,3 +5500,24 @@ PROVISIONAL, RAISED TO HADI (conceptual readings the records do not settle; each
 FOUND (for the polishing round): with the note "all agents have finished" the control bar's tick text is cut at four
 digits at 1440 wide (kitting scenario_s05_02 past tick 2000); a task's text in a light band (pink, aqua) is white on a
 light hue.
+
+1c, HADI'S REVIEW AND TWO VERSIONS OF THE BOTTOM PANEL (Hadi, 7 October 2026, preferred; recorded by ccode the same
+day, before any code of it).
+1. Point 1 of 1c's provisional readings (lane 5 shows the smallest distance within the tick) stays as built, with no
+   extra label. No longer provisional.
+2. Point 2 (the human-unaware sim-run): the dotted minimum separation line stays; the label "not kept" is removed. No
+   longer provisional.
+3. A principle from Hadi: the web-ui is for users, not a tool for the developer to debug the algorithms. Few labels and
+   explanations; more would crowd it.
+4. Hadi finds the bottom panel as built not modern; he asked twice why no JavaScript chart library is used. He likes the
+   light colouring and the soft boxes of the right panel as it is now (the tinted blocks for intention recognition and
+   planning). The ten strong task colours and the flat default look of the panel are what he objects to.
+5. Hadi chooses between two versions of the bottom panel from screenshots: version A, ccode's own drawing restyled;
+   version B, drawn with a JavaScript chart library of ccode's choice. Both show the same five lanes for the same
+   sim-run, with the click on an earlier tick working; modern, minimal, abstract and still elegant; few colours; few
+   labels; in the page's theme, so that the panel belongs to the scene and to the right panel's tinted boxes (Hadi's
+   taste: the handoff, section 10). Screenshots at 1920 x 1080, the size of Hadi's projector; the page's size and
+   layout unchanged; the screenshot folder untracked.
+6. Not in this step: the left panel, the right panel, the scene, the selection, the page's size, the messages, the
+   lanes' content. A change of the tasks' colours applies to the bottom panel only for now; the side panels follow after
+   Hadi's choice.
