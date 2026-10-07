@@ -17,6 +17,10 @@ plan and the build without a pause). The plan: `docs/handoffs/plan_T-viz_1d_1e.m
 - Checks: the suite 455 passed; vitest 56; build and type check; Chrome at 2560 x 1440: 5.08 ticks per second, no long
   task, while walking and with 2000 ticks held; the past view; screenshots in docs/handoffs/tviz_1d/ (untracked).
 
+- Hadi's follow-up (f44e69d, recorded; 3438ecd, built): the prediction in blue, four switches, the names "Prediction
+  from intention" and "Prediction from motion" in the scene and panel 4b; screenshots in docs/handoffs/tviz_1d/
+  (`*_blue.png`).
+
 ## In progress
 
 - None. Hadi's review of the build.

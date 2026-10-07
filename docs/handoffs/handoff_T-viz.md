@@ -114,6 +114,10 @@ gained `WorldTick.walks_ahead` and `RobotTick.walks_ahead`, `projection_ahead`, 
 actions. The record of the build, ccode's decisions and two readings provisional and raised to Hadi: design_records.md,
 1d AND 1e, THE PATHS ON THE FLOOR, BUILT; the plan `docs/handoffs/plan_T-viz_1d_1e.md`; the state file
 `docs/handoffs/build_T-viz_1d_1e_state.md`. Stage 1 is built. Next: Hadi's review; the polishing round (open).
+CHANGED (Hadi, 7 October 2026, preferred; design_records.md, 1d AND 1e, HADI'S FOLLOW-UP; built 3438ecd): the robot's
+prediction of the human is blue (blue everything of the robot, orange the human's reality); four switches: Robot's plan,
+Human's real path, Prediction from intention (the admitted projection), Prediction from motion (the fallback
+projection); panel 4b names the two kinds the same way.
 
 ### What stage 1b starts from
 

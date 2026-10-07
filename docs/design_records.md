@@ -5716,3 +5716,11 @@ before any code of it). It amends 1d AND 1e, THE PATHS ON THE FLOOR, items 2 and
    wherever the page names these two kinds, the right panel included, so that the scene and the panel say the same.
    THE MAPPING (the glossary's terms unchanged; the page's names are labels for viewers): "Prediction from intention" is
    the admitted projection (the plan of the admitted hypothesis), "Prediction from motion" is the fallback projection.
+BUILT (ccode, 7 October 2026; 3438ecd; Hadi's review open). The stripe in the robot's colour, filled (from intention)
+and hatched (from motion), its values unchanged; four switches with swatches of their drawings; the names in one place
+(`webui/page/src/frame/robot.ts`, `PREDICTION`), read by the switches and by panel 4b's projection block, which now reads
+"kind" with the prediction's name, then "task" and "plan" (from intention) or "motion" (from motion). A switch
+remembered in the browser before this build ("expectation") is not read again: both predictions are shown until
+switched off. Checks: vitest 56; the build and type check; the scan for domain words; one look in Chrome at 2560 x
+1440 (kitting scenario_s05_02 tick 8, dock_loading scenario_s07_07 tick 100; no console error). No simulator code
+changed.
