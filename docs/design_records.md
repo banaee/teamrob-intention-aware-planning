@@ -5521,3 +5521,35 @@ day, before any code of it).
 6. Not in this step: the left panel, the right panel, the scene, the selection, the page's size, the messages, the
    lanes' content. A change of the tasks' colours applies to the bottom panel only for now; the side panels follow after
    Hadi's choice.
+
+1c, THE TWO VERSIONS OF THE BOTTOM PANEL, BUILT (ccode, 7 October 2026; 19d62e1; for Hadi's choice, open).
+- Version A: the page's own drawing on a canvas (`src/plots/drawA.ts`), restyled: each lane a tinted box as the right
+  panel's blocks (the human's warm tint, the recognition tint, the planning tone, neutral), small-capital titles, a faint
+  dashed grid, the tasks as soft tints of dusty colours, lines only for hypotheses that have led, a gradient under the
+  leading belief and under the distance, a dot at the shown tick and a large number at the box's right.
+- Version B: the look of the ReUI chart components (reui.io, MIT) in a light scheme, on their chart base, Recharts 3.10.1
+  (MIT), with ReUI's styling written in the page's CSS (`src/plots/PlotsB.tsx`): each lane a white card with a fine ring
+  and a faint shadow, a header column in the matching tint with the title, a large number (the leading belief, the
+  present distance), a badge and a muted line; areas with a gradient fading under the line; a faint dashed horizontal
+  grid; no axes; the task lanes as rounded shapes in soft tints on the same axis; a hold as ReUI's stripe texture.
+- Shared (`src/plots/look.ts`): one geometry per version's proportions, one click mapping (`tickOf`, tested for both), the
+  tooltip (a header line, rows with a colour square, a muted label and a value), the soft task colours
+  (`theme.taskSoft`, the bottom panel only until Hadi chooses). The label "not kept" is gone (HADI'S REVIEW, item 2).
+- The switch: a small A/B control at the panel's foot, remembered in the browser. Screenshots at 1920 x 1080, kitting
+  scenario_s05_02 at tick 120 (a hold, ticks below min_separation): `docs/handoffs/tviz_1c/`, untracked (.gitignore).
+- The libraries considered for B (Hadi's three, 7 October 2026): FusionCharts is commercial and watermarks its free
+  version, and its plain style reads as a paper figure (Hadi): out. ReUI's components are MIT but are Tailwind and shadcn
+  code, which the page does not use: their look is rebuilt on their base instead. Recharts in its usual look: not
+  delivered (Hadi). Apache ECharts and visx were started and removed on Hadi's word; Motion, ReUI's animation library,
+  was tried and removed: in a 2000-tick sim-run it lengthened every step (the longest task 192 ms against 77 ms), and
+  CSS transitions give the shapes' growth.
+- Found and avoided: Recharts' own animation and an SVG glow filter on its areas each drew a stale copy of a curve across
+  a gap of the line in Chrome; the line grows by a short reveal of the chart's right edge, and no line glows (Hadi: no
+  glow on lines).
+- Checks: vitest 46 (the click mapping for both versions); the lanes against the run log (tests/test_tviz_plots.py,
+  unchanged lanes); the suite 450 passed; the page's build and type check; the click on an earlier tick in both versions
+  in Chrome (no request sent); 2000 ticks held, play at 5 ticks per second: A 5.1 ticks per second, no long task; B 5.2
+  ticks per second, four tasks over 50 ms (the longest 80 ms; B draws its lines through at most one point per 6 px).
+  No simulator code changed.
+DECIDED BY CCODE: the soft palette (eight dusty tones, theme.taskSoft); the gradient only under the leader at the shown
+tick (two fills mixed muddily); the large numbers' tick is the shown one (the viewed tick in the past view).

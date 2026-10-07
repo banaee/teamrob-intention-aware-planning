@@ -16,13 +16,16 @@ web-ui", 1c blocks.
   `webui/page/test/lanes.test.ts`. The suite 450 passed; vitest 44; the build and type check; Chrome at 1440 wide;
   2000 ticks at the default speed; the solara-ui's light check.
 
+- Hadi's review of 1c recorded (0942d69); the two versions of panel 4c built (19d62e1): A the page's own canvas, B the
+  ReUI look on Recharts; the A/B switch at the panel's foot; screenshots in docs/handoffs/tviz_1c/ (untracked).
+
 ## In progress
 
-- None.
+- None. Hadi chooses between versions A and B; then the soft task colours reach the side panels (a later step).
 
 ## Next
 
-- Hadi's review of 1c; then 1d and 1e; the polishing round after 1c or after 1e (open).
+- Hadi's choice between A and B; the side panels' task colours after it; then 1d and 1e; the polishing round (open).
 
 ## Decisions taken on the way
 
@@ -30,3 +33,5 @@ web-ui", 1c blocks.
 - `pytest -p no:logging` removes `caplog` and makes tests/kitting/test_g_build.py error: run the suite without it.
 - A browser look that runs a web-ui sim-run writes into logs/: never at the same time as a sweep that picks "the new
   log pair".
+- ECharts and visx were started and removed on Hadi's word; Motion was tried and removed (slower steps at 2000 ticks).
+- In Chrome, an SVG filter on a Recharts area, and Recharts' own animation across a gap, each leave a stale curve.

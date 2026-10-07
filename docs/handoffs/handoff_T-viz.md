@@ -97,8 +97,9 @@ colours, line weights and type; one colour per task across the page; a click on 
 whole page, for display only (TODO-189's item). The messages gained `WorldTick.separations` and `TaskRef.identity`.
 Design_records.md, "T-viz, the web-ui", 1c blocks (Hadi's preferences; BUILT, with ccode's design decisions and two
 readings provisional and raised to Hadi); the plan `docs/handoffs/plan_T-viz_1c.md`; the state file
-`docs/handoffs/build_T-viz_1c_state.md`. Hadi's review open. Next: 1d and 1e (paths on the floor); the polishing round
-after 1c or after 1e (open).
+`docs/handoffs/build_T-viz_1c_state.md`. Hadi reviewed it (7 October 2026): the panel in two versions for his choice, A the
+page's own drawing restyled, B the ReUI look on Recharts, built the same day (design_records.md, 1c, THE TWO VERSIONS OF
+THE BOTTOM PANEL, BUILT). Next: Hadi's choice; then 1d and 1e (paths on the floor); the polishing round (open).
 
 ### What stage 1b starts from
 
