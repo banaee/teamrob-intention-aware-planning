@@ -15,9 +15,13 @@ short plan and the build without a pause). The plan: `docs/handoffs/plan_T-viz_1
 - The messages, the piece, the page, the tests: see design_records.md, 1b, THE RIGHT PANEL, BUILT. Checks: the suite,
   vitest 38, the build and type check, one look in Chrome at 1440 wide, the solara-ui's light check.
 
+- Hadi's review (7 October 2026) recorded and built: design_records.md, 1b, HADI'S REVIEW (the exception "gate" named
+  alone; the admission's two parts "held" and "gate now", "held" tested against the decision record at every tick;
+  the panel in three parts with short labels; the belief chart with fixed rows). No simulator code changed.
+
 ## In progress
 
-- None. Hadi's review of 1b is open.
+- None.
 
 ## Next
 

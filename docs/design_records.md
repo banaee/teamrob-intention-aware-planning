@@ -5336,6 +5336,8 @@ DECIDED BY CCODE (web design and naming):
   name or in prose, still refusing it as a string literal on its own, the form a dependence on the object type takes.
 - The tick update grows from about 1.3 KB to about 3.5 KB (kitting scenario_s01_06): noted, with open item 10.
 PROVISIONAL, RAISED TO HADI (conceptual readings the records do not settle; each built as judged closest to them):
+ANSWERED (Hadi, 7 October 2026, preferred; 1b, HADI'S REVIEW, below): 1, 3, 4 and 5 kept, no longer provisional; 2
+changed.
 1. The belief block shows the belief over the live hypotheses (`BeliefState.belief`, the value the gate compares with
    θ, AM42), not the reported distribution with the floor and the pins (`distribution`, the `[IR-dist]` line).
    Example: kitting scenario_s05_02, tick 71: deliver_item(item_5) 0.999 shown, 0.995 in `[IR-dist]`.
@@ -5349,6 +5351,58 @@ PROVISIONAL, RAISED TO HADI (conceptual readings the records do not settle; each
 4. The body's action is the action at the plan's cursor; on an acknowledgement tick the executor's `current_action`
    (the step line's) still names the action just completed. Example: kitting scenario_s05_02, tick 38: the step line
    says move_to, the panel pick_up, not begun.
+   THE CONVENTION (Hadi, 7 October 2026, preferred): the body shows the action at the plan's cursor; on the tick
+   between two actions it may name the next action one tick before the step line does.
 5. The fallback's form (standing, moving) is read from the projection's segment (it moves or not), not from the
    perceived displacement; a moving human whose ray is blocked at once would read "stays where it was seen". No instance
    in kitting scenario_s05_02, s01_06, s04_01 or dock_loading scenario_s07_07, s03_02.
+
+1b, HADI'S REVIEW (Hadi, 7 October 2026, preferred; recorded by ccode the same day, then built).
+1. The check for domain words names one exception and only that one: "gate", the framework's own term for the
+   admission gate, which collides with dock_loading's object type `gate`; a string literal that is the word alone is
+   still refused. Not a general loosening (tests/test_tviz_messages.py, `GATE`).
+2. The belief block keeps the belief over the live hypotheses, the value the gate compares with θ (point 1 kept).
+3. The admission block shows two named parts, the first first: (a) what the robot holds since its last decision, with
+   that decision's tick ("held"); (b) what the gate would answer if asked at this tick ("gate now"). Reason: the robot
+   asks the gate only when it decides and keeps what it admitted in between; a single "refused" beside a decision that
+   rests on an admitted task reads as a fault. These are the two readings of "admitted" the analyses already report
+   (point 2 changed).
+4. The projection after its end: kept (point 3). The robot's action on the tick between two actions: a difference of
+   one tick is acceptable, kept as built, the convention stated under point 4 above. The fallback's form read from the
+   projection: kept (point 5).
+5. Three requirements for the panel: (i) not crowded: no full sentences, short labels and values, read at a glance
+   during play; (ii) what intention recognition provides is clear and explicit: the panel shows visibly which part is
+   the recognizer's output and which is what the planner does with it (admission, projection, decision), the
+   recognizer's part naming its outputs one by one; reason: the framework's claim is the step from intention
+   recognition to adaptive planning, and an audience must see where one ends and the other begins; (iii) the live
+   hypotheses as a small, simple bar chart, one bar per live hypothesis with its value at the tick and the threshold
+   marked, each bar keeping its position from tick to tick; reason: it is the snapshot at one tick of what panel 4c
+   (stage 1c) shows over time.
+BUILT (ccode, 7 October 2026; commits below):
+- Panel 4b in three parts: Body; "Intention recognition, the recognizer's outputs" (leader, finding, lifecycle, an
+  episode boundary; the belief chart with, per hypothesis, hypothesis adequacy, observation warrant, evidence rank, S
+  and, with context knowledge on, the prior; the levels); "Planning, what the meta-planner does with them" (admission:
+  held, gate now; projection; decision). The recognizer's outputs are the fields of `BeliefState` (its docstring:
+  the belief, the adequacy finding and the lifecycle, then G1's adequacy, AD's warrant, AM76's rank, L's boundary,
+  T-K's prior and levels). The gate, the projection (it only looks the admitted hypothesis up in the recognizer,
+  `get_hypothesis`) and the decision are the meta-planner's.
+- Checks: tests/test_tviz_robot.py also tests "held" at every tick against the decision record the log's last
+  [meta-proj] states (the gate now was tested already); the suite 449 passed; vitest 39; the build and type check; one
+  look in Chrome at 1440 wide (kitting scenario_s05_02 tick 24, scenario_s10_14 tick 59, scenario_s05_02
+  intention-unaware, dock_loading scenario_s07_07 tick 92). No simulator code changed.
+DECIDED BY CCODE:
+- The two parts framed side by side in colour: the recognizer's in the robot's light tone, the planning's in the
+  robot's colour, each with its title and a short subtitle.
+- Labels: "held … · since N" or "nothing admitted · since N"; "gate now" with a short label and the log's code small;
+  the gate's answers "passes", "below θ", "leader not observed", "leader inadequate", "leader unwarranted", "leader
+  outranked", "intention off", "no human"; triggers and causes by their glossary words; a decision's task "starts",
+  "continues", "switches to", "all done"; "–" for nothing; a part that does not apply says "off"; the condition as a
+  chip beside the robot's id.
+- The chart: horizontal bars, one row per hypothesis that has been live at some tick so far, in the order first live
+  (those first live on one tick by key); a row whose hypothesis is not live at the tick stays, greyed, with no bar; the
+  label on its own line, under it the bar (θ a thin mark), the value to 2 decimals, then the columns adeq (✓ ✗ ·), warr
+  (✓ ·), rank (↓ when outranked), S and prior to 2 decimals; column names spelled out on hover; the leader in the
+  robot's colour.
+- The memory's recency facts are shown in the recognition part as "memory … (input)": the memory of observed
+  completions is a component of its own (AM30) that hands the recognizer its recency facts, an input, not an output.
+- The last decision and the three before it (five before the review).

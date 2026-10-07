@@ -81,3 +81,10 @@ first step: "no observation yet".
 Panel 4b takes the rail's place: 340 px, beside the env-pane, which keeps working at 1440 px (panel 4a 360 px). Its
 title is the robot's id in the robot's colour; the five blocks in order, each under its heading, in the glossary's
 words. The page computes nothing of the simulation: it orders rows, chooses phrases and reads the tick updates.
+
+## 6. Amended after Hadi's review (7 October 2026)
+
+Design_records.md, "T-viz, the web-ui", 1b, HADI'S REVIEW: the panel in three parts (body; intention recognition, the
+recognizer's outputs; planning: admission, projection, decision), short labels and no sentences; admission in two
+parts, "held" (what the robot holds since its last decision) and "gate now"; the belief as a bar chart whose rows keep
+their place. Sections 1 and 5 above read with it.

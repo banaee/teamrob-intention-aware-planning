@@ -84,8 +84,10 @@ solara run mesa_sim/run_mesa.py -- --domain kitting --scenario scenario_s01_01
 Panel 4b is built: the robot's five blocks (body, belief, admission, projection, decision), the messages' `robots`
 section, `RobotAgent.last_decision` for readers; design_records.md, "T-viz, the web-ui", 1b, THE RIGHT PANEL, BUILT,
 with ccode's design decisions and five readings marked provisional and raised to Hadi; the plan
-`docs/handoffs/plan_T-viz_1b.md`; the state file `docs/handoffs/build_T-viz_1b_state.md`. Hadi's review is open. Next:
-stage 1c (plots over ticks), then 1d and 1e (paths on the floor).
+`docs/handoffs/plan_T-viz_1b.md`; the state file `docs/handoffs/build_T-viz_1b_state.md`. Hadi reviewed it (7 October
+2026, preferred; design_records.md, 1b, HADI'S REVIEW): the panel in three parts (body; intention recognition, the
+recognizer's outputs; planning), short labels, admission as "held" and "gate now", the belief as a bar chart whose
+rows keep their place; built the same day. Next: stage 1c (plots over ticks), then 1d and 1e (paths on the floor).
 
 ### What stage 1b starts from
 
