@@ -1,0 +1,4 @@
+# The deck: dependencies, build output and screenshots stay out of git
+node_modules/
+dist/
+shots/
