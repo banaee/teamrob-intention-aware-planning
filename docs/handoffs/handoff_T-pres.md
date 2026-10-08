@@ -95,6 +95,9 @@ the framework; this file is authoritative only for what was discussed and prefer
 
 ## 5. The skeleton [preferred, 8 October 2026]
 
+> The current structure is section 14, addition l (8 October 2026): no levels, talk stages 0 to 11, fit at talk stage
+> 6. The skeleton below is the earlier one, kept as it was written.
+
 The robot's mind answers three questions, the columns of every stage: what I know (knowledge representation), what I
 believe (intention recognition), what I decide (adaptive planning). The stages grow in complexity, the rows.
 
@@ -484,6 +487,29 @@ The talk and the afternoon station should say the same; decide whether the web-u
   (`presentation/replays_review.csv`) is made as a copy under new ids in a range of its own, with its own run file
   outside the measured set; Anton is never scripted. design_records.md, "T-pres, the talk", NEW SCENARIOS FOR THE
   REPLAYS.
+
+- l. [preferred] (Hadi, 8 October 2026, the merge of talk stages 6 and 7) The structure of the talk as it is now; it
+  replaces section 5's skeleton, its levels and its numbering, and section 6.4's "Stage 7 adds no element and no arrow".
+  No levels; each talk stage 1 to 6 opens with a transition slide listing the six:
+  - 0 Opening.
+  - 1 The robot alone: it plans and executes its own tasks.
+  - 2 A human in the shared space: the robot knows nothing about her; it reacts to her motion.
+  - 3 Assigned tasks: the robot knows her task list and recognises which task she does.
+  - 4 Foreseeable behaviours: she does something expected that is not a task, such as a coffee break.
+  - 5 Context: the situation makes some behaviours more likely.
+  - 6 Unmodelled behaviour: she does something the robot has no model of. Fit is introduced here (the block in the
+    diagram, the confidence check's condition "it fits"). The old talk stage 6 (switch and resumption) is one step of it,
+    without a replay: she turns mid-way to something Anton knows and the belief moves there, or to something it has no
+    model of and no hypothesis fits. Then the unmodelled case: unexplained, the projection from her motion as the
+    fallback (the callback to talk stage 2), her task trusted again when she returns. "Deviation" only here, only for
+    the unmodelled case. Time and depth (section 4): talk stages 3 and 6.
+  - 7 Recap: the complete architecture. 8 The lift truck's turn. 9 Results. 10 Limits and outlook. 11 The afternoon:
+    the web-ui station.
+  The talk's title: "Intention-aware adaptive planning in human-robot teams". The names and lines are those of
+  `presentation/src/talk.ts`. design_records.md, "T-pres, the talk", THE MERGE OF TALK STAGES 6 AND 7.
+  The other preferences of 8 October 2026 that changed this file stand in j (plain terms, one per concept; the transition
+  slides; the simpler panels; pseudocode for the realizer and task choice; Anton's mind beside each replay) and k
+  (scenarios authored for the talk as copies under new ids in a range of their own, with their own run files).
 
 Where the rest of that prompt is recorded (the words "talk stage" and "part", the parts 1 to 6 that replace section
 12's plan, the working rule, the deck's design): `docs/design_records.md`, "T-pres, the talk".

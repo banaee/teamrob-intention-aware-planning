@@ -5767,6 +5767,8 @@ is the default for now, never final; an item can be settled, open with low prior
 TWO WORDS, kept apart everywhere in T-pres:
 - "talk stage": a row of the talk, the handoff's section 5, talk stages 0 to 12, with three level titles and one turning
   point. The handoff says "stage"; it means talk stage.
+  (Since 8 October 2026: no levels, talk stages 0 to 11; THE MERGE OF TALK STAGES 6 AND 7 below, the handoff's section
+  14, addition l.)
 - "part": a unit of work on the deck.
 
 THE PARTS (Hadi, 8 October 2026, preferred; they replace the plan in the handoff's section 12):
@@ -5969,3 +5971,40 @@ the slide then replays that recording, with stops and captions written from the 
 the run shows what he asked for. Anton is never scripted: a change can set where Anton starts and which tasks it has,
 and what Donny does; what Anton then does is the framework's own result. The flow starts only when Hadi hands the filled
 sheet back.
+
+THE MERGE OF TALK STAGES 6 AND 7 (Hadi, 8 October 2026, preferred; recorded by ccode the same day). The old talk stages
+6 (switch and resumption) and 7 (unmodelled behaviour) are one talk stage, the new talk stage 6, "Unmodelled behaviour:
+she does something the robot has no model of". Reason: both rest on one mechanism, fit: the trusted hypothesis stops
+fitting what she does and Anton stops trusting it. With the levels gone, two talk stages for one mechanism repeat each
+other, the old talk stage 6 has no replay that shows fit changing what Anton does, and the talk is too long.
+- Fit is introduced at talk stage 6: the block appears in the diagram there, and the confidence check gains its
+  condition "it fits" there.
+- The old talk stage 6's case is one step of talk stage 6, not a talk stage, and has no replay: she turns mid-way to
+  something Anton knows (a coffee break), the belief moves to that hypothesis and Anton trusts it; she turns to something
+  Anton has no model of, and no hypothesis fits.
+- Then the unmodelled case as before: her behaviour is unexplained, Anton knows that it does not know, the projection
+  from her motion returns as the fallback (the callback to talk stage 2), and when she returns to modelled behaviour
+  Anton trusts her task again; the resumption is shown in this run.
+- The caption "nothing new" goes, since fit is new at this talk stage; the callback stays. "Deviation" is used only for
+  the unmodelled case.
+- The replay stays scenario_s10_07, run_028, marked not settled; Hadi is choosing the scenarios for talk stages 1 to 6.
+  The old talk stage 6's replay (scenario_s23_23, run_584) leaves the deck.
+- The numbering: six talk stages on the transition slides (1 The robot alone, 2 A human in the shared space, 3 Assigned
+  tasks, 4 Foreseeable behaviours, 5 Context, 6 Unmodelled behaviour); the later talk stages move up by one: 7 the
+  recap, 8 the lift truck, 9 results, 10 limits and outlook, 11 the afternoon. In UNBOXING THE BLOCKS above, the
+  projection's fallback and fit's "no hypothesis fits" now come at talk stage 6.
+- `presentation/replays_review.csv` is not changed: Hadi reads its row for the old talk stage 7 as the new talk stage 6.
+BUILT (ccode, 8 October 2026; Hadi's review open; tagged tpres-v3).
+- `presentation/src/talk.ts`: talk stages 0 to 11, six on the transition slides, talk stage 6's line and columns.
+- `presentation/src/slides/later.tsx`: talk stage 6 is its transition, "She turns mid-way" (two clicks: the two cases,
+  with bars drawn in the look of Anton's mind beside the replays, without values, an illustration and not a run), the
+  replay, and the architecture (fit appears; fit, the confidence check and the projection opened; last the caption "The
+  reactive robot's projection from her motion is now Anton's fallback."). The recap and the placeholders renumbered 7
+  to 11. `src/slides/replays.tsx` and `scripts/record.mjs`: run_584 removed, run_028 recorded as `stage6_unmodelled`;
+  the caption at 120 says that her task is trusted again (the log: `[meta-proj] projection=built` at the decision of
+  tick 120). `src/architecture/unboxing.tsx`: the two items of talk stage 7 moved to 6. `src/slides/kit.tsx`: a
+  caption comes after the opened blocks (only this slide has one).
+- Clicks per talk stage (each slide's entering click and its steps): 0 18, 1 11, 2 15, 3 14, 4 9, 5 9, 6 15, 7 to 11
+  one each; 95 in all (96 steps).
+- Checks: the build (type check included); the click-through, 96 steps at 1920 x 1080 and 2560 x 1440, 0 outside
+  requests, 0 page errors, 0 notes on screen.
