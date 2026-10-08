@@ -21,7 +21,7 @@ export function Stage2Transition() {
         reacts to her motion.</p>
       <p><strong>OPTIONAL</strong> (2024 callback): Hadi's October 2024 deck and the HHAI/CHAI 2024 poster contrasted an
         "intrinsic reaction" (the robot halts to avoid a collision) with an "enhanced reaction" (it recognises the
-        intention and adapts its plan). Talk stage 2 is the intrinsic reaction; talk stages 3 to 7 the enhanced one.</p>
+        intention and adapts its plan). Talk stage 2 is the intrinsic reaction; talk stages 3 to 6 the enhanced one.</p>
     </>} />
   );
 }

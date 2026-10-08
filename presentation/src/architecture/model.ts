@@ -3,7 +3,8 @@
  * 2026): the elements (6.2) with their kinds (6.1), the talk stage at which each appears (6.5), the arrows with their
  * keywords and the talk stage at which each appears or gives way (6.4), and the arrangement (6.3). One diagram: its
  * state is a talk stage, and each state holds everything of the earlier states except the two direct arrows into
- * "execute" that give way at talk stages 2 and 3. Talk stage 7 adds nothing.
+ * "execute" that give way at talk stages 2 and 3. Fit appears at talk stage 6 (unmodelled behaviour, since the merge of
+ * 8 October 2026 the last talk stage that adds to the diagram).
  *
  * Positions are in the diagram's own unit, a canvas of DESIGN.w x DESIGN.h that the page scales to the slide. The
  * arrangement: knowledge in a left column (C1, C2, C3, the AAAI order); the mind beside it, recognition (C4) left and

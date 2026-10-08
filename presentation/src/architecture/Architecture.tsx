@@ -61,7 +61,7 @@ function Diagram({ stage, revealed, colouring = "new", questionTags = false, tag
     [stage, revealed, colouring, questionTags, tagsShown, focus]);
   const edges = useMemo(() => buildEdges(stage, revealed, colouring), [stage, revealed, colouring]);
   // Something is new only once the talk stage's additions are shown, and only if the talk stage adds or removes
-  // anything (talk stage 7 adds nothing); then the rest recedes.
+  // anything (the recap, talk stage 7, adds nothing); then the rest recedes.
   const changes = ELEMENTS.some((e) => e.stage === stage) || ARROWS.some((a) => a.stage === stage || a.leaves === stage)
     || ELEMENTS.some((e) => e.sub.some((s) => s.stage === stage));
   const hasNew = revealed && stage > 0 && changes && colouring === "new";

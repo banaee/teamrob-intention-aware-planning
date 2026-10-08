@@ -11,8 +11,7 @@ import s2 from "../../data/run_stage2_reactive.json";
 import s3 from "../../data/run_stage3_switch.json";
 import s4 from "../../data/run_stage4_break.json";
 import s5 from "../../data/run_stage5_breaktime.json";
-import s6 from "../../data/run_stage6_switch.json";
-import s7 from "../../data/run_stage7_stand.json";
+import s6 from "../../data/run_stage6_unmodelled.json";
 import { type RecordedRun, ReplayView, type Stop } from "../scene/RunReplay";
 
 const run = (r: unknown) => r as RecordedRun;   // the JSON's enumerations are read as strings
@@ -85,35 +84,17 @@ export function ReplayBreakTime() {
                      mind={{ belief: true, hold: true, projection: true, context: true }} />;
 }
 
-/** Talk stage 6: scenario_s23_23 on env_layout_07 (T-F part 1's run_584, break time in force from tick 48 to 84): her
- * delivery trusted at 36 with a hold; the coffee break cut into it at 48, which then leads, and Anton stops trusting the
- * delivery; the break trusted at 53, a hold; her break over at 82; she resumes at 84; the delivery trusted again at 94
- * and the hold ends. The trust ends at 48 because the break overtakes the delivery (the log's cause "replaced"), not
- * because the delivery stops fitting: flagged, marked not settled on the slide. */
-export function ReplaySwitch() {
-  const stops: Stop[] = [
-    { tick: 30, caption: "Anton carries item 1; she is on her way with her delivery of item 5." },
-    { tick: 36, caption: "Her delivery is trusted (0.75): Anton holds 7 ticks." },
-    { tick: 48, caption: "Break time. Mid-way she turns to the coffee machine; the coffee break now leads: Anton stops trusting her delivery." },
-    { tick: 53, caption: "The coffee break is trusted (0.81): Anton holds beside her, a hold of up to 33 ticks." },
-    { tick: 82, caption: "Her break is over: nothing is trusted. Anton plans again and holds." },
-    { tick: 84, caption: "She resumes her delivery." },
-    { tick: 94, caption: "Her delivery is trusted again (0.78): the hold ends after 12 ticks and Anton walks on." },
-  ];
-  return <ReplayView recorded={run(s6)} stops={stops}
-                     mind={{ belief: true, fit: true, hold: true, projection: true, context: true }} />;
-}
-
-/** Talk stage 7: scenario_s10_07 (run_028): a 60-tick stand cut into her delivery mid-walk (unmodelled), unexplained
- * from 62, the fallback, the resumption at 107, adequate again at 120. */
+/** Talk stage 6 (the merge of 8 October 2026; the old talk stage 7's replay): scenario_s10_07 (run_028): a 60-tick stand
+ * cut into her delivery mid-walk (unmodelled), unexplained from 62, the fallback, she walks on at 107, her delivery
+ * adequate and trusted again at 120 (the log: [meta-proj] projection=built at the decision of tick 120). */
 export function ReplayStand() {
   const stops: Stop[] = [
     { tick: 40, caption: "Anton trusts her task: deliver item 1." },
     { tick: 46, caption: "Mid-way she stops and stands: unmodelled behaviour." },
-    { tick: 62, caption: "After 16 ticks of standing no hypothesis fits: her behaviour is unexplained. Anton uses the projection from her motion." },
+    { tick: 62, caption: "After 16 ticks of standing no hypothesis fits: her behaviour is unexplained, and Anton stops trusting her task. It falls back on the projection from her motion, as the reactive robot did." },
     { tick: 107, caption: "She walks on with her delivery." },
-    { tick: 120, caption: "Deliver item 1 fits again: recognition resumes." },
+    { tick: 120, caption: "Deliver item 1 fits again: Anton trusts her task again." },
   ];
-  return <ReplayView recorded={run(s7)} stops={stops}
+  return <ReplayView recorded={run(s6)} stops={stops}
                      mind={{ belief: true, fit: true, hold: true, projection: true }} />;
 }

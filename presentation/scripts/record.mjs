@@ -21,8 +21,7 @@ const RUNS = [
   ["stage3_switch", `${TF1}/scenario_s12_01/run_060.yaml`, 0, 62],
   ["stage4_break", `${TF1}/scenario_s24_14/run_264.yaml`, 85, 150],
   ["stage5_breaktime", `${TF1}/scenario_s23_03/run_576.yaml`, 0, 62],
-  ["stage6_switch", `${TF1}/scenario_s23_23/run_584.yaml`, 30, 100],
-  ["stage7_stand", `${TF1}/scenario_s10_07/run_028.yaml`, 40, 125],
+  ["stage6_unmodelled", `${TF1}/scenario_s10_07/run_028.yaml`, 40, 125],
 ];
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -1,7 +1,8 @@
 /**
  * The talk's skeleton (docs/handoffs/handoff_T-pres.md, section 5; preferred, 8 October 2026; revised 8 October 2026,
- * the overall revision: the levels removed, each talk stage 1 to 7 opened by a transition slide, the names Hadi gave):
- * the talk stages 0 to 12 as rows, the robot's three questions as columns. A "talk stage" is a row of the talk; a
+ * the overall revision: the levels removed, each talk stage opened by a transition slide, the names Hadi gave; and the
+ * merge of the same day: the old talk stages 6, switch and resumption, and 7, unmodelled behaviour, are one talk stage
+ * 6, since both rest on fit): the talk stages 0 to 11 as rows, the robot's three questions as columns. A "talk stage" is a row of the talk; a
  * "part" is a unit of work on the deck (design_records.md, "T-pres, the talk"). The slides read their titles, keywords
  * and footers from here, so that a change of wording is made once.
  *
@@ -30,10 +31,10 @@ export const QUESTION_HEADER: Record<Question, string> = {
 /** The talk's title (Hadi, 8 October 2026, preferred, a first version). */
 export const TALK_TITLE = "Intention-aware adaptive planning in human-robot teams";
 
-export type TalkStage = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+export type TalkStage = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 
-/** The talk stages a transition slide lists: the seven that build the architecture. */
-export const BUILT_STAGES = [1, 2, 3, 4, 5, 6, 7] as const;
+/** The talk stages a transition slide lists: the six that build the architecture. */
+export const BUILT_STAGES = [1, 2, 3, 4, 5, 6] as const;
 
 export interface StageRow {
   stage: TalkStage;
@@ -91,26 +92,19 @@ export const STAGES: Record<TalkStage, StageRow> = {
     },
   },
   6: {
-    stage: 6, title: "Switch and resumption", line: "she leaves a task mid-way and returns to it",
-    columns: {
-      believe: ["Fit: the trusted intention no longer fits"],
-      decide: ["Anton stops trusting it and plans again", "When she resumes, her task is trusted again"],
-    },
-  },
-  7: {
-    stage: 7, title: "Unmodelled behaviour", line: "she does something the robot has no model of",
+    stage: 6, title: "Unmodelled behaviour", line: "she does something the robot has no model of",
     columns: {
       know: ["Where its model ends"],
-      believe: ["Fit: no hypothesis fits", "Anton knows that it does not know"],
-      decide: ["Projection from her motion, now as the fallback",
-        "Recognition resumes when she returns to a modelled behaviour"],
+      believe: ["Fit: does the trusted intention still fit what she does?", "No hypothesis fits: Anton knows that it does not know"],
+      decide: ["Anton stops trusting it", "Projection from her motion, now as the fallback",
+        "When she returns to a modelled behaviour, her task is trusted again"],
     },
   },
-  8: { stage: 8, title: "Recap: the complete architecture", line: "", columns: {} },
-  9: { stage: 9, title: "The lift truck's turn", line: "", columns: {} },
-  10: { stage: 10, title: "Results", line: "", columns: {} },
-  11: { stage: 11, title: "Limits and outlook", line: "", columns: {} },
-  12: { stage: 12, title: "The afternoon: the web-ui station", line: "", columns: {} },
+  7: { stage: 7, title: "Recap: the complete architecture", line: "", columns: {} },
+  8: { stage: 8, title: "The lift truck's turn", line: "", columns: {} },
+  9: { stage: 9, title: "Results", line: "", columns: {} },
+  10: { stage: 10, title: "Limits and outlook", line: "", columns: {} },
+  11: { stage: 11, title: "The afternoon: the web-ui station", line: "", columns: {} },
 };
 
 /** The footer of a slide: where in the talk it stands. */

@@ -1,6 +1,6 @@
 /**
  * The parts every slide is made of: the slide itself (its section, its 16:9 stage, its footer and its speaker notes),
- * a step, a TODO box, a mark for what is not settled, a talk stage's transition (the seven talk stages as a list, the
+ * a step, a TODO box, a mark for what is not settled, a talk stage's transition (the six talk stages as a list, the
  * starting one with its three columns), and the architecture at a talk stage. Text and keywords come from talk.ts.
  */
 
@@ -87,7 +87,7 @@ export function StageTitle({ stage }: { stage: TalkStage }) {
   );
 }
 
-/** The transition into a talk stage 1 to 7 (the overall revision, point B): the seven talk stages as numbered circles
+/** The transition into a talk stage 1 to 6 (the overall revision, point B): the six talk stages as numbered circles
  * joined by a line, the starting one larger and bold, the finished ones marked done (a check and a quiet colour), the
  * coming ones plain; beside them the starting talk stage's three columns (what I know, believe, decide). */
 export function Transition({ stage }: { stage: TalkStage }) {
@@ -124,7 +124,7 @@ export function Transition({ stage }: { stage: TalkStage }) {
   );
 }
 
-/** The slide that opens a talk stage 1 to 7. */
+/** The slide that opens a talk stage 1 to 6. */
 export function TransitionSlide({ stage, notes }: { stage: TalkStage; notes: ReactNode }) {
   return (
     <Slide stage={stage} className="transition-slide" notes={notes}>
@@ -135,8 +135,8 @@ export function TransitionSlide({ stage, notes }: { stage: TalkStage; notes: Rea
 
 /** The architecture at a talk stage. With `step`, the slide opens on the state before the talk stage and a click adds
  * what it adds (at talk stage 0, the three questions over the empty frames); without, it shows the talk stage's state
- * at once. Then, one click each: a `caption`, and the blocks of `opens` in their order, each opened from its place into
- * a panel (unboxing.tsx) while the rest of the diagram recedes. */
+ * at once. Then, one click each: the blocks of `opens` in their order, each opened from its place into a panel
+ * (unboxing.tsx) while the rest of the diagram recedes, and last a `caption` (the last block stays opened). */
 export function ArchitectureView({ stage, step = true, colouring = "new", questionTags = false, title, caption, opens = [] }: {
   stage: TalkStage; step?: boolean; colouring?: Colouring; questionTags?: boolean; title: string; caption?: string;
   opens?: Unboxable[];
@@ -160,8 +160,8 @@ export function ArchitectureView({ stage, step = true, colouring = "new", questi
         ))}
       </div>
       {step && <StepMarker r={marker} />}
-      {caption !== undefined && <p className="arch-caption fragment">{caption}</p>}
       {opens.map((b) => <span key={b} className="fragment step-marker step-open" aria-hidden />)}
+      {caption !== undefined && <p className="arch-caption fragment">{caption}</p>}
     </>
   );
 }

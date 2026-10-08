@@ -60,7 +60,7 @@ export function ActorsSlide() {
   return (
     <Slide stage={0} className="actors-slide" notes={<>
       <p>Anton has a colleague: the lift truck at the dock (dock loading, defined with Scania). It uses the same mind
-        as Anton. Today it waits for its turn; it comes back before the results (talk stage 9).</p>
+        as Anton. Today it waits for its turn; it comes back before the results (talk stage 8).</p>
       <p><strong>OPEN</strong>: the lift truck's name and the dock worker's, and the wording of its return.</p>
       <p><strong>OPTIONAL</strong> (handoff 9): the lift truck stays small and idle in a corner of the stage slides,
         still waiting.</p>

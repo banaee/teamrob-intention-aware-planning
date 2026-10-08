@@ -2,8 +2,9 @@
 
 The slides of Hadi's talk at the TeamRob final demo day, as an HTML deck: reveal.js over slides written in React. The
 records: `docs/design_records.md`, "T-pres, the talk"; the content's starting point: `docs/handoffs/handoff_T-pres.md`,
-read in full in every T-pres session. A "talk stage" is a row of the talk (the handoff's section 5, 0 to 12); a "part"
-is a unit of work on the deck.
+read in full in every T-pres session. A "talk stage" is a row of the talk: 0 to 11 since the merge of 8 October 2026
+(the handoff's section 14, addition l, the current structure; section 5 holds the earlier one, 0 to 12); a "part" is a
+unit of work on the deck.
 
 The scenes draw with the web-ui page's own code (`webui/page/src`), imported directly, so that a change of the web-ui's
 look reaches the slides after one build; `webui/` is never changed for the deck (the areas' names left the env-pane's
@@ -82,7 +83,7 @@ working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm ru
   talk stage adds (it fades in, an arrow is drawn along its length; the rest recedes). `colouring="questions"` colours it
   by know, believe, decide (the recap).
 - `src/slides/`: `kit.tsx` (the slide frame with its footer and notes, steps, TODO boxes, the mark "not settled", a talk
-  stage's transition slide: the seven talk stages as numbered circles, the starting one large, the finished ones
+  stage's transition slide: the six talk stages as numbered circles, the starting one large, the finished ones
   checked, with the starting one's three columns; the architecture slide), one file per stretch of the talk, and
   `index.ts`, the order.
 - `src/scene/AgentsInRoom.tsx`: one canvas; the env-pane's `FramingCamera` framing a box that moves from a figure's ring

@@ -1,7 +1,7 @@
 /**
  * The deck's slides, in the talk's order (handoff_T-pres.md, section 5, as the overall revision of 8 October 2026 left
- * it): talk stages 0 to 12, each of 1 to 7 opened by its transition slide, and the question that leads from talk stage
- * 2 to 3. Each entry is one slide; a slide may have several steps.
+ * it, and the merge of the same day, the old talk stages 6 and 7 one talk stage 6): talk stages 0 to 11, each of 1 to 6
+ * opened by its transition slide, and the question that leads from talk stage 2 to 3. Each entry is one slide; a slide may have several steps.
  */
 
 import type { ComponentType } from "react";
@@ -46,18 +46,15 @@ export const SLIDES: ComponentType[] = [
   later.Stage5Transition,
   later.Stage5Replay,
   later.Stage5Architecture,
-  // 6 Switch and resumption
+  // 6 Unmodelled behaviour (the old talk stage 6's switch one slide, before the replay)
   later.Stage6Transition,
+  later.Stage6MidWay,
   later.Stage6Replay,
   later.Stage6Architecture,
-  // 7 Unmodelled behaviour
-  later.Stage7Transition,
-  later.Stage7Replay,
-  later.Stage7Architecture,
-  // 8 to 12
-  later.Stage8Recap,
+  // 7 to 11
+  later.Stage7Recap,
+  later.Stage8,
   later.Stage9,
   later.Stage10,
   later.Stage11,
-  later.Stage12,
 ];

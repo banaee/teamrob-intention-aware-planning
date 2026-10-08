@@ -95,7 +95,7 @@ export const BOXES: Record<Unboxable, Box> = {
       { stage: 3, kind: "words", content: <>From her intention: Anton plans her trusted task with the same task knowledge
           it plans its own work with.</> },
       { stage: 3, kind: "formal", content: <><V>her path</V> = <V>plan</V>(trusted intention)</> },
-      { stage: 7, kind: "words", content: <>No trusted intention: the projection from her motion is the fallback, until a
+      { stage: 6, kind: "words", content: <>No trusted intention: the projection from her motion is the fallback, until a
           hypothesis is trusted again.</> },
     ],
   },
@@ -131,7 +131,7 @@ export const BOXES: Record<Unboxable, Box> = {
       { stage: 6, kind: "words", content: <>A hypothesis fits while her detours and her standing delay its current action
           no more than is plausible.</> },
       { stage: 6, kind: "out", content: <>When the trusted intention stops fitting, Anton stops trusting it.</> },
-      { stage: 7, kind: "out", content: <>No hypothesis fits: her behaviour is unexplained.</> },
+      { stage: 6, kind: "out", content: <>No hypothesis fits: her behaviour is unexplained.</> },
     ],
   },
 };

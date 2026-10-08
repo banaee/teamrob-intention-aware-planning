@@ -1,17 +1,19 @@
 /**
- * Talk stages 3 to 12. Talk stages 3 to 7 (the overall revision of 8 October 2026): each opens with its transition
- * slide (the seven talk stages, the starting one with its three columns), then a replayed sim-run with Anton's mind
+ * Talk stages 3 to 11. Talk stages 3 to 6 (the overall revision of 8 October 2026): each opens with its transition
+ * slide (the six talk stages, the starting one with its three columns), then a replayed sim-run with Anton's mind
  * beside it, then the architecture, a click adding what the talk stage adds and one click per block it opens or extends
- * (architecture/unboxing.tsx). Talk stages 8 to 12 stay placeholders (parts 3 and 5). A replay that does not yet meet
- * its criterion (the mechanism visibly changes what Anton does) carries the mark "not settled".
+ * (architecture/unboxing.tsx). Talk stage 6 is the merge of the same day (the old talk stages 6, switch and resumption,
+ * and 7, unmodelled behaviour, both resting on fit): the old switch is one slide before its replay, with no replay of its
+ * own. Talk stages 7 to 11 stay placeholders (parts 3 and 5). A replay that does not yet meet its criterion (the
+ * mechanism visibly changes what Anton does) carries the mark "not settled".
  */
 
 import type { ReactNode } from "react";
 
 import type { Unboxable } from "../architecture/unboxing";
 import { STAGES, type TalkStage } from "../talk";
-import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide, Unsettled } from "./kit";
-import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplaySwitch, ReplayTrusted } from "./replays";
+import { ArchitectureView, Slide, StageTitle, StepMarker, Todo, TransitionSlide, Unsettled, useStep } from "./kit";
+import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplayTrusted } from "./replays";
 
 /** A talk stage's replayed sim-run, with Anton's mind beside it. `todo`: what the TODO box this replay stands in asked
  * for (in the notes); `unsettled`: a visible mark where the replay does not yet meet its criterion. */
@@ -203,89 +205,105 @@ export function Stage5Architecture() {
   );
 }
 
-// ---- 6 Switch and resumption -------------------------------------------------------------------------------------
+// ---- 6 Unmodelled behaviour --------------------------------------------------------------------------------------
 
 export function Stage6Transition() {
   return (
     <TransitionSlide stage={6} notes={<>
-      <p>She leaves a task mid-way: Anton's trusted intention no longer explains what she does. Anton notices, stops
-        trusting it, and plans again; when she resumes, her task is trusted again.</p>
+      <p>One mechanism carries this talk stage: fit. Anton checks whether the intention it trusts still fits what she
+        does; when it stops fitting, Anton stops trusting it. Two cases: she turns mid-way to something Anton knows, or to
+        something Anton has no model of.</p>
+      <p>She does something the robot has no model of: unmodelled behaviour, the only deviation in the glossary's sense
+        (a part of what she does that Anton's task model lacks). This talk stage is the one place the talk says
+        "deviation", and only for the unmodelled case. It may say here why common sense would call a coffee break a
+        deviation and the framework does not: the coffee break is foreseen, in Anton's model.</p>
+      <p>(The merge of 8 October 2026: the old talk stages 6, switch and resumption, and 7, unmodelled behaviour, are
+        this one talk stage, since both rest on fit.)</p>
     </>} />
+  );
+}
+
+/** One abstract row of the drawing: a hypothesis, its belief as a bar (no value: an illustration, not a run), θ, and
+ * whether it fits. */
+function TurnRow({ name, share, fits, trusted = false }: {
+  name: string; share: number; fits: boolean; trusted?: boolean;
+}) {
+  return (
+    <div className={`turn-row${trusted ? " is-trusted" : ""}`}>
+      <span className="turn-name">{name}{trusted && <span className="turn-badge">trusted</span>}</span>
+      <span className="turn-bar"><span style={{ width: `${share * 100}%` }} /><i style={{ left: "75%" }} /></span>
+      <span className={`turn-fit${fits ? "" : " turn-misfit"}`}>{fits ? "fits" : "does not fit"}</span>
+    </div>
+  );
+}
+
+/** The old talk stage 6's case as one step of this talk stage (the merge, 8 October 2026), no replay: she turns
+ * mid-way. Click 1: to something Anton knows; the belief moves to that hypothesis and Anton trusts it. Click 2: to
+ * something Anton has no model of; no hypothesis fits, whatever the belief says. The bars are an illustration in the
+ * look of Anton's mind beside the replays, without values; θ the thin line. */
+export function Stage6MidWay() {
+  const [known, knownShown] = useStep();
+  const [unknown, unknownShown] = useStep();
+  return (
+    <Slide stage={6} className="turn-slide" notes={<>
+      {FIRST}
+      <p>The old talk stage 6 (switch and resumption), kept as one step of this talk stage, with no replay of its own
+        (the merge, 8 October 2026).</p>
+      <p>Click 1: she leaves her delivery mid-way for something Anton knows, a coffee break. Her movement now fits the
+        coffee break better: the belief moves to it and, with support, Anton trusts it. Her delivery is no longer the
+        trusted intention. When she returns to her delivery, it is trusted again in the same way.</p>
+      <p>Click 2: she leaves it for something Anton has no model of. Her delivery may still lead the belief (the belief
+        is shared among the hypotheses Anton has), but it no longer fits what she does, and neither does any other
+        hypothesis. A strong belief alone is not enough: that is what fit adds. The sim-run that follows shows this
+        case.</p>
+      <p>The bars are an illustration, not a run: no values.</p>
+    </>}>
+      <h1 className="slide-head">She turns mid-way</h1>
+      <div className="turn-cases">
+        <div className={`turn-case appear${knownShown ? " on" : ""}`}>
+          <h2 className="turn-head">To something Anton knows</h2>
+          <p className="turn-sub">a coffee break</p>
+          <div className="turn-chart">
+            <TurnRow name="her delivery" share={0.12} fits />
+            <TurnRow name="coffee break" share={0.86} fits trusted />
+          </div>
+          <p className="turn-says">The belief moves to the coffee break, and Anton trusts it.</p>
+        </div>
+        <div className={`turn-case appear${unknownShown ? " on" : ""}`}>
+          <h2 className="turn-head">To something Anton has no model of</h2>
+          <p className="turn-sub">unmodelled behaviour</p>
+          <div className="turn-chart">
+            <TurnRow name="her delivery" share={0.95} fits={false} />
+            <TurnRow name="coffee break" share={0.05} fits={false} />
+          </div>
+          <p className="turn-says">No hypothesis fits: Anton knows that it does not know.</p>
+        </div>
+      </div>
+      <StepMarker r={known} />
+      <StepMarker r={unknown} />
+    </Slide>
   );
 }
 
 export function Stage6Replay() {
   return (
-    <ReplaySlide stage={6} title="Switch and resumption: a sim-run"
-                 unsettled="In this run the trust ends because the break overtakes her delivery, not because it stops fitting."
-                 todo={<>
-      A recorded sim-run in which she switches mid-way and later resumes: the trusted intention stops fitting, Anton
-      stops trusting it and plans again against the projection from her motion, and recognition picks her up again when
-      she resumes. Why: fit is what makes Anton keep pace with her; the audience sees it change the outcome.
-    </>} notes={<>
-      {FIRST}
-      <p><strong>DRAFT</strong> (the second search): kitting scenario_s23_23 on env_layout_07, T-F part 1's run_584
-        (break time in force from 48 to 84), ticks 30 to 100. Her delivery trusted at 36, a hold of 7; the coffee break
-        cut in at 48 leads, and Anton stops trusting the delivery; the break trusted at 53, a hold (planned 33, 29
-        stood); her break over at 82, a new hold; she resumes at 84; the delivery trusted again at 94, the hold ends
-        after 12 ticks and Anton walks on.</p>
-      <p><strong>NOT SETTLED</strong>: in this run the trust ends at 48 because the coffee break overtakes the delivery
-        (the log's cause "replaced"), not because the delivery stops fitting: the delivery is adequate throughout. The
-        switch and the resumption change what Anton does; fit is not what changes it. The earlier draft, run_012 of
-        scenario_s10_03, shows fit (the delivery stops fitting at 55) but Anton's tasks are those of the human-unaware
-        run_009, with no hold: fit changes nothing for Anton there. Hadi chooses, or authors a scenario.</p>
-      {MIND}
-    </>}>
-      <ReplaySwitch />
-    </ReplaySlide>
-  );
-}
-
-export function Stage6Architecture() {
-  return (
-    <ArchSlide stage={6} opens={["B42", "B44"]} notes={<>
-      {FIRST}
-      <p>Click 1: fit appears, going into the confidence check.</p>
-      <p>Click 2, fit: for each hypothesis, how much later than its plan she would finish its current action, from her
-        extra path and her extra standing. Taken off the panel: it fits unless that delay is surprising at a test level
-        of 5 % (in kitting about 334 cm off the way, or 17 ticks of standing beyond the action). When the trusted
-        intention stops fitting, Anton stops trusting it (withdrawing a trusted intention, one sentence) and plans again,
-        against the projection from her motion until a hypothesis is trusted again.</p>
-      <p>Click 3, confidence check: the condition "it fits" added. In the code it was read from talk stage 3 on; the talk
-        introduces it here, where it changes the outcome.</p>
-    </>} />
-  );
-}
-
-// ---- 7 Unmodelled behaviour --------------------------------------------------------------------------------------
-
-export function Stage7Transition() {
-  return (
-    <TransitionSlide stage={7} notes={<>
-      <p>She does something the robot has no model of: unmodelled behaviour, the only deviation in the glossary's sense
-        (a part of what she does that Anton's task model lacks). This is the one place the talk says "deviation". It may
-        say here why common sense would call a coffee break a deviation and the framework does not: the coffee break is
-        foreseen, in Anton's model.</p>
-    </>} />
-  );
-}
-
-export function Stage7Replay() {
-  return (
-    <ReplaySlide stage={7} title="Unmodelled behaviour: a sim-run"
-                 unsettled="No existing run shows Anton act differently on it: Anton is far from her. A scenario is proposed."
+    <ReplaySlide stage={6} title="Unmodelled behaviour: a sim-run"
+                 unsettled="No existing run shows Anton act differently on it: Anton is far from her. Hadi is choosing the scenario."
                  todo={<>
       A recorded sim-run with unmodelled behaviour (for example a walk to a corner): no hypothesis fits, the projection
-      from her motion takes over as the fallback, and recognition resumes when she returns to modelled behaviour. Why:
-      the hardest case, handled by blocks the audience already knows.
+      from her motion takes over as the fallback, and when she returns to modelled behaviour her task is trusted again.
+      Why: the hardest case, and the one in which fit changes what Anton does.
     </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong>: kitting scenario_s10_07 on env_layout_12, run_028, ticks 40 to 125. One click per
-        stop.</p>
+      <p><strong>DRAFT</strong>: kitting scenario_s10_07 on env_layout_12, T-F part 1's run_028, ticks 40 to 125: her
+        delivery of item 1 trusted; a 60-tick stand cut into it at 46 (unmodelled); after 16 ticks of standing, at 62,
+        it no longer fits and no hypothesis fits: unexplained, Anton stops trusting it and uses the projection from her
+        motion (the callback to talk stage 2); she walks on at 107; at 120 her delivery fits again and is trusted again
+        (the projection from her intention is built again). One click per stop.</p>
       <p><strong>NOT SETTLED</strong>: no existing run meets the criterion (the second search, 8 October 2026: no
         retraction at an unexplained finding is followed by a hold or a switch within 40 ticks). Here Anton's tasks are
-        those of the human-unaware run_025, no hold, Anton at least 405 cm away. The proposal for Hadi to author is in
-        the report of the overall revision.</p>
+        those of the human-unaware run_025, no hold, Anton at least 405 cm away. Hadi is choosing the scenarios for talk
+        stages 1 to 6 (the review sheet, its row for the old talk stage 7).</p>
       {MIND}
     </>}>
       <ReplayStand />
@@ -293,34 +311,40 @@ export function Stage7Replay() {
   );
 }
 
-export function Stage7Architecture() {
+export function Stage6Architecture() {
   return (
-    <ArchSlide stage={7} opens={["B42", "B51"]}
-               caption="Nothing new: fit, now for every hypothesis, and the projection from her motion, now as the fallback."
+    <ArchSlide stage={6} opens={["B42", "B44", "B51"]}
+               caption="The reactive robot's projection from her motion is now Anton's fallback."
                notes={<>
       {FIRST}
-      <p>Click 1: nothing is added. Click 2: the caption: the hardest case is handled by blocks the audience already
-        knows.</p>
-      <p>Click 3, fit: no hypothesis fits: her behaviour is unexplained; Anton knows that it does not know.</p>
+      <p>Click 1: fit appears, going into the confidence check. New at this talk stage.</p>
+      <p>Click 2, fit: for each hypothesis, how much later than its plan she would finish its current action, from her
+        extra path and her extra standing. Taken off the panel: it fits unless that delay is surprising at a test level
+        of 5 % (in kitting about 334 cm off the way, or 17 ticks of standing beyond the action). When the trusted
+        intention stops fitting, Anton stops trusting it (withdrawing a trusted intention, one sentence) and plans again.
+        When no hypothesis fits, her behaviour is unexplained: Anton knows that it does not know.</p>
+      <p>Click 3, confidence check: the condition "it fits" added. In the code it is read from talk stage 3 on; the talk
+        introduces it here, where it changes the outcome.</p>
       <p>Click 4, projection: with no trusted intention, the projection from her motion, the reactive robot's only option
         at talk stage 2, is now the fallback; when she returns to modelled behaviour and a hypothesis is trusted again,
-        the projection from her intention returns. The call back to talk stage 2.</p>
+        the projection from her intention returns.</p>
+      <p>Click 5: the caption, the call back to talk stage 2.</p>
     </>} />
   );
 }
 
-// ---- After the seven talk stages -----------------------------------------------------------------------------------
+// ---- After the six talk stages -------------------------------------------------------------------------------------
 
-export function Stage8Recap() {
+export function Stage7Recap() {
   return (
-    <Slide stage={8} className="arch-slide" notes={<>
+    <Slide stage={7} className="arch-slide" notes={<>
       {PLACEHOLDER}
       <p>Will show: the complete architecture, coloured by the three questions: what Anton knows (the knowledge
         column), what it believes (recognition), what it decides (adaptive planning). Its own content is part 3's.</p>
       <p><strong>OPEN</strong> (handoff 11): the explicit list of contributions the talk claims, marking what is new
         since June; settled after the architecture's content is final.</p>
     </>}>
-      <ArchitectureView stage={8} step={false} colouring="questions" title={`8 ${STAGES[8].title}`} />
+      <ArchitectureView stage={7} step={false} colouring="questions" title={`7 ${STAGES[7].title}`} />
     </Slide>
   );
 }
@@ -339,9 +363,9 @@ function SideSlide({ stage, todo, by, notes, diagram }: {
   );
 }
 
-export function Stage9() {
+export function Stage8() {
   return (
-    <SideSlide stage={9} by="part 3" diagram todo={<>
+    <SideSlide stage={8} by="part 3" diagram todo={<>
       The lift truck's turn: the same mind in dock loading, its room drawn by the web-ui's own code and, from part 4, a
       recorded dock_loading sim-run. Why: the second domain shows that the mind does not depend on kitting.
     </>} notes={<>
@@ -354,10 +378,10 @@ export function Stage9() {
   );
 }
 
-export function Stage10() {
+export function Stage9() {
   return (
-    <SideSlide stage={10} by="part 5" diagram={false} todo={<>
-      The talk stages measured, in both domains: talk stage 2 is the intention-unaware run, talk stages 3 to 7 together
+    <SideSlide stage={9} by="part 5" diagram={false} todo={<>
+      The talk stages measured, in both domains: talk stage 2 is the intention-unaware run, talk stages 3 to 6 together
       the intention-aware run (T-F part 1, analysis/kitting/tf1/REPORT.md and COMPARISON.md; dock loading's
       measurements). Every number from an actual run. Why: evidence for the mechanisms the talk showed.
     </>} notes={<>
@@ -371,9 +395,9 @@ export function Stage10() {
   );
 }
 
-export function Stage11() {
+export function Stage10() {
   return (
-    <SideSlide stage={11} by="part 5" diagram={false} todo={<>
+    <SideSlide stage={10} by="part 5" diagram={false} todo={<>
       Limits and outlook, as Hadi chooses them. Why: an industrial audience needs to know what the framework does not do
       yet.
     </>} notes={<>
@@ -386,9 +410,9 @@ export function Stage11() {
   );
 }
 
-export function Stage12() {
+export function Stage11() {
   return (
-    <SideSlide stage={12} by="part 5" diagram={false} todo={<>
+    <SideSlide stage={11} by="part 5" diagram={false} todo={<>
       The afternoon station: the web-ui, with a screenshot (Hadi or part 4) labelled with what the audience learned to
       read in the talk: the env-pane, the robot's panel (intention recognition, planning), the human's panel. Why: the
       talk is the entry point to the station.

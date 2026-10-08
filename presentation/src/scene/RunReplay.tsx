@@ -57,7 +57,7 @@ export function RunReplay({ recorded, stops, step, hideHumans = false, mind, tic
   // Mounted when the slide first comes near and then kept: the env-pane's Scene places the agents' labels as DOM
   // elements beside its canvas, and removing the canvas while the deck runs throws (a React removeChild error). The
   // web-ui never removes its scene during a sim-run; the deck keeps it too, at the cost of one WebGL context per
-  // replay seen (seven at most).
+  // replay seen (six at most).
   const nearNow = useSlideNear();
   const current = useSlideCurrent();
   const [near, setNear] = useState(nearNow);
