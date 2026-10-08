@@ -13,6 +13,7 @@ tqdm==4.66.5
 pydantic==2.13.5
 starlette==0.48.0     # the web-ui's server; also holds solara on a compatible starlette
 uvicorn==0.30.5       # serves the web-ui's server
+watchfiles==1.1.0     # web-ui.sh -dev: restarts the web-ui's server on a change
 
 # Visualization (solara run only)
 solara==1.57.3

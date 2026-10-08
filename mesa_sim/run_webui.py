@@ -9,6 +9,9 @@ PURPOSE:
 
 USAGE (from the repository's root; the page built once, webui/page/README.md):
     PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python mesa_sim/run_webui.py [--run <file>] [flags] [--port 8000]
+        [--api_only]
+    --api_only serves the requests under /api/ alone, without the built page and without its check: the page comes from
+    Vite's dev server (npm run dev, which passes /api/ to port 8000). ./web-ui.sh -dev starts both.
 
 WHAT THE START CHECKS:
     - The flags are the headless start's, plus --port. --steps sets the default step limit; the run file's `steps` is
@@ -25,6 +28,7 @@ WHAT THIS MODULE DOES NOT DO:
     - No rule of the web-ui (webui/server.py) and no message (mesa_sim/webui_adapter.py)
 """
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -85,7 +89,13 @@ def page_ready() -> None:
 
 
 def main(argv: list) -> None:
-    simulator, port = read_start(argv)
+    dev = argparse.ArgumentParser(add_help=False)
+    dev.add_argument("--api_only", action="store_true")
+    known, rest = dev.parse_known_args(argv)
+    simulator, port = read_start(rest)
+    if known.api_only:
+        serve(simulator, port, None)
+        return
     page_ready()
     serve(simulator, port, DIST)
 

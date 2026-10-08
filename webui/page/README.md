@@ -24,6 +24,10 @@ PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python mesa_sim/run_webui.py
 While working on the page: the server as above, and Vite's dev server (`npm run dev`, http://localhost:5173), which
 passes `/api/` to the server on port 8000.
 
+Both in one command, from the repository's root: `./web-ui.sh [flags]` installs and builds the page when it needs it,
+then starts the server; `./web-ui.sh -dev [flags]` starts the server without the page (`--api_only`), restarted on every
+change of the Python side, and Vite's dev server. The flags are `run_webui.py`'s.
+
 Screenshots in the installed Google Chrome, driving a running web-ui: `npm run shots -- --runs '[["<domain>",
 "<scenario>"], ...]'` writes them to `docs/handoffs/tviz_1a/` (untracked): per sim-run its start chosen in the page, a
 moment after 60 steps (tilted, from above, and at 1920 wide), play until all agents have finished, and an end at a step
