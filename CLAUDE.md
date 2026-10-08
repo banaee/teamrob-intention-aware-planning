@@ -39,6 +39,13 @@ about: what the human produces. An abandoned delivery is in scope for what it do
   - When Hadi switches the model between stages, there is a pause at each stage boundary.
   - The model to use stands as the first line inside each prompt.
   - A new ccode session per step.
+- Rule Hadi set on 8 October 2026: the repository's folder is attached to the design chat (cchat) in the Claude
+  desktop app, so that cchat can read the files. cchat stays the conceptual designer: it holds the discussions with
+  Hadi and writes the prompts for ccode. The repository is read-only for cchat: cchat changes no file. cchat may run
+  light commands that only look (search, list, read the git history, print a value). cchat runs no simulator, test,
+  build or analysis; a result that a decision rests on comes from ccode. ccode records the decisions and builds.
+  Reason: one actor is responsible for every change and every result in the repository, so the records and the code
+  cannot diverge through a second writer.
 
 ## Where to look, and what to skip
 
