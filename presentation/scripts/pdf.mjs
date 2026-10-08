@@ -7,6 +7,8 @@
 // --quick (npm run pdf:quick): a fast, rough copy for a quick check, pdf/deck_<yyyy-mm-dd-hh-mm>_quick.pdf: 1280 x 720,
 // JPEG pages, each slide jumped to its last step with a short wait (no click played; a replay shows whatever frame it
 // has reached).
+// --quick --steps (npm run pdf:steps): the same, one page per step (every click of every slide),
+// pdf/deck_<yyyy-mm-dd-hh-mm>_quick_steps.pdf.
 
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -28,10 +30,12 @@ const { values } = parseArgs({
     out: { type: "string" },     // default: pdf/deck_<stamp>.pdf, dated so that earlier exports are kept
     settle: { type: "string", default: "1300" },
     quick: { type: "boolean", default: false },
+    steps: { type: "boolean", default: false },
   },
 });
-const quick = values.quick;
-const out = values.out ?? resolve(here, `../pdf/deck_${stamp()}${quick ? "_quick" : ""}.pdf`);
+const quick = values.quick || values.steps;
+const suffix = values.steps ? "_quick_steps" : quick ? "_quick" : "";
+const out = values.out ?? resolve(here, `../pdf/deck_${stamp()}${suffix}.pdf`);
 const [W, H] = quick ? [1280, 720] : [2560, 1440];
 const origin = new URL(values.url).origin;
 
@@ -55,12 +59,13 @@ if (quick) {
   const count = await page.evaluate(() => window.deck.getTotalSlides());
   for (let h = 0; h < count; h++) {
     console.log(`[pdf] slide ${h + 1} of ${count}`);
-    await page.evaluate((i) => {
-      const steps = window.deck.getSlide(i).querySelectorAll(".fragment").length;
-      window.deck.slide(i, 0, steps - 1);
-    }, h);
-    await page.waitForTimeout(700);
-    last.set(h, await shot());
+    const n = await page.evaluate((i) => window.deck.getSlide(i).querySelectorAll(".fragment").length, h);
+    // --steps: every step, from the slide as it opens (fragment -1) to its last; otherwise its last step only
+    for (let f = values.steps ? -1 : n - 1; f < n; f++) {
+      await page.evaluate(([i, j]) => window.deck.slide(i, 0, j), [h, f]);
+      await page.waitForTimeout(700);
+      last.set(`${String(h).padStart(3, "0")}.${String(f + 1).padStart(3, "0")}`, await shot());
+    }
   }
 } else {
   for (;;) {
@@ -68,15 +73,16 @@ if (quick) {
       h: window.deck.getIndices().h,
       end: window.deck.isLastSlide() && !window.deck.availableFragments().next,
     }));
-    if (!last.has(at.h)) console.log(`[pdf] slide ${at.h + 1}`);     // progress: the export takes a few minutes
-    last.set(at.h, await shot());
+    const key = String(at.h).padStart(3, "0");
+    if (!last.has(key)) console.log(`[pdf] slide ${at.h + 1}`);     // progress: the export takes a few minutes
+    last.set(key, await shot());
     if (at.end) break;
     await page.mouse.click(W / 2, H / 2);
     await page.waitForTimeout(Number(values.settle));
   }
 }
 
-const pages = [...last.keys()].sort((a, b) => a - b).map((h) => last.get(h).toString("base64"));
+const pages = [...last.keys()].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)).map((k) => last.get(k).toString("base64"));
 const sheet = await browser.newPage();
 await sheet.setContent(`<!doctype html><html><head><style>
   @page { size: ${W}px ${H}px; margin: 0; }
@@ -86,5 +92,5 @@ await sheet.setContent(`<!doctype html><html><head><style>
 mkdirSync(dirname(out), { recursive: true });
 await sheet.pdf({ path: out, width: `${W}px`, height: `${H}px`, printBackground: true, preferCSSPageSize: true });
 await browser.close();
-console.log(`[pdf] ${pages.length} slides written to ${out}; outside requests: ${outside}`);
+console.log(`[pdf] ${pages.length} pages written to ${out}; outside requests: ${outside}`);
 if (outside > 0) process.exit(1);

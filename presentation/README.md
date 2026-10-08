@@ -56,7 +56,8 @@ working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm ru
   runs one size.
 - `npm run pdf` (with `npm run preview` running): the deck as a PDF, one page per slide in its final step, at 2560 x
   1440, into `pdf/deck_<yyyy-mm-dd-hh-mm>.pdf` (untracked; earlier exports are kept). `npm run pdf:quick`: a fast, rough copy for a quick check, 1280 x 720,
-  each slide jumped to its last step, `pdf/deck_<yyyy-mm-dd-hh-mm>_quick.pdf`; no speaker notes. A fallback copy and a handout for review.
+  each slide jumped to its last step, `pdf/deck_<yyyy-mm-dd-hh-mm>_quick.pdf`. `npm run pdf:steps`: the same, one page per step (every click),
+  `pdf/deck_<yyyy-mm-dd-hh-mm>_quick_steps.pdf`; no speaker notes. A fallback copy and a handout for review.
 
 ## How it is put together
 

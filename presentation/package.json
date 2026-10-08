@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit",
     "shots": "node scripts/shots.mjs",
     "pdf": "node scripts/pdf.mjs",
-    "pdf:quick": "node scripts/pdf.mjs --quick"
+    "pdf:quick": "node scripts/pdf.mjs --quick",
+    "pdf:steps": "node scripts/pdf.mjs --quick --steps"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.2.7",
