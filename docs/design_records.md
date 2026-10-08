@@ -6008,3 +6008,14 @@ BUILT (ccode, 8 October 2026; Hadi's review open; tagged tpres-v3).
   one each; 95 in all (96 steps).
 - Checks: the build (type check included); the click-through, 96 steps at 1920 x 1080 and 2560 x 1440, 0 outside
   requests, 0 page errors, 0 notes on screen.
+
+THE RESULTS SLIDE, A FIRST VERSION (Hadi, 8 October 2026, preferred; recorded by ccode the same day). Talk stage 9
+shows Hadi's table of measured results per stage (made in another chat from T-F's analyses) in place of its TODO box,
+with exactly his columns, labels, numbers and words: neither traced, checked, reworded nor regrouped by ccode, by his
+instruction (it replaces his earlier prompt, which asked for tracing and the deck's present terms). Its words are the
+earlier ones (levels, "prediction", "admit", min_separation); bringing them to the deck's terms is open.
+BUILT (ccode, 8 October 2026; Hadi's review open): `presentation/src/slides/later.tsx`, `Stage9`, and `src/deck.css`.
+The first group shows as the slide opens, each later group on a click (talk stage 9: 5 clicks; the deck 99 clicks, 100
+steps); the two numbers of a row large; a row whose n is a scenario (s10_02) set apart by a dashed rule and an italic n;
+"worse, 1%" in weight and a colour, the word carrying it. Checks: the build; the click-through, 100 steps at both
+sizes, 0 outside requests, 0 page errors, 0 notes on screen.
