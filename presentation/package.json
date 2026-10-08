@@ -14,7 +14,8 @@
     "build": "npm run pins && npm run record && tsc --noEmit && vite build",
     "preview": "vite preview --open",
     "typecheck": "tsc --noEmit",
-    "shots": "node scripts/shots.mjs"
+    "shots": "node scripts/shots.mjs",
+    "pdf": "node scripts/pdf.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "5.2.7",
