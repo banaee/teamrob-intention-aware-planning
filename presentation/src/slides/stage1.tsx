@@ -1,20 +1,19 @@
 /**
- * Talk stage 1, Anton works alone (handoff_T-pres.md, section 5): it knows its own tasks, decomposed down to actions;
- * it plans, then executes. The decomposition is kitting's own: the work task deliver_item, its three methods (chosen
+ * Talk stage 1, the robot alone (handoff_T-pres.md, section 5; the name of the overall revision): it knows its own tasks,
+ * broken down into actions; it plans, then executes. The decomposition is kitting's own: the work task deliver_item, its three methods (chosen
  * by the situation: domains/kitting/tasks.py) and the actions of the usual one. A first version for Hadi's revision.
  */
 
-import { ArchitectureView, Slide, StageCard } from "./kit";
+import { ArchitectureView, Slide, TransitionSlide } from "./kit";
 import { ReplayAlone } from "./replays";
 
-export function Stage1Card() {
+export function Stage1Transition() {
   return (
-    <Slide stage={1} notes={<>
-      <p>First, Anton alone, no human in the room. It knows its own tasks; it plans, then executes.</p>
-      <p>Nothing to believe yet: nobody else is there. Light stage: keep it short.</p>
-    </>}>
-      <StageCard stage={1} />
-    </Slide>
+    <TransitionSlide stage={1} notes={<>
+      <p>Seven steps, each one making the situation harder; the list on the left comes back at the start of each.</p>
+      <p>First, Anton alone, no human in the room. It knows its own tasks; it plans, then executes. Nothing to believe
+        yet: nobody else is there. Light stage: keep it short.</p>
+    </>} />
   );
 }
 
@@ -69,8 +68,11 @@ export function DecompositionSlide() {
 export function PlanExecuteSlide() {
   return (
     <Slide stage={1} className="replay-slide" notes={<>
-      <p>Anton chooses a task, its planner decomposes it into actions, and its body executes them one at a time. When the
+      <p>Anton chooses a task, its planner breaks it down into actions, and its body executes them one at a time. When the
         task is done, it chooses the next. One click per stop of the replay.</p>
+      <p>Say it once, here: the counter in the corner counts ticks; one tick is one time step of the simulation. Every
+        duration in the talk is in ticks.</p>
+      <p>Beside the scene, Anton's mind: for now only its task.</p>
       <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s12_01 on env_layout_14, T-F part 1's
         human-unaware run (run_057), ticks 0 to 126; the human is not drawn, since in this condition Anton's mind receives
         no human. Flag: hiding her is a choice of the slide.</p>

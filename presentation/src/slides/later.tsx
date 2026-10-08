@@ -1,30 +1,29 @@
 /**
- * Levels 2 and 3 and talk stages 3 to 12. Talk stages 3 to 7, a first version: each talk stage's card (its keywords,
- * and the sim-run that will show it), then the architecture, a click adding what the talk stage adds and one click
- * per block it opens or extends (architecture/unboxing.tsx: Hadi, 8 October 2026, preferred). Talk stages 8 to 12 stay
- * placeholders (parts 3 and 5).
+ * Talk stages 3 to 12. Talk stages 3 to 7 (the overall revision of 8 October 2026): each opens with its transition
+ * slide (the seven talk stages, the starting one with its three columns), then a replayed sim-run with Anton's mind
+ * beside it, then the architecture, a click adding what the talk stage adds and one click per block it opens or extends
+ * (architecture/unboxing.tsx). Talk stages 8 to 12 stay placeholders (parts 3 and 5).
  */
 
 import type { ReactNode } from "react";
 
 import type { Unboxable } from "../architecture/unboxing";
 import { STAGES, type TalkStage } from "../talk";
-import { ArchitectureView, LevelTitle, Slide, StageCard, StageTitle, Todo } from "./kit";
+import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide } from "./kit";
 import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplaySwitch, ReplayTrusted } from "./replays";
 
-/** A talk stage's card. `scene` (a replayed sim-run) stands in the TODO box's place once it exists; the box's text then
- * goes to the notes. */
-function CardSlide({ stage, todo, by = "part 4", notes, scene }: {
-  stage: TalkStage; todo: ReactNode; by?: string; notes: ReactNode; scene?: ReactNode;
+/** A talk stage's replayed sim-run, with Anton's mind beside it. `todo`: what the TODO box this replay stands in asked
+ * for (in the notes); `unsettled`: a visible mark where the replay does not yet meet its criterion. */
+function ReplaySlide({ stage, title, notes, todo, children }: {
+  stage: TalkStage; title: string; notes: ReactNode; todo: ReactNode; children: ReactNode;
 }) {
   return (
-    <Slide stage={stage} className={`card-slide${scene !== undefined ? " card-scene" : ""}`} notes={<>
+    <Slide stage={stage} className="replay-slide" notes={<>
       {notes}
-      {scene !== undefined && <p><strong>TODO ({by})</strong>, the box this draft stands in: {todo}</p>}
+      <p><strong>TODO (part 4)</strong>, the box this draft stands in: {todo}</p>
     </>}>
-      <StageCard stage={stage}>
-        {scene ?? <Todo by={by} className="todo-card">{todo}</Todo>}
-      </StageCard>
+      <h1 className="slide-head">{title}</h1>
+      {children}
     </Slide>
   );
 }
@@ -39,36 +38,38 @@ function ArchSlide({ stage, notes, caption, opens }: {
   );
 }
 
-const FIRST = <p><strong>FIRST VERSION</strong> (T-pres, 8 October 2026), for Hadi's revision.</p>;
+const FIRST = <p><strong>FIRST VERSION</strong> (T-pres, 8 October 2026; revised the same day), for Hadi's revision.</p>;
 const PLACEHOLDER = <p><strong>PLACEHOLDER</strong> (T-pres part 1): the content is built in a later part.</p>;
+const MIND = <p>Beside the scene, Anton's mind at the tick, as the robot panel at the station shows it: the hypotheses
+  as bars (θ the thin line on each), the trusted intention marked; its task, its hold, which projection of her it
+  uses.</p>;
 
-// ---- Level 2 ---------------------------------------------------------------------------------------------------
+// ---- 3 Assigned tasks --------------------------------------------------------------------------------------------
 
-export function Level2Slide() {
+export function Stage3Transition() {
   return (
-    <Slide stage={3} className="level-slide" notes={<>
-      <p>Level 2: Anton works with her. What Anton knows grows, one kind of knowledge per stage: her task list, the
-        behaviours one can foresee, the situation.</p>
-    </>}>
-      <LevelTitle level={2} />
-    </Slide>
+    <TransitionSlide stage={3} notes={<>
+      <p>Anton now knows her task list: the tasks she is assigned. What it believes: which of her tasks she is doing.
+        What it decides: its own next task and hold, against where her task will take her.</p>
+      <p>The heaviest stage: most of the time goes here.</p>
+    </>} />
   );
 }
 
-export const STAGE3_TODO = <>
-  A recorded sim-run in the web-ui's look: the belief over her tasks rising as she walks, the confidence check
-  passing, the projection from her intention on the floor (a filled blue stripe), and Anton's hold or task choice
-  against it. Why: this is where recognition first changes what Anton does.
-</>;
-
-export function Stage3Card() {
+export function Stage3Replay() {
   return (
-    <CardSlide stage={3} todo={STAGE3_TODO} scene={<ReplayTrusted />} notes={<>
+    <ReplaySlide stage={3} title="Assigned tasks: a sim-run" todo={<>
+      A recorded sim-run in the web-ui's look: the belief over her tasks rising as she walks, the confidence check
+      passing, the projection from her intention on the floor (a filled blue stripe), and Anton's hold or task choice
+      against it. Why: this is where recognition first changes what Anton does.
+    </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_02 on env_layout_12, T-F part 1's run_008 (intention-aware), ticks 0 to 24. One click per stop.</p>
-      <p>Anton now knows her task list. What it believes: which of her tasks she is doing. What it decides: its own
-        next task and hold, against where her task will take her. The heaviest stage: most of the time goes here.</p>
-    </>} />
+      <p><strong>DRAFT</strong>: kitting scenario_s10_02 on env_layout_12, T-F part 1's run_008 (intention-aware),
+        ticks 0 to 24. One click per stop.</p>
+      {MIND}
+    </>}>
+      <ReplayTrusted />
+    </ReplaySlide>
   );
 }
 
@@ -76,43 +77,57 @@ export function Stage3Architecture() {
   return (
     <ArchSlide stage={3} opens={["B41", "B43", "B44", "B51", "B53", "B54"]} notes={<>
       {FIRST}
-      <p>Click 1: recognition appears with belief update, support and the confidence check; C1 gains her task list; the
-        world state gives her actions to recognition. The arrow "trusted intention, or none" is the visual centre: where
-        recognition affects planning. Task choice takes the realizer's cost; the realizer's direct arrow to execute
-        gives way.</p>
-      <p>Click 2, belief update: the one formula: belief = prior times evidence, normalised over H, with H her assigned
-        tasks. The evidence is her movement: walking off the shortest way to a step's target, or standing longer than
-        the step takes, lowers it. The prior is equal for now; talk stage 5 opens it.</p>
-      <p>Click 3, support: a belief needs support from what she actually does: a step toward the target, or a completion
-        Anton saw. Knowing which task is probable does not say when she starts.</p>
+      <p>Click 1: recognition appears with belief update, support and the confidence check; the team task knowledge
+        gains her task list; the world state gives her actions to recognition. The arrow "trusted intention, or none"
+        is the visual centre: where recognition affects planning. Task choice takes the realizer's cost; the realizer's
+        direct arrow to execute gives way.</p>
+      <p>Click 2, belief update: Bayes. The hypotheses H are her assigned tasks; o is what Anton has seen her do. Taken
+        off the panel: the likelihood P(o | h) is a product over the actions of h, one factor L(x) = 2 / (1 + e^(βx)) per
+        action, x her extra path beyond the shortest way to the action's target plus her standing beyond what the
+        action takes (β = 0.01 per cm). The prior is equal for now; talk stage 5 opens it.</p>
+      <p>Click 3, support: a belief needs support from what she actually does. Knowing which task is probable does not
+        say when she starts. A wait has only the second source (a completion Anton saw).</p>
       <p>Click 4, confidence check: the leader is trusted when it is strong enough (θ = 0.75) and supported; out comes
         the trusted intention, or none. In the code the check also reads fit from here on; the talk adds it at talk
-        stage 6. In the code the check is the meta-planner's gate; the talk places it in recognition, because
-        everything it reads is recognition's output.</p>
-      <p>Click 5, projection: from her intention, her path is the plan of the trusted task, decomposed with the same
-        task knowledge Anton plans its own work with. Say it here, once: one knowledge, two uses; the AAAI paper's
-        first contribution in one sentence, and why talk stage 1 was not wasted.</p>
-      <p>Click 6, realizer: per task of Anton's plan, the smallest hold that keeps the minimum separation (50 cm in the
-        simulation) from her projected path; cost = duration plus holds. A hold always exists.</p>
-      <p>Click 7, task choice: each candidate (one task, or an ordering) realized, the cheapest chosen. That is where a
-        switch or a reorder comes from; only the first hold is carried out.</p>
+        stage 6. In the code the check is the meta-planner's gate; the talk places it in recognition, because everything
+        it reads is recognition's output.</p>
+      <p>Click 5, projection: from her intention, her path is the plan of the trusted task, broken down into actions from
+        where she is now: where she will be, and when. Say it here, once: one knowledge, two uses; the AAAI paper's first
+        contribution in one sentence, and why talk stage 1 was not wasted.</p>
+      <p>Click 6, realizer: per task of Anton's plan, in order, the smallest hold in whole ticks such that Anton's moving
+        path never comes closer than the minimum separation (50 cm in the simulation) to her projected path; a later
+        task's hold counts from the holds before it. Cost: the plan's duration plus its holds.</p>
+      <p>Click 7, task choice: each candidate (one task under single_task, or an order of all remaining tasks under
+        full_reorder) realized, the cheapest chosen. Only the first hold is carried out; the rest is lookahead, decided
+        again later.</p>
     </>} />
   );
 }
 
-export const STAGE4_TODO = <>
-  A recorded sim-run with a coffee break: the break recognised, and a visible planning consequence, for example a
-  reorder caused by the trusted break. Why: one later stage should show planning change, not only recognition.
-</>;
+// ---- 4 Foreseeable behaviours ------------------------------------------------------------------------------------
 
-export function Stage4Card() {
+export function Stage4Transition() {
   return (
-    <CardSlide stage={4} todo={STAGE4_TODO} scene={<ReplayBreak />} notes={<>
-      {FIRST}
-      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s12_02 on env_layout_14, run_064, ticks 60 to 112. One click per stop.</p>
+    <TransitionSlide stage={4} notes={<>
       <p>Anton also knows what people foreseeably do besides their tasks: a coffee break, switching on the A/C. A coffee
-        break is modelled behaviour, foreseen: Anton plans around her break. Words: "foreseeable behaviours".</p>
+        break is modelled behaviour, foreseen. Words: "foreseeable behaviours"; never a deviation.</p>
     </>} />
+  );
+}
+
+export function Stage4Replay() {
+  return (
+    <ReplaySlide stage={4} title="Foreseeable behaviours: a sim-run" todo={<>
+      A recorded sim-run with a coffee break: the break recognised, and a visible planning consequence, for example a
+      reorder caused by the trusted break. Why: one later stage should show planning change, not only recognition.
+    </>} notes={<>
+      {FIRST}
+      <p><strong>DRAFT</strong>: kitting scenario_s12_02 on env_layout_14, run_064, ticks 60 to 112. One click per
+        stop.</p>
+      {MIND}
+    </>}>
+      <ReplayBreak />
+    </ReplaySlide>
   );
 }
 
@@ -120,30 +135,41 @@ export function Stage4Architecture() {
   return (
     <ArchSlide stage={4} opens={["B41"]} notes={<>
       {FIRST}
-      <p>Click 1: knowledge about the human (C2) appears, its foreseeable behaviours going to recognition.</p>
-      <p>Click 2, belief update again: the same formula; only H grows, by the foreseeable behaviours. Nothing else in
-        the mind changes: the same blocks now also recognise a break.</p>
+      <p>Click 1: knowledge about the human appears, its foreseeable behaviours going to recognition.</p>
+      <p>Click 2, belief update again: the same formula; only H grows, by the foreseeable behaviours. Nothing else in the
+        mind changes: the same blocks now also recognise a break.</p>
     </>} />
   );
 }
 
-export const STAGE5_TODO = <>
-  A recorded sim-run with a fact in force (break time), the same script with and without it if one exists: the prior
-  favouring the coffee break, its trust coming earlier, her movement still deciding. Why: the audience sees the situation
-  make Anton adapt earlier.
-</>;
+// ---- 5 Context ---------------------------------------------------------------------------------------------------
 
-export function Stage5Card() {
+export function Stage5Transition() {
   return (
-    <CardSlide stage={5} todo={STAGE5_TODO} scene={<ReplayBreakTime />} notes={<>
+    <TransitionSlide stage={5} notes={<>
+      <p>Context: facts of the situation (break time, a warm room, a break just taken) set how likely Anton considers
+        each foreseeable behaviour before it sees her move. Her observed movement still decides.</p>
+    </>} />
+  );
+}
+
+export function Stage5Replay() {
+  return (
+    <ReplaySlide stage={5} title="Context: a sim-run" todo={<>
+      A recorded sim-run with a context fact in force (break time), the same script with and without it if one exists:
+      the prior favouring the coffee break, its trust coming earlier, her movement still deciding. Why: the audience
+      sees the situation make Anton adapt earlier.
+    </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s12_04 on env_layout_14 (scenario_s12_02 with break time in force from tick 63), run_707, ticks 60 to 90; scenario_s12_02 itself is talk stage 4's draft. One click per stop.</p>
-      <p>Context: facts of the situation (break time, a warm room, a break just taken) set how strongly Anton considers
-        each foreseeable behaviour. The prior favours what the situation makes likely; observations still decide.</p>
+      <p><strong>DRAFT</strong>: kitting scenario_s12_04 on env_layout_14 (scenario_s12_02 with break time in force from
+        tick 63), run_707, ticks 60 to 90; scenario_s12_02 itself is talk stage 4's draft. One click per stop.</p>
       <p>Measured (T-F part 1, COMPARISON.md, step 3b): with a fact in force, a fact in accord with her task speeds its
         trust, one not in accord delays it, with little change in completion. A number on a slide comes from an actual
         run.</p>
-    </>} />
+      {MIND}
+    </>}>
+      <ReplayBreakTime />
+    </ReplaySlide>
   );
 }
 
@@ -151,44 +177,43 @@ export function Stage5Architecture() {
   return (
     <ArchSlide stage={5} opens={["B41", "B44"]} notes={<>
       {FIRST}
-      <p>Click 1: context (C3) appears, its prior going into the belief update.</p>
-      <p>Click 2, belief update: the prior opened. Her assigned tasks together weigh 1; each foreseeable behaviour weighs
-        its strength, which the situation sets: ordinary 0.02, raised by its favouring fact (break time: coffee break 2;
-        a warm room: the A/C 0.5), lowered to 0.005 just after it happened. The evidence is untouched.</p>
-      <p>Click 3, confidence check: one condition added: observations still decide. Context may make the trust come
-        earlier; it never makes Anton trust a task that her movement alone ranks below another (the evidence rank).</p>
+      <p>Click 1: context appears, its prior going into the belief update.</p>
+      <p>Click 2, belief update: the prior depends on the context. Taken off the panel: her assigned tasks together weigh
+        1; each foreseeable behaviour weighs its strength, which the context sets: ordinary 0.02, raised by its
+        favouring fact (break time: coffee break 2; a warm room: the A/C 0.5), lowered to 0.005 just after it happened.
+        The likelihood is untouched: it holds no context.</p>
+      <p>Click 3, confidence check: one condition added, observations still decide. Context may make the trust come
+        earlier; it never makes Anton trust a hypothesis that her movement alone ranks below another (the evidence
+        rank).</p>
     </>} />
   );
 }
 
-// ---- Level 3 ---------------------------------------------------------------------------------------------------
+// ---- 6 Switch and resumption -------------------------------------------------------------------------------------
 
-export function Level3Slide() {
+export function Stage6Transition() {
   return (
-    <Slide stage={6} className="level-slide" notes={<>
-      <p>Level 3: Anton keeps up with her. Anton checks whether its belief still fits.</p>
-      <p>From here on the talk may say "deviation", in the glossary's sense only (talk stage 7). It may say once why
-        common sense would call a coffee break a deviation and the framework does not.</p>
-    </>}>
-      <LevelTitle level={3} />
-    </Slide>
+    <TransitionSlide stage={6} notes={<>
+      <p>She leaves a task mid-way: Anton's trusted intention no longer explains what she does. Anton notices, stops
+        trusting it, and plans again; when she resumes, her task is trusted again.</p>
+    </>} />
   );
 }
 
-export const STAGE6_TODO = <>
-  A recorded sim-run in which she switches mid-way and later resumes: the trusted belief stops fitting, Anton stops
-  trusting it and replans against the projection from her motion, and recognition picks her up again when she resumes.
-  Why: fit is what makes Anton keep up; the audience sees it change the outcome.
-</>;
-
-export function Stage6Card() {
+export function Stage6Replay() {
   return (
-    <CardSlide stage={6} todo={STAGE6_TODO} scene={<ReplaySwitch />} notes={<>
+    <ReplaySlide stage={6} title="Switch and resumption: a sim-run" todo={<>
+      A recorded sim-run in which she switches mid-way and later resumes: the trusted intention stops fitting, Anton
+      stops trusting it and plans again against the projection from her motion, and recognition picks her up again when
+      she resumes. Why: fit is what makes Anton keep pace with her; the audience sees it change the outcome.
+    </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_03 on env_layout_12, run_012, ticks 40 to 125. One click per stop.</p>
-      <p>She switches mid-way: Anton's trusted belief no longer explains what she does. Anton notices, stops trusting it,
-        and replans; when she resumes, recognition picks it up again.</p>
-    </>} />
+      <p><strong>DRAFT</strong>: kitting scenario_s10_03 on env_layout_12, run_012, ticks 40 to 125. One click per
+        stop.</p>
+      {MIND}
+    </>}>
+      <ReplaySwitch />
+    </ReplaySlide>
   );
 }
 
@@ -196,51 +221,65 @@ export function Stage6Architecture() {
   return (
     <ArchSlide stage={6} opens={["B42", "B44"]} notes={<>
       {FIRST}
-      <p>Click 1: fit (B4.2) appears, going into the confidence check.</p>
-      <p>Click 2, fit: for each hypothesis, how much later than its plan she would finish its current step; it fits
-        unless that delay is surprising at 5 % (about 334 cm off the way, or 17 ticks of standing). When the trusted
-        hypothesis stops fitting, Anton stops trusting it (withdrawing a trusted belief, one sentence) and replans,
-        against the projection from her motion until a belief is trusted again.</p>
-      <p>Click 3, confidence check: the condition "it fits" added. In the code it was read from talk stage 3 on; the
-        talk introduces it here, where it changes the outcome.</p>
+      <p>Click 1: fit appears, going into the confidence check.</p>
+      <p>Click 2, fit: for each hypothesis, how much later than its plan she would finish its current action, from her
+        extra path and her extra standing. Taken off the panel: it fits unless that delay is surprising at a test level
+        of 5 % (in kitting about 334 cm off the way, or 17 ticks of standing beyond the action). When the trusted
+        intention stops fitting, Anton stops trusting it (withdrawing a trusted intention, one sentence) and plans again,
+        against the projection from her motion until a hypothesis is trusted again.</p>
+      <p>Click 3, confidence check: the condition "it fits" added. In the code it was read from talk stage 3 on; the talk
+        introduces it here, where it changes the outcome.</p>
     </>} />
   );
 }
 
-export const STAGE7_TODO = <>
-  A recorded sim-run with unmodelled behaviour (for example a walk to a corner): no hypothesis fits, the projection
-  from her motion takes over as the fallback, and recognition resumes when she returns to modelled behaviour. Why: the
-  hardest case, handled by blocks the audience already knows.
-</>;
+// ---- 7 Unmodelled behaviour --------------------------------------------------------------------------------------
 
-export function Stage7Card() {
+export function Stage7Transition() {
   return (
-    <CardSlide stage={7} todo={STAGE7_TODO} scene={<ReplayStand />} notes={<>
-      {FIRST}
-      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_07 on env_layout_12, run_028, ticks 40 to 125. One click per stop.</p>
-      <p>She does something nobody modelled: the only deviation in the glossary's sense (a node of her plan the robot's
-        model lacks). Words: "unmodelled behaviour".</p>
+    <TransitionSlide stage={7} notes={<>
+      <p>She does something the robot has no model of: unmodelled behaviour, the only deviation in the glossary's sense
+        (a part of what she does that Anton's task model lacks). This is the one place the talk says "deviation". It may
+        say here why common sense would call a coffee break a deviation and the framework does not: the coffee break is
+        foreseen, in Anton's model.</p>
     </>} />
+  );
+}
+
+export function Stage7Replay() {
+  return (
+    <ReplaySlide stage={7} title="Unmodelled behaviour: a sim-run" todo={<>
+      A recorded sim-run with unmodelled behaviour (for example a walk to a corner): no hypothesis fits, the projection
+      from her motion takes over as the fallback, and recognition resumes when she returns to modelled behaviour. Why:
+      the hardest case, handled by blocks the audience already knows.
+    </>} notes={<>
+      {FIRST}
+      <p><strong>DRAFT</strong>: kitting scenario_s10_07 on env_layout_12, run_028, ticks 40 to 125. One click per
+        stop.</p>
+      {MIND}
+    </>}>
+      <ReplayStand />
+    </ReplaySlide>
   );
 }
 
 export function Stage7Architecture() {
   return (
     <ArchSlide stage={7} opens={["B42", "B51"]}
-               caption="Nothing new: fit, now for every hypothesis, and the projection from motion, now as a fallback."
+               caption="Nothing new: fit, now for every hypothesis, and the projection from her motion, now as the fallback."
                notes={<>
       {FIRST}
       <p>Click 1: nothing is added. Click 2: the caption: the hardest case is handled by blocks the audience already
         knows.</p>
       <p>Click 3, fit: no hypothesis fits: her behaviour is unexplained; Anton knows that it does not know.</p>
       <p>Click 4, projection: with no trusted intention, the projection from her motion, the reactive robot's only option
-        at talk stage 2, is now a deliberate fallback; when she returns to modelled behaviour and a belief is trusted
-        again, the projection from her intention returns. The call back to talk stage 2.</p>
+        at talk stage 2, is now the fallback; when she returns to modelled behaviour and a hypothesis is trusted again,
+        the projection from her intention returns. The call back to talk stage 2.</p>
     </>} />
   );
 }
 
-// ---- After the levels ------------------------------------------------------------------------------------------
+// ---- After the seven talk stages -----------------------------------------------------------------------------------
 
 export function Stage8Recap() {
   return (
@@ -288,14 +327,14 @@ export function Stage9() {
 export function Stage10() {
   return (
     <SideSlide stage={10} by="part 5" diagram={false} todo={<>
-      The levels measured, in both domains: level 1 is the intention-unaware run, levels 2 and 3 together the
-      intention-aware run (T-F part 1, analysis/kitting/tf1/REPORT.md and COMPARISON.md; dock loading's measurements).
-      Every number from an actual run. Why: evidence for the mechanisms the talk showed.
+      The talk stages measured, in both domains: talk stage 2 is the intention-unaware run, talk stages 3 to 7 together
+      the intention-aware run (T-F part 1, analysis/kitting/tf1/REPORT.md and COMPARISON.md; dock loading's
+      measurements). Every number from an actual run. Why: evidence for the mechanisms the talk showed.
     </>} notes={<>
       {PLACEHOLDER}
-      <p>Will show: the levels as run conditions. Human-unaware may appear as a mode of the implementation. The oracle
-        (as if Anton could see her intention) is the upper bound only if it is built (TODO-101, recorded, not
-        built).</p>
+      <p>Will show: the talk stages as run conditions (the levels of the handoff, removed from the slides in the overall
+        revision). Human-unaware may appear as a mode of the implementation. The oracle (as if Anton could see her
+        intention) is the upper bound only if it is built (TODO-101, recorded, not built).</p>
       <p><strong>PARKED</strong> (E1): every stage's illustration a moment from a real sim-run, so that evidence
         accumulates along the talk.</p>
     </>} />
@@ -327,7 +366,7 @@ export function Stage12() {
       {PLACEHOLDER}
       <p>Will say: come to the station this afternoon. The same names and drawings as in the talk: blue Anton, orange
         Donny, the dashed blue plan, the blue stripe of Anton's projection of her (filled from her intention, hatched
-        from her motion).</p>
+        from her motion), and the robot panel's bars of the hypotheses, as beside every replay.</p>
       <p><strong>OPEN</strong> (handoff 7): whether the web-ui's two labels "Prediction from intention" and "Prediction
         from motion" change; the slides say "projection".</p>
     </>} />

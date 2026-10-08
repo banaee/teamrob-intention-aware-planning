@@ -1,8 +1,12 @@
 /**
- * The talk's skeleton (docs/handoffs/handoff_T-pres.md, section 5; preferred, 8 October 2026): the talk stages 0 to 12
- * as rows, the robot's three questions as columns, three level titles and one turning point. A "talk stage" is a row of
- * the talk; a "part" is a unit of work on the deck (design_records.md, "T-pres, the talk"). The slides read their
- * titles, keywords and footers from here, so that a change of wording is made once.
+ * The talk's skeleton (docs/handoffs/handoff_T-pres.md, section 5; preferred, 8 October 2026; revised 8 October 2026,
+ * the overall revision: the levels removed, each talk stage 1 to 7 opened by a transition slide, the names Hadi gave):
+ * the talk stages 0 to 12 as rows, the robot's three questions as columns. A "talk stage" is a row of the talk; a
+ * "part" is a unit of work on the deck (design_records.md, "T-pres, the talk"). The slides read their titles, keywords
+ * and footers from here, so that a change of wording is made once.
+ *
+ * One concept, one term in the whole deck (the overall revision, point A): the terms used here are the deck's, listed
+ * with their meaning and their repo term in the report of that revision.
  */
 
 export type Question = "know" | "believe" | "decide";
@@ -16,103 +20,100 @@ export const QUESTION_TEXT: Record<Question, { ask: string; field: string }> = {
   decide: { ask: "What do I decide?", field: "adaptive planning" },
 };
 
-/** A column's short header on a talk stage's card. */
+/** A column's short header. */
 export const QUESTION_HEADER: Record<Question, string> = {
   know: "What I know",
   believe: "What I believe",
   decide: "What I decide",
 };
 
+/** The talk's title (Hadi, 8 October 2026, preferred, a first version). */
+export const TALK_TITLE = "Intention-aware adaptive planning in human-robot teams";
+
 export type TalkStage = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-export interface Level {
-  n: 1 | 2 | 3;
-  title: string;
-  sub: string;
-}
-
-export const LEVELS: Record<1 | 2 | 3, Level> = {
-  1: { n: 1, title: "Anton works around her", sub: "It sees where she moves, and keeps clear" },
-  2: { n: 2, title: "Anton works with her", sub: "What Anton knows grows" },
-  3: { n: 3, title: "Anton keeps up with her", sub: "Anton checks whether its belief still fits" },
-};
+/** The talk stages a transition slide lists: the seven that build the architecture. */
+export const BUILT_STAGES = [1, 2, 3, 4, 5, 6, 7] as const;
 
 export interface StageRow {
   stage: TalkStage;
+  /** The short label: in the transition slides' list and in the footer. */
   title: string;
-  level: 1 | 2 | 3 | null;
-  /** The keywords of the three columns, as section 5 gives them; a missing column has none. */
+  /** The line after the colon (Hadi's names): under the label in the transition slides' list. */
+  line: string;
+  /** The keywords of the three columns; a missing column has none. */
   columns: Partial<Record<Question, string[]>>;
 }
 
 export const STAGES: Record<TalkStage, StageRow> = {
-  0: { stage: 0, title: "Opening", level: null, columns: {} },
+  0: { stage: 0, title: "Opening", line: "", columns: {} },
   1: {
-    stage: 1, title: "Anton works alone", level: null,
+    stage: 1, title: "The robot alone", line: "it plans and executes its own tasks",
     columns: {
-      know: ["Its own tasks, decomposed down to actions"],
+      know: ["Its own tasks, broken down into actions"],
       decide: ["Plan, then execute"],
     },
   },
   2: {
-    stage: 2, title: "Donny enters", level: 1,
+    stage: 2, title: "A human in the shared space",
+    line: "the robot knows nothing about her; it reacts to her motion",
     columns: {
       know: ["Nothing about her intentions"],
-      believe: ["Empty"],
-      decide: ["Projection from her motion", "Hold near her"],
+      believe: ["Nothing"],
+      decide: ["Projection from her motion", "A hold to keep the minimum separation"],
     },
   },
   3: {
-    stage: 3, title: "She does her assigned tasks", level: 2,
+    stage: 3, title: "Assigned tasks",
+    line: "the robot knows her task list and recognises which task she does",
     columns: {
       know: ["Her task list"],
-      believe: ["H = {assigned tasks}", "Belief update", "Support from her movement",
-        "The confidence check admits a belief when it is strong enough"],
-      decide: ["Projection from her intention", "Realizer (holds)", "Task choice (switch, reorder)"],
+      believe: ["Hypotheses: her assigned tasks", "Belief update", "Support from her movement",
+        "Confidence check: a trusted intention, or none"],
+      decide: ["Projection from her intention", "Realizer: the holds", "Task choice: a switch or a reorder"],
     },
   },
   4: {
-    stage: 4, title: "She takes a coffee break", level: 2,
+    stage: 4, title: "Foreseeable behaviours",
+    line: "she does something expected that is not a task, such as a coffee break",
     columns: {
       know: ["Foreseeable behaviours"],
-      believe: ["H = {assigned tasks + foreseeable behaviours}"],
-      decide: ["Anton plans around her break"],
+      believe: ["More hypotheses: her assigned tasks and the foreseeable behaviours"],
+      decide: ["Anton adapts its plan to her coffee break"],
     },
   },
   5: {
-    stage: 5, title: "The situation gives hints", level: 2,
+    stage: 5, title: "Context", line: "the situation makes some behaviours more likely",
     columns: {
       know: ["Context"],
-      believe: ["The prior favours what the situation makes likely", "Observations still decide"],
-      decide: ["Anton adapts earlier"],
+      believe: ["The prior depends on the context", "Her observed movement still decides"],
+      decide: ["Anton adapts its plan earlier"],
     },
   },
   6: {
-    stage: 6, title: "She switches mid-way, and resumes", level: 3,
+    stage: 6, title: "Switch and resumption", line: "she leaves a task mid-way and returns to it",
     columns: {
-      believe: ["The trusted belief stops fitting (fit, for one hypothesis)"],
-      decide: ["Anton stops trusting it, replans", "Resumption"],
+      believe: ["Fit: the trusted intention no longer fits"],
+      decide: ["Anton stops trusting it and plans again", "When she resumes, her task is trusted again"],
     },
   },
   7: {
-    stage: 7, title: "She does something nobody modelled", level: 3,
+    stage: 7, title: "Unmodelled behaviour", line: "she does something the robot has no model of",
     columns: {
-      know: ["Anton knows where its model ends"],
-      believe: ["No hypothesis fits (fit, for all)", "Anton knows that it does not know"],
-      decide: ["Projection from motion, now as a deliberate fallback",
-        "Recognition resumes when she returns to modelled behaviour"],
+      know: ["Where its model ends"],
+      believe: ["Fit: no hypothesis fits", "Anton knows that it does not know"],
+      decide: ["Projection from her motion, now as the fallback",
+        "Recognition resumes when she returns to a modelled behaviour"],
     },
   },
-  8: { stage: 8, title: "Recap: the complete architecture", level: null, columns: {} },
-  9: { stage: 9, title: "The lift truck's turn", level: null, columns: {} },
-  10: { stage: 10, title: "Results", level: null, columns: {} },
-  11: { stage: 11, title: "Limits and outlook", level: null, columns: {} },
-  12: { stage: 12, title: "The afternoon: the web-ui station", level: null, columns: {} },
+  8: { stage: 8, title: "Recap: the complete architecture", line: "", columns: {} },
+  9: { stage: 9, title: "The lift truck's turn", line: "", columns: {} },
+  10: { stage: 10, title: "Results", line: "", columns: {} },
+  11: { stage: 11, title: "Limits and outlook", line: "", columns: {} },
+  12: { stage: 12, title: "The afternoon: the web-ui station", line: "", columns: {} },
 };
 
 /** The footer of a slide: where in the talk it stands. */
 export function footerText(stage: TalkStage): string {
-  const row = STAGES[stage];
-  const level = row.level === null ? "" : `Level ${row.level} · `;
-  return `${level}${stage} ${row.title}`;
+  return stage === 0 ? "Opening" : `${stage} ${STAGES[stage].title}`;
 }

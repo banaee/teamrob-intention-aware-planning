@@ -6,7 +6,8 @@ read in full in every T-pres session. A "talk stage" is a row of the talk (the h
 is a unit of work on the deck.
 
 The scenes draw with the web-ui page's own code (`webui/page/src`), imported directly, so that a change of the web-ui's
-look reaches the slides after one build; `webui/` is never changed for the deck. The type's family, weights and colours
+look reaches the slides after one build; `webui/` is never changed for the deck (the areas' names left the env-pane's
+floor by Hadi's decision of 8 October 2026, in the web-ui and on the slides alike). The type's family, weights and colours
 are the web-ui's theme (`webui/page/src/theme.ts`); the three questions' colours (`src/look.ts`) and all sizes are the
 deck's own. "Anton" and "Donny" are display text only.
 
@@ -41,7 +42,10 @@ The sim-runs replayed on slides are recorded the same way, from existing run fil
 `MesaSimulator`, as the web-ui does, and keeps the tick updates of the ticks a slide replays, cut to what it draws, in
 `data/run_<name>.json` (untracked; the list is `RUNS` in `scripts/record.mjs`). Each recording also writes the usual log
 pair to `logs/`, as every sim-run does. A slide replays one with `src/scene/RunReplay.tsx` (the env-pane's own Scene and
-floor drawings), one click per stop.
+floor drawings), one click per stop, with Anton's mind at the tick beside the scene (`src/scene/MindPanel.tsx`: the live
+hypotheses as bars, θ and the trusted intention marked, and the parts a talk stage is about; a temporary version, in
+the look of the web-ui's robot panel, of what that panel's components would draw if they were exported). The agents'
+id labels ("robot_0") are hidden on slides by the deck's stylesheet.
 
 The Python environment: `TEAMROB_PYTHON` if set, else `~/python-envs/ir-nomesa-env/bin/python` (the repository's
 working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm run build`.
@@ -55,26 +59,34 @@ working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm ru
   page error, on any request that leaves the local server, or on a speaker note visible on the screen. `--only 1920`
   runs one size.
 - `npm run pdf` (with `npm run preview` running): the deck as a PDF, one page per slide in its final step, at 2560 x
-  1440, into `pdf/deck_<yyyy-mm-dd-hh-mm>.pdf` (untracked; earlier exports are kept). `npm run pdf:quick`: a fast, rough copy for a quick check, 1280 x 720,
+  1440, into `pdf/deck_<yyyy-mm-dd-hh-mm>.pdf` (untracked; earlier exports are kept). The PDF and the click-through
+  capture a step only once the slide has settled: no replay playing, no view moving, no fade running. `npm run pdf:quick`: a fast, rough copy for a quick check, 1280 x 720,
   each slide jumped to its last step, `pdf/deck_<yyyy-mm-dd-hh-mm>_quick.pdf`. `npm run pdf:steps`: the same, one page per step (every click),
   `pdf/deck_<yyyy-mm-dd-hh-mm>_quick_steps.pdf`; no speaker notes. A fallback copy and a handout for review.
 
 ## How it is put together
 
-- `src/talk.ts`: the talk's skeleton (talk stages, levels, the three questions and the keywords of each talk stage's
-  columns), the one place of their wording.
+- `src/talk.ts`: the talk's skeleton (the title, the talk stages with their short labels and lines, the three questions
+  and the keywords of each talk stage's columns), the one place of their wording. The levels of the handoff are not on
+  the slides (the overall revision, 8 October 2026).
+- `src/architecture/unboxing.tsx`: what a block does, opened from its place: at most one formal line and two short
+  sentences (the belief as Bayes; support, fit and the confidence check as conditions), or a few lines of pseudocode
+  (the realizer, task choice).
 - `src/architecture/`: the architecture diagram (the handoff's section 6). `model.ts` holds the elements with their kinds,
   the talk stage at which each appears, the arrows with their keywords and the talk stages at which they appear or give
   way, and the positions; `Architecture.tsx` draws it with React Flow (`@xyflow/react`, pinned, bundled into the build).
   One diagram whose state is a talk stage: a slide opens on the state before its talk stage and a click adds what the
   talk stage adds (it fades in, an arrow is drawn along its length; the rest recedes). `colouring="questions"` colours it
   by know, believe, decide (the recap).
-- `src/slides/`: `kit.tsx` (the slide frame with its footer and notes, steps, TODO boxes, a talk stage's card, a level's
-  title, the architecture slide), one file per stretch of the talk, and `index.ts`, the order.
+- `src/slides/`: `kit.tsx` (the slide frame with its footer and notes, steps, TODO boxes, the mark "not settled", a talk
+  stage's transition slide: the seven talk stages as numbered circles, the starting one large, the finished ones
+  checked, with the starting one's three columns; the architecture slide), one file per stretch of the talk, and
+  `index.ts`, the order.
 - `src/scene/AgentsInRoom.tsx`: one canvas; the env-pane's `FramingCamera` framing a box that moves from a figure's ring
   to the room; the env-pane's `Scene` with a moment without agents (as the web-ui draws a layout's view); the figures
   (the domain's robot and human) drawn beside it; a veil in the slide's ground over the room and under the figures,
-  fading out as the view moves back. It mounts only while its slide is current or next to it.
+  fading out as the view moves back. It mounts only while its slide is current or next to it, and renders only while
+  its slide is current (a replay's canvas too), so that the canvases kept mounted do not load the page.
 - `src/Deck.tsx`: reveal.js with its own layout off (`disableLayout`); `src/deck.css` sizes a 16:9 stage in the unit
   `--u` (1/1920 of the stage), so a canvas is never scaled by CSS and renders sharp at both screen sizes. A slide's step
   is a reveal fragment (`useShown`); `useNear` mounts heavy content near the current slide only.

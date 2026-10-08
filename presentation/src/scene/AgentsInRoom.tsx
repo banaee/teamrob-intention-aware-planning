@@ -9,11 +9,13 @@
  * extents geometrically, so the zoom changes at an even pace. The room appears during the movement: a veil in the
  * slide's ground lies over the room and under the figures, and fades out.
  *
- * The canvas mounts only while its slide is the current one or next to it.
+ * The canvas mounts only while its slide is the current one or next to it, and renders only while its slide is the
+ * current one. While the view moves it marks itself busy (`data-busy`), which the PDF export and the click-through
+ * wait for.
  */
 
 import { Canvas, createPortal, useFrame, useThree } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
 import { FramingCamera } from "../../../webui/page/src/env-pane/camera";
@@ -25,7 +27,7 @@ import { setPixelRatio } from "../../../webui/page/src/env-pane/material";
 import { paints } from "../../../webui/page/src/env-pane/solids";
 import type { Appearance, Bounds, Direction, LayoutView } from "../../../webui/page/src/gen/messages";
 import { theme } from "../../../webui/page/src/theme";
-import { useSlideNear } from "../slides/kit";
+import { useSlideCurrent, useSlideNear } from "../slides/kit";
 
 export interface Recorded {
   appearance: Appearance;
@@ -48,10 +50,20 @@ const NO_AGENTS: Moment = { humans: [], robots: [], fixed_object_contents: [], c
  * no pointer, so the camera's orbit controls never move it. `focus`: the index of the figure the view starts on. */
 export function AgentsInRoom(props: { recorded: Recorded; figures: Placed[]; focus?: number; inRoom: boolean }) {
   const near = useSlideNear();
+  const current = useSlideCurrent();
+  const [busy, setBusy] = useState(false);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    setBusy(true);
+    const id = setTimeout(() => setBusy(false), MOVE_MS + 150);
+    return () => clearTimeout(id);
+  }, [props.inRoom]);
   return (
-    <div className="scene-canvas">
+    <div className="scene-canvas" data-busy={busy ? "true" : undefined}>
       {near && (
-        <Canvas orthographic flat dpr={[1, 2]} gl={{ antialias: true, stencil: true }}>
+        <Canvas orthographic flat dpr={[1, 2]} gl={{ antialias: true, stencil: true }}
+                frameloop={current ? "always" : "never"}>
           <PixelRatio />
           <AgentsInRoomScene {...props} focus={props.focus ?? 0} />
         </Canvas>

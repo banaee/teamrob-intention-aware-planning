@@ -10,6 +10,14 @@
  *
  * `hideHumans`: the human is not drawn, nor her path (talk stage 1, Anton alone: a human-unaware sim-run, in which the
  * robot's mind receives no human; flagged in the report).
+ *
+ * `mind`: what Anton's mind holds at the tick, beside the scene (MindPanel.tsx; the overall revision, point F).
+ * `tickNote`: the first replay says once what a tick is. The agents' id labels (the env-pane's pills, "robot_0") are
+ * hidden on slides by the deck's stylesheet: the slides name them Anton and Donny.
+ *
+ * The canvas renders only while its slide is the current one (R3F's frameloop "never" otherwise), so that the replays
+ * kept mounted do not load the page while another slide runs; while the replay plays toward a stop it marks itself
+ * busy (`data-busy`), which the PDF export and the click-through wait for.
  */
 
 import { Canvas, useThree } from "@react-three/fiber";
@@ -20,8 +28,11 @@ import { setPixelRatio } from "../../../webui/page/src/env-pane/material";
 import { aheadOf, ALL_SHOWN } from "../../../webui/page/src/env-pane/paths";
 import { foldBook } from "../../../webui/page/src/env-pane/places";
 import { type Moment, type Room, Scene } from "../../../webui/page/src/env-pane/Scene";
-import type { Appearance, RunTriple, TickUpdate, WorldDescription } from "../../../webui/page/src/gen/messages";
-import { useSlideNear, useSlideSteps } from "../slides/kit";
+import type {
+  Appearance, RobotDescription, RunTriple, TickUpdate, WorldDescription,
+} from "../../../webui/page/src/gen/messages";
+import { useSlideCurrent, useSlideNear, useSlideSteps } from "../slides/kit";
+import { type MindParts, MindPanel } from "./MindPanel";
 
 export interface RecordedRun {
   name: string;
@@ -29,7 +40,8 @@ export interface RecordedRun {
   appearance: Appearance;
   run: RunTriple;
   sim_run: string;
-  world: Pick<WorldDescription, "space" | "areas" | "fixed_objects" | "movable_objects">;
+  world: Pick<WorldDescription, "space" | "areas" | "fixed_objects" | "movable_objects" | "scripts">;
+  robots: Pick<RobotDescription, "robot" | "condition" | "assigned" | "hypotheses" | "theta">[];
   ticks: TickUpdate[];     // cut to what the slide draws (record_run.py, cut); read as tick updates
 }
 
@@ -39,14 +51,15 @@ const TICK_MS = 140;    // the pace between stops: about seven ticks a second,
 const MOVE_MAX_MS = 4000;   // and faster where a move would take longer than this
 
 /** `step`: the index of the stop the slide shows (0: the first). */
-export function RunReplay({ recorded, stops, step, hideHumans = false }: {
-  recorded: RecordedRun; stops: Stop[]; step: number; hideHumans?: boolean;
+export function RunReplay({ recorded, stops, step, hideHumans = false, mind, tickNote = false }: {
+  recorded: RecordedRun; stops: Stop[]; step: number; hideHumans?: boolean; mind?: MindParts; tickNote?: boolean;
 }) {
   // Mounted when the slide first comes near and then kept: the env-pane's Scene places the agents' labels as DOM
   // elements beside its canvas, and removing the canvas while the deck runs throws (a React removeChild error). The
   // web-ui never removes its scene during a sim-run; the deck keeps it too, at the cost of one WebGL context per
   // replay seen (seven at most).
   const nearNow = useSlideNear();
+  const current = useSlideCurrent();
   const [near, setNear] = useState(nearNow);
   useEffect(() => { if (nearNow) setNear(true); }, [nearNow]);
   const first = recorded.ticks[0].tick!;
@@ -85,17 +98,21 @@ export function RunReplay({ recorded, stops, step, hideHumans = false }: {
     recorded.appearance.default_fixed.height, ...Object.values(recorded.appearance.fixed).map((l) => l.height));
 
   return (
-    <div className="replay">
+    <div className={`replay${mind !== undefined ? " with-mind" : ""}`} data-busy={shown !== target ? "true" : undefined}>
+      <div className="replay-main">
       <div className="replay-scene">
         {near && (
-          <Canvas orthographic flat dpr={[1, 2]} gl={{ antialias: true, stencil: true }}>
+          <Canvas orthographic flat dpr={[1, 2]} gl={{ antialias: true, stencil: true }}
+                  frameloop={current ? "always" : "never"}>
             <PixelRatio />
             <FramingCamera view="tilted" free={false} onFree={() => {}} bounds={room.space.bounds} height={tallest} />
             <Scene room={room} moment={moment} book={book} appearance={recorded.appearance}
                    glideMs={target > shown ? pace : 0} ahead={ahead} shown={ALL_SHOWN} />
           </Canvas>
         )}
-        <div className="replay-tick">tick {update.tick}</div>
+        <div className="replay-tick">tick {update.tick}{tickNote && <small>one tick: one time step</small>}</div>
+      </div>
+      {mind !== undefined && <MindPanel recorded={recorded} shown={shown} parts={mind} />}
       </div>
       <p className="replay-caption">{caption}</p>
     </div>
@@ -110,13 +127,13 @@ function PixelRatio() {
 }
 
 /** A replay with its steps: one hidden step marker per stop after the first. */
-export function ReplayView({ recorded, stops, hideHumans = false }: {
-  recorded: RecordedRun; stops: Stop[]; hideHumans?: boolean;
+export function ReplayView({ recorded, stops, hideHumans = false, mind, tickNote }: {
+  recorded: RecordedRun; stops: Stop[]; hideHumans?: boolean; mind?: MindParts; tickNote?: boolean;
 }) {
   const step = useSlideSteps(".step-stop");
   return (
     <>
-      <RunReplay recorded={recorded} stops={stops} step={step} hideHumans={hideHumans} />
+      <RunReplay recorded={recorded} stops={stops} step={step} hideHumans={hideHumans} mind={mind} tickNote={tickNote} />
       {stops.slice(1).map((s) => <span key={s.tick} className="fragment step-marker step-stop" aria-hidden />)}
     </>
   );

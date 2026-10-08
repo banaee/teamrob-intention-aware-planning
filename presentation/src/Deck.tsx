@@ -95,6 +95,21 @@ export function useNear(section: RefObject<HTMLElement | null>): boolean {
   return near;
 }
 
+/** Whether a slide (its section) is the current one. */
+export function useCurrent(section: RefObject<HTMLElement | null>): boolean {
+  const deck = useContext(DeckContext);
+  const [current, setCurrent] = useState(false);
+  useEffect(() => {
+    if (deck === null) return;
+    const update = () => setCurrent(section.current !== null && deck.getCurrentSlide() === section.current);
+    deck.on("slidechanged", update);
+    deck.on("ready", update);
+    update();
+    return () => { deck.off("slidechanged", update); deck.off("ready", update); };
+  }, [deck, section]);
+  return current;
+}
+
 /** How many of a slide's elements matching `selector` are shown fragments now (the steps a slide has taken). */
 export function useVisibleCount(section: RefObject<HTMLElement | null>, selector: string): number {
   const deck = useContext(DeckContext);

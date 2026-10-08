@@ -10,7 +10,7 @@ import dock from "../../data/dock_loading_env_layout_03.json";
 import kitting from "../../data/kitting_env_layout_01.json";
 import { useShown } from "../Deck";
 import { AgentsInRoom, type Recorded } from "../scene/AgentsInRoom";
-import { QUESTION_TEXT, QUESTIONS } from "../talk";
+import { QUESTION_TEXT, QUESTIONS, TALK_TITLE } from "../talk";
 import { ArchitectureView, Slide, Todo } from "./kit";
 
 // The JSON's enumerations are read as strings; the recording wrote the web-ui's messages (LayoutView, Appearance).
@@ -26,12 +26,13 @@ const LIFT_TRUCK = { who: "robot" as const, x: 260, y: -370, facing: { x: 0, y: 
 export function TitleSlide() {
   return (
     <Slide stage={0} footer={false} className="title-slide" notes={<>
-      <p><strong>OPEN</strong>: the talk's title. The one shown is a placeholder by ccode.</p>
+      <p>The title is Hadi's (8 October 2026, preferred, a first version). The line under it is ccode's, written in the
+        talk's terms: <strong>NOT SETTLED</strong>, for Hadi.</p>
       <p>About 30 minutes plus 5 of questions. Time is budgeted per section only (for example 5 + 7 + 7 + 8 + 3).</p>
     </>}>
       <p className="title-kicker">TeamRob final demo day</p>
-      <h1 className="title-main">Working beside a human</h1>
-      <p className="title-sub">How a robot recognises what a person is doing, and plans around it</p>
+      <h1 className="title-main">{TALK_TITLE}</h1>
+      <p className="title-sub">A robot recognises which task a person does, and adapts its own plan</p>
       <p className="title-who">Hadi Banaee · TeamRob SP4, intention recognition, with SP3, planning</p>
     </Slide>
   );
@@ -64,7 +65,7 @@ export function ActorsSlide() {
       <p><strong>OPTIONAL</strong> (handoff 9): the lift truck stays small and idle in a corner of the stage slides,
         still waiting.</p>
     </>}>
-      <h1 className="scene-line">Two robots, one mind.</h1>
+      <h1 className="scene-line">Two robots with the same mind.</h1>
       <div className="actors">
         <figure className="actor">
           <div className="actor-scene"><AgentsInRoom recorded={KITTING} figures={[ANTON]} inRoom /></div>
@@ -135,12 +136,12 @@ export function TeamSlide() {
 export function QuestionsSlide() {
   return (
     <Slide stage={0} notes={<>
-      <p>Anton's mind answers three questions. They are the columns of every stage that follows; the stages grow in
-        complexity, one row at a time.</p>
+      <p>Anton answers three questions. They are the columns of every talk stage that follows; the talk stages grow in
+        complexity, one at a time.</p>
       <p>What I know: knowledge representation. What I believe: intention recognition. What I decide: adaptive
         planning.</p>
     </>}>
-      <h1 className="slide-head">Anton's mind answers three questions</h1>
+      <h1 className="slide-head">Anton answers three questions</h1>
       <div className="questions">
         {QUESTIONS.map((q) => (
           <div key={q} className={`question fragment column-${q}`}>
@@ -157,13 +158,13 @@ export function QuestionsSlide() {
 export function ArchitectureFrameSlide() {
   return (
     <Slide stage={0} className="arch-slide" notes={<>
-      <p>This is the picture of Anton's mind we will fill, one stage at a time: what it is given (knowledge, left),
-        its mind (what it believes, what it decides), its body, and the world, which it reaches only through its
+      <p>This is Anton's architecture, still empty; it is filled one talk stage at a time: what it is given (knowledge,
+        left), its mind (what it believes, what it decides), its body, and the world, which it reaches only through its
         body.</p>
       <p>Click: the three questions over the regions they will fill.</p>
       <p>Suggestion by ccode: the empty frames here, so that the diagram is introduced once and then only grows.</p>
     </>}>
-      <ArchitectureView stage={0} questionTags title="The picture we will fill" />
+      <ArchitectureView stage={0} questionTags title="Anton's architecture" />
     </Slide>
   );
 }

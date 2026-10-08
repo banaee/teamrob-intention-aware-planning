@@ -1,6 +1,7 @@
 /**
- * The deck's slides, in the talk's order (handoff_T-pres.md, section 5): talk stages 0 to 12, the three level titles
- * and the turning point after talk stage 2. Each entry is one slide; a slide may have several steps.
+ * The deck's slides, in the talk's order (handoff_T-pres.md, section 5, as the overall revision of 8 October 2026 left
+ * it): talk stages 0 to 12, each of 1 to 7 opened by its transition slide, and the question that leads from talk stage
+ * 2 to 3. Each entry is one slide; a slide may have several steps.
  */
 
 import type { ComponentType } from "react";
@@ -20,33 +21,38 @@ export const SLIDES: ComponentType[] = [
   opening.TeamSlide,
   opening.QuestionsSlide,
   opening.ArchitectureFrameSlide,
-  // 1 Anton works alone
-  stage1.Stage1Card,
+  // 1 The robot alone
+  stage1.Stage1Transition,
   stage1.DecompositionSlide,
   stage1.PlanExecuteSlide,
   stage1.Stage1Architecture,
-  // Level 1; 2 Donny enters; the turning point
-  stage2.Level1Slide,
+  // 2 A human in the shared space; the question that leads to talk stage 3
+  stage2.Stage2Transition,
   stage2.DonnyEntersSlide,
   stage2.AudienceQuestionSlide,
-  stage2.Stage2Card,
   stage2.ProjectionSlide,
   stage2.ReactiveRunSlide,
   stage2.Stage2Architecture,
   stage2.TurningPointSlide,
-  // Level 2: 3, 4, 5
-  later.Level2Slide,
-  later.Stage3Card,
+  // 3 Assigned tasks
+  later.Stage3Transition,
+  later.Stage3Replay,
   later.Stage3Architecture,
-  later.Stage4Card,
+  // 4 Foreseeable behaviours
+  later.Stage4Transition,
+  later.Stage4Replay,
   later.Stage4Architecture,
-  later.Stage5Card,
+  // 5 Context
+  later.Stage5Transition,
+  later.Stage5Replay,
   later.Stage5Architecture,
-  // Level 3: 6, 7
-  later.Level3Slide,
-  later.Stage6Card,
+  // 6 Switch and resumption
+  later.Stage6Transition,
+  later.Stage6Replay,
   later.Stage6Architecture,
-  later.Stage7Card,
+  // 7 Unmodelled behaviour
+  later.Stage7Transition,
+  later.Stage7Replay,
   later.Stage7Architecture,
   // 8 to 12
   later.Stage8Recap,

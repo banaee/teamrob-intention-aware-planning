@@ -8,7 +8,8 @@ configs/kitting/tf1/measurement/), its run options passed as the web-ui passes a
 
 Writes presentation/data/run_<name>.json: the domain's scene appearance, the run's triple and world (the run
 description's), and the tick updates of ticks <first> to <last>, each cut to what the slide draws (the world, and per
-robot its body, the leader of its belief, its last decision and what lies ahead). The deck's build runs it
+robot its body, its belief over the live hypotheses, its gate's answer, its last decision and what lies ahead), and the
+robots' descriptions (their hypotheses and θ), which the robot's mind beside a replay reads. The deck's build runs it
 (scripts/record.mjs) every time, from the original files.
 """
 
@@ -52,9 +53,7 @@ def cut(update: msg.TickUpdate) -> dict:
         robots.append({
             "robot": r.robot,
             "body": r.body.model_dump(mode="json", include={"task", "hold", "finished"}),
-            "belief": None if belief is None else
-            {"leader": belief.leader, "confidence": belief.confidence,
-             "finding": None if belief.finding is None else belief.finding.value},
+            "belief": None if belief is None else belief.model_dump(mode="json"),
             "gate_answer": r.gate_answer.value,
             "decision": None if r.decision is None else r.decision.model_dump(mode="json"),
             "walks_ahead": [w.model_dump(mode="json") for w in r.walks_ahead],
@@ -87,7 +86,10 @@ def main(name: str, run_path: str, first: int, last: int) -> None:
         "run": description.run.model_dump(mode="json"),
         "sim_run": f"deck-{name}",
         "world": description.world.model_dump(mode="json", include={"space", "areas", "fixed_objects",
-                                                                     "movable_objects"}),
+                                                                     "movable_objects", "scripts"}),
+        "robots": [r.model_dump(mode="json", include={"robot", "condition", "assigned", "hypotheses",
+                                                       "theta"})
+                   for r in description.robots],
         "ticks": ticks,
     }
     out = REPO / "presentation" / "data" / f"run_{name}.json"

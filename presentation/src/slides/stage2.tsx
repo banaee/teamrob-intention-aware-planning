@@ -1,6 +1,7 @@
 /**
- * Level 1 and talk stage 2, Donny enters (handoff_T-pres.md, sections 4, 5, 9): Anton knows nothing about her
- * intentions, its belief is empty; it projects from her motion and holds near her: the reactive robot. The planner
+ * Talk stage 2, a human in the shared space (handoff_T-pres.md, sections 4, 5, 9; the name of the overall revision):
+ * Anton knows nothing about her intentions, it believes nothing; it projects her motion and holds to keep the minimum
+ * separation: the reactive robot. The planner
  * stays; what changes is the projection it receives. Then the turning point: what if Anton knows something about her
  * behaviour? A first version for Hadi's revision.
  *
@@ -10,19 +11,18 @@
  * projection**, T-D P4): the last displacement continued for as many ticks as the current straight run has lasted.
  */
 
-import { ArchitectureView, LevelTitle, Slide, StageCard, Todo, useStep, StepMarker } from "./kit";
+import { ArchitectureView, Slide, StepMarker, Todo, TransitionSlide, useStep } from "./kit";
 import { ReplayReactive } from "./replays";
 
-export function Level1Slide() {
+export function Stage2Transition() {
   return (
-    <Slide stage={2} className="level-slide" notes={<>
-      <p>Level 1: Anton works around her. It sees where she moves, and keeps clear.</p>
+    <TransitionSlide stage={2} notes={<>
+      <p>Donny enters the shared space. Anton knows nothing about her intentions and believes nothing about them: it
+        reacts to her motion.</p>
       <p><strong>OPTIONAL</strong> (2024 callback): Hadi's October 2024 deck and the HHAI/CHAI 2024 poster contrasted an
         "intrinsic reaction" (the robot halts to avoid a collision) with an "enhanced reaction" (it recognises the
-        intention and adapts its plan). Level 1 is the intrinsic reaction; levels 2 and 3 the enhanced one.</p>
-    </>}>
-      <LevelTitle level={1} />
-    </Slide>
+        intention and adapts its plan). Talk stage 2 is the intrinsic reaction; talk stages 3 to 7 the enhanced one.</p>
+    </>} />
   );
 }
 
@@ -57,17 +57,6 @@ export function AudienceQuestionSlide() {
   );
 }
 
-export function Stage2Card() {
-  return (
-    <Slide stage={2} notes={<>
-      <p>Anton knows nothing about her intentions; its belief is empty. What it can do: see where she moves, project
-        that motion ahead, and hold where its own path would come too close.</p>
-    </>}>
-      <StageCard stage={2} />
-    </Slide>
-  );
-}
-
 // The drawing's ground: a room seen from above, in its own unit.
 const W = 1100;
 const H = 600;
@@ -87,7 +76,8 @@ export function ProjectionSlide() {
       <p>Click 2: the projection from her motion: Anton continues her last motion, for as long as it has seen her move
         that way (a straight run of k ticks is projected k ticks ahead; a stand, as long as she has stood). It claims
         nothing about what she intends.</p>
-      <p>Click 3: where Anton's path would come too close to her projected path, it holds, then goes on.</p>
+      <p>Click 3: where Anton's path would come closer than the minimum separation to her projected path, it holds, then
+        goes on.</p>
       <p>This is the reactive robot. The planner stays; what changes is the projection it receives. The same drawing
         is on the floor of the web-ui this afternoon: the robot's plan a dashed blue line, its projection of her a wide
         hatched blue stripe.</p>
@@ -126,7 +116,8 @@ export function ProjectionSlide() {
         <div className="projection-text">
           <p className={`appear${seenShown ? " on" : ""}`}>Anton sees where she moves.</p>
           <p className={`appear${projectedShown ? " on" : ""}`}>It continues her motion, for as long as it has seen it.</p>
-          <p className={`appear${heldShown ? " on" : ""}`}>Where its path would come too close, it holds.</p>
+          <p className={`appear${heldShown ? " on" : ""}`}>Where its path would come closer than the minimum separation, it
+            holds.</p>
         </div>
       </div>
       <StepMarker r={seen} />
@@ -139,7 +130,8 @@ export function ProjectionSlide() {
 export function ReactiveRunSlide() {
   return (
     <Slide stage={2} className="replay-slide" notes={<>
-      <p>The reactive robot in a real sim-run: Anton keeps clear, and it holds near her. One click per stop.</p>
+      <p>The reactive robot in a real sim-run: Anton holds to keep the minimum separation from her projected path. One
+        click per stop. Beside the scene, Anton's mind: no hypotheses, the projection from her motion, its hold.</p>
       <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_02 on env_layout_12, T-F part 1's
         intention-unaware run (run_006), ticks 24 to 52.</p>
       <p><strong>OPEN</strong> (handoff 5, 11): a screenshot of Fatemeh's PRIEST trajectory adaptation (ROS side) may
@@ -164,7 +156,7 @@ export function Stage2Architecture() {
       <p>Click: with Donny in the room, the world state holds her motion. The projection turns it into her path; the
         realizer takes the planner's plan and her path, and decides the next action and the hold. The direct arrow from
         the planner to execute gives way to the realizer's.</p>
-      <p>Recognition is still empty: Anton believes nothing about her.</p>
+      <p>Recognition is still absent: Anton believes nothing about her.</p>
     </>}>
       <ArchitectureView stage={2} title="The architecture so far" />
     </Slide>
@@ -174,11 +166,12 @@ export function Stage2Architecture() {
 export function TurningPointSlide() {
   return (
     <Slide stage={2} className="turning-slide" notes={<>
-      <p>The challenge: Anton keeps clear, but it only reacts to where she is going now. The solution the rest of the
-        talk builds: let Anton know something about her behaviour.</p>
+      <p>The challenge: Anton keeps the minimum separation, but it only reacts to her present motion. The solution the
+        rest of the talk builds: let Anton know something about her behaviour.</p>
       <p>A challenge followed by a solution, never a list of failures.</p>
     </>}>
-      <p className="turning-challenge">Anton keeps clear of her. It reacts to where she is going now.</p>
+      <p className="turning-challenge">Anton keeps the minimum separation from her. It reacts only to her present
+        motion.</p>
       <p className="turning-solution fragment">What if Anton knows something about her behaviour?</p>
     </Slide>
   );

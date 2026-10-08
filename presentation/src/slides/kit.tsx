@@ -1,7 +1,7 @@
 /**
  * The parts every slide is made of: the slide itself (its section, its 16:9 stage, its footer and its speaker notes),
- * a step, a TODO box, a talk stage's card with the three questions as columns, a level's title, and the architecture
- * at a talk stage. Text and keywords come from talk.ts.
+ * a step, a TODO box, a mark for what is not settled, a talk stage's transition (the seven talk stages as a list, the
+ * starting one with its three columns), and the architecture at a talk stage. Text and keywords come from talk.ts.
  */
 
 import { createContext, type ReactNode, type RefObject, useContext, useRef } from "react";
@@ -9,8 +9,8 @@ import { createContext, type ReactNode, type RefObject, useContext, useRef } fro
 import { Architecture, type Colouring } from "../architecture/Architecture";
 import { type Unboxable, Unboxed } from "../architecture/unboxing";
 import { ELEMENTS } from "../architecture/model";
-import { useNear, useShown, useVisibleCount } from "../Deck";
-import { footerText, LEVELS, QUESTION_HEADER, QUESTIONS, STAGES, type TalkStage } from "../talk";
+import { useCurrent, useNear, useShown, useVisibleCount } from "../Deck";
+import { BUILT_STAGES, footerText, QUESTION_HEADER, QUESTIONS, STAGES, type TalkStage } from "../talk";
 
 const SlideContext = createContext<RefObject<HTMLElement | null> | null>(null);
 
@@ -25,7 +25,7 @@ export function Slide({ stage, notes, children, className = "", footer = true }:
       <SlideContext.Provider value={section}>
         <div className={`stage ${className}`}>
           {children}
-          {footer && <div className="footer">{stage === 0 ? "Opening" : footerText(stage)}</div>}
+          {footer && <div className="footer">{footerText(stage)}</div>}
         </div>
       </SlideContext.Provider>
       <aside className="notes">{notes}</aside>
@@ -38,6 +38,13 @@ export function useSlideNear(): boolean {
   const section = useContext(SlideContext);
   if (section === null) throw new Error("useSlideNear outside a Slide");
   return useNear(section);
+}
+
+/** Whether the slide this is called in is the current one: a canvas renders only then. */
+export function useSlideCurrent(): boolean {
+  const section = useContext(SlideContext);
+  if (section === null) throw new Error("useSlideCurrent outside a Slide");
+  return useCurrent(section);
 }
 
 /** How many of the slide's elements matching `selector` are shown steps now. */
@@ -68,45 +75,61 @@ export function Todo({ by, children, className = "" }: { by: string; children: R
   );
 }
 
+/** A mark on a slide whose content is not settled: Hadi's word is needed (listed in the report of the revision that
+ * set it). Small, in a corner, never in the way of the content. */
+export function Unsettled({ children }: { children: ReactNode }) {
+  return <div className="unsettled"><span className="unsettled-head">not settled</span> {children}</div>;
+}
+
 export function StageTitle({ stage }: { stage: TalkStage }) {
   return (
     <h1 className="stage-title"><span className="stage-n">{stage}</span>{STAGES[stage].title}</h1>
   );
 }
 
-/** A talk stage's card: its title and the three questions as columns, with the keywords of section 5; a column the
- * talk stage leaves empty shows a dash. `children` go below the columns (a scene, a TODO box). */
-export function StageCard({ stage, children }: { stage: TalkStage; children?: ReactNode }) {
+/** The transition into a talk stage 1 to 7 (the overall revision, point B): the seven talk stages as numbered circles
+ * joined by a line, the starting one larger and bold, the finished ones marked done (a check and a quiet colour), the
+ * coming ones plain; beside them the starting talk stage's three columns (what I know, believe, decide). */
+export function Transition({ stage }: { stage: TalkStage }) {
   const row = STAGES[stage];
   return (
-    <>
-      <StageTitle stage={stage} />
-      <div className="card-body">
-      <div className="columns">
+    <div className="transition">
+      <ol className="steps">
+        {BUILT_STAGES.map((n) => {
+          const state = n < stage ? "done" : n === stage ? "now" : "coming";
+          return (
+            <li key={n} className={`step step-${state}`}>
+              <span className="step-circle" aria-label={state === "done" ? `${n}, done` : `${n}`}>
+                {state === "done" ? "✓" : n}
+              </span>
+              <span className="step-text">
+                <span className="step-label">{STAGES[n].title}</span>
+                <span className="step-line">{STAGES[n].line}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="transition-columns">
         {QUESTIONS.map((q) => (
-          <div key={q} className={`column column-${q}`}>
-            <h2 className="column-head">{QUESTION_HEADER[q]}</h2>
-            {(row.columns[q] ?? []).length === 0 ? <p className="column-empty">–</p> : (
+          <div key={q} className={`tcol column-${q}`}>
+            <h2 className="tcol-head">{QUESTION_HEADER[q]}</h2>
+            {(row.columns[q] ?? []).length === 0 ? <p className="tcol-empty">–</p> : (
               <ul>{row.columns[q]!.map((k) => <li key={k}>{k}</li>)}</ul>
             )}
           </div>
         ))}
       </div>
-      {children}
-      </div>
-    </>
+    </div>
   );
 }
 
-/** A level's title and its sub-line. */
-export function LevelTitle({ level }: { level: 1 | 2 | 3 }) {
-  const l = LEVELS[level];
+/** The slide that opens a talk stage 1 to 7. */
+export function TransitionSlide({ stage, notes }: { stage: TalkStage; notes: ReactNode }) {
   return (
-    <div className="level">
-      <div className="level-n">Level {l.n}</div>
-      <h1 className="level-title">{l.title}</h1>
-      <p className="level-sub">{l.sub}</p>
-    </div>
+    <Slide stage={stage} className="transition-slide" notes={notes}>
+      <Transition stage={stage} />
+    </Slide>
   );
 }
 
