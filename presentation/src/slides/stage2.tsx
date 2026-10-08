@@ -11,7 +11,7 @@
  * projection**, T-D P4): the last displacement continued for as many ticks as the current straight run has lasted.
  */
 
-import { ArchitectureView, Slide, StepMarker, Todo, TransitionSlide, useStep } from "./kit";
+import { ArchitectureView, Slide, StepMarker, TransitionSlide, Unsettled, useStep } from "./kit";
 import { ReplayReactive } from "./replays";
 
 export function Stage2Transition() {
@@ -26,35 +26,16 @@ export function Stage2Transition() {
   );
 }
 
-export function DonnyEntersSlide() {
-  return (
-    <Slide stage={2} notes={<>
-      <p>Donny enters the room while Anton works.</p>
-      <p><strong>NOT SETTLED</strong> (the second search, 8 October 2026): no existing kitting scenario has her enter the
-        room. None starts her outside or at a door; three (scenario_s01_05, s01_08, s05_04) walk her to the door and back
-        in, with no hold for Anton; scenario_s10_01 with her start moved to door_N gives no hold either. A proposal for
-        Hadi to author is in the report of the overall revision.</p>
-      <p><strong>PARKED</strong> (handoff 11): the comparison with centralised multi-agent planning, candidate place
-        here. Agreed wording: a central planner can command robots; nobody can command a human, whose current intention
-        is not communicated and whose behaviour is only partly modelled. A different setting, not a weaker approach.</p>
-    </>}>
-      <h1 className="slide-head">Donny enters</h1>
-      <Todo by="part 4" className="todo-large">
-        Donny walking into the room while Anton works, replayed from a recorded sim-run of an existing kitting
-        scenario: the human in orange, the robot in blue, the floor as the web-ui draws it. A few clicks, or a short
-        play that stops when she is in the room. Why: the moment the human enters is the moment the question below is
-        asked.
-      </Todo>
-    </Slide>
-  );
-}
-
 export function AudienceQuestionSlide() {
   return (
     <Slide stage={2} className="question-slide" notes={<>
       <p>The one question to the audience. Let them answer; collect two or three answers, then go on: first, the
         simplest robot, which knows nothing about her.</p>
       <p>Wording: the handoff's candidate.</p>
+      <p><strong>PARKED</strong> (handoff 11): the comparison with centralised multi-agent planning, candidate place at
+        the moment Donny enters (its slide removed, tpres-v4). Agreed wording: a central planner can command robots;
+        nobody can command a human, whose current intention is not communicated and whose behaviour is only partly
+        modelled. A different setting, not a weaker approach.</p>
     </>}>
       <p className="ask">What would Anton need to know to work beside her?</p>
     </Slide>
@@ -136,8 +117,12 @@ export function ReactiveRunSlide() {
     <Slide stage={2} className="replay-slide" notes={<>
       <p>The reactive robot in a real sim-run: Anton holds to keep the minimum separation from her projected path. One
         click per stop. Beside the scene, Anton's mind: no hypotheses, the projection from her motion, its hold.</p>
-      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_02 on env_layout_12, T-F part 1's
-        intention-unaware run (run_006), ticks 24 to 52.</p>
+      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026): kitting scenario_s302_02 on env_layout_12, run file
+        configs/kitting/tpres/stage2_s302_02.yaml (intention-unaware, as the replay it replaced), ticks 0 to 26. Anton
+        decides again at 2, 6, 14, 23 and 25 as each projection from her motion runs out; she picks up item 1 at 24.</p>
+      <p><strong>NOT SETTLED</strong>: in this run Anton never holds (every candidate's hold is 0). Within ticks 0 to 26
+        the two stay 428 cm apart or more; their paths pass closest at tick 42, 60.31 cm apart, beyond the minimum
+        separation (50 cm). The replay does not show the reactive robot's hold that this slide is about.</p>
       <p><strong>OPEN</strong> (handoff 5, 11): a screenshot of Fatemeh's PRIEST trajectory adaptation (ROS side) may
         acknowledge her work here, labelled as such; Hadi fixes its wording. It would need its own slide or a corner of
         this one.</p>
@@ -147,6 +132,8 @@ export function ReactiveRunSlide() {
         sim-run of an existing kitting scenario with the robot intention-unaware, in the env-pane's look: the hatched
         blue stripe, the dashed blue plan, the hold. Stepped by clicks around the hold.</p>
     </>}>
+      <Unsettled>Anton never holds in this run: their paths pass 60 cm apart at tick 42, beyond the minimum
+        separation.</Unsettled>
       <h1 className="slide-head">The reactive robot</h1>
       <ReplayReactive />
       <p className="slide-foot-line">The planner stays; what changes is the projection it receives.</p>

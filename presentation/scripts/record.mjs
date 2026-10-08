@@ -13,15 +13,18 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const VIEWS = [["kitting", "env_layout_01"], ["dock_loading", "env_layout_03"]];   // [domain, layout], one per data file
-// The sim-runs replayed on slides (scripts/record_run.py): [name, existing run file, first tick, last tick].
+// The sim-runs replayed on slides (scripts/record_run.py): [name, run file, first tick, last tick]. Talk stage 3's is T-F
+// part 1's run file; the others run Hadi's scenarios for the talk (tpres-v4) from their own run files under
+// configs/kitting/tpres/, outside every measured set.
 const TF1 = "configs/kitting/tf1/measurement";
+const TPRES = "configs/kitting/tpres";
 const RUNS = [
-  ["stage1_alone", `${TF1}/scenario_s12_02/run_061.yaml`, 0, 136],        // human-unaware
-  ["stage2_reactive", `${TF1}/scenario_s10_02/run_006.yaml`, 24, 52],     // intention-unaware
+  ["stage1_alone", `${TPRES}/stage1_s301_01.yaml`, 0, 150],                // human-unaware, no human in the scenario
+  ["stage2_reactive", `${TPRES}/stage2_s302_02.yaml`, 0, 26],              // intention-unaware
   ["stage3_switch", `${TF1}/scenario_s12_01/run_060.yaml`, 0, 62],
-  ["stage4_break", `${TF1}/scenario_s24_14/run_264.yaml`, 85, 150],
-  ["stage5_breaktime", `${TF1}/scenario_s23_03/run_576.yaml`, 0, 62],
-  ["stage6_unmodelled", `${TF1}/scenario_s10_07/run_028.yaml`, 40, 125],
+  ["stage4_break", `${TPRES}/stage4_s304_14_ck_off.yaml`, 85, 150],        // context knowledge off
+  ["stage5_context", `${TPRES}/stage5_s304_14_ck_on.yaml`, 85, 150],       // the same scenario, context knowledge on
+  ["stage6_unmodelled", `${TPRES}/stage6_s111_02.yaml`, 0, 70],
 ];
 
 const here = dirname(fileURLToPath(import.meta.url));

@@ -164,57 +164,6 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
   color: var(--color-inkSoft); z-index: 5; }
 .unsettled-head { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink); }
 
-/* ---- Talk stage 6: she turns mid-way (the old talk stage 6's case as one slide) --------------------------------
-   Two cases side by side, each a click; the bars an illustration in the look of Anton's mind beside the replays. */
-
-.turn-cases { display: flex; gap: calc(72 * var(--u)); margin-top: calc(72 * var(--u)); flex: 1; min-height: 0; }
-.turn-case { flex: 1; padding-top: calc(24 * var(--u)); border-top: calc(5 * var(--u)) solid var(--color-line); }
-.turn-head { font-size: calc(44 * var(--u)); font-weight: var(--weight-medium); line-height: 1.2; }
-.turn-sub { margin-top: calc(8 * var(--u)); font-size: calc(28 * var(--u)); color: var(--color-inkFaint); }
-.turn-chart { margin-top: calc(48 * var(--u)); display: flex; flex-direction: column; gap: calc(28 * var(--u)); }
-.turn-row { display: grid; grid-template-columns: calc(300 * var(--u)) 1fr calc(190 * var(--u)); align-items: center;
-  gap: calc(24 * var(--u)); font-size: calc(30 * var(--u)); }
-.turn-name { display: flex; align-items: center; gap: calc(12 * var(--u)); white-space: nowrap; color: var(--color-ink); }
-.turn-badge { padding: 0 calc(12 * var(--u)); border-radius: calc(14 * var(--u)); font-size: calc(22 * var(--u));
-  color: var(--color-floor); background: var(--color-robot); }
-.turn-bar { position: relative; display: block; height: calc(18 * var(--u)); border-radius: calc(9 * var(--u));
-  background: var(--color-lineFaint); }
-.turn-bar span { position: absolute; inset: 0 auto 0 0; border-radius: calc(9 * var(--u)); background: var(--color-inkFaint); }
-.turn-row.is-trusted .turn-bar span { background: var(--color-robot); }
-.turn-bar i { position: absolute; top: calc(-7 * var(--u)); bottom: calc(-7 * var(--u)); width: calc(3 * var(--u));
-  background: var(--color-ink); }
-.turn-fit { font-size: calc(26 * var(--u)); color: var(--color-inkSoft); }
-.turn-misfit { color: var(--color-ink); font-weight: var(--weight-medium); }
-.turn-misfit::before { content: "✗ "; }
-.turn-says { margin-top: calc(48 * var(--u)); font-size: calc(34 * var(--u)); line-height: 1.3; color: var(--color-ink); }
-
-/* ---- Talk stage 9: the results table (Hadi's table, as he gave it) ------------------------------------------------
-   The two numbers of a row large; a group a click; a row measured on one scenario set apart by a dashed rule and its
-   n in italics; "worse" is a word, given weight, not a colour alone. */
-
-.results { margin-top: calc(28 * var(--u)); width: 100%; border-collapse: collapse; font-size: calc(23 * var(--u));
-  line-height: 1.25; }
-.results thead th { text-align: left; font-weight: var(--weight-medium); font-size: calc(20 * var(--u));
-  color: var(--color-inkFaint); padding: 0 calc(14 * var(--u)) calc(10 * var(--u));
-  border-bottom: calc(2 * var(--u)) solid var(--color-line); }
-.results tbody { border-bottom: calc(1.5 * var(--u)) solid var(--color-lineFaint); }
-.results td, .results tbody th { padding: calc(9 * var(--u)) calc(14 * var(--u)); vertical-align: middle; }
-.results .r-stage { text-align: left; font-weight: var(--weight-medium); color: var(--color-ink); width: calc(270 * var(--u));
-  vertical-align: top; padding-top: calc(14 * var(--u)); }
-.results .r-measure { color: var(--color-ink); }
-.results .r-num { text-align: right; font-family: var(--font-mono); font-size: calc(34 * var(--u)); color: var(--color-inkSoft);
-  white-space: nowrap; }
-.results thead .r-num { font-family: inherit; font-size: calc(20 * var(--u)); text-align: right; }
-.results .r-with { color: var(--color-ink); font-weight: var(--weight-medium); }
-.results .r-word { font-family: inherit; font-size: calc(22 * var(--u)); white-space: normal; }
-.results .r-better { color: var(--color-inkSoft); }
-.results .r-result { color: var(--color-ink); }
-.results .r-worse { font-weight: var(--weight-medium); color: var(--color-stateSuspended); }
-.results .r-n { color: var(--color-inkFaint); white-space: nowrap; }
-.results tr.r-one td { border-top: calc(1.5 * var(--u)) dashed var(--color-lineFaint);
-  border-bottom: calc(1.5 * var(--u)) dashed var(--color-lineFaint); }
-.results tr.r-one .r-n { font-style: italic; color: var(--color-inkSoft); }
-
 /* ---- The question to the audience, the turning point ------------------------------------------------------------ */
 
 .question-slide, .turning-slide { justify-content: center; padding-left: calc(160 * var(--u)); }

@@ -3,8 +3,9 @@
  * slide (the six talk stages, the starting one with its three columns), then a replayed sim-run with Anton's mind
  * beside it, then the architecture, a click adding what the talk stage adds and one click per block it opens or extends
  * (architecture/unboxing.tsx). Talk stage 6 is the merge of the same day (the old talk stages 6, switch and resumption,
- * and 7, unmodelled behaviour, both resting on fit): the old switch is one slide before its replay, with no replay of its
- * own. Talk stages 7 to 11 stay placeholders (parts 3 and 5). A replay that does not yet meet its criterion (the
+ * and 7, unmodelled behaviour, both resting on fit); since tpres-v4 it shows unmodelled behaviour only, the switch to a
+ * known behaviour one line of its notes. Talk stages 7, 8, 10 and 11 stay placeholders (parts 3 and 5); 9 holds Hadi's
+ * results table. A replay that does not yet meet its criterion (the
  * mechanism visibly changes what Anton does) carries the mark "not settled".
  */
 
@@ -12,7 +13,7 @@ import type { ReactNode } from "react";
 
 import type { Unboxable } from "../architecture/unboxing";
 import { STAGES, type TalkStage } from "../talk";
-import { ArchitectureView, Slide, StageTitle, StepMarker, Todo, TransitionSlide, Unsettled, useStep } from "./kit";
+import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide, Unsettled } from "./kit";
 import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplayTrusted } from "./replays";
 
 /** A talk stage's replayed sim-run, with Anton's mind beside it. `todo`: what the TODO box this replay stands in asked
@@ -130,11 +131,12 @@ export function Stage4Replay() {
       reorder caused by the trusted break. Why: one later stage should show planning change, not only recognition.
     </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong> (the second search): kitting scenario_s24_14 on env_layout_07, T-F part 1's run_264
-        (context knowledge on, no fact in force), ticks 85 to 150. The coffee break trusted at 116 (0.78), and Anton
-        switches from item 56 to item 54; the human-unaware run_261 does item 56 at 85 to 169. Weakness: from 90 to 114
-        Anton walks about 55 cm behind her. The earlier draft, run_064 of scenario_s12_02, held 18 ticks with no change of
-        task. One click per stop.</p>
+      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026): kitting scenario_s304_14 on env_layout_07,
+        context knowledge off, run file configs/kitting/tpres/stage4_s304_14_ck_off.yaml, ticks 85 to 150. Her second
+        coffee break starts at 90; Anton chooses deliver item 56 at 97; the break is trusted at 106 (0.76), and Anton
+        switches to deliver item 54: item 56, realized against her break, would need a hold of 26 ticks. No hold carried
+        out; closest 96.48 cm (tick 89). Talk stage 5 replays the same scenario with context knowledge on. One click per
+        stop.</p>
       {MIND}
     </>}>
       <ReplayBreak />
@@ -166,19 +168,23 @@ export function Stage5Transition() {
 
 export function Stage5Replay() {
   return (
-    <ReplaySlide stage={5} title="Context: a sim-run" todo={<>
+    <ReplaySlide stage={5} title="Context: a sim-run"
+                 unsettled="Here context makes the break trusted later (116 against 106): just after a break, another is less likely. The stage says earlier."
+                 todo={<>
       A recorded sim-run with a context fact in force (break time), the same script with and without it if one exists:
       the prior favouring the coffee break, its trust coming earlier, her movement still deciding. Why: the audience
       sees the situation make Anton adapt earlier.
     </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong> (the second search): kitting scenario_s23_03 on env_layout_07 (scenario_s05_01 with break
-        time in force from 0 to 56), T-F part 1's run_576, ticks 0 to 62: the coffee break leads from tick 0 (0.66) and is
-        trusted at 27 (0.76); Anton switches to item 2 and walks away, no violation. The same shift without the fact
-        (scenario_s05_01, run_108, context knowledge on): the break is trusted only at 52, Anton passes her at 31.62 cm at
-        tick 28 (3 ticks below the minimum separation). Weakness: in run_108 the context makes the start worse than
-        with context knowledge off (her walk read as deliver item 5 at 0.97; off, run_107, the break is trusted at 32).
-        The earlier draft, run_707 against run_064, changed only where and when Anton paused. One click per stop.</p>
+      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026): the same scenario_s304_14 as talk stage 4, context
+        knowledge on, run file configs/kitting/tpres/stage5_s304_14_ck_on.yaml, the same ticks 85 to 150, so that the two
+        replays show one situation without and with context knowledge. The coffee break trusted at 116 (0.78), against
+        106 without (talk stage 4); the same switch, from item 56 to item 54, 10 ticks later. No timeline: no context fact
+        is in force; her first break, completed at 51, makes the coffee break recent, its level suppressed until 141. At
+        106 the coffee break stands at 0.37, behind switching on the A/C at 0.46. Closest 96.48 cm (tick 89).</p>
+      <p><strong>NOT SETTLED</strong>: here context knowledge makes the break trusted later, not earlier: the talk
+        stage's columns say "Anton adapts its plan earlier". What the run shows is true of the framework (just after a
+        break, another is less likely); whether the stage shows this case or one with a fact in force is Hadi's.</p>
       <p>Measured (T-F part 1, COMPARISON.md, step 3b): with a fact in force, a fact in accord with her task speeds its
         trust, one not in accord delays it, with little change in completion. A number on a slide comes from an actual
         run.</p>
@@ -211,99 +217,38 @@ export function Stage6Transition() {
   return (
     <TransitionSlide stage={6} notes={<>
       <p>One mechanism carries this talk stage: fit. Anton checks whether the intention it trusts still fits what she
-        does; when it stops fitting, Anton stops trusting it. Two cases: she turns mid-way to something Anton knows, or to
-        something Anton has no model of.</p>
+        does; when it stops fitting, Anton stops trusting it.</p>
+      <p>If she turns mid-way to something Anton knows, a coffee break, the belief moves to it and Anton trusts it (said
+        only here, on no slide).</p>
       <p>She does something the robot has no model of: unmodelled behaviour, the only deviation in the glossary's sense
         (a part of what she does that Anton's task model lacks). This talk stage is the one place the talk says
         "deviation", and only for the unmodelled case. It may say here why common sense would call a coffee break a
         deviation and the framework does not: the coffee break is foreseen, in Anton's model.</p>
       <p>(The merge of 8 October 2026: the old talk stages 6, switch and resumption, and 7, unmodelled behaviour, are
-        this one talk stage, since both rest on fit.)</p>
+        this one talk stage, since both rest on fit; since tpres-v4 it shows only unmodelled behaviour.)</p>
     </>} />
-  );
-}
-
-/** One abstract row of the drawing: a hypothesis, its belief as a bar (no value: an illustration, not a run), θ, and
- * whether it fits. */
-function TurnRow({ name, share, fits, trusted = false }: {
-  name: string; share: number; fits: boolean; trusted?: boolean;
-}) {
-  return (
-    <div className={`turn-row${trusted ? " is-trusted" : ""}`}>
-      <span className="turn-name">{name}{trusted && <span className="turn-badge">trusted</span>}</span>
-      <span className="turn-bar"><span style={{ width: `${share * 100}%` }} /><i style={{ left: "75%" }} /></span>
-      <span className={`turn-fit${fits ? "" : " turn-misfit"}`}>{fits ? "fits" : "does not fit"}</span>
-    </div>
-  );
-}
-
-/** The old talk stage 6's case as one step of this talk stage (the merge, 8 October 2026), no replay: she turns
- * mid-way. Click 1: to something Anton knows; the belief moves to that hypothesis and Anton trusts it. Click 2: to
- * something Anton has no model of; no hypothesis fits, whatever the belief says. The bars are an illustration in the
- * look of Anton's mind beside the replays, without values; θ the thin line. */
-export function Stage6MidWay() {
-  const [known, knownShown] = useStep();
-  const [unknown, unknownShown] = useStep();
-  return (
-    <Slide stage={6} className="turn-slide" notes={<>
-      {FIRST}
-      <p>The old talk stage 6 (switch and resumption), kept as one step of this talk stage, with no replay of its own
-        (the merge, 8 October 2026).</p>
-      <p>Click 1: she leaves her delivery mid-way for something Anton knows, a coffee break. Her movement now fits the
-        coffee break better: the belief moves to it and, with support, Anton trusts it. Her delivery is no longer the
-        trusted intention. When she returns to her delivery, it is trusted again in the same way.</p>
-      <p>Click 2: she leaves it for something Anton has no model of. Her delivery may still lead the belief (the belief
-        is shared among the hypotheses Anton has), but it no longer fits what she does, and neither does any other
-        hypothesis. A strong belief alone is not enough: that is what fit adds. The sim-run that follows shows this
-        case.</p>
-      <p>The bars are an illustration, not a run: no values.</p>
-    </>}>
-      <h1 className="slide-head">She turns mid-way</h1>
-      <div className="turn-cases">
-        <div className={`turn-case appear${knownShown ? " on" : ""}`}>
-          <h2 className="turn-head">To something Anton knows</h2>
-          <p className="turn-sub">a coffee break</p>
-          <div className="turn-chart">
-            <TurnRow name="her delivery" share={0.12} fits />
-            <TurnRow name="coffee break" share={0.86} fits trusted />
-          </div>
-          <p className="turn-says">The belief moves to the coffee break, and Anton trusts it.</p>
-        </div>
-        <div className={`turn-case appear${unknownShown ? " on" : ""}`}>
-          <h2 className="turn-head">To something Anton has no model of</h2>
-          <p className="turn-sub">unmodelled behaviour</p>
-          <div className="turn-chart">
-            <TurnRow name="her delivery" share={0.95} fits={false} />
-            <TurnRow name="coffee break" share={0.05} fits={false} />
-          </div>
-          <p className="turn-says">No hypothesis fits: Anton knows that it does not know.</p>
-        </div>
-      </div>
-      <StepMarker r={known} />
-      <StepMarker r={unknown} />
-    </Slide>
   );
 }
 
 export function Stage6Replay() {
   return (
     <ReplaySlide stage={6} title="Unmodelled behaviour: a sim-run"
-                 unsettled="No existing run shows Anton act differently on it: Anton is far from her. Hadi is choosing the scenario."
                  todo={<>
-      A recorded sim-run with unmodelled behaviour (for example a walk to a corner): no hypothesis fits, the projection
-      from her motion takes over as the fallback, and when she returns to modelled behaviour her task is trusted again.
-      Why: the hardest case, and the one in which fit changes what Anton does.
+      A recorded sim-run with unmodelled behaviour: no hypothesis fits, the projection from her motion takes over as the
+      fallback. Why: the hardest case, and the one in which fit changes what Anton does.
     </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong>: kitting scenario_s10_07 on env_layout_12, T-F part 1's run_028, ticks 40 to 125: her
-        delivery of item 1 trusted; a 60-tick stand cut into it at 46 (unmodelled); after 16 ticks of standing, at 62,
-        it no longer fits and no hypothesis fits: unexplained, Anton stops trusting it and uses the projection from her
-        motion (the callback to talk stage 2); she walks on at 107; at 120 her delivery fits again and is trusted again
-        (the projection from her intention is built again). One click per stop.</p>
-      <p><strong>NOT SETTLED</strong>: no existing run meets the criterion (the second search, 8 October 2026: no
-        retraction at an unexplained finding is followed by a hold or a switch within 40 ticks). Here Anton's tasks are
-        those of the human-unaware run_025, no hold, Anton at least 405 cm away. Hadi is choosing the scenarios for talk
-        stages 1 to 6 (the review sheet, its row for the old talk stage 7).</p>
+      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026), the stage's one example: kitting scenario_s111_02 on
+        env_layout_12, run file configs/kitting/tpres/stage6_s111_02.yaml, ticks 0 to 70. Her whole script is unmodelled:
+        a walk to the north door, a stand of 60 seconds at spot_E (standing from 26 to 57), a walk to the south-east
+        corner. Her assigned delivery of item 12 leads the belief at 0.98 but is never trusted: no support up to tick 9,
+        and from 10 no hypothesis fits (unexplained). Anton uses the projection from her motion throughout: holds of 2
+        ticks at 14, 20 and 25, then 4 at 27, 8 at 31, 16 at 39 and 32 at 55 (to 86) while she stands, the projection of
+        a stand reaching as far as she has stood; closest 50.44 cm (ticks 24 and 56). One click per stop.</p>
+      <p>Not in this run: a trusted intention withdrawn (nothing was trusted before her behaviour became unexplained;
+        before tick 10 the refusal was for lack of support, with the same projection from her motion), and her return
+        to a modelled behaviour with her task trusted again (her script ends unmodelled; within the range nothing is
+        trusted again). The hold of 32 ticks decided at 55 runs on after she walks off at 57.</p>
       {MIND}
     </>}>
       <ReplayStand />

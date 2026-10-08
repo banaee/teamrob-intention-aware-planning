@@ -47,12 +47,13 @@ export interface RecordedRun {
 
 export interface Stop { tick: number; caption: string }
 
-const TICK_MS = 140;    // the pace between stops: about seven ticks a second,
+const TICK_MS = 140;    // the pace between stops: about seven ticks a second (a replay may set its own, `tickMs`),
 const MOVE_MAX_MS = 4000;   // and faster where a move would take longer than this
 
 /** `step`: the index of the stop the slide shows (0: the first). */
-export function RunReplay({ recorded, stops, step, hideHumans = false, mind, tickNote = false }: {
+export function RunReplay({ recorded, stops, step, hideHumans = false, mind, tickNote = false, tickMs = TICK_MS }: {
   recorded: RecordedRun; stops: Stop[]; step: number; hideHumans?: boolean; mind?: MindParts; tickNote?: boolean;
+  tickMs?: number;
 }) {
   // Mounted when the slide first comes near and then kept: the env-pane's Scene places the agents' labels as DOM
   // elements beside its canvas, and removing the canvas while the deck runs throws (a React removeChild error). The
@@ -68,17 +69,17 @@ export function RunReplay({ recorded, stops, step, hideHumans = false, mind, tic
   const [shown, setShown] = useState(target);
   const from = useRef(shown);
   from.current = shown;
-  const [pace, setPace] = useState(TICK_MS);
+  const [pace, setPace] = useState(tickMs);
   useEffect(() => {
     if (target <= from.current) { setShown(target); return; }      // back, or no move: jump
-    const ms = Math.max(30, Math.min(TICK_MS, MOVE_MAX_MS / (target - from.current)));
+    const ms = Math.max(30, Math.min(tickMs, MOVE_MAX_MS / (target - from.current)));
     setPace(ms);
     const id = setInterval(() => setShown((s) => {
       if (s + 1 >= target) { clearInterval(id); return target; }
       return s + 1;
     }), ms);
     return () => clearInterval(id);
-  }, [target]);
+  }, [target, tickMs]);
 
   const update = recorded.ticks[shown];
   const room = useMemo<Room>(() => ({ key: recorded.sim_run, ...recorded.world }), [recorded]);
@@ -127,13 +128,14 @@ function PixelRatio() {
 }
 
 /** A replay with its steps: one hidden step marker per stop after the first. */
-export function ReplayView({ recorded, stops, hideHumans = false, mind, tickNote }: {
-  recorded: RecordedRun; stops: Stop[]; hideHumans?: boolean; mind?: MindParts; tickNote?: boolean;
+export function ReplayView({ recorded, stops, hideHumans = false, mind, tickNote, tickMs }: {
+  recorded: RecordedRun; stops: Stop[]; hideHumans?: boolean; mind?: MindParts; tickNote?: boolean; tickMs?: number;
 }) {
   const step = useSlideSteps(".step-stop");
   return (
     <>
-      <RunReplay recorded={recorded} stops={stops} step={step} hideHumans={hideHumans} mind={mind} tickNote={tickNote} />
+      <RunReplay recorded={recorded} stops={stops} step={step} hideHumans={hideHumans} mind={mind} tickNote={tickNote}
+                 tickMs={tickMs} />
       {stops.slice(1).map((s) => <span key={s.tick} className="fragment step-marker step-stop" aria-hidden />)}
     </>
   );

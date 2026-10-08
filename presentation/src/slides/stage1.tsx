@@ -73,14 +73,10 @@ export function PlanExecuteSlide() {
       <p>Say it once, here: the counter in the corner counts ticks; one tick is one time step of the simulation. Every
         duration in the talk is in ticks.</p>
       <p>Beside the scene, Anton's mind: for now only its task.</p>
-      <p><strong>DRAFT</strong> (the second search, 8 October 2026): kitting scenario_s12_02 on env_layout_14, T-F part
-        1's human-unaware run (run_061), ticks 0 to 136: two deliveries, each turning 87 and 101 degrees between its walk
-        to the item and its walk to the table (the earlier draft, run_057, went straight on in its first delivery); the human is not drawn, since in this condition Anton's mind receives
-        no human. Flag: hiding her is a choice of the slide.</p>
-      <p><strong>TODO (part 4)</strong>, the box this draft stands in: a fast-forward of Anton alone, delivering items,
-        replayed from a recorded sim-run of an existing kitting scenario, in the web-ui's env-pane look: the robot in
-        blue, its plan as its dashed blue line on the floor. Why: the audience sees "plan, then execute" happen, and
-        learns to read the floor drawing they meet at the station.</p>
+      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026): kitting scenario_s301_01 on env_layout_14, no human
+        in it, run file configs/kitting/tpres/stage1_s301_01.yaml (human-unaware, as the replay it replaced), ticks 0 to
+        150, played fast (about 14 ticks a second). Deliver item 1 chosen at 0, picked up at 32, placed at 64; deliver
+        item 2 chosen at 67, picked up at 97, placed at 145. One click per stop.</p>
     </>}>
       <h1 className="slide-head">It plans, then executes</h1>
       <ReplayAlone />

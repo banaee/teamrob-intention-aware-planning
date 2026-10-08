@@ -28,7 +28,6 @@ export const SLIDES: ComponentType[] = [
   stage1.Stage1Architecture,
   // 2 A human in the shared space; the question that leads to talk stage 3
   stage2.Stage2Transition,
-  stage2.DonnyEntersSlide,
   stage2.AudienceQuestionSlide,
   stage2.ProjectionSlide,
   stage2.ReactiveRunSlide,
@@ -46,9 +45,8 @@ export const SLIDES: ComponentType[] = [
   later.Stage5Transition,
   later.Stage5Replay,
   later.Stage5Architecture,
-  // 6 Unmodelled behaviour (the old talk stage 6's switch one slide, before the replay)
+  // 6 Unmodelled behaviour
   later.Stage6Transition,
-  later.Stage6MidWay,
   later.Stage6Replay,
   later.Stage6Architecture,
   // 7 to 11

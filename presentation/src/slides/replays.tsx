@@ -1,42 +1,47 @@
 /**
- * The first drafts of the sim-runs on slides (T-pres, task B of 8 October 2026; before part 4 is planned): existing
- * scenarios and T-F part 1's own run files only, recorded at every build (scripts/record.mjs, RUNS). Each stop is a
- * tick and a caption; every caption states what the run's log shows at that tick (the recognizer's leader and its
- * belief, the gate, the decision, the hold, the human's record), in the talk's words. Beside each scene, Anton's mind at
- * the tick (scene/MindPanel.tsx), the parts each talk stage is about.
+ * The sim-runs replayed on slides, recorded at every build (scripts/record.mjs, RUNS). Talk stage 3's is T-F part 1's
+ * run_060; the others are Hadi's scenarios for the talk (tpres-v4, 8 October 2026), each run from its own run file
+ * under configs/kitting/tpres/, outside every measured set; its log pair and figure are kept in presentation/runs/
+ * (untracked). Each stop is a tick and a caption; every caption states only what the run's log shows at that tick (the
+ * recognizer's leader and its belief, the gate, the decision, the hold, the human's record), in the talk's words.
+ * Beside each scene, Anton's mind at the tick (scene/MindPanel.tsx), the parts each talk stage is about.
  */
 
 import s1 from "../../data/run_stage1_alone.json";
 import s2 from "../../data/run_stage2_reactive.json";
 import s3 from "../../data/run_stage3_switch.json";
 import s4 from "../../data/run_stage4_break.json";
-import s5 from "../../data/run_stage5_breaktime.json";
+import s5 from "../../data/run_stage5_context.json";
 import s6 from "../../data/run_stage6_unmodelled.json";
 import { type RecordedRun, ReplayView, type Stop } from "../scene/RunReplay";
 
 const run = (r: unknown) => r as RecordedRun;   // the JSON's enumerations are read as strings
 
-/** Talk stage 1: kitting scenario_s12_02 on env_layout_14, human-unaware (T-F part 1's run_061): Anton's two
- * deliveries, each with its two walks (to the item, to its table) in clearly different directions (87 and 101 degrees
- * between them); the human is not drawn (the robot's mind receives no human in this condition). */
+/** Talk stage 1: Hadi's scenario_s301_01 on env_layout_14 (configs/kitting/tpres/stage1_s301_01.yaml; the options of
+ * T-F part 1's run_061, human-unaware; the scenario has no human), ticks 0 to 150, played fast (about 14 ticks a
+ * second): Anton chooses deliver item 1 at 0, picks it up at 32, places it at 64; chooses deliver item 2 at 67, picks it
+ * up at 97, places it at 145. */
 export function ReplayAlone() {
   const stops: Stop[] = [
-    { tick: 0, caption: "Anton chooses a task, deliver item 3, and plans its actions: the dashed line." },
-    { tick: 8, caption: "It picks up item 3; what is left of its plan turns toward the table." },
-    { tick: 30, caption: "Item 3 delivered: it chooses the next task, deliver item 14." },
-    { tick: 95, caption: "It picks up item 14." },
-    { tick: 136, caption: "Both delivered." },
+    { tick: 0, caption: "Anton chooses a task, deliver item 1, and plans its actions: the dashed line." },
+    { tick: 32, caption: "It picks up item 1; what is left of its plan leads to the table." },
+    { tick: 67, caption: "Item 1 delivered: it chooses the next task, deliver item 2." },
+    { tick: 97, caption: "It picks up item 2." },
+    { tick: 150, caption: "Both delivered." },
   ];
-  return <ReplayView recorded={run(s1)} stops={stops} hideHumans mind={{}} tickNote />;
+  return <ReplayView recorded={run(s1)} stops={stops} hideHumans mind={{}} tickNote tickMs={70} />;
 }
 
-/** Talk stage 2: scenario_s10_02, intention-unaware (run_006): the projection from her motion and a hold of 5 ticks. */
+/** Talk stage 2: Hadi's scenario_s302_02 on env_layout_12 (configs/kitting/tpres/stage2_s302_02.yaml; the options of
+ * T-F part 1's run_006, intention-unaware), ticks 0 to 26: the projection from her motion, Anton deciding again each
+ * time it runs out (2, 6, 14, 23, 25); no hold: every candidate's hold is 0; the two are 626 cm apart at 0 and 428 cm
+ * at 26 (their closest, 60.31 cm, is at 42, outside the range). She picks up item 1 at 24. */
 export function ReplayReactive() {
   const stops: Stop[] = [
-    { tick: 24, caption: "Anton knows nothing of her task: it projects her motion (the hatched blue stripe)." },
-    { tick: 40, caption: "Its path would come closer than the minimum separation to her projected path: it holds, 5 ticks." },
-    { tick: 45, caption: "The hold is over: it goes on." },
-    { tick: 52, caption: "Each time the projection from her motion runs out, Anton decides again." },
+    { tick: 0, caption: "Anton knows nothing of her task: it projects her motion (the hatched blue stripe) and sets off to deliver item 7." },
+    { tick: 14, caption: "Each time the projection from her motion runs out, Anton decides again. Its path stays clear of hers: no hold." },
+    { tick: 24, caption: "She picks up item 1." },
+    { tick: 26, caption: "She turns toward the table. Anton goes on, 428 cm from her: no hold so far." },
   ];
   return <ReplayView recorded={run(s2)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
@@ -56,44 +61,54 @@ export function ReplayTrusted() {
                      mind={{ belief: true, support: true, hold: true, projection: true }} />;
 }
 
-/** Talk stage 4: scenario_s24_14 on env_layout_07 (T-F part 1's run_264, no context fact in force): her coffee break
- * trusted at tick 116, and Anton switches from deliver item 56 to deliver item 54 (the human-unaware run_261 does item
- * 56 at 85 to 169). */
+/** Talk stage 4: Hadi's scenario_s304_14 on env_layout_07 (configs/kitting/tpres/stage4_s304_14_ck_off.yaml, context
+ * knowledge off), ticks 85 to 150: she delivers item 52 at 90 and starts her second coffee break; Anton chooses deliver
+ * item 56 at 97; the break trusted at 106 (0.76), and Anton switches to deliver item 54, item 56 realized with a hold of
+ * 26 ticks; the break ends at 150. Talk stage 5 replays the same scenario with context knowledge on. */
 export function ReplayBreak() {
   const stops: Stop[] = [
-    { tick: 85, caption: "Anton starts its next task: deliver item 56." },
-    { tick: 90, caption: "She has delivered her item and walks off to the coffee machine." },
-    { tick: 115, caption: "The coffee break leads with 0.74: not trusted yet." },
-    { tick: 116, caption: "0.78, and it has support: the coffee break is trusted. Anton switches to deliver item 54." },
-    { tick: 150, caption: "Item 54 first; item 56 comes after her break." },
+    { tick: 85, caption: "Anton carries item 55; she is on her way with her delivery of item 52." },
+    { tick: 90, caption: "She has delivered item 52 and walks to the coffee machine: her second coffee break." },
+    { tick: 97, caption: "Item 55 delivered: Anton chooses deliver item 56." },
+    { tick: 106, caption: "0.76, and it has support: the coffee break is trusted. Against her break, item 56 would need a hold of 26 ticks: Anton switches to deliver item 54." },
+    { tick: 150, caption: "Her break is over and she goes on with item 53; Anton is on item 54, item 56 comes after." },
   ];
   return <ReplayView recorded={run(s4)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
 
-/** Talk stage 5: scenario_s23_03 on env_layout_07 (T-F part 1's run_576; scenario_s05_01 with break time in force from
- * tick 0 to 56): the coffee break trusted at tick 27, and Anton switches to deliver item 2. Without the fact (scenario_s05_01,
- * run_108) the break is trusted only at 52 and Anton passes her at 31.62 cm at tick 28. */
+/** Talk stage 5: the same scenario_s304_14 (configs/kitting/tpres/stage5_s304_14_ck_on.yaml, context knowledge on), the
+ * same ticks 85 to 150. No timeline: no context fact is in force; her first coffee break (completed at 51) makes the
+ * coffee break recent, its level suppressed until 141. The break is trusted at 116 (0.78), 10 ticks later than with
+ * context knowledge off (106); at 106 it stands at 0.37 behind ac_activation's 0.46 ([IR-dist]); Anton switches to deliver item 54 at 116,
+ * item 56 realized with a hold of 26 ticks. */
 export function ReplayBreakTime() {
   const stops: Stop[] = [
-    { tick: 0, caption: "Break time. She walks to the coffee machine; break time raises the coffee break's prior: it leads from the start." },
-    { tick: 26, caption: "The coffee break leads with 0.74: not trusted yet." },
-    { tick: 27, caption: "0.76, and it has support: trusted. Anton switches from deliver item 1 to deliver item 2." },
-    { tick: 62, caption: "The same shift without break time: the break is trusted only at tick 52, and Anton passes her closer than the minimum separation." },
+    { tick: 85, caption: "The same shift, now with context knowledge. Anton carries item 55; she is on her way with her delivery of item 52." },
+    { tick: 90, caption: "She walks to the coffee machine again. Her first break ended at tick 51: just after a break, Anton's prior makes another one less likely." },
+    { tick: 97, caption: "Item 55 delivered: Anton chooses deliver item 56." },
+    { tick: 106, caption: "Without context knowledge the break was trusted at this tick. Here it stands at 0.37, behind switching on the A/C: not trusted, and Anton goes on toward item 56." },
+    { tick: 116, caption: "0.78, and it has support: trusted, 10 ticks later. Item 56 would need a hold of 26 ticks: Anton switches to deliver item 54." },
+    { tick: 150, caption: "Her break is over and she goes on with item 53; Anton is on item 54." },
   ];
   return <ReplayView recorded={run(s5)} stops={stops}
                      mind={{ belief: true, hold: true, projection: true, context: true }} />;
 }
 
-/** Talk stage 6 (the merge of 8 October 2026; the old talk stage 7's replay): scenario_s10_07 (run_028): a 60-tick stand
- * cut into her delivery mid-walk (unmodelled), unexplained from 62, the fallback, she walks on at 107, her delivery
- * adequate and trusted again at 120 (the log: [meta-proj] projection=built at the decision of tick 120). */
+/** Talk stage 6: Hadi's scenario_s111_02 on env_layout_12 (configs/kitting/tpres/stage6_s111_02.yaml; the options of
+ * T-F part 1's run_028), ticks 0 to 70. Her script is unmodelled throughout: a walk to door_N, a stand of 60 seconds at
+ * spot_E (standing from 26 to 57), a walk to corner_SE. Her assigned delivery of item 12 leads at 0.98 but is not
+ * trusted: no support to 9, no fit from 10 (unexplained, every live hypothesis inadequate). The projection from her
+ * motion all along; holds of 2 ticks at 14, 20 and 25, then 4 at 27, 8 at 31, 16 at 39 and 32 at 55 (to 86), while she
+ * stands; closest 50.44 cm (24 and 56). Nothing is trusted again within the range. */
 export function ReplayStand() {
   const stops: Stop[] = [
-    { tick: 40, caption: "Anton trusts her task: deliver item 1." },
-    { tick: 46, caption: "Mid-way she stops and stands: unmodelled behaviour." },
-    { tick: 62, caption: "After 16 ticks of standing no hypothesis fits: her behaviour is unexplained, and Anton stops trusting her task. It falls back on the projection from her motion, as the reactive robot did." },
-    { tick: 107, caption: "She walks on with her delivery." },
-    { tick: 120, caption: "Deliver item 1 fits again: Anton trusts her task again." },
+    { tick: 0, caption: "She walks to the north door. Her delivery of item 12 leads the belief, but has no support: not trusted." },
+    { tick: 10, caption: "Her walk fits none of Anton's hypotheses: her behaviour is unexplained. Anton knows that it does not know." },
+    { tick: 14, caption: "It falls back on the projection from her motion, as the reactive robot did: a hold of 2 ticks." },
+    { tick: 26, caption: "She stands at a spot by the east wall: something Anton has no model of." },
+    { tick: 39, caption: "The longer she stands, the further the projection of her stand reaches: Anton's holds grow, 4, 8, now 16 ticks." },
+    { tick: 57, caption: "She walks on, still unexplained. Anton's hold of 32 ticks, decided at tick 55 on her stand, runs on." },
+    { tick: 70, caption: "Anton still holds. No hypothesis fits her walk: nothing is trusted." },
   ];
   return <ReplayView recorded={run(s6)} stops={stops}
                      mind={{ belief: true, fit: true, hold: true, projection: true }} />;

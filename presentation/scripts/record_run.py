@@ -1,7 +1,8 @@
 """Records a sim-run for a slide: the run file's sim-run, built and stepped by the same piece of code that feeds the
 web-ui (mesa_sim/webui_adapter.py, MesaSimulator), and the tick updates of the ticks a slide replays, so that the deck
-needs no server at talk time. Nothing is authored or changed: the run file is an existing one (T-F part 1's, under
-configs/kitting/tf1/measurement/), its run options passed as the web-ui passes a screen-user's choice.
+needs no server at talk time. Nothing is authored or changed here: the run file is T-F part 1's (under
+configs/kitting/tf1/measurement/) or one of the deck's own (configs/kitting/tpres/, Hadi's scenarios for the talk), its
+run options passed as the web-ui passes a screen-user's choice.
 
     PYTHONHASHSEED=0 ~/python-envs/ir-nomesa-env/bin/python presentation/scripts/record_run.py \
         <name> <run file> <first tick> <last tick>
