@@ -1,0 +1,209 @@
+﻿"talk stage","place","slide address (slide.step; the key A shows it in the deck)","mechanism this stage is about","layout id: current","layout id: change","setup id: current","setup id: change","scenario id: current","scenario id: change","run file and run options: current","run file and run options: change","ticks replayed: current","ticks replayed: change","Donny's start position: current","Donny's start position: change","Donny's script, in order, with ticks (as the run's record shows it): current","Donny's script, in order, with ticks (as the run's record shows it): change","context facts in force, with their windows: current","context facts in force, with their windows: change","Anton's start position: current","Anton's start position: change","Anton's tasks (items and their tables): current","Anton's tasks (items and their tables): change","Donny's assigned tasks as Anton knows them: current","Donny's assigned tasks as Anton knows them: change","what the run shows, with the key ticks","missing or weak","other runs considered","proposal where a new scenario is needed","Hadi: what the replay should show","Hadi: decision (keep, change, replace, new scenario)","Hadi: notes"
+"1","1, the robot alone","11.0 to 11.4, one step per stop:
+11.0 tick 0
+11.1 tick 8
+11.2 tick 30
+11.3 tick 95
+11.4 tick 136","Anton plans and executes its own tasks: a task, its actions, one after the other.","env_layout_14","","env_setup_12","","scenario_s12_02","","configs/kitting/tf1/measurement/scenario_s12_02/run_061.yaml
+human-aware: off
+intention-aware: off (the run file says on; human-aware off sets it off)
+assignment knowledge: off
+context knowledge: off (set off by the option above)
+task-choice strategy: single_task
+separation stop: off","","0 to 136","","(0, 220) (x, y in cm)","","tick 0: starts deliver item_1 to kitting_table_0
+tick 63: finishes deliver item_1 to kitting_table_0
+tick 63: starts coffee break at coffee_machine_0
+tick 135: finishes coffee break at coffee_machine_0
+tick 135: starts deliver item_2 to kitting_table_0
+tick 203: finishes deliver item_2 to kitting_table_0
+tick 203: starts walk to corner_SE
+tick 251: finishes walk to corner_SE","","none","","(460, 480) (x, y in cm)","","deliver item_3 to kitting_table_1; deliver item_14 to kitting_table_6","","none: assignment knowledge is off in this run","","Anton's two deliveries, item_3 then item_14; between the walk to the item and the walk to its table Anton turns 87 degrees (item_3) and 101 degrees (item_14). Grasp and release: item_3 at 8 and 30, item_14 at 95 and 135. The human is in the world but not drawn: in this human-unaware run Anton's mind receives no human.
+
+From the log, ticks 0 to 136:
+closest distance between the two: 25.41 cm at tick 119 (min_separation 50 cm)","The first walk (to item_3) is short: Anton grasps it at tick 8. Hiding the human is a choice of the slide; in this human-unaware run Anton comes within 25.41 cm of her at tick 119, unseen on the slide.","run_057 (scenario_s12_01, the earlier draft: its first delivery goes straight on); run_065 and run_073 (scenario_s16_01, s16_03, env_layout_18: one delivery each, 86 and 88 degrees); run_433 (scenario_s29_02, env_layout_20: the first delivery nearly out and back).","–","","",""
+"2","2, she enters","14.0 (one step: the slide as it opens)","Donny enters the shared space while Anton works; Anton knows nothing about her intentions.","–","","–","","–","","–","","–","","–","","–","","–","","–","","–","","–","","No replay yet.","No replay: no existing kitting scenario has her enter the room. The slide holds a TODO box.","None starts her outside the room or at a door. scenario_s01_05, s01_08, s05_04 walk her to the door and back in, with no hold for Anton (run intention-unaware). scenario_s10_01 with her start moved to door_N (an override): no hold.","env_layout_12, 13 or 14. Start her at door_N (300, 690) on the north wall beside Anton's work area. Her first walk goes south across Anton's route from shelf_4 to kitting_table_1 (about y = 640), timed so that Anton carries along that route then. Starting her at door_N alone is not enough (the override trial).","","",""
+"2","2, reactive","17.0 to 17.3, one step per stop:
+17.0 tick 24
+17.1 tick 40
+17.2 tick 45
+17.3 tick 52","The reactive robot: the projection from her motion, and a hold to keep the minimum separation.","env_layout_12","","env_setup_10","","scenario_s10_02","","configs/kitting/tf1/measurement/scenario_s10_02/run_006.yaml
+human-aware: on
+intention-aware: off
+assignment knowledge: off
+context knowledge: off (set off by the option above)
+task-choice strategy: single_task
+separation stop: off","","24 to 52","","(0, 220) (x, y in cm)","","tick 0: starts deliver item_1 to kitting_table_0
+tick 63: finishes deliver item_1 to kitting_table_0
+tick 63: starts deliver item_2 to kitting_table_0
+tick 126: finishes deliver item_2 to kitting_table_0
+tick 126: starts walk to corner_SE
+tick 174: finishes walk to corner_SE","","none","","(390, -573) (x, y in cm)","","deliver item_7 to kitting_table_3","","none: assignment knowledge is off in this run","","She crosses ahead of Anton; on the projection from her motion Anton holds 5 ticks at 40 to 44, then goes on.
+
+From the log, ticks 24 to 52:
+tick 29 (projection expired): projection from her motion; Anton's task deliver item_7 to kitting_table_3
+tick 31 (projection expired): projection from her motion; Anton's task deliver item_7 to kitting_table_3
+tick 35 (projection expired): projection from her motion; Anton's task deliver item_7 to kitting_table_3
+tick 40 (projection expired): projection from her motion; Anton's task deliver item_7 to kitting_table_3
+tick 50 (projection expired): projection from her motion; Anton's task deliver item_7 to kitting_table_3
+tick 40: Anton holds, planned 5 ticks, stood 5
+closest distance between the two: 53.19 cm at tick 47 (min_separation 50 cm)","Short: one hold of 5 ticks.","run_446 (scenario_s29_16, env_layout_20, ticks 130 to 200): a hold of 24 ticks at 166 to 189 near her at the coffee machine; she walks away while Anton still holds. run_194 (scenario_s21_07, env_layout_06, ticks 120 to 150): a hold of 9 ticks as she walks toward Anton; she passes at 36 cm. run_050 (scenario_s11_02, env_layout_12, ticks 10 to 92): holds of 2 and 2 ticks as she crosses, then a chain of holds 25 to 86 while she stands 50 cm away; Anton holds until 86 though she left at 57.","–","","",""
+"3","3, assigned tasks","21.0 to 21.4, one step per stop:
+21.0 tick 0
+21.1 tick 6
+21.2 tick 8
+21.3 tick 29
+21.4 tick 62","Anton knows her task list and recognises which task she does; the trusted intention changes its task choice (a switch) or its holds.","env_layout_14","","env_setup_12","","scenario_s12_01","","configs/kitting/tf1/measurement/scenario_s12_01/run_060.yaml
+human-aware: on
+intention-aware: on
+assignment knowledge: on
+context knowledge: on
+task-choice strategy: single_task
+separation stop: off","","0 to 62","","(0, 220) (x, y in cm)","","tick 0: starts deliver item_1 to kitting_table_0
+tick 63: finishes deliver item_1 to kitting_table_0
+tick 63: starts deliver item_2 to kitting_table_0
+tick 126: finishes deliver item_2 to kitting_table_0
+tick 126: starts walk to corner_SE
+tick 174: finishes walk to corner_SE","","none","","(390, -573) (x, y in cm)","","deliver item_7 to kitting_table_3; deliver item_13 to kitting_table_5","","deliver item_1 to kitting_table_0; deliver item_2 to kitting_table_0","","Her delivery of item_1 is trusted at 8 (0.78), and Anton switches from item_7 to item_13 (task choice). In the intention-unaware run_058 Anton carries item_7 across her route, with holds at 40 (5 ticks), 103 (4) and 113 (1).
+
+From the log, ticks 0 to 62:
+tick 0 (no current task): projection from her motion; Anton's task deliver item_7 to kitting_table_3
+tick 2 (projection expired): projection from her motion; Anton's task deliver item_7 to kitting_table_3
+tick 6 (projection expired): projection from her motion; Anton's task deliver item_7 to kitting_table_3
+tick 8 (recognition changed, entered): trusted deliver item_1 (0.78); Anton's task deliver item_13 to kitting_table_5 (a switch)
+tick 61 (recognition changed, replaced): projection from her motion; Anton's task deliver item_13 to kitting_table_5
+closest distance between the two: 362.03 cm at tick 59 (min_separation 50 cm)","item_7's and item_13's shelves are close, on one approach line: the switch shows only from the carry on (tick 29).","run_008 (scenario_s10_02, the earlier draft): trusted at 8, a hold of 5 ticks far from her (681 cm). run_059: the same switch at 25 with context knowledge off. run_256 (scenario_s24_02, env_layout_07): trusted at 94, a hold of 67 ticks; she passes the standing Anton at 23 and 18 cm. No other switch caused by a trusted delivery among the 720 intention-aware runs.","–","","",""
+"4","4, foreseeable behaviours","24.0 to 24.4, one step per stop:
+24.0 tick 85
+24.1 tick 90
+24.2 tick 115
+24.3 tick 116
+24.4 tick 150","A foreseeable behaviour (the coffee break) is recognised and trusted; Anton adapts its plan to it.","env_layout_07","","env_setup_24","","scenario_s24_14","","configs/kitting/tf1/measurement/scenario_s24_14/run_264.yaml
+human-aware: on
+intention-aware: on
+assignment knowledge: on
+context knowledge: on
+task-choice strategy: single_task
+separation stop: off","","85 to 150","","(300, -300) (x, y in cm)","","tick 0: starts coffee break at coffee_machine_0
+tick 51: finishes coffee break at coffee_machine_0
+tick 51: starts deliver item_52 to kitting_table_0
+tick 90: finishes deliver item_52 to kitting_table_0
+tick 90: starts coffee break at coffee_machine_0
+tick 150: finishes coffee break at coffee_machine_0
+tick 150: starts deliver item_53 to kitting_table_0
+tick 272: finishes deliver item_53 to kitting_table_0
+tick 272: starts walk to corner_NE
+tick 337: finishes walk to corner_NE","","none","","(-600, 600) (x, y in cm)","","deliver item_54 to kitting_table_0; deliver item_55 to kitting_table_0; deliver item_56 to kitting_table_0","","deliver item_52 to kitting_table_0; deliver item_53 to kitting_table_0","","Her coffee break (from 90) is trusted at 116 (0.78); Anton switches from item_56 to item_54. The human-unaware run_261 does item_56 at 85 to 169.
+
+From the log, ticks 85 to 150:
+tick 85 (no current task): trusted deliver item_52 (1.00); Anton's task deliver item_56 to kitting_table_0
+tick 88 (recognition changed, replaced): projection from her motion; Anton's task deliver item_56 to kitting_table_0
+tick 91 (projection expired): projection from her motion; Anton's task deliver item_56 to kitting_table_0
+tick 94 (projection expired): projection from her motion; Anton's task deliver item_56 to kitting_table_0
+tick 100 (projection expired): projection from her motion; Anton's task deliver item_56 to kitting_table_0
+tick 112 (projection expired): projection from her motion; Anton's task deliver item_56 to kitting_table_0
+tick 116 (recognition changed, entered): trusted coffee break at coffee_machine_0 (0.78); Anton's task deliver item_54 to kitting_table_0 (a switch)
+tick 148 (recognition changed, replaced): projection from her motion; Anton's task deliver item_54 to kitting_table_0
+tick 150 (recognition changed, entered): trusted deliver item_53 (0.98); Anton's task deliver item_54 to kitting_table_0
+tick 85: Anton holds, planned 5 ticks, stood 3 (cut short)
+tick 88: Anton holds, planned 3 ticks, stood 3
+closest distance between the two: 35.18 cm at tick 86 (min_separation 50 cm)","From 90 to 114 Anton walks about 55 cm behind her.","run_272 (scenario_s24_26, env_layout_07): trusted at 83, a reorder (item_54 next), but she is 414 cm away. run_107 (scenario_s05_01, context knowledge off): a hold at 24 to 31 at 58 cm, trusted at 32, switch item_1 to item_2. run_064 (scenario_s12_02, the earlier draft): a hold of 18 ticks, no change of task.","–","","",""
+"5","5, context","27.0 to 27.3, one step per stop:
+27.0 tick 0
+27.1 tick 26
+27.2 tick 27
+27.3 tick 62","Context: a fact of the situation (break time) raises the prior of the coffee break; the trust comes earlier and Anton adapts earlier; her observed movement still decides.","env_layout_07","","env_setup_23","","scenario_s23_03","","configs/kitting/tf1/measurement/scenario_s23_03/run_576.yaml
+human-aware: on
+intention-aware: on
+assignment knowledge: on
+context knowledge: on
+task-choice strategy: single_task
+separation stop: off","","0 to 62","","(510, -550) (x, y in cm)","","tick 0: starts coffee break at coffee_machine_0
+tick 56: finishes coffee break at coffee_machine_0
+tick 56: starts deliver item_5 to kitting_table_0
+tick 96: finishes deliver item_5 to kitting_table_0
+tick 96: starts switch on the A/C (ac_switch_0)
+tick 143: finishes switch on the A/C (ac_switch_0)","","break_time from tick 0 until tick 56; room_warm from tick 96 until tick 143 (stated by the scenario)","","(0, 0) (x, y in cm)","","deliver item_1 to kitting_table_0; deliver item_2 to kitting_table_0","","deliver item_5 to kitting_table_0","","With break time in force the coffee break leads from tick 0 (0.66) and is trusted at 27 (0.76); Anton switches to item_2 and walks away, no violation. The same shift without the fact (scenario_s05_01, run_108, context knowledge on): trusted only at 52, and Anton passes her at 31.62 cm at tick 28 (3 ticks below the minimum separation).
+
+From the log, ticks 0 to 62:
+tick 0 (no current task): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 2 (projection expired): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 6 (projection expired): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 14 (projection expired): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 24 (projection expired): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 26 (projection expired): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 27 (recognition changed, entered): trusted coffee break at coffee_machine_0 (0.76); Anton's task deliver item_2 to kitting_table_0 (a switch)
+tick 54 (recognition changed, replaced): projection from her motion; Anton's task deliver item_2 to kitting_table_0
+tick 56 (recognition changed, entered): trusted deliver item_5 (0.98); Anton's task deliver item_2 to kitting_table_0
+tick 24: Anton holds, planned 1 ticks, stood 1
+tick 26: Anton holds, planned 4 ticks, stood 1 (cut short)
+closest distance between the two: 58.31 cm at tick 25 (min_separation 50 cm)","The comparison is told in the last caption only; the run without the fact is not replayed. In run_108 the start is worse than with context knowledge off (her walk read as deliver item_5 at 0.97; off, run_107, the break is trusted at 32).","run_112 against run_577 (scenario_s05_02 / s23_04): trusted at 52 against 27; with the fact a hold of 27 ticks. run_076 against run_710 (scenario_s16_03 / s16_08): trusted at 55 against 22. run_064 against run_707 (the earlier draft): the same hold in both, only where and when Anton pauses differs.","–","","",""
+"6","6, switch and resumption","30.0 to 30.6, one step per stop:
+30.0 tick 30
+30.1 tick 36
+30.2 tick 48
+30.3 tick 53
+30.4 tick 82
+30.5 tick 84
+30.6 tick 94","Fit: she leaves a task mid-way; the trusted intention stops fitting, Anton stops trusting it and plans again; when she resumes, her task is trusted again.","env_layout_07","","env_setup_23","","scenario_s23_23","","configs/kitting/tf1/measurement/scenario_s23_23/run_584.yaml
+human-aware: on
+intention-aware: on
+assignment knowledge: on
+context knowledge: on
+task-choice strategy: single_task
+separation stop: off","","30 to 100","","(0, 400) (x, y in cm)","","tick 0: starts deliver item_5 to kitting_table_0
+tick 48: leaves, unfinished, deliver item_5 to kitting_table_0
+tick 48: turns to coffee break at coffee_machine_0 (after the action in hand)
+tick 84: finishes coffee break at coffee_machine_0
+tick 84: resumes deliver item_5 to kitting_table_0
+tick 122: finishes deliver item_5 to kitting_table_0
+tick 122: starts deliver item_2 to kitting_table_0
+tick 214: finishes deliver item_2 to kitting_table_0
+tick 214: starts walk to corner_SW
+tick 282: finishes walk to corner_SW","","break_time from tick 48 until tick 84 (stated by the scenario)","","(0, 0) (x, y in cm)","","deliver item_1 to kitting_table_0; deliver item_3 to kitting_table_0","","deliver item_5 to kitting_table_0; deliver item_2 to kitting_table_0","","Her delivery is trusted at 36, Anton holds 7 ticks. Break time from 48: she turns to the coffee break, which then leads, and Anton stops trusting the delivery. The break is trusted at 53, Anton holds. Her break is over at 82, a new hold; she resumes at 84; her delivery is trusted again at 94, the hold ends after 12 ticks and Anton walks on.
+
+From the log, ticks 30 to 100:
+tick 30 (projection expired): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 36 (recognition changed, entered): trusted deliver item_5 (0.75); Anton's task deliver item_1 to kitting_table_0
+tick 48 (recognition changed, replaced): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 50 (projection expired): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 52 (projection expired): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 53 (recognition changed, entered): trusted coffee break at coffee_machine_0 (0.81); Anton's task deliver item_1 to kitting_table_0
+tick 82 (recognition changed, replaced): projection from her motion; Anton's task deliver item_1 to kitting_table_0
+tick 94 (recognition changed, entered): trusted deliver item_5 (0.78); Anton's task deliver item_1 to kitting_table_0
+tick 36: Anton holds, planned 7 ticks, stood 7
+tick 52: Anton holds, planned 2 ticks, stood 1 (cut short)
+tick 53: Anton holds, planned 33 ticks, stood 29 (cut short)
+tick 82: Anton holds, planned 32 ticks, stood 12 (cut short)
+closest distance between the two: 56.40 cm at tick 51 (min_separation 50 cm)","NOT SETTLED on the slide. The trust ends at 48 because the coffee break overtakes the delivery (the log's cause ""replaced""), not because the delivery stops fitting: the delivery is adequate throughout. Fit is not what changes Anton here. Without break time (run_244, scenario_s23_21) the delivery stays trusted through her cut, Anton passes her at 21 cm at 54, and the trust is withdrawn only at 64.","run_012 (scenario_s10_03, the earlier draft): fit withdraws the trust at 55, but Anton's tasks are those of the human-unaware run_009, with no hold. run_328 (scenario_s26_16): a hold of 8 ticks at 172 when she is trusted again after resuming.","A run where her delivery stops fitting (not overtaken) while Anton is close: her cut must leave the delivery's path (walking off the way or standing beyond the action) near Anton's route, and Anton's next decision must depend on her path. Not authored; a sketch only, to be designed with Hadi.","","",""
+"7","7, unmodelled behaviour","33.0 to 33.4, one step per stop:
+33.0 tick 40
+33.1 tick 46
+33.2 tick 62
+33.3 tick 107
+33.4 tick 120","Unmodelled behaviour: no hypothesis fits (unexplained); the projection from her motion is the fallback; recognition resumes when she returns to modelled behaviour.","env_layout_12","","env_setup_10","","scenario_s10_07","","configs/kitting/tf1/measurement/scenario_s10_07/run_028.yaml
+human-aware: on
+intention-aware: on
+assignment knowledge: on
+context knowledge: on
+task-choice strategy: single_task
+separation stop: off","","40 to 125","","(0, 220) (x, y in cm)","","tick 0: starts deliver item_1 to kitting_table_0
+tick 46: leaves, unfinished, deliver item_1 to kitting_table_0
+tick 46: turns to stand still (cut into the walk in hand)
+tick 107: finishes stand still
+tick 107: resumes deliver item_1 to kitting_table_0
+tick 125: finishes deliver item_1 to kitting_table_0
+tick 125: starts deliver item_2 to kitting_table_0
+tick 188: finishes deliver item_2 to kitting_table_0
+tick 188: starts walk to corner_SE
+tick 236: finishes walk to corner_SE","","none","","(460, 480) (x, y in cm)","","deliver item_3 to kitting_table_1; deliver item_4 to kitting_table_1; deliver item_5 to kitting_table_1; deliver item_6 to kitting_table_1","","deliver item_1 to kitting_table_0; deliver item_2 to kitting_table_0","","A stand of 61 ticks cut into her carry of item_1 at 46; unexplained from 62 (16 ticks of standing); the fallback; she walks on at 107; deliver item_1 fits again at 120.
+
+From the log, ticks 40 to 125:
+tick 62 (recognition changed, retraction): projection from her motion; Anton's task deliver item_5 to kitting_table_1
+tick 67 (no current task): projection from her motion; Anton's task deliver item_3 to kitting_table_1
+tick 90 (projection expired): projection from her motion; Anton's task deliver item_3 to kitting_table_1
+tick 110 (no current task): projection from her motion; Anton's task deliver item_4 to kitting_table_1
+tick 115 (projection expired): projection from her motion; Anton's task deliver item_4 to kitting_table_1
+tick 120 (recognition changed, entered): trusted deliver item_1 (1.00); Anton's task deliver item_4 to kitting_table_1
+tick 123 (recognition changed, replaced): projection from her motion; Anton's task deliver item_4 to kitting_table_1
+tick 125 (recognition changed, entered): trusted deliver item_2 (0.98); Anton's task deliver item_4 to kitting_table_1
+closest distance between the two: 405.43 cm at tick 120 (min_separation 50 cm)","NOT SETTLED on the slide: it changes nothing for Anton. Anton's tasks are those of the human-unaware run_025, no hold, Anton at least 405 cm away. No run in the set meets the criterion: no retraction at an unexplained finding is followed by a hold or a switch within 40 ticks.","run_056 (scenario_s11_03): unexplained from 16, a switch at 30 and a hold of 43 ticks at 53 to 95, but Anton was on the projection from her motion from tick 0 (the same as the intention-unaware run_054). run_196 (scenario_s21_07): unexplained from 132, a hold of 4 ticks at 133; she passes at 39 cm; likewise already on the projection from her motion.","env_layout_14, env_setup_12, Anton as in scenario_s12_01 (start (390, -573), deliver item_7 to kitting_table_3 and item_13 to kitting_table_5). Donny with scenario_s10_07's script: a stand cut into her carry of item_1, at (-207, 3), on the crossing (-210, 0) of item_7's carry from shelf_5 (20, -220) to kitting_table_3 (-420, 200). Anton must decide on item_7 while her delivery is still trusted (before about tick 62) and reach the crossing after 62 and before her stand ends: grasp item_7 at about 50 to 55 (start Anton about 50 ticks of walking from shelf_5), or keep run_060's order and lengthen the stand to about 170 ticks. Expected: at the withdrawal Anton plans against her motion (she stands) and holds before the crossing, or switches to item_13 if it is still in the pool.","","",""
