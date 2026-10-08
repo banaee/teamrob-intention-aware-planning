@@ -2,26 +2,28 @@
  * Talk stages 3 to 12. Talk stages 3 to 7 (the overall revision of 8 October 2026): each opens with its transition
  * slide (the seven talk stages, the starting one with its three columns), then a replayed sim-run with Anton's mind
  * beside it, then the architecture, a click adding what the talk stage adds and one click per block it opens or extends
- * (architecture/unboxing.tsx). Talk stages 8 to 12 stay placeholders (parts 3 and 5).
+ * (architecture/unboxing.tsx). Talk stages 8 to 12 stay placeholders (parts 3 and 5). A replay that does not yet meet
+ * its criterion (the mechanism visibly changes what Anton does) carries the mark "not settled".
  */
 
 import type { ReactNode } from "react";
 
 import type { Unboxable } from "../architecture/unboxing";
 import { STAGES, type TalkStage } from "../talk";
-import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide } from "./kit";
+import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide, Unsettled } from "./kit";
 import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplaySwitch, ReplayTrusted } from "./replays";
 
 /** A talk stage's replayed sim-run, with Anton's mind beside it. `todo`: what the TODO box this replay stands in asked
  * for (in the notes); `unsettled`: a visible mark where the replay does not yet meet its criterion. */
-function ReplaySlide({ stage, title, notes, todo, children }: {
-  stage: TalkStage; title: string; notes: ReactNode; todo: ReactNode; children: ReactNode;
+function ReplaySlide({ stage, title, notes, todo, unsettled, children }: {
+  stage: TalkStage; title: string; notes: ReactNode; todo: ReactNode; unsettled?: ReactNode; children: ReactNode;
 }) {
   return (
     <Slide stage={stage} className="replay-slide" notes={<>
       {notes}
       <p><strong>TODO (part 4)</strong>, the box this draft stands in: {todo}</p>
     </>}>
+      {unsettled !== undefined && <Unsettled>{unsettled}</Unsettled>}
       <h1 className="slide-head">{title}</h1>
       {children}
     </Slide>
@@ -64,8 +66,12 @@ export function Stage3Replay() {
       against it. Why: this is where recognition first changes what Anton does.
     </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong>: kitting scenario_s10_02 on env_layout_12, T-F part 1's run_008 (intention-aware),
-        ticks 0 to 24. One click per stop.</p>
+      <p><strong>DRAFT</strong> (the second search, 8 October 2026): kitting scenario_s12_01 on env_layout_14, T-F part
+        1's run_060 (intention-aware), ticks 0 to 62. Her delivery of item 1 trusted at 8 (0.78), and Anton switches
+        from item 7 to item 13: task choice changes what Anton does. In the intention-unaware run_058 Anton carries item 7
+        across her route, with holds at 40 (5 ticks), 103 (4) and 113 (1). Weakness: item 7's and item 13's shelves are
+        close on one approach line, so the switch shows from the carry on (tick 29). The earlier draft, run_008 of
+        scenario_s10_02, held 5 ticks far from her. One click per stop.</p>
       {MIND}
     </>}>
       <ReplayTrusted />
@@ -122,8 +128,11 @@ export function Stage4Replay() {
       reorder caused by the trusted break. Why: one later stage should show planning change, not only recognition.
     </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong>: kitting scenario_s12_02 on env_layout_14, run_064, ticks 60 to 112. One click per
-        stop.</p>
+      <p><strong>DRAFT</strong> (the second search): kitting scenario_s24_14 on env_layout_07, T-F part 1's run_264
+        (context knowledge on, no fact in force), ticks 85 to 150. The coffee break trusted at 116 (0.78), and Anton
+        switches from item 56 to item 54; the human-unaware run_261 does item 56 at 85 to 169. Weakness: from 90 to 114
+        Anton walks about 55 cm behind her. The earlier draft, run_064 of scenario_s12_02, held 18 ticks with no change of
+        task. One click per stop.</p>
       {MIND}
     </>}>
       <ReplayBreak />
@@ -161,8 +170,13 @@ export function Stage5Replay() {
       sees the situation make Anton adapt earlier.
     </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong>: kitting scenario_s12_04 on env_layout_14 (scenario_s12_02 with break time in force from
-        tick 63), run_707, ticks 60 to 90; scenario_s12_02 itself is talk stage 4's draft. One click per stop.</p>
+      <p><strong>DRAFT</strong> (the second search): kitting scenario_s23_03 on env_layout_07 (scenario_s05_01 with break
+        time in force from 0 to 56), T-F part 1's run_576, ticks 0 to 62: the coffee break leads from tick 0 (0.66) and is
+        trusted at 27 (0.76); Anton switches to item 2 and walks away, no violation. The same shift without the fact
+        (scenario_s05_01, run_108, context knowledge on): the break is trusted only at 52, Anton passes her at 31.62 cm at
+        tick 28 (3 ticks below the minimum separation). Weakness: in run_108 the context makes the start worse than
+        with context knowledge off (her walk read as deliver item 5 at 0.97; off, run_107, the break is trusted at 32).
+        The earlier draft, run_707 against run_064, changed only where and when Anton paused. One click per stop.</p>
       <p>Measured (T-F part 1, COMPARISON.md, step 3b): with a fact in force, a fact in accord with her task speeds its
         trust, one not in accord delays it, with little change in completion. A number on a slide comes from an actual
         run.</p>
@@ -202,14 +216,24 @@ export function Stage6Transition() {
 
 export function Stage6Replay() {
   return (
-    <ReplaySlide stage={6} title="Switch and resumption: a sim-run" todo={<>
+    <ReplaySlide stage={6} title="Switch and resumption: a sim-run"
+                 unsettled="In this run the trust ends because the break overtakes her delivery, not because it stops fitting."
+                 todo={<>
       A recorded sim-run in which she switches mid-way and later resumes: the trusted intention stops fitting, Anton
       stops trusting it and plans again against the projection from her motion, and recognition picks her up again when
       she resumes. Why: fit is what makes Anton keep pace with her; the audience sees it change the outcome.
     </>} notes={<>
       {FIRST}
-      <p><strong>DRAFT</strong>: kitting scenario_s10_03 on env_layout_12, run_012, ticks 40 to 125. One click per
-        stop.</p>
+      <p><strong>DRAFT</strong> (the second search): kitting scenario_s23_23 on env_layout_07, T-F part 1's run_584
+        (break time in force from 48 to 84), ticks 30 to 100. Her delivery trusted at 36, a hold of 7; the coffee break
+        cut in at 48 leads, and Anton stops trusting the delivery; the break trusted at 53, a hold (planned 33, 29
+        stood); her break over at 82, a new hold; she resumes at 84; the delivery trusted again at 94, the hold ends
+        after 12 ticks and Anton walks on.</p>
+      <p><strong>NOT SETTLED</strong>: in this run the trust ends at 48 because the coffee break overtakes the delivery
+        (the log's cause "replaced"), not because the delivery stops fitting: the delivery is adequate throughout. The
+        switch and the resumption change what Anton does; fit is not what changes it. The earlier draft, run_012 of
+        scenario_s10_03, shows fit (the delivery stops fitting at 55) but Anton's tasks are those of the human-unaware
+        run_009, with no hold: fit changes nothing for Anton there. Hadi chooses, or authors a scenario.</p>
       {MIND}
     </>}>
       <ReplaySwitch />
@@ -248,7 +272,9 @@ export function Stage7Transition() {
 
 export function Stage7Replay() {
   return (
-    <ReplaySlide stage={7} title="Unmodelled behaviour: a sim-run" todo={<>
+    <ReplaySlide stage={7} title="Unmodelled behaviour: a sim-run"
+                 unsettled="No existing run shows Anton act differently on it: Anton is far from her. A scenario is proposed."
+                 todo={<>
       A recorded sim-run with unmodelled behaviour (for example a walk to a corner): no hypothesis fits, the projection
       from her motion takes over as the fallback, and recognition resumes when she returns to modelled behaviour. Why:
       the hardest case, handled by blocks the audience already knows.
@@ -256,6 +282,10 @@ export function Stage7Replay() {
       {FIRST}
       <p><strong>DRAFT</strong>: kitting scenario_s10_07 on env_layout_12, run_028, ticks 40 to 125. One click per
         stop.</p>
+      <p><strong>NOT SETTLED</strong>: no existing run meets the criterion (the second search, 8 October 2026: no
+        retraction at an unexplained finding is followed by a hold or a switch within 40 ticks). Here Anton's tasks are
+        those of the human-unaware run_025, no hold, Anton at least 405 cm away. The proposal for Hadi to author is in
+        the report of the overall revision.</p>
       {MIND}
     </>}>
       <ReplayStand />

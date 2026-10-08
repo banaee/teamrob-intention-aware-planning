@@ -30,6 +30,10 @@ export function DonnyEntersSlide() {
   return (
     <Slide stage={2} notes={<>
       <p>Donny enters the room while Anton works.</p>
+      <p><strong>NOT SETTLED</strong> (the second search, 8 October 2026): no existing kitting scenario has her enter the
+        room. None starts her outside or at a door; three (scenario_s01_05, s01_08, s05_04) walk her to the door and back
+        in, with no hold for Anton; scenario_s10_01 with her start moved to door_N gives no hold either. A proposal for
+        Hadi to author is in the report of the overall revision.</p>
       <p><strong>PARKED</strong> (handoff 11): the comparison with centralised multi-agent planning, candidate place
         here. Agreed wording: a central planner can command robots; nobody can command a human, whose current intention
         is not communicated and whose behaviour is only partly modelled. A different setting, not a weaker approach.</p>

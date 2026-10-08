@@ -8,7 +8,7 @@
 
 import s1 from "../../data/run_stage1_alone.json";
 import s2 from "../../data/run_stage2_reactive.json";
-import s3 from "../../data/run_stage3_hold.json";
+import s3 from "../../data/run_stage3_switch.json";
 import s4 from "../../data/run_stage4_break.json";
 import s5 from "../../data/run_stage5_breaktime.json";
 import s6 from "../../data/run_stage6_switch.json";
@@ -17,14 +17,16 @@ import { type RecordedRun, ReplayView, type Stop } from "../scene/RunReplay";
 
 const run = (r: unknown) => r as RecordedRun;   // the JSON's enumerations are read as strings
 
-/** Talk stage 1: kitting scenario_s12_01, human-unaware (T-F part 1's run_057): Anton's two deliveries; the human is
- * not drawn (the robot's mind receives no human in this condition). */
+/** Talk stage 1: kitting scenario_s12_02 on env_layout_14, human-unaware (T-F part 1's run_061): Anton's two
+ * deliveries, each with its two walks (to the item, to its table) in clearly different directions (87 and 101 degrees
+ * between them); the human is not drawn (the robot's mind receives no human in this condition). */
 export function ReplayAlone() {
   const stops: Stop[] = [
-    { tick: 0, caption: "Anton chooses a task, deliver item 7, and plans its actions." },
-    { tick: 30, caption: "It executes them, one at a time: the dashed line is what is left of its plan." },
-    { tick: 63, caption: "Item 7 delivered: it chooses the next task, deliver item 13." },
-    { tick: 126, caption: "Both delivered." },
+    { tick: 0, caption: "Anton chooses a task, deliver item 3, and plans its actions: the dashed line." },
+    { tick: 8, caption: "It picks up item 3; what is left of its plan turns toward the table." },
+    { tick: 30, caption: "Item 3 delivered: it chooses the next task, deliver item 14." },
+    { tick: 95, caption: "It picks up item 14." },
+    { tick: 136, caption: "Both delivered." },
   ];
   return <ReplayView recorded={run(s1)} stops={stops} hideHumans mind={{}} tickNote />;
 }
@@ -40,56 +42,66 @@ export function ReplayReactive() {
   return <ReplayView recorded={run(s2)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
 
-/** Talk stage 3: scenario_s10_02, intention-aware (run_008): her task trusted at tick 8, a hold of 5 ticks. */
+/** Talk stage 3: scenario_s12_01 on env_layout_14 (T-F part 1's run_060): her delivery of item 1 trusted at tick 8, and
+ * Anton switches from deliver item 7 to deliver item 13 (task choice); in the intention-unaware run_058 Anton carries
+ * item 7 across her route, with holds. */
 export function ReplayTrusted() {
   const stops: Stop[] = [
-    { tick: 0, caption: "She starts work; Anton does not yet know which of her tasks it is." },
-    { tick: 6, caption: "Deliver item 1 leads with a belief of 0.71: below 0.75, not trusted yet." },
-    { tick: 8, caption: "0.78, and it has support: trusted. Anton projects her task's path (the filled stripe) and holds 5 ticks." },
-    { tick: 13, caption: "The hold is over: it goes on with its own delivery." },
-    { tick: 24, caption: "The projection follows her task, not only her present motion." },
+    { tick: 0, caption: "She starts work. Anton chooses deliver item 7; it does not yet know which of her tasks she does." },
+    { tick: 6, caption: "Her delivery of item 1 leads with a belief of 0.71: below 0.75, not trusted yet." },
+    { tick: 8, caption: "0.78, and it has support: trusted. Realized against her projected path, deliver item 13 is now cheaper: Anton switches to it." },
+    { tick: 29, caption: "It picks up item 13." },
+    { tick: 62, caption: "Item 13 delivered, far from her path. Item 7 comes next." },
   ];
   return <ReplayView recorded={run(s3)} stops={stops}
                      mind={{ belief: true, support: true, hold: true, projection: true }} />;
 }
 
-/** Talk stage 4: scenario_s12_02 (run_064): the coffee break trusted at tick 93, a hold of 18 ticks around her break. */
+/** Talk stage 4: scenario_s24_14 on env_layout_07 (T-F part 1's run_264, no context fact in force): her coffee break
+ * trusted at tick 116, and Anton switches from deliver item 56 to deliver item 54 (the human-unaware run_261 does item
+ * 56 at 85 to 169). */
 export function ReplayBreak() {
   const stops: Stop[] = [
-    { tick: 63, caption: "Item 1 delivered; she walks off toward the coffee machine." },
-    { tick: 92, caption: "The coffee break leads with 0.74: not trusted yet." },
-    { tick: 93, caption: "0.79, and it has support: the coffee break is trusted. Anton's plan now starts with a hold of 18 ticks." },
-    { tick: 110, caption: "It goes on." },
+    { tick: 85, caption: "Anton starts its next task: deliver item 56." },
+    { tick: 90, caption: "She has delivered her item and walks off to the coffee machine." },
+    { tick: 115, caption: "The coffee break leads with 0.74: not trusted yet." },
+    { tick: 116, caption: "0.78, and it has support: the coffee break is trusted. Anton switches to deliver item 54." },
+    { tick: 150, caption: "Item 54 first; item 56 comes after her break." },
   ];
   return <ReplayView recorded={run(s4)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
 
-/** Talk stage 5: scenario_s12_04 (run_707), scenario_s12_02's copy with break time in force from tick 63: the coffee
- * break trusted at tick 69, 24 ticks earlier than without it. */
+/** Talk stage 5: scenario_s23_03 on env_layout_07 (T-F part 1's run_576; scenario_s05_01 with break time in force from
+ * tick 0 to 56): the coffee break trusted at tick 27, and Anton switches to deliver item 2. Without the fact (scenario_s05_01,
+ * run_108) the break is trusted only at 52 and Anton passes her at 31.62 cm at tick 28. */
 export function ReplayBreakTime() {
   const stops: Stop[] = [
-    { tick: 63, caption: "The same shift, now in break time. Item 1 delivered; she walks off toward the coffee machine." },
-    { tick: 68, caption: "Break time raises the coffee break's prior: it leads with 0.74 after 5 ticks." },
-    { tick: 69, caption: "Trusted at tick 69, not 93: 24 ticks earlier. Anton's plan starts with a hold of 18 ticks." },
-    { tick: 86, caption: "It goes on. Her movement still decided: break time only made the trust come earlier." },
+    { tick: 0, caption: "Break time. She walks to the coffee machine; break time raises the coffee break's prior: it leads from the start." },
+    { tick: 26, caption: "The coffee break leads with 0.74: not trusted yet." },
+    { tick: 27, caption: "0.76, and it has support: trusted. Anton switches from deliver item 1 to deliver item 2." },
+    { tick: 62, caption: "The same shift without break time: the break is trusted only at tick 52, and Anton passes her closer than the minimum separation." },
   ];
   return <ReplayView recorded={run(s5)} stops={stops}
                      mind={{ belief: true, hold: true, projection: true, context: true }} />;
 }
 
-/** Talk stage 6: scenario_s10_03 (run_012): the coffee break cut into her delivery mid-walk, the withdrawal at 55,
- * the break trusted at 76, the resumption at 107. */
+/** Talk stage 6: scenario_s23_23 on env_layout_07 (T-F part 1's run_584, break time in force from tick 48 to 84): her
+ * delivery trusted at 36 with a hold; the coffee break cut into it at 48, which then leads, and Anton stops trusting the
+ * delivery; the break trusted at 53, a hold; her break over at 82; she resumes at 84; the delivery trusted again at 94
+ * and the hold ends. The trust ends at 48 because the break overtakes the delivery (the log's cause "replaced"), not
+ * because the delivery stops fitting: flagged, marked not settled on the slide. */
 export function ReplaySwitch() {
   const stops: Stop[] = [
-    { tick: 40, caption: "Anton trusts her task: deliver item 1." },
-    { tick: 46, caption: "Mid-way, carrying the item, she turns to the coffee machine." },
-    { tick: 55, caption: "Deliver item 1 no longer fits: Anton stops trusting it and plans against the projection from her motion." },
-    { tick: 76, caption: "The coffee break is trusted." },
-    { tick: 107, caption: "She resumes her delivery." },
-    { tick: 120, caption: "Deliver item 1 is trusted again." },
+    { tick: 30, caption: "Anton carries item 1; she is on her way with her delivery of item 5." },
+    { tick: 36, caption: "Her delivery is trusted (0.75): Anton holds 7 ticks." },
+    { tick: 48, caption: "Break time. Mid-way she turns to the coffee machine; the coffee break now leads: Anton stops trusting her delivery." },
+    { tick: 53, caption: "The coffee break is trusted (0.81): Anton holds beside her, a hold of up to 33 ticks." },
+    { tick: 82, caption: "Her break is over: nothing is trusted. Anton plans again and holds." },
+    { tick: 84, caption: "She resumes her delivery." },
+    { tick: 94, caption: "Her delivery is trusted again (0.78): the hold ends after 12 ticks and Anton walks on." },
   ];
   return <ReplayView recorded={run(s6)} stops={stops}
-                     mind={{ belief: true, fit: true, hold: true, projection: true }} />;
+                     mind={{ belief: true, fit: true, hold: true, projection: true, context: true }} />;
 }
 
 /** Talk stage 7: scenario_s10_07 (run_028): a 60-tick stand cut into her delivery mid-walk (unmodelled), unexplained

@@ -16,12 +16,12 @@ const VIEWS = [["kitting", "env_layout_01"], ["dock_loading", "env_layout_03"]];
 // The sim-runs replayed on slides (scripts/record_run.py): [name, existing run file, first tick, last tick].
 const TF1 = "configs/kitting/tf1/measurement";
 const RUNS = [
-  ["stage1_alone", `${TF1}/scenario_s12_01/run_057.yaml`, 0, 126],        // human-unaware
+  ["stage1_alone", `${TF1}/scenario_s12_02/run_061.yaml`, 0, 136],        // human-unaware
   ["stage2_reactive", `${TF1}/scenario_s10_02/run_006.yaml`, 24, 52],     // intention-unaware
-  ["stage3_hold", `${TF1}/scenario_s10_02/run_008.yaml`, 0, 24],
-  ["stage4_break", `${TF1}/scenario_s12_02/run_064.yaml`, 60, 112],
-  ["stage5_breaktime", `${TF1}/scenario_s12_04/run_707.yaml`, 60, 90],
-  ["stage6_switch", `${TF1}/scenario_s10_03/run_012.yaml`, 40, 125],
+  ["stage3_switch", `${TF1}/scenario_s12_01/run_060.yaml`, 0, 62],
+  ["stage4_break", `${TF1}/scenario_s24_14/run_264.yaml`, 85, 150],
+  ["stage5_breaktime", `${TF1}/scenario_s23_03/run_576.yaml`, 0, 62],
+  ["stage6_switch", `${TF1}/scenario_s23_23/run_584.yaml`, 30, 100],
   ["stage7_stand", `${TF1}/scenario_s10_07/run_028.yaml`, 40, 125],
 ];
 

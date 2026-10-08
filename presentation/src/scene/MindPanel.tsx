@@ -32,10 +32,14 @@ export interface MindParts {
   context?: boolean;
 }
 
+/** Tasks whose schema's words are not the talk's (the talk says "switching on the A/C"). */
+const SAID: Record<string, string> = { ac_activation: "switching on the A/C" };
+
 /** A task or a hypothesis in the talk's words: its schema's words, and the number of a binding whose object the
  * schema names (deliver_item with item_1: "deliver item 1"); other bindings are left out (coffee_break with
  * coffee_machine_0: "coffee break"). */
 export function talkName(task: string, bindings: readonly { value: string }[]): string {
+  if (task in SAID) return SAID[task];
   const words = task.split("_");
   for (const b of bindings) {
     const m = /^(.*)_(\d+)$/.exec(b.value);
