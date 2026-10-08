@@ -3,6 +3,10 @@
 // the pages into one file. The speaker notes are not in it. A fallback copy of the talk, and a handout for review.
 //
 //   npm run preview &   then   npm run pdf -- [--url http://127.0.0.1:4173] [--out pdf/deck_<yyyy-mm-dd-hh-mm>.pdf]
+//
+// --quick (npm run pdf:quick): a fast, rough copy for a quick check, pdf/deck_<yyyy-mm-dd-hh-mm>_quick.pdf: 1280 x 720,
+// JPEG pages, each slide jumped to its last step with a short wait (no click played; a replay shows whatever frame it
+// has reached).
 
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -21,11 +25,14 @@ function stamp() {
 const { values } = parseArgs({
   options: {
     url: { type: "string", default: "http://127.0.0.1:4173" },
-    out: { type: "string", default: resolve(here, `../pdf/deck_${stamp()}.pdf`) },   // dated: earlier exports are kept
+    out: { type: "string" },     // default: pdf/deck_<stamp>.pdf, dated so that earlier exports are kept
     settle: { type: "string", default: "1300" },
+    quick: { type: "boolean", default: false },
   },
 });
-const [W, H] = [2560, 1440];
+const quick = values.quick;
+const out = values.out ?? resolve(here, `../pdf/deck_${stamp()}${quick ? "_quick" : ""}.pdf`);
+const [W, H] = quick ? [1280, 720] : [2560, 1440];
 const origin = new URL(values.url).origin;
 
 const browser = await chromium.launch({ channel: "chrome", args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
@@ -42,16 +49,31 @@ await page.evaluate(() => document.fonts.ready);
 await page.waitForTimeout(1500);
 
 const last = new Map();      // slide index -> its screenshot in its final step so far
-for (;;) {
-  const at = await page.evaluate(() => ({
-    h: window.deck.getIndices().h,
-    end: window.deck.isLastSlide() && !window.deck.availableFragments().next,
-  }));
-  if (!last.has(at.h)) console.log(`[pdf] slide ${at.h + 1}`);     // progress: the export takes a few minutes
-  last.set(at.h, await page.screenshot({ type: "png" }));
-  if (at.end) break;
-  await page.mouse.click(W / 2, H / 2);
-  await page.waitForTimeout(Number(values.settle));
+const shot = () => page.screenshot(quick ? { type: "jpeg", quality: 70 } : { type: "png" });
+if (quick) {
+  // Each slide at its last step, by jumping there: no click is played, only a short wait for the slide to draw.
+  const count = await page.evaluate(() => window.deck.getTotalSlides());
+  for (let h = 0; h < count; h++) {
+    console.log(`[pdf] slide ${h + 1} of ${count}`);
+    await page.evaluate((i) => {
+      const steps = window.deck.getSlide(i).querySelectorAll(".fragment").length;
+      window.deck.slide(i, 0, steps - 1);
+    }, h);
+    await page.waitForTimeout(700);
+    last.set(h, await shot());
+  }
+} else {
+  for (;;) {
+    const at = await page.evaluate(() => ({
+      h: window.deck.getIndices().h,
+      end: window.deck.isLastSlide() && !window.deck.availableFragments().next,
+    }));
+    if (!last.has(at.h)) console.log(`[pdf] slide ${at.h + 1}`);     // progress: the export takes a few minutes
+    last.set(at.h, await shot());
+    if (at.end) break;
+    await page.mouse.click(W / 2, H / 2);
+    await page.waitForTimeout(Number(values.settle));
+  }
 }
 
 const pages = [...last.keys()].sort((a, b) => a - b).map((h) => last.get(h).toString("base64"));
@@ -60,9 +82,9 @@ await sheet.setContent(`<!doctype html><html><head><style>
   @page { size: ${W}px ${H}px; margin: 0; }
   html, body { margin: 0; }
   img { display: block; width: ${W}px; height: ${H}px; page-break-after: always; }
-</style></head><body>${pages.map((p) => `<img src="data:image/png;base64,${p}">`).join("")}</body></html>`);
-mkdirSync(dirname(values.out), { recursive: true });
-await sheet.pdf({ path: values.out, width: `${W}px`, height: `${H}px`, printBackground: true, preferCSSPageSize: true });
+</style></head><body>${pages.map((p) => `<img src="data:image/${quick ? "jpeg" : "png"};base64,${p}">`).join("")}</body></html>`);
+mkdirSync(dirname(out), { recursive: true });
+await sheet.pdf({ path: out, width: `${W}px`, height: `${H}px`, printBackground: true, preferCSSPageSize: true });
 await browser.close();
-console.log(`[pdf] ${pages.length} slides written to ${values.out}; outside requests: ${outside}`);
+console.log(`[pdf] ${pages.length} slides written to ${out}; outside requests: ${outside}`);
 if (outside > 0) process.exit(1);
