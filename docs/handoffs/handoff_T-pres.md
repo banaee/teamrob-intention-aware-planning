@@ -474,5 +474,11 @@ The talk and the afternoon station should say the same; decide whether the web-u
   a block of the contribution is opened once when it appears and again when a later talk stage extends it, showing its
   formulation; abstract, no flowchart, no if-then branches. design_records.md, "T-pres, the talk", UNBOXING THE BLOCKS.
 
+- j. [preferred] (Hadi, 8 October 2026, the overall revision) Plain, consistent terms, one per concept; the levels
+  removed and each talk stage 1 to 7 opened by a transition slide with its three columns; the talk's title and the talk
+  stages' names; the opened blocks simpler (at most one formal line and two short sentences), the realizer and task
+  choice as pseudocode (setting aside "no if-then" for these two); Anton's mind beside each replay; no area names in the
+  env-pane; one criterion for every replay. design_records.md, "T-pres, the talk", THE OVERALL REVISION.
+
 Where the rest of that prompt is recorded (the words "talk stage" and "part", the parts 1 to 6 that replace section
 12's plan, the working rule, the deck's design): `docs/design_records.md`, "T-pres, the talk".

@@ -5858,3 +5858,75 @@ canvas while the deck runs throws (a React removeChild error); so up to seven We
 replay has been seen (part 6 checks it on the hall's laptop). Each recording writes the usual log pair to `logs/`.
 Checks: the build; the click-through, 99 steps at 1920 x 1080 and 2560 x 1440, 0 outside requests, 0 page errors, 0 notes
 on screen.
+
+THE OVERALL REVISION (Hadi, 8 October 2026, preferred; recorded by ccode the same day, after Hadi had seen talk stages 0
+to 7 as a first version and 8 to 12 as placeholders). His overall points, applied to the whole deck; his points on
+single talk stages come afterwards. Each changes a preference of the handoff, whose own text stays as it is
+(handoff, section 14, item j, points here):
+- Plain, consistent terms: one concept, one term in the whole deck, literal wording of the kind the AAAI-26 HCM paper
+  and the project's documents use, abstract and understandable for a lay industrial audience; no figurative titles. The
+  block names of the architecture stay. Reason: the audience meets the framework for the first time; a term that
+  changes or reads as a metaphor costs them the thread.
+- The three levels are removed (they replace the handoff's section 5 level titles on the slides). Each talk stage 1 to
+  7 opens with a transition slide: the seven talk stages as numbered circles joined vertically, the starting one larger
+  and bold, the finished ones done (a check mark and a quiet colour, not colour alone), the coming ones plain; the
+  starting talk stage's three columns (what I know, believe, decide) on it, and the separate card slides go. The
+  audience question at talk stage 2 and the question that leads to talk stage 3 stay; "deviation" only at talk stage 7.
+  Reason: one visible thread through the talk, and fewer clicks.
+- The names (a first version): the talk's title "Intention-aware adaptive planning in human-robot teams"; talk stages
+  1 The robot alone, 2 A human in the shared space, 3 Assigned tasks, 4 Foreseeable behaviours, 5 Context, 6 Switch and
+  resumption, 7 Unmodelled behaviour, each with its line (`presentation/src/talk.ts`).
+- The opened blocks simpler: at most one formal line and two short sentences per panel, readable from the back of a
+  hall; what is taken out goes to the speaker notes. The belief as Bayes, P(h | o) ∝ P(o | h) P(h) over H, H growing at
+  talk stage 4 and the prior depending on the context at 5; no likelihood formula, no survival function, no figures in
+  centimetres; support, fit and the confidence check as short conditions in plain words. Reason: the panel says what
+  the block does in the time of one sentence of speech.
+- The realizer and task choice as a few lines of high-level pseudocode, not an equation. This sets aside the handoff's
+  "no if-then" (section 4; UNBOXING THE BLOCKS) for these two blocks.
+- The robot's mind beside the replay: on a slide with a replay, what Anton's mind holds at the tick beside the scene,
+  in place of a footer sentence where the picture says it better: first the live hypotheses as bars that rise and fall
+  per tick with the trusted intention marked, then the parts a talk stage is about (support, fit, the hold), taken from
+  the web-ui's robot panel so that the audience learns to read the station. Reason: the audience sees the belief move
+  while she walks. A needed change in `webui/` is not made: a temporary version in the same look, the change reported.
+- The zones' names leave the env-pane, on the slides and in the web-ui: the one authorised change in `webui/`
+  (recorded under T-viz, NO AREA NAMES IN THE SCENE). The label "robot_0" is hidden on slides without a change in
+  `webui/`.
+- One criterion for every replay: the mechanism the talk stage is about visibly changes what Anton does. Where no
+  existing scenario meets it, a TODO box or a mark "not settled" stays, and what a scenario would need is a proposal for
+  Hadi to author; ccode authors nothing.
+- The captions count in ticks; the deck says once, early, that a tick is one time step.
+- Each finished round of revision is tagged in git, in order: the state before this revision tpres-v1 (ca261d4), this
+  revision tpres-v2.
+BUILT (ccode, 8 October 2026; d61c73c the web-ui's change, 74e7bfd, 8ab4a71, b13be80, 5d31a53; Hadi's review open).
+- `presentation/src/talk.ts`: no levels; the title, the names and lines, the columns in the deck's terms.
+  `presentation/src/slides/kit.tsx`: `Transition`, `TransitionSlide`, the mark `Unsettled`. 39 slides.
+- `presentation/src/architecture/unboxing.tsx`: items (formal, words, condition, pseudocode, output) with the talk
+  stage that brings each and the one that replaces it; at an extension the earlier items recede, a receded formal line
+  stays with its sentence (the fault at talk stage 7's projection panel), the new part of a formal line is drawn
+  distinct.
+- `presentation/src/scene/MindPanel.tsx`: Anton's mind beside every replay, from the recorded tick update (the full
+  belief and the robots' descriptions, `scripts/record_run.py`), with the web-ui's `beliefRows`, `taskColours` and
+  `colourOf`. The web-ui's `ChartRow` and `Facts` are not exported; the change that would let the deck reuse them: export
+  both from `webui/page/src/frame/RobotPanel.tsx` with their sizes read from CSS variables.
+- Faults seen in the PDF: the new blocks at talk stage 3, the room cut off and the pages caught in a transition were
+  captures taken while the slide still moved (the page blocked about 1.5 s by the replay canvases kept mounted, which
+  rendered every frame): a canvas now renders only while its slide is current, a replay or a moving view marks itself
+  busy, and the PDF and the click-through capture a step once the slide has settled. The stray floor label under Donny
+  was an area's name. An arrow's keyword that gave way no longer shows while a block is opened.
+- THE SECOND SEARCH FOR REPLAYS (T-F part 1's 688 runs, and wider; numbers from the logs):
+
+| talk stage | replay | what it shows | criterion |
+|---|---|---|---|
+| 1 | scenario_s12_02, env_layout_14, run_061 (human-unaware), 0 to 136 | two deliveries; between the walk to the item and the walk to its table Anton turns 87 and 101 degrees | met |
+| 2, Donny enters | none | no scenario has her enter the room; three walk her to a door and back, with no hold; a start moved to door_N gives no hold | not met; TODO box stays |
+| 2, reactive | scenario_s10_02, env_layout_12, run_006 (intention-unaware), 24 to 52 | a hold of 5 ticks at 40 on the projection from her motion | met (short); longer: run_446 (24 ticks), run_050 |
+| 3 | scenario_s12_01, env_layout_14, run_060, 0 to 62 | her delivery of item 1 trusted at 8 (0.78); Anton switches from item 7 to item 13 | met; the switch shows from the carry on |
+| 4 | scenario_s24_14, env_layout_07, run_264, 85 to 150 | the coffee break trusted at 116 (0.78); Anton switches from item 56 to item 54 | met; Anton walks about 55 cm behind her at 90 to 114 |
+| 5 | scenario_s23_03, env_layout_07, run_576, 0 to 62 (scenario_s05_01 with break time 0 to 56) | trusted at 27 (0.76), Anton switches to item 2; without the fact (run_108) trusted at 52 and Anton passes her at 31.62 cm | met; without the fact the start is worse than with context knowledge off |
+| 6 | scenario_s23_23, env_layout_07, run_584 (break time 48 to 84), 30 to 100 | delivery trusted 36, hold 7; break cut in at 48 leads, trust ends; break trusted 53, hold; resumes 84; delivery trusted again 94, the hold ends | met for switch and resumption; the trust ends by replacement, not by fit: marked not settled |
+| 7 | scenario_s10_07, env_layout_12, run_028, 40 to 125 | unexplained from 62, the fallback; Anton's tasks those of the human-unaware run, no hold, at least 405 cm away | not met: marked not settled; a scenario proposed |
+
+- Clicks per talk stage (each slide's entering click and its steps): 0 18, 1 11, 2 15, 3 14, 4 9, 5 9, 6 12, 7 11, 8 to
+  12 one each; 103 in all.
+- Checks: the build (type check included); vitest 56 and the build of `webui/page`; the click-through, 104 steps at
+  1920 x 1080 and 2560 x 1440, 0 outside requests, 0 page errors, 0 notes on screen; `npm run pdf:steps`, 104 pages.
