@@ -40,6 +40,13 @@ export function useSlideNear(): boolean {
   return useNear(section);
 }
 
+/** How many of the slide's elements matching `selector` are shown steps now. */
+export function useSlideSteps(selector: string): number {
+  const section = useContext(SlideContext);
+  if (section === null) throw new Error("useSlideSteps outside a Slide");
+  return useVisibleCount(section, selector);
+}
+
 /** A step of a slide: a hidden marker that a click shows; `shown` tells the slide. */
 export function useStep(): [RefObject<HTMLSpanElement | null>, boolean] {
   const ref = useRef<HTMLSpanElement>(null);
@@ -74,6 +81,7 @@ export function StageCard({ stage, children }: { stage: TalkStage; children?: Re
   return (
     <>
       <StageTitle stage={stage} />
+      <div className="card-body">
       <div className="columns">
         {QUESTIONS.map((q) => (
           <div key={q} className={`column column-${q}`}>
@@ -85,6 +93,7 @@ export function StageCard({ stage, children }: { stage: TalkStage; children?: Re
         ))}
       </div>
       {children}
+      </div>
     </>
   );
 }

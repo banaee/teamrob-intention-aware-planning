@@ -4,7 +4,8 @@
  * by the situation: domains/kitting/tasks.py) and the actions of the usual one. A first version for Hadi's revision.
  */
 
-import { ArchitectureView, Slide, StageCard, Todo } from "./kit";
+import { ArchitectureView, Slide, StageCard } from "./kit";
+import { ReplayAlone } from "./replays";
 
 export function Stage1Card() {
   return (
@@ -67,25 +68,19 @@ export function DecompositionSlide() {
 
 export function PlanExecuteSlide() {
   return (
-    <Slide stage={1} notes={<>
+    <Slide stage={1} className="replay-slide" notes={<>
       <p>Anton chooses a task, its planner decomposes it into actions, and its body executes them one at a time. When the
-        task is done, it chooses the next.</p>
-      <p>Part 4 fills the box with a fast-forward of Anton delivering items.</p>
+        task is done, it chooses the next. One click per stop of the replay.</p>
+      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s12_01 on env_layout_14, T-F part 1's
+        human-unaware run (run_057), ticks 0 to 126; the human is not drawn, since in this condition Anton's mind receives
+        no human. Flag: hiding her is a choice of the slide.</p>
+      <p><strong>TODO (part 4)</strong>, the box this draft stands in: a fast-forward of Anton alone, delivering items,
+        replayed from a recorded sim-run of an existing kitting scenario, in the web-ui's env-pane look: the robot in
+        blue, its plan as its dashed blue line on the floor. Why: the audience sees "plan, then execute" happen, and
+        learns to read the floor drawing they meet at the station.</p>
     </>}>
       <h1 className="slide-head">It plans, then executes</h1>
-      <div className="two-col">
-        <ol className="steps-list">
-          <li className="fragment">Choose a task</li>
-          <li className="fragment">Plan its actions</li>
-          <li className="fragment">Execute them, one at a time</li>
-        </ol>
-        <Todo by="part 4">
-          A fast-forward of Anton alone, delivering items, replayed from a recorded sim-run of an existing kitting
-          scenario, in the web-ui's env-pane look: the robot in blue, its plan as its dashed blue line on the floor.
-          Several ticks per click or a short continuous play. Why: the audience sees "plan, then execute" happen, and
-          learns to read the floor drawing they meet at the station.
-        </Todo>
-      </div>
+      <ReplayAlone />
     </Slide>
   );
 }

@@ -11,6 +11,7 @@
  */
 
 import { ArchitectureView, LevelTitle, Slide, StageCard, Todo, useStep, StepMarker } from "./kit";
+import { ReplayReactive } from "./replays";
 
 export function Level1Slide() {
   return (
@@ -137,26 +138,21 @@ export function ProjectionSlide() {
 
 export function ReactiveRunSlide() {
   return (
-    <Slide stage={2} notes={<>
-      <p>The reactive robot in a real sim-run: Anton keeps clear, and it holds near her.</p>
+    <Slide stage={2} className="replay-slide" notes={<>
+      <p>The reactive robot in a real sim-run: Anton keeps clear, and it holds near her. One click per stop.</p>
+      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_02 on env_layout_12, T-F part 1's
+        intention-unaware run (run_006), ticks 24 to 52.</p>
       <p><strong>OPEN</strong> (handoff 5, 11): a screenshot of Fatemeh's PRIEST trajectory adaptation (ROS side) may
-        acknowledge her work here, labelled as such; Hadi fixes its wording.</p>
+        acknowledge her work here, labelled as such; Hadi fixes its wording. It would need its own slide or a corner of
+        this one.</p>
       <p>In the results this is the intention-unaware run: the same planner, fed only with the projection from her
         motion.</p>
+      <p><strong>TODO (part 4)</strong>, the box this draft stands in: Anton holding near Donny, replayed from a recorded
+        sim-run of an existing kitting scenario with the robot intention-unaware, in the env-pane's look: the hatched
+        blue stripe, the dashed blue plan, the hold. Stepped by clicks around the hold.</p>
     </>}>
       <h1 className="slide-head">The reactive robot</h1>
-      <div className="two-col two-col-wide">
-        <Todo by="part 4">
-          Anton holding near Donny, replayed from a recorded sim-run of an existing kitting scenario with the robot
-          intention-unaware (T-F part 1's condition), in the env-pane's look: the hatched blue stripe of the projection
-          from her motion, the dashed blue plan, the hold. Stepped by clicks around the hold. Why: the audience sees
-          the reactive robot keep clear, and reads the same drawing at the station.
-        </Todo>
-        <Todo by="Hadi, open">
-          Optional: a screenshot of Fatemeh's PRIEST trajectory adaptation (ROS side), labelled as her work, if Hadi
-          keeps the acknowledgement here.
-        </Todo>
-      </div>
+      <ReplayReactive />
       <p className="slide-foot-line">The planner stays; what changes is the projection it receives.</p>
     </Slide>
   );

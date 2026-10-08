@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 import type { Unboxable } from "../architecture/unboxing";
 import { STAGES, type TalkStage } from "../talk";
 import { ArchitectureView, LevelTitle, Slide, StageCard, StageTitle, Todo } from "./kit";
+import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplaySwitch, ReplayTrusted } from "./replays";
 
 /** A talk stage's card. `scene` (a replayed sim-run) stands in the TODO box's place once it exists; the box's text then
  * goes to the notes. */
@@ -60,10 +61,11 @@ export const STAGE3_TODO = <>
   against it. Why: this is where recognition first changes what Anton does.
 </>;
 
-export function Stage3Card({ scene }: { scene?: ReactNode }) {
+export function Stage3Card() {
   return (
-    <CardSlide stage={3} todo={STAGE3_TODO} scene={scene} notes={<>
+    <CardSlide stage={3} todo={STAGE3_TODO} scene={<ReplayTrusted />} notes={<>
       {FIRST}
+      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_02 on env_layout_12, T-F part 1's run_008 (intention-aware), ticks 0 to 24. One click per stop.</p>
       <p>Anton now knows her task list. What it believes: which of her tasks she is doing. What it decides: its own
         next task and hold, against where her task will take her. The heaviest stage: most of the time goes here.</p>
     </>} />
@@ -103,10 +105,11 @@ export const STAGE4_TODO = <>
   reorder caused by the trusted break. Why: one later stage should show planning change, not only recognition.
 </>;
 
-export function Stage4Card({ scene }: { scene?: ReactNode }) {
+export function Stage4Card() {
   return (
-    <CardSlide stage={4} todo={STAGE4_TODO} scene={scene} notes={<>
+    <CardSlide stage={4} todo={STAGE4_TODO} scene={<ReplayBreak />} notes={<>
       {FIRST}
+      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s12_02 on env_layout_14, run_064, ticks 60 to 112. One click per stop.</p>
       <p>Anton also knows what people foreseeably do besides their tasks: a coffee break, switching on the A/C. A coffee
         break is modelled behaviour, foreseen: Anton plans around her break. Words: "foreseeable behaviours".</p>
     </>} />
@@ -130,10 +133,11 @@ export const STAGE5_TODO = <>
   make Anton adapt earlier.
 </>;
 
-export function Stage5Card({ scene }: { scene?: ReactNode }) {
+export function Stage5Card() {
   return (
-    <CardSlide stage={5} todo={STAGE5_TODO} scene={scene} notes={<>
+    <CardSlide stage={5} todo={STAGE5_TODO} scene={<ReplayBreakTime />} notes={<>
       {FIRST}
+      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s12_04 on env_layout_14 (scenario_s12_02 with break time in force from tick 63), run_707, ticks 60 to 90; scenario_s12_02 itself is talk stage 4's draft. One click per stop.</p>
       <p>Context: facts of the situation (break time, a warm room, a break just taken) set how strongly Anton considers
         each foreseeable behaviour. The prior favours what the situation makes likely; observations still decide.</p>
       <p>Measured (T-F part 1, COMPARISON.md, step 3b): with a fact in force, a fact in accord with her task speeds its
@@ -177,10 +181,11 @@ export const STAGE6_TODO = <>
   Why: fit is what makes Anton keep up; the audience sees it change the outcome.
 </>;
 
-export function Stage6Card({ scene }: { scene?: ReactNode }) {
+export function Stage6Card() {
   return (
-    <CardSlide stage={6} todo={STAGE6_TODO} scene={scene} notes={<>
+    <CardSlide stage={6} todo={STAGE6_TODO} scene={<ReplaySwitch />} notes={<>
       {FIRST}
+      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_03 on env_layout_12, run_012, ticks 40 to 125. One click per stop.</p>
       <p>She switches mid-way: Anton's trusted belief no longer explains what she does. Anton notices, stops trusting it,
         and replans; when she resumes, recognition picks it up again.</p>
     </>} />
@@ -208,10 +213,11 @@ export const STAGE7_TODO = <>
   hardest case, handled by blocks the audience already knows.
 </>;
 
-export function Stage7Card({ scene }: { scene?: ReactNode }) {
+export function Stage7Card() {
   return (
-    <CardSlide stage={7} todo={STAGE7_TODO} scene={scene} notes={<>
+    <CardSlide stage={7} todo={STAGE7_TODO} scene={<ReplayStand />} notes={<>
       {FIRST}
+      <p><strong>DRAFT</strong> (task B, 8 October 2026): kitting scenario_s10_07 on env_layout_12, run_028, ticks 40 to 125. One click per stop.</p>
       <p>She does something nobody modelled: the only deviation in the glossary's sense (a node of her plan the robot's
         model lacks). Words: "unmodelled behaviour".</p>
     </>} />

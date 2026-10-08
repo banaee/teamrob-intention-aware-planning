@@ -36,6 +36,13 @@ that feeds the web-ui (`mesa_sim/webui_adapter.py`; `scripts/record_view.py`) in
 every time, from the original files (`scripts/record.mjs`). The old recording is deleted first; if the recording cannot
 run, the build stops with a message and nothing is built.
 
+The sim-runs replayed on slides are recorded the same way, from existing run files (T-F part 1's, under
+`configs/kitting/tf1/measurement/`): `scripts/record_run.py` builds and steps the run file's sim-run through
+`MesaSimulator`, as the web-ui does, and keeps the tick updates of the ticks a slide replays, cut to what it draws, in
+`data/run_<name>.json` (untracked; the list is `RUNS` in `scripts/record.mjs`). Each recording also writes the usual log
+pair to `logs/`, as every sim-run does. A slide replays one with `src/scene/RunReplay.tsx` (the env-pane's own Scene and
+floor drawings), one click per stop.
+
 The Python environment: `TEAMROB_PYTHON` if set, else `~/python-envs/ir-nomesa-env/bin/python` (the repository's
 working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm run build`.
 

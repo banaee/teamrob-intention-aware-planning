@@ -240,3 +240,23 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .frac-den { padding: 0 0.2em; }
 .ub-formal sub, .ub-formal sup { font-size: 0.7em; }
 .side-plain .todo-large { margin-top: 0; }
+
+/* ---- A replayed sim-run (scene/RunReplay.tsx) ------------------------------------------------------------------- */
+
+.card-body { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.card-scene .card-body { flex-direction: row; gap: calc(48 * var(--u)); margin-top: calc(36 * var(--u)); }
+.card-scene .columns { flex-direction: column; width: 30%; flex: none; margin-top: 0; gap: calc(26 * var(--u)); }
+.card-scene .column { padding-top: calc(12 * var(--u)); border-top-width: calc(4 * var(--u)); }
+.card-scene .column-head { font-size: calc(24 * var(--u)); }
+.card-scene .column ul { margin-top: calc(8 * var(--u)); }
+.card-scene .column li, .card-scene .column-empty { font-size: calc(24 * var(--u)); margin-bottom: calc(4 * var(--u)); }
+.replay { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; }
+.replay-slide .replay { margin-top: calc(20 * var(--u)); }
+.replay-scene { position: relative; flex: 1; min-height: 0; pointer-events: none; }
+.replay-tick {
+  position: absolute; top: calc(6 * var(--u)); right: calc(8 * var(--u)); padding: calc(2 * var(--u)) calc(14 * var(--u));
+  border-radius: var(--radius-pill); background: var(--color-page); font-family: var(--font-mono);
+  font-size: calc(22 * var(--u)); color: var(--color-inkSoft);
+}
+.replay-caption { min-height: 2.7em; margin-top: calc(10 * var(--u)); font-size: calc(30 * var(--u)); line-height: 1.35; }
+.replay-slide .slide-foot-line { margin-top: calc(6 * var(--u)); font-size: calc(28 * var(--u)); }
