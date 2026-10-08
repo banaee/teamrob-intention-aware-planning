@@ -9,23 +9,26 @@ import { createContext, type ReactNode, type RefObject, useContext, useRef } fro
 import { Architecture, type Colouring } from "../architecture/Architecture";
 import { type Unboxable, Unboxed } from "../architecture/unboxing";
 import { ELEMENTS } from "../architecture/model";
-import { useCurrent, useNear, useShown, useVisibleCount } from "../Deck";
+import { useCurrent, useNear, useShown, useSlideNumber, useVisibleCount } from "../Deck";
 import { BUILT_STAGES, footerText, QUESTION_HEADER, QUESTIONS, STAGES, type TalkStage } from "../talk";
 
 const SlideContext = createContext<RefObject<HTMLElement | null> | null>(null);
 
 /** One slide. `notes` are the speaker notes (never projected); `footer` false for a slide that stands outside the
- * talk stages' flow (the title slide). */
+ * talk stages' flow (the title slide), which then shows no number either; the slide's number, small and grey, stands in
+ * the bottom right corner of every other slide. */
 export function Slide({ stage, notes, children, className = "", footer = true }: {
   stage: TalkStage; notes: ReactNode; children: ReactNode; className?: string; footer?: boolean;
 }) {
   const section = useRef<HTMLElement>(null);
+  const number = useSlideNumber();
   return (
     <section ref={section} data-talk-stage={stage}>
       <SlideContext.Provider value={section}>
         <div className={`stage ${className}`}>
           {children}
           {footer && <div className="footer">{footerText(stage)}</div>}
+          {footer && <div className="slide-no">{number}</div>}
         </div>
       </SlideContext.Provider>
       <aside className="notes">{notes}</aside>

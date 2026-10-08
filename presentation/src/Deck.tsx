@@ -38,6 +38,13 @@ export function addressOf(h: number, f: number | undefined): string {
 
 const DeckContext = createContext<RevealApi | null>(null);
 
+/** A slide's number in the deck, from 1, as the review mode's address counts it: a slide shows it in its corner. */
+const SlideNumberContext = createContext<number>(0);
+
+export function useSlideNumber(): number {
+  return useContext(SlideNumberContext);
+}
+
 export function Deck() {
   const root = useRef<HTMLDivElement>(null);
   const [deck, setDeck] = useState<RevealApi | null>(null);
@@ -84,7 +91,9 @@ export function Deck() {
     <DeckContext.Provider value={deck}>
       <div className="reveal" ref={root}>
         <div className="slides">
-          {SLIDES.map((S, i) => <S key={i} />)}
+          {SLIDES.map((S, i) => (
+            <SlideNumberContext.Provider key={i} value={i + 1}><S /></SlideNumberContext.Provider>
+          ))}
         </div>
       </div>
       {review && <div className="review-address" aria-label="review mode: slide and step">{address}</div>}

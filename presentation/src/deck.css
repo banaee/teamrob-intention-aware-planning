@@ -57,6 +57,11 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
   position: absolute; left: calc(120 * var(--u)); bottom: calc(36 * var(--u));
   font-size: calc(18 * var(--u)); color: var(--color-inkFaint); letter-spacing: 0.01em;
 }
+/* The slide's number: grey and very small, in the bottom right corner. */
+.slide-no {   /* not "slide-number": reveal.js styles that class */
+  position: absolute; right: calc(28 * var(--u)); bottom: calc(20 * var(--u));
+  font-family: var(--font-mono); font-size: calc(14 * var(--u)); color: var(--color-inkFaint);
+}
 
 /* ---- Text ------------------------------------------------------------------------------------------------------ */
 
