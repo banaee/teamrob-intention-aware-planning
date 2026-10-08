@@ -24,7 +24,10 @@ npm run preview   # the deck at http://127.0.0.1:4173/ (offline)
 
 In the browser: F fullscreen; a click, the right arrow, Space or the clicker's key advances one step; the left arrow or
 PageUp goes back; Esc the overview; S the speaker view (the notes, the next slide, a clock) in its own window, which
-goes on the laptop's screen while the deck is fullscreen on the projector. The notes never show on the projected deck.
+goes on the laptop's screen while the deck is fullscreen on the projector. The notes never show on the projected deck. A
+toggles the review mode: the address of the slide and its step in the top-left corner, "slide.step" (the slide from
+1, the step from 0 as the slide opens, 1 after its first click); off at every start, never for the talk. The same
+address is on every page of `npm run pdf:steps` and in `replays_review.csv`.
 The built deck (`dist/`) needs a local server: Chrome runs no module script from a file opened by double-click. While
 working on the slides: `npm run dev` (http://127.0.0.1:5174/).
 

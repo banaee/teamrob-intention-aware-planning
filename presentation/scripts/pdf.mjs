@@ -7,7 +7,8 @@
 // --quick (npm run pdf:quick): a fast, rough copy for a quick check, pdf/deck_<yyyy-mm-dd-hh-mm>_quick.pdf: 1280 x 720,
 // JPEG pages, each slide jumped to its last step (no click played), captured once it has settled.
 // --quick --steps (npm run pdf:steps): the same, one page per step (every click of every slide),
-// pdf/deck_<yyyy-mm-dd-hh-mm>_quick_steps.pdf.
+// pdf/deck_<yyyy-mm-dd-hh-mm>_quick_steps.pdf, each page with its address "slide.step" in a corner (the deck's review
+// mode, the key A), the same address as in presentation/replays_review.csv.
 
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -65,6 +66,7 @@ await page.waitForTimeout(1500);
 
 const last = new Map();      // slide index -> its screenshot in its final step so far
 const shot = () => page.screenshot(quick ? { type: "jpeg", quality: 70 } : { type: "png" });
+if (values.steps) await page.evaluate(() => window.deckReview(true));
 if (quick) {
   // Each slide at its last step, by jumping there: no click is played, only a short wait for the slide to draw.
   const count = await page.evaluate(() => window.deck.getTotalSlides());

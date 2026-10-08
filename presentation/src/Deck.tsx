@@ -9,6 +9,11 @@
  *
  * A slide's heavy content (a 3D scene, the architecture diagram) is mounted only while the slide is the current one
  * or next to it (useNear), so that the browser holds a few WebGL contexts at a time, never one per slide.
+ *
+ * The review mode (the key A, off at every start, never part of the talk): the address of the slide and its step in a
+ * corner of the screen, "slide.step", the slide counted from 1 and the step from 0 (as the slide opens; 1 after its
+ * first click). The same address names the slide and step in presentation/replays_review.csv and on every page of the
+ * steps PDF (scripts/pdf.mjs), so that a comment can name a place exactly.
  */
 
 import Reveal from "reveal.js";
@@ -20,7 +25,15 @@ import { SLIDES } from "./slides";
 type RevealApi = InstanceType<typeof Reveal>;
 
 declare global {
-  interface Window { deck?: RevealApi }     // for the click-through script (scripts/shots.mjs)
+  interface Window {
+    deck?: RevealApi;                        // for the click-through script (scripts/shots.mjs)
+    deckReview?: (on: boolean) => void;      // the review mode, for the steps PDF (scripts/pdf.mjs)
+  }
+}
+
+/** A slide's and step's address: "slide.step", the slide from 1, the step from 0 (the slide as it opens). */
+export function addressOf(h: number, f: number | undefined): string {
+  return `${h + 1}.${(f ?? -1) + 1}`;
 }
 
 const DeckContext = createContext<RevealApi | null>(null);
@@ -28,6 +41,8 @@ const DeckContext = createContext<RevealApi | null>(null);
 export function Deck() {
   const root = useRef<HTMLDivElement>(null);
   const [deck, setDeck] = useState<RevealApi | null>(null);
+  const [review, setReview] = useState(false);
+  const [address, setAddress] = useState("");
   useEffect(() => {
     const el = root.current!;
     const d = new Reveal(el, {
@@ -50,6 +65,21 @@ export function Deck() {
       setDeck(null);
     };
   }, []);
+  useEffect(() => {
+    if (deck === null) return;
+    const update = () => { const i = deck.getIndices(); setAddress(addressOf(i.h, i.f)); };
+    const events = ["slidechanged", "fragmentshown", "fragmenthidden"];
+    for (const e of events) deck.on(e, update);
+    update();
+    deck.addKeyBinding({ keyCode: 65, key: "A", description: "Review mode: the slide's and step's address" },
+      () => setReview((r) => !r));
+    window.deckReview = setReview;
+    return () => {
+      for (const e of events) deck.off(e, update);
+      deck.removeKeyBinding(65);
+      delete window.deckReview;
+    };
+  }, [deck]);
   return (
     <DeckContext.Provider value={deck}>
       <div className="reveal" ref={root}>
@@ -57,6 +87,7 @@ export function Deck() {
           {SLIDES.map((S, i) => <S key={i} />)}
         </div>
       </div>
+      {review && <div className="review-address" aria-label="review mode: slide and step">{address}</div>}
     </DeckContext.Provider>
   );
 }

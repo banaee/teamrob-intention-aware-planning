@@ -346,3 +346,9 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .mind .mark-yes, .mind .mark-adequate { color: var(--color-stateCompleted); }
 .mind .mark-inadequate { color: var(--color-stateAbandoned); }
 .mind .mark-faint, .mind .mark-no_observation { color: var(--color-inkFaint); }
+
+/* ---- The review mode (the key A; Deck.tsx): the slide's and step's address in a corner, never in the talk -------- */
+
+.review-address { position: fixed; left: calc(14 * var(--u)); top: calc(12 * var(--u)); z-index: 50;
+  padding: calc(2 * var(--u)) calc(12 * var(--u)); border-radius: calc(8 * var(--u)); background: var(--color-ink);
+  color: var(--color-floor); font-family: var(--font-mono); font-size: calc(22 * var(--u)); pointer-events: none; }
