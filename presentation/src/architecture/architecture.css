@@ -1,0 +1,123 @@
+/* The architecture diagram. Lengths are in the diagram's own unit (model.ts, DESIGN), which React Flow scales to the
+   slide. Colours are the web-ui's theme (applyTheme's variables) and the deck's question colours (look.ts). The only
+   motion: an element or an arrow a talk stage adds appears (a fade; an arrow drawn along its length), an arrow that
+   gives way fades out. */
+
+.architecture { width: 100%; height: 100%; pointer-events: none; }
+.architecture .react-flow { background: transparent; }
+.architecture .react-flow__pane, .architecture .react-flow__node, .architecture .react-flow__edge { cursor: default; }
+.architecture .react-flow__node { pointer-events: none; }
+.el-handle { opacity: 0; width: 1px; min-width: 1px; height: 1px; min-height: 1px; border: none; background: none; }
+
+/* ---- Elements ------------------------------------------------------------------------------------------------ */
+
+.el {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  color: var(--color-ink);
+  font-family: var(--font);
+  transition: opacity 600ms ease;
+}
+.el-code { font-family: var(--font-mono); font-size: 15px; color: var(--color-inkFaint); letter-spacing: 0.02em; }
+.el-label { font-size: 24px; font-weight: var(--weight-medium); line-height: 1.15; }
+.el-sub { font-size: 18px; color: var(--color-inkSoft); line-height: 1.25; }
+.part-new { color: var(--color-ink); font-weight: var(--weight-medium); }
+.part-human { color: var(--color-humanDark); }
+
+/* The frames: a layer of the robot, the knowledge column. A thin dashed line; their head names them. */
+.el-layer, .el-column { border: 1.5px dashed var(--color-lineFaint); border-radius: 18px; }
+.el-head { display: flex; align-items: baseline; gap: 10px; padding: 12px 18px; }
+.el-layer .el-head { justify-content: flex-end; }
+.architecture .react-flow__edgelabel-renderer { z-index: 2000; }
+.el-layer .el-label, .el-column .el-label { font-size: 21px; color: var(--color-inkSoft); }
+.el-column .el-head { flex-direction: column; gap: 0; }
+.el-column .el-sub { font-size: 16px; color: var(--color-inkFaint); }
+.robot-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--color-robot); align-self: center; }
+
+/* The world: a strip outside the robot. */
+.el-world {
+  display: flex; align-items: center; gap: 16px; height: 100%; padding: 0 22px;
+  background: var(--color-page); border-top: 1.5px solid var(--color-lineFaint); border-radius: 12px;
+}
+.el-world .el-label { font-size: 21px; color: var(--color-inkSoft); }
+.el-world .el-sub { font-size: 19px; }
+
+/* A function (a component): a framed box with its name in its head; its blocks sit inside. */
+.el-component { background: var(--color-surface); border: 1.5px solid var(--color-line); border-radius: 16px; }
+.el-component .el-label { font-size: 23px; }
+
+/* A mechanism (a block): a solid rounded block. */
+.el-mechanism {
+  background: var(--color-faceLight); border: 1.5px solid var(--color-line); border-radius: 12px;
+}
+.el-body {
+  display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;
+  padding: 0 12px; text-align: center;
+}
+.el-body .el-code { position: absolute; top: 4px; left: 10px; font-size: 13px; }
+.el-body .el-sub { font-size: 16px; }
+
+/* Given information (a sheet with a folded corner) and sensed information (a cylinder): drawn by an SVG shape. */
+.el-shape { position: absolute; inset: 0; overflow: visible; }
+.el-shape path { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 1.5px; stroke-linejoin: round; }
+.el-knowledge .el-body, .el-sensed .el-body { position: relative; }
+.el-knowledge .el-body { align-items: flex-start; text-align: left; padding: 0 30px 0 16px; }
+.el-knowledge .el-body .el-code { position: static; }
+.el-knowledge .el-label { font-size: 22px; }
+.el-sensed .el-shape path { fill: var(--color-faceLight); }
+.el-sensed .el-body { padding-top: 12px; }
+
+/* ---- Presence ------------------------------------------------------------------------------------------------ */
+
+.presence-absent, .presence-leaving { opacity: 0; }
+.has-new .el.presence-old:not(.el-layer):not(.el-column):not(.el-world) { opacity: 0.45; }
+.el.presence-new.el-mechanism, .el.presence-new.el-component { border-width: 2.5px; border-color: var(--color-ink); }
+.el.presence-new .el-shape path { stroke: var(--color-ink); stroke-width: 2.5px; }
+
+/* ---- Arrows -------------------------------------------------------------------------------------------------- */
+
+.arrow { transition: opacity 500ms ease; }
+.arrow-line {
+  fill: none; stroke: var(--color-inkSoft); stroke-width: 2px;
+  stroke-dasharray: 1; stroke-dashoffset: 0; transition: stroke-dashoffset 800ms ease;
+}
+.arrow .arrowhead { fill: var(--color-inkSoft); }
+.arrow.presence-absent .arrow-line { stroke-dashoffset: 1; }
+.arrow.presence-new .arrow-line { stroke: var(--color-ink); stroke-width: 2.6px; }
+.arrow.presence-new .arrowhead { fill: var(--color-ink); }
+.has-new .arrow.presence-old { opacity: 0.45; }
+.arrow.arrow-centre .arrow-line { stroke-width: 4px; }
+
+.arrow-label {
+  position: absolute; white-space: nowrap; padding: 1px 10px; border-radius: var(--radius-pill);
+  background: var(--color-floor); color: var(--color-inkSoft); font-size: 19px; line-height: 1.3;
+  transition: opacity 600ms ease;
+}
+.arrow-label.presence-new { color: var(--color-ink); }
+.has-new .arrow-label.presence-old { opacity: 0.45; }
+.arrow-label.arrow-centre { font-size: 21px; font-weight: var(--weight-medium); color: var(--color-ink); }
+
+/* ---- The questions ------------------------------------------------------------------------------------------- */
+
+/* The three questions laid over the empty frames (talk stage 0). */
+.q-tag {
+  display: flex; align-items: center; justify-content: center; height: 100%; border-radius: var(--radius-pill);
+  font-size: 26px; font-weight: var(--weight-medium); border: 2px solid currentColor; background: var(--color-surface);
+}
+.q-tag-know { color: var(--q-know); }
+.q-tag-believe { color: var(--q-believe); }
+.q-tag-decide { color: var(--q-decide); }
+
+/* Coloured by question (the recap): the elements of the knowledge column, of recognition and of planning. */
+.colouring-questions .q-know .el-shape path { stroke: var(--q-know); fill: var(--q-know-tint); }
+.colouring-questions .q-know .el-column { border-color: var(--q-know); }
+.colouring-questions .q-know .el-label { color: var(--q-know); }
+.colouring-questions .q-believe .el-mechanism, .colouring-questions .q-believe .el-component { border-color: var(--q-believe); }
+.colouring-questions .q-believe .el-mechanism { background: var(--q-believe-tint); }
+.colouring-questions .q-believe .el-component > .el-head .el-label { color: var(--q-believe); }
+.colouring-questions .q-decide .el-mechanism, .colouring-questions .q-decide .el-component { border-color: var(--q-decide); }
+.colouring-questions .q-decide .el-mechanism { background: var(--q-decide-tint); }
+.colouring-questions .q-decide .el-component > .el-head .el-label { color: var(--q-decide); }
+.q-tag { transition: opacity 600ms ease; }
