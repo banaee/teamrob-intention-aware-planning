@@ -85,8 +85,7 @@ export function Scene({ room, moment, book, appearance, glideMs, ahead, shown }:
     <group>
       <Floor bounds={world.space.bounds} />
       {world.areas.map((area) => (
-        <AreaMark key={area.id} id={area.id} bounds={area.bounds} space={world.space.bounds}
-                  occupied={world.fixed_objects} />
+        <AreaMark key={area.id} bounds={area.bounds} />
       ))}
       {world.fixed_objects.map((f) => (
         <Fixed key={f.id} f={f} appearance={appearance} held={heldBy(held, f.id)} bounds={world.space.bounds} />
@@ -215,47 +214,18 @@ function Floor({ bounds }: { bounds: Bounds }) {
   );
 }
 
-/** An area: a dashed outline just inside its bounds, and its id written small and light on the floor in one of its
- * corners, the farthest from the space's centre first, where the text covers no fixed object; else at its centre. */
-function AreaMark({ id, bounds, space, occupied }: {
-  id: string; bounds: Bounds; space: Bounds; occupied: readonly FixedObject[];
-}) {
+/** An area: a dashed outline just inside its bounds. Its id is not written on the floor (Hadi, 8 October 2026,
+ * preferred: no area names in the scene). */
+function AreaMark({ bounds }: { bounds: Bounds }) {
   const x0 = bounds.x_min + AREA_INSET;
   const x1 = bounds.x_max - AREA_INSET;
   const y0 = bounds.y_min + AREA_INSET;
   const y1 = bounds.y_max - AREA_INSET;
   const lift = 0.3;
-  const size = Math.min(theme.scene.areaLabel, (0.5 * (x1 - x0)) / (TEXT_WIDTH * id.length));
-  const place = areaLabelPlace(id, size, { x_min: x0, x_max: x1, y_min: y0, y_max: y1 }, space, occupied);
   return (
-    <group>
-      <Line points={[at(x0, y0, lift), at(x1, y0, lift), at(x1, y1, lift), at(x0, y1, lift), at(x0, y0, lift)]}
-            color={theme.color.lineFaint} lineWidth={theme.line.area} dashed dashSize={14} gapSize={10} />
-      <FloorText text={id} x={place.x} y={place.y} size={size} colour={theme.color.labelFaint}
-                 anchorX="center" anchorY="middle" />
-    </group>
+    <Line points={[at(x0, y0, lift), at(x1, y0, lift), at(x1, y1, lift), at(x0, y1, lift), at(x0, y0, lift)]}
+          color={theme.color.lineFaint} lineWidth={theme.line.area} dashed dashSize={14} gapSize={10} />
   );
-}
-
-const TEXT_WIDTH = 0.62;   // a mono character's width, as a share of the font size
-
-function areaLabelPlace(id: string, size: number, inner: Bounds, space: Bounds, occupied: readonly FixedObject[]) {
-  const w = TEXT_WIDTH * size * id.length;
-  const h = size;
-  const pad = 16;
-  const cx = (inner.x_min + inner.x_max) / 2;
-  const cy = (inner.y_min + inner.y_max) / 2;
-  const left = inner.x_min + pad + w / 2;
-  const right = inner.x_max - pad - w / 2;
-  const low = inner.y_min + pad + h / 2;
-  const high = inner.y_max - pad - h / 2;
-  const sx = (space.x_min + space.x_max) / 2;
-  const sy = (space.y_min + space.y_max) / 2;
-  const candidates = [{ x: left, y: low }, { x: left, y: high }, { x: right, y: low }, { x: right, y: high }]
-    .sort((a, b) => Math.hypot(b.x - sx, b.y - sy) - Math.hypot(a.x - sx, a.y - sy));
-  const free = (c: { x: number; y: number }) => occupied.every((f) =>
-    Math.abs(c.x - f.position.x) > (w + f.size.x) / 2 + pad || Math.abs(c.y - f.position.y) > (h + f.size.y) / 2 + pad);
-  return candidates.find(free) ?? { x: cx, y: cy };
 }
 
 function Fixed({ f, appearance, held, bounds }: {

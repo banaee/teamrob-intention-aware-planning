@@ -101,7 +101,6 @@ export const theme = {
     weight: { regular: 400, medium: 500 },
   },
   scene: {                    // in the layout's unit, on the floor
-    areaLabel: 26,            // an area's id, at most
     passiveLabel: 13,         // a background object's id
     activeLabel: 18,          // an active object's id
     gridStep: 100,

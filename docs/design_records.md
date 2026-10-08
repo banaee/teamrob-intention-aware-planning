@@ -5725,6 +5725,14 @@ switched off. Checks: vitest 56; the build and type check; the scan for domain w
 1440 (kitting scenario_s05_02 tick 8, dock_loading scenario_s07_07 tick 100; no console error). No simulator code
 changed.
 
+NO AREA NAMES IN THE SCENE (Hadi, 8 October 2026, preferred; through the prompt of T-pres's overall revision, the one
+change in `webui/` that task authorises). The areas' ids are no longer written on the floor of the env-pane, neither on
+the deck's slides nor in the web-ui: Hadi does not want the zones' names drawn there. An area keeps its dashed outline.
+A deliberate change of the web-ui's look, by his decision; nothing else in the web-ui changes with it.
+BUILT (ccode, 8 October 2026): `webui/page/src/env-pane/Scene.tsx`, `AreaMark` draws the outline only (the placement
+of the id's text removed); `theme.scene.areaLabel` removed with its only reader. Checks: vitest 56; the build and type
+check.
+
 ## T-pres, the talk
 
 WHAT IT IS (Hadi, 8 October 2026, preferred; recorded by ccode the same day). T-pres is the name for all work on the
