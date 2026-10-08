@@ -1432,6 +1432,12 @@ in V1, stages 2 and 3 FW for now. Its records use the status words open, preferr
 cchat, verified, not verified, not "ruling" or "ruled". A name, not a task letter.
 → `docs/handoffs/handoff_T-viz.md`; `docs/design_records.md`, "T-viz, the web-ui"; `docs/roadmap.md`, "The plan from
 T-A", T-viz.
+**T-pres** — the name for all work on the deck of Hadi's talk at the TeamRob final demo day (Hadi, 8 October 2026,
+preferred): the HTML deck in `presentation/`. A name, not a task letter. Its records use "preferred" and "open", never
+"ruled". Two words of its records only: a **talk stage** is a row of the talk (0 to 12), a **part** a unit of work on the
+deck. "Anton" and "Donny" are display text on its slides, never terms.
+→ `docs/handoffs/handoff_T-pres.md`; `docs/design_records.md`, "T-pres, the talk"; `docs/roadmap.md`, "The plan from
+T-A", T-pres.
 **T-S** — ROS/PRIEST (ruled 30 September 2026): Phase 6's execution layer and the paused `ros_sim/`; future work, at
 the end of the queue. FW (T-G A1, 1 October 2026).
 → `docs/roadmap.md`, "The plan from T-A", T-S.

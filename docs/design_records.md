@@ -5724,3 +5724,85 @@ remembered in the browser before this build ("expectation") is not read again: b
 switched off. Checks: vitest 56; the build and type check; the scan for domain words; one look in Chrome at 2560 x
 1440 (kitting scenario_s05_02 tick 8, dock_loading scenario_s07_07 tick 100; no console error). No simulator code
 changed.
+
+## T-pres, the talk
+
+WHAT IT IS (Hadi, 8 October 2026, preferred; recorded by ccode the same day). T-pres is the name for all work on the
+deck of Hadi's talk at the TeamRob final demo day: a name, not a task letter, as T-viz is. The deck is the HTML deck in
+`presentation/` (reveal.js over React slides; its scenes drawn by the web-ui page's own code; README.md there). The
+talk is about 30 minutes, for an audience of mostly industrial partners who meet the framework for the first time; its
+message is the "how", the mechanisms; the levels and talk stages only decide when a mechanism appears. The starting
+point is `docs/handoffs/handoff_T-pres.md` (written by the content design chat, placed by Hadi, d1b7418), which every
+T-pres session reads in full first; its section 14 holds the additions of 8 October 2026 (a to h). This heading records
+the working rules, the parts and the steps done; it does not repeat the handoff. Nothing in the framework changes for
+the deck: no change in `shared/`, `world/`, `domains/`, `mesa_sim/` or the scenarios, no new scenario; `webui/` keeps its
+behaviour and its look exactly (it runs at Hadi's station on the demo day), and a change there that the deck needs is
+reported before it is committed.
+
+THE STATUS WORDS. T-pres records use "preferred" and "open", never "ruled" or "ruling" (Hadi, as for T-viz). Preferred
+is the default for now, never final; an item can be settled, open with low priority, or open with high priority
+(handoff, addition c).
+
+TWO WORDS, kept apart everywhere in T-pres:
+- "talk stage": a row of the talk, the handoff's section 5, talk stages 0 to 12, with three level titles and one turning
+  point. The handoff says "stage"; it means talk stage.
+- "part": a unit of work on the deck.
+
+THE PARTS (Hadi, 8 October 2026, preferred; they replace the plan in the handoff's section 12):
+- Part 1: the records, the skeleton of the whole deck, the architecture diagram, talk stages 0 to 2.
+- Part 2: talk stages 3 to 7.
+- Part 3: talk stages 8 and 9.
+- Part 4: a sim-run on a slide, a small technical trial on existing scenarios and recorded sim-runs (handoff, addition
+  e); it fills the TODO boxes.
+- Part 5: talk stages 10 to 12.
+- Part 6: hall readiness of the deck (projector size, offline, clicker, a fallback).
+
+HOW CCODE WORKS IN T-PRES (Hadi, 8 October 2026, preferred). Hadi is short of time and revises the built slides
+afterwards. So:
+- ccode decides graphic design, layout, sizes, libraries and every technical matter itself, without a pause and without
+  a plan-only step. This sets aside CLAUDE.md's two-step build discipline for T-pres only. Reason: these are cheap to
+  revise on the built deck.
+- ccode does not change the skeleton of the talk unless it is necessary, and does not decide alone what a mechanism
+  shows or leaves out. Where it thinks a change of either kind is better, it makes the suggestion, goes ahead with it,
+  and flags it in its report; cchat tells Hadi which flags need his answer. Reason: the content is Hadi's, but waiting
+  on each point costs more than revising.
+- ccode stops only for something serious: a needed change in `webui/`, or a contradiction that makes a slide state
+  something false about the framework.
+- A slide may abstract a mechanism, and may present an idea that the records explore in detail even if it is not built.
+  A slide stays aligned with the framework: it does not contradict the records or the code. A measured number comes
+  from an actual run.
+- Checks stay light: the deck builds, loads nothing from outside, and clicks through at 1920 x 1080 and 2560 x 1440. No
+  test suite for slides.
+
+THE DECK'S DESIGN (Hadi, 8 October 2026, preferred). Simple and still elegant: minimal, modern, calm. A few light effects
+and animations where they help the audience follow a change (an element of the diagram appearing, a step of a slide, a
+change of view), nothing more. No heavy or crowded JavaScript libraries, and no motion-graphics treatment of the slides.
+Reason: the audience must follow the mechanisms, and motion that carries no meaning competes with them; a light deck is
+also less likely to stutter on the hall's projector. For the diagram: a small library that draws nodes and arrows well
+is enough, and "animated" means only that a new element or arrow appears smoothly. The diagram itself (preferred, from
+the prompt of part 1): drawn by a current JavaScript diagram library whose arrows the page lays out, not a static image;
+vendored and pinned; colours from the web-ui's theme and its reserved meanings (blue the robot, orange the human); no red
+and green as a pair of markers.
+
+THE TRIAL (done and pushed before part 1): 1275770, 6af69fa, bd6c90c; one slide, the robot alone, then the robot in
+kitting's env_layout_01. It is talk stage 0's slide "This is Anton, a robot." in the deck.
+
+PART 1, BUILT (ccode, 8 October 2026; d43fbc2, 0270035; Hadi's revision open).
+- The deck's skeleton: 37 slides, every row of section 5 in its place (talk stages 0 to 12, the three level titles with
+  their sub-lines, the turning point after talk stage 2), speaker notes on every slide (reveal's notes plugin, the key S;
+  never projected), a footer naming the talk stage. Talk stages 3 to 12 are placeholders: the talk stage's card (its title
+  and the keywords of the three columns, from `presentation/src/talk.ts`), a TODO box saying what is to be shown and
+  why, the diagram in the talk stage's state, notes saying what the stage will say.
+- The architecture diagram (`presentation/src/architecture/`): the handoff's section 6 as one model (elements, kinds,
+  talk stages, arrows, positions) drawn by React Flow (`@xyflow/react` 12.12.0). Its state is a talk stage; a slide
+  opens on the state before its talk stage and a click adds what the talk stage adds, the rest receding. Shapes: given
+  information a sheet with a folded corner, sensed information a cylinder, a function a framed box with its blocks
+  inside, a mechanism a solid rounded block. The codes show small beside the names. A colouring by question for the
+  recap (talk stage 8), shown there already. Talk stage 0 shows the empty frames with the three questions over them.
+- Talk stages 0 to 2, a first version for Hadi's revision; the parked and open items of the handoff in the notes or in a
+  TODO box, marked.
+- Drawn by the web-ui's own code, no change in `webui/`: Anton and Donny in kitting's env_layout_01, the lift truck in
+  dock_loading's env_layout_03 (both recorded at every build). The projection from her motion is an SVG abstraction in
+  the web-ui's visual language (the hatched blue stripe, the dashed blue plan, the human orange).
+- Checks: `npm run build` (type check included); `npm run shots` clicks through all 64 steps at both sizes: 0 outside
+  requests, 0 page errors, 0 notes on screen; the speaker view opens offline.

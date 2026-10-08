@@ -448,3 +448,27 @@ The talk and the afternoon station should say the same; decide whether the web-u
   stage; context separated from task knowledge; the knowledge column in the AAAI order; the gate moved conceptually
   into recognition; the projection kept as a light planning block; observation and execution as free body blocks;
   the world strip added; element kinds made visible by shape.
+
+## 14. Additions of 8 October 2026 (Hadi, through the prompt of T-pres part 1; added by ccode, the text above unchanged)
+
+- a. [preferred] One knowledge, two uses. The task knowledge Anton plans its own work with (C1, shown at talk stage 1)
+  is the same knowledge it uses to read Donny's actions at talk stage 3. The talk says this once, when Donny enters or
+  at talk stage 3. It is the AAAI paper's first contribution in one sentence, and it is why talk stage 1 is not wasted
+  time.
+- b. [preferred] The talk teaches the afternoon station. Slides use the web-ui's visual language and the same names, so
+  that the audience can read the env-pane and the robot's panel at the station without Hadi.
+- c. "Preferred" is the default for now, never final. An item can be settled, open with low priority, or open with high
+  priority.
+- d. Advice on the talk stays off the project's outside logistics. Hall readiness of the deck itself is in scope.
+- e. [preferred] Part 4 is a technical trial: existing scenarios and recorded sim-runs only, nothing authored or changed
+  for it, no dependence on the unfinished showcase scenarios, kept small.
+- f. Optional material: Hadi's October 2024 deck and the HHAI/CHAI 2024 poster contrasted an "intrinsic reaction" (the
+  robot halts to avoid a collision) with an "enhanced reaction" (the robot recognises the intention and adapts its
+  plan). Talk stage 2 is the intrinsic reaction, talk stages 3 to 7 the enhanced one.
+- g. The names of B4.3 and B4.4 are confirmed as section 6.2 has them: B4.3 "support" (the observation warrant), B4.4
+  "confidence check" (the gate). The open item on them (6.6, 11) is closed.
+- h. [preferred] The slides say "projection", never "prediction". Whether the web-ui's two labels change is still open
+  (section 7) and was not part of T-pres part 1.
+
+Where the rest of that prompt is recorded (the words "talk stage" and "part", the parts 1 to 6 that replace section
+12's plan, the working rule, the deck's design): `docs/design_records.md`, "T-pres, the talk".

@@ -912,6 +912,16 @@ of the layouts with more than one A/C switch (AM19), then the build's plan.
     name for all web-ui work. T-V track 1 (what the viewer shows; T-E as originally defined) is carried out as T-viz
     stage 1, track 2 is T-viz stage 3. T-L's run-file panel is the solara-ui's form of T-L ruling 7; the web-ui has
     none yet. TODO-110 (selection by composition) bears on the selection panel.
+- **T-pres — The talk** (Hadi, 8 October 2026, preferred; `docs/handoffs/handoff_T-pres.md`, read in full in every
+  T-pres session; design_records.md, "T-pres, the talk"). The deck of Hadi's talk at the TeamRob final demo day, in
+  `presentation/`. A name, not a task letter; its records use "preferred" and "open". A "talk stage" is a row of the
+  talk (0 to 12), a "part" a unit of work on the deck. Nothing in the framework changes for it; `webui/` keeps its
+  behaviour and look. The parts: 1 the records, the skeleton, the architecture diagram, talk stages 0 to 2; 2 talk stages
+  3 to 7; 3 talk stages 8 and 9; 4 a sim-run on a slide (a technical trial on existing scenarios and recorded sim-runs);
+  5 talk stages 10 to 12; 6 hall readiness. ccode decides design and technique without a plan-only step (CLAUDE.md's
+  two-step build discipline set aside for T-pres only) and flags content suggestions.
+  BUILT (ccode, 8 October 2026; design_records.md, "T-pres, the talk", PART 1, BUILT): part 1. Next: part 2, when Hadi
+  asks for it.
 - **T-K — Context knowledge** (ruled by Hadi, 2 October 2026; design_decisions.md, "T-K: context knowledge in the
   recognizer's belief"; design_records.md, "T-K"; `docs/handoffs/T-G_forward_inputs.md`, section 5). Context knowledge
   as a whole, framework-wide: it concerns kitting and dock_loading alike. Three parts.

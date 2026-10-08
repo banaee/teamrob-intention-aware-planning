@@ -87,7 +87,7 @@ Relevant (read as needed):
 - Design record, in `docs/`: `design_decisions.md`, `roadmap.md`, `TODOS_AND_DEFERRED.md`;
   plus `shared/io_contracts.md` and `docs/recognizer_handback.md`
 - The record of planning and building (the records split, 2 October 2026): `docs/design_records.md`, one heading per
-  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-K, T-F part 1, T-viz). A session reads its own task's heading. In
+  task (phase4, T-A, T-B, T-C, T-H, T-L, T-D, T-G, T-G stage 1, T-K, T-F part 1, T-viz, T-pres). A session reads its own task's heading. In
   `design_decisions.md` an index line `→ RECORD [<id>]` stands where a moved block was; `design_records.md` heads the
   block with the entry's title and the same id, so a citation by title and label resolves.
 - `docs/handoffs/handoff_T-H.md`: T-H, the human behaviour model (ruled 25 Sept 2026; design_decisions.md, "T-H: the
@@ -100,6 +100,11 @@ Relevant (read as needed):
   is a word of the T-viz records only. "The viewer" in older records and in code means the solara-ui (a tentative
   name for the existing program, `solara run mesa_sim/run_mesa.py`) or T-V's planned viewer, now T-viz stage 1;
   nothing is renamed without Hadi's word.
+- `docs/handoffs/handoff_T-pres.md` and `presentation/`: T-pres, the deck of Hadi's demo-day talk (8 October 2026;
+  design_records.md, "T-pres, the talk": the words "talk stage" and "part", the parts 1 to 6, the working rule that sets
+  aside the two-step build discipline for T-pres only, the deck's design). Read the handoff in full in every T-pres
+  session; `presentation/README.md` says how the deck is built and started. `node_modules/`, `dist/`, `data/` and
+  `shots/` there are not read.
 - `analysis/`, sorted by domain (the sort, 1 October 2026; `analysis/README.md`): `analysis/instruments/` holds the
   test-beds' code both domains run (`run.sh <domain>`), `analysis/kitting/` every earlier analysis with kitting's run
   sets, expectations and reports, `analysis/dock_loading/` dock_loading's; the run files under `configs/<domain>/`, the
