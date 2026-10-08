@@ -44,5 +44,12 @@
       ],
       "notes": "T-K part 1, step 5: a robot item, carried along the east wall past the human's point at the coffee machine."
     }
+  ],
+  "timeline": [
+  {
+    "fact": "break_time",
+    "from": 10,
+    "until": 100
+  }
   ]
 }

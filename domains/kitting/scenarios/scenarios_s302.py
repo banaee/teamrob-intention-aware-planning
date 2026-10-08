@@ -77,3 +77,24 @@ scenario_s302_02 = ScenarioConfig(
         _robot((390, 160), [deliver_item("item_7", table="kitting_table_3")]),
     ],
 )
+
+
+scenario_s302_02 = ScenarioConfig(
+    id="scenario_s302_02",
+    setup="env_setup_302",
+    reference_layouts=["env_layout_12"],
+    description= "stage2 of slides",
+    agents=[
+        AgentConfig(
+            agent_id="human_0",
+            agent_type="human",
+            start_position=(-240, 220),
+            scheduled_tasks=Script([
+                deliver_item("item_1", table="kitting_table_0"),
+            ]),
+            assigned_tasks=list(_TWO_DELIVERIES),
+            observes=[],
+        ),
+        _robot((390, 160), [deliver_item("item_7", table="kitting_table_3")]),
+    ],
+)

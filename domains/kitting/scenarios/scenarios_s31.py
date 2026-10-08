@@ -28,14 +28,7 @@ _TK5 = (
 
 
 def _human(script):
-    return AgentConfig(
-        agent_id="human_0",
-        agent_type="human",
-        start_position=(0, 450),
-        scheduled_tasks=Script(script),
-        assigned_tasks=[deliver_item("item_4", table="kitting_table_0")],
-        observes=[],
-    )
+    return 
 
 
 
@@ -48,7 +41,17 @@ scenario_s31_01 = ScenarioConfig(
         "scenario_s31_01, a coffee break, Hadi test on top of scenario_s16_03."
     ),
     agents=[
-        _human([coffee_break("coffee_machine_0"), deliver_item("item_4", table="kitting_table_0"), go_to("corner_NE")]),
+        AgentConfig(
+        agent_id="human_0",
+        agent_type="human",
+        start_position=(-200, -300),
+        scheduled_tasks=Script([coffee_break("coffee_machine_0"), 
+                deliver_item("item_4", table="kitting_table_0"), 
+                go_to("corner_NE")]
+                               ),
+        assigned_tasks=[deliver_item("item_4", table="kitting_table_0")],
+        observes=[],
+        ),
         AgentConfig(
             agent_id="robot_0",
             agent_type="robot",
