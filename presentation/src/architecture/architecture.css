@@ -128,3 +128,5 @@
 .focusing .react-flow__node:not(.focused), .focusing .react-flow__edge, .focusing .arrow-label { opacity: 0.14 !important; }
 .focusing .react-flow__node.focused .el { opacity: 1 !important; border-width: 3px; border-color: var(--color-ink);
   box-shadow: 0 0 0 6px var(--color-floor), 0 0 0 8px var(--color-line); }
+/* An arrow's keyword that is absent or has given way stays hidden while a block is opened. */
+.focusing .arrow-label.presence-absent, .focusing .arrow-label.presence-leaving { opacity: 0 !important; }
