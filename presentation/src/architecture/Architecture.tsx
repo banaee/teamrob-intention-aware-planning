@@ -167,7 +167,6 @@ function ElementNodeView({ data }: NodeProps<ElementNode>) {
   const { element, presence: p, stage, revealed, handles } = data;
   const sub = element.sub.length > 0 && <div className="el-sub"><PartsText parts={element.sub} stage={stage}
                                                                              revealed={revealed} /></div>;
-  const code = element.code !== null && <span className="el-code">{element.code}</span>;
   return (
     <div className={`el el-${element.kind} presence-${p}`}>
       <Shape kind={element.kind} w={element.box.w} h={element.box.h} />
@@ -175,7 +174,6 @@ function ElementNodeView({ data }: NodeProps<ElementNode>) {
         <div className="el-head">
           {element.kind === "layer" && <span className="robot-dot" />}
           <span className="el-label">{element.label}</span>
-          {code}
           {element.kind === "column" && sub}
         </div>
       ) : element.kind === "world" ? (
@@ -185,7 +183,6 @@ function ElementNodeView({ data }: NodeProps<ElementNode>) {
         </div>
       ) : (
         <div className="el-body">
-          {code}
           <span className="el-label">{element.label}</span>
           {sub}
         </div>

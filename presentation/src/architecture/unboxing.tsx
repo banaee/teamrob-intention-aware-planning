@@ -12,6 +12,9 @@
  * handoff's "no if-then" for these two blocks). No likelihood formula, no survival function, no figures in
  * centimetres.
  *
+ * Formal lines and pseudocode are typeset in TeX style by KaTeX (../tex.tsx; Hadi, tpres-v5). The codes of the blocks
+ * (B4.1 and so on) stay here as internal labels; no slide shows them (Hadi, tpres-v5).
+ *
  * Every formulation is an abstraction of the code and the records:
  * - belief update: shared/recognizer.py (belief = normalise(prior × evidence) over the live hypotheses);
  *   docs/context_knowledge_method.md, sections 6 and 7 (the prior from the context facts);
@@ -27,12 +30,14 @@
 import type { ReactNode } from "react";
 
 import type { TalkStage } from "../talk";
+import { Tex } from "../tex";
 
 export type Unboxable = "B41" | "B43" | "B44" | "B51" | "B53" | "B54" | "B42";
 
-/** One item of a panel. `words`: a short sentence; `formal`: the formal line (its new part in an `Add` where an
- * extension changes it); `lead` and `cond`: a condition's lead and its parts; `code`: pseudocode, one string per line;
- * `out`: the block's output, set apart below the rest. `until`: the talk stage from which a later item replaces it. */
+/** One item of a panel. `words`: a short sentence (its symbols typeset, `T`); `formal`: the formal line, a TeX string
+ * (its new part in \htmlClass{add} where an extension changes it); `lead` and `cond`: a condition's lead and its parts;
+ * `code`: pseudocode, one TeX string per line, typeset as an algorithm; `out`: the block's output, set apart below the
+ * rest. `until`: the talk stage from which a later item replaces it. */
 export interface Item {
   stage: TalkStage;
   until?: TalkStage;
@@ -46,25 +51,22 @@ export interface Box {
   items: Item[];
 }
 
-const V = ({ children }: { children: ReactNode }) => <i className="mv">{children}</i>;
-/** The part of a formal line a talk stage adds. */
-const Add = ({ children }: { children: ReactNode }) => <span className="add">{children}</span>;
+const T = ({ children }: { children: string }) => <Tex>{children}</Tex>;
 
-const P = (a: ReactNode, b?: ReactNode) => <><V>P</V>({a}{b !== undefined && <> | {b}</>})</>;
+/** The belief update's formal line; `add` marks the part a talk stage adds (\htmlClass{add}). */
+const BAYES = String.raw`P(h \mid o) \;\propto\; P(o \mid h)\,`;
 
 export const BOXES: Record<Unboxable, Box> = {
   B41: {
     name: "belief update", code: "B4.1",
     items: [
-      { stage: 3, until: 4, kind: "formal",
-        content: <>{P(<V>h</V>, <V>o</V>)} ∝ {P(<V>o</V>, <V>h</V>)} · {P(<V>h</V>)}, &nbsp;<V>h</V> ∈ <V>H</V></> },
-      { stage: 4, until: 5, kind: "formal",
-        content: <>{P(<V>h</V>, <V>o</V>)} ∝ {P(<V>o</V>, <V>h</V>)} · {P(<V>h</V>)}, &nbsp;<V>h</V> ∈ <Add><V>H</V></Add></> },
+      { stage: 3, until: 4, kind: "formal", content: String.raw`${BAYES} P(h), \qquad h \in H` },
+      { stage: 4, until: 5, kind: "formal", content: String.raw`${BAYES} P(h), \qquad h \in \htmlClass{add}{H}` },
       { stage: 5, kind: "formal",
-        content: <>{P(<V>h</V>, <V>o</V>)} ∝ {P(<V>o</V>, <V>h</V>)} · <Add>{P(<V>h</V>, "context")}</Add>, &nbsp;<V>h</V> ∈ <V>H</V></> },
-      { stage: 3, until: 4, kind: "words", content: <><V>H</V>: the hypotheses, her assigned tasks.</> },
-      { stage: 4, kind: "words", content: <><V>H</V> grows: her assigned tasks and the foreseeable behaviours.</> },
-      { stage: 3, until: 5, kind: "words", content: <><V>o</V>: her observed movement. The prior <V>P</V>(<V>h</V>) is
+        content: String.raw`${BAYES} \htmlClass{add}{P(h \mid \text{context})}, \qquad h \in H` },
+      { stage: 3, until: 4, kind: "words", content: <><T>H</T>: the hypotheses, her assigned tasks.</> },
+      { stage: 4, kind: "words", content: <><T>H</T> grows: her assigned tasks and the foreseeable behaviours.</> },
+      { stage: 3, until: 5, kind: "words", content: <><T>o</T>: her observed movement. The prior <T>P(h)</T> is
           equal, for now.</> },
       { stage: 5, kind: "words", content: <>The context sets the prior: break time makes a coffee break more likely.</> },
     ],
@@ -74,14 +76,14 @@ export const BOXES: Record<Unboxable, Box> = {
     items: [
       { stage: 3, kind: "lead", content: <>A hypothesis has support when</> },
       { stage: 3, kind: "cond", content: <>she moves toward the target of its current action,</> },
-      { stage: 3, kind: "cond", content: <>or Anton has just seen her finish the action before it.</> },
+      { stage: 3, kind: "cond", content: <>or the robot has just seen her finish the action before it.</> },
     ],
   },
   B44: {
     name: "confidence check", code: "B4.4",
     items: [
       { stage: 3, kind: "lead", content: <>The leading hypothesis is trusted when</> },
-      { stage: 3, kind: "cond", content: <>its belief is at least θ = 0.75,</> },
+      { stage: 3, kind: "cond", content: <>its belief is at least <T>{String.raw`\theta = 0.75`}</T>,</> },
       { stage: 3, kind: "cond", content: <>it has support,</> },
       { stage: 5, kind: "cond", content: <>her movement alone ranks no other hypothesis above it,</> },
       { stage: 6, kind: "cond", content: <>it fits.</> },
@@ -92,9 +94,9 @@ export const BOXES: Record<Unboxable, Box> = {
     name: "projection", code: "B5.1",
     items: [
       { stage: 2, kind: "words", content: <>From her motion: her present motion, continued.</> },
-      { stage: 3, kind: "words", content: <>From her intention: Anton plans her trusted task with the same task knowledge
-          it plans its own work with.</> },
-      { stage: 3, kind: "formal", content: <><V>her path</V> = <V>plan</V>(trusted intention)</> },
+      { stage: 3, kind: "words", content: <>From her intention: the robot plans her trusted task with the same task
+          knowledge it plans its own work with.</> },
+      { stage: 3, kind: "formal", content: String.raw`\text{her path} = \operatorname{plan}(\text{trusted intention})` },
       { stage: 6, kind: "words", content: <>No trusted intention: the projection from her motion is the fallback, until a
           hypothesis is trusted again.</> },
     ],
@@ -103,11 +105,11 @@ export const BOXES: Record<Unboxable, Box> = {
     name: "realizer", code: "B5.3",
     items: [
       { stage: 3, kind: "code", content: [
-        "for each task of Anton's plan, in order:",
-        "    hold ← the smallest hold, in ticks, such that",
-        "           Anton's path keeps the minimum separation",
-        "           from her projected path",
-        "cost ← the plan's duration + its holds",
+        String.raw`\textbf{for each}\ \text{task of the robot's plan, in order:}`,
+        String.raw`\quad \mathit{hold} \leftarrow \text{the smallest hold, in ticks, such that}`,
+        String.raw`\qquad\qquad \text{the robot's path keeps the minimum separation}`,
+        String.raw`\qquad\qquad \text{from her projected path}`,
+        String.raw`\mathit{cost} \leftarrow \text{the plan's duration} + \text{its holds}`,
       ] },
       { stage: 3, kind: "words", content: <>Standing still never comes too close: a hold always exists.</> },
     ],
@@ -116,12 +118,12 @@ export const BOXES: Record<Unboxable, Box> = {
     name: "task choice", code: "B5.4",
     items: [
       { stage: 3, kind: "code", content: [
-        "for each candidate (a task, or an order of tasks):",
-        "    cost ← realizer(candidate, her projected path)",
-        "take the cheapest candidate",
-        "carry out its first hold and its first task",
+        String.raw`\textbf{for each}\ \text{candidate (a task, or an order of tasks):}`,
+        String.raw`\quad \mathit{cost} \leftarrow \operatorname{realizer}(\text{candidate},\ \text{her projected path})`,
+        String.raw`\text{take the cheapest candidate}`,
+        String.raw`\text{carry out its first hold and its first task}`,
       ] },
-      { stage: 3, kind: "words", content: <>A switch or a reorder comes from here. Anton decides again at the next
+      { stage: 3, kind: "words", content: <>A switch or a reorder comes from here. The robot decides again at the next
           change.</> },
     ],
   },
@@ -130,7 +132,7 @@ export const BOXES: Record<Unboxable, Box> = {
     items: [
       { stage: 6, kind: "words", content: <>A hypothesis fits while her detours and her standing delay its current action
           no more than is plausible.</> },
-      { stage: 6, kind: "out", content: <>When the trusted intention stops fitting, Anton stops trusting it.</> },
+      { stage: 6, kind: "out", content: <>When the trusted intention stops fitting, the robot stops trusting it.</> },
       { stage: 6, kind: "out", content: <>No hypothesis fits: her behaviour is unexplained.</> },
     ],
   },
@@ -147,12 +149,12 @@ export function Unboxed({ block, stage, side }: { block: Unboxable; stage: TalkS
     const cls = state(i);
     switch (i.kind) {
       case "formal":
-        return <p key={k} className={`ub-item ub-formal${cls}`}>{i.content}</p>;
+        return <p key={k} className={`ub-item ub-formal${cls}`}><Tex>{i.content as string}</Tex></p>;
       case "code":
         return (
-          <pre key={k} className={`ub-item ub-code${cls}`}>
-            {(i.content as string[]).map((line, j) => <span key={j}>{line}{"\n"}</span>)}
-          </pre>
+          <div key={k} className={`ub-item ub-code${cls}`}>
+            {(i.content as string[]).map((line, j) => <div key={j} className="ub-code-line"><Tex>{line}</Tex></div>)}
+          </div>
         );
       case "cond":
         return <p key={k} className={`ub-item ub-cond${cls}`}>{i.content}</p>;
@@ -166,7 +168,7 @@ export function Unboxed({ block, stage, side }: { block: Unboxable; stage: TalkS
   const outs = shown.filter((i) => i.kind === "out");
   return (
     <div className={`unboxed unboxed-${side}`}>
-      <div className="ub-head"><span className="ub-name">{box.name}</span><span className="ub-code-name">{box.code}</span></div>
+      <div className="ub-head"><span className="ub-name">{box.name}</span></div>
       {body.map(item)}
       {outs.length > 0 && <div className="ub-out">{outs.map(item)}</div>}
     </div>

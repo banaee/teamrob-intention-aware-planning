@@ -6,6 +6,9 @@
  * "execute" that give way at talk stages 2 and 3. Fit appears at talk stage 6 (unmodelled behaviour, since the merge of
  * 8 October 2026 the last talk stage that adds to the diagram).
  *
+ * The codes (L1, C4, B4.1, BL2.1 and so on) are internal labels: no slide shows them (Hadi, tpres-v5). The world strip
+ * names no communication (Hadi, tpres-v5).
+ *
  * Positions are in the diagram's own unit, a canvas of DESIGN.w x DESIGN.h that the page scales to the slide. The
  * arrangement: knowledge in a left column (C1, C2, C3, the AAAI order); the mind beside it, recognition (C4) left and
  * adaptive planning (C5) right, the arrow "trusted intention" between them at the centre; the body below; the world a
@@ -70,12 +73,11 @@ export const ELEMENTS: Element[] = [
   el({ id: "L1", code: "L1", label: "Mind", kind: "layer", stage: 0, box: { x: 340, y: 0, w: 1420, h: 640 } }),
   el({ id: "L2", code: "L2", label: "Body", kind: "layer", stage: 0, box: { x: 340, y: 680, w: 1420, h: 170 } }),
   el({ id: "W", label: "World", kind: "world", stage: 0, box: { x: 0, y: 890, w: 1760, h: 70 },
-       sub: [{ text: "the room, objects", stage: 0 }, { text: "Donny", stage: 2, who: "human" },
-             { text: "communication: none", stage: 2 }] }),
+       sub: [{ text: "the room, objects", stage: 0 }, { text: "the human", stage: 2, who: "human" }] }),
 
   // Knowledge (given).
   el({ id: "C1", code: "C1", label: "team task knowledge", kind: "knowledge", stage: 1, parent: "K", question: "know",
-       sub: [{ text: "Anton's tasks", stage: 1 }, { text: "her task list", stage: 3 }],
+       sub: [{ text: "the robot's tasks", stage: 1 }, { text: "her task list", stage: 3 }],
        box: { x: 20, y: 60, w: 250, h: 110 } }),
   el({ id: "C2", code: "C2", label: "knowledge about the human", kind: "knowledge", stage: 4, parent: "K",
        question: "know", sub: [{ text: "foreseeable behaviours", stage: 4 }], box: { x: 20, y: 205, w: 250, h: 110 } }),
@@ -125,12 +127,12 @@ const onWorld = (x: number) => x / 1760;
 const onWorldState = (x: number) => (x - 820) / 260;
 
 export const ARROWS: Arrow[] = [
-  // Talk stage 1: Anton alone.
+  // Talk stage 1: the robot alone.
   arrow({ id: "sense", from: end("W", "top", onWorld(510)), to: end("BL21", "bottom"), label: kw("sense", 1), stage: 1,
           labelOffset: { dx: 50, dy: 0 } }),
   arrow({ id: "fills", from: end("BL21", "right"), to: end("WS", "left"), label: [], stage: 1 }),
   arrow({ id: "tasks", from: end("C1", "right"), to: end("L1", "left", 40 / 640),
-          label: [{ text: "Anton's tasks", stage: 1 }, { text: "her task list", stage: 3 }], stage: 1,
+          label: [{ text: "the robot's tasks", stage: 1 }, { text: "her task list", stage: 3 }], stage: 1,
           labelOffset: { dx: 200, dy: -38 } }),
   arrow({ id: "room", from: end("WS", "top", onWorldState(950)), to: end("C5", "bottom", 0.5), label: kw("room", 1),
           stage: 1, labelOffset: { dx: 150, dy: 0 } }),
@@ -138,7 +140,7 @@ export const ARROWS: Arrow[] = [
           leaves: 2 }),
   arrow({ id: "act", from: end("BL22", "bottom"), to: end("W", "top", onWorld(1600)), label: kw("act", 1), stage: 1,
           labelOffset: { dx: 40, dy: 0 } }),
-  // Talk stage 2: Donny enters.
+  // Talk stage 2: a human in the shared space.
   arrow({ id: "her-motion", from: end("WS", "top", onWorldState(1050)), to: end("B51", "bottom"),
           label: kw("her motion", 2), stage: 2, labelOffset: { dx: 0, dy: -60 } }),
   arrow({ id: "her-path", from: end("B51", "right"), to: end("B53", "left"), label: kw("her path", 2), stage: 2,
