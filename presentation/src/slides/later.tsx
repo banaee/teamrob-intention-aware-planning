@@ -378,20 +378,70 @@ export function Stage8() {
   );
 }
 
+/** Hadi's table of measured results (8 October 2026, made in another chat from T-F's analyses), on the slide exactly as
+ * he gave it: its columns, labels, numbers and words; neither traced nor reworded here, by his instruction. Laid out
+ * by ccode: the first group shown as the slide opens, each later group on a click; the two numbers of a row large;
+ * a row measured on one scenario (its n a scenario's id) set apart from the rows measured over many. */
+const RESULTS: { stage: string; rows: [string, string, string, string, string, string][] }[] = [
+  { stage: "Level 1, prediction from motion", rows: [
+    ["Violation ticks", "137", "14", "lower", "better", "128 scen."],
+    ["Closest distance (cm)", "18.5", "52.2", "higher", "better", "s10_02"],
+    ["Completion delay (ticks, mean)", "0", "+5.8", "lower", "worse, 1%", "128 scen."],
+  ] },
+  { stage: "Level 2, recognition", rows: [
+    ["Task known before the human arrives (ticks, median)", "no task known", "41", "higher", "better", "102 arrivals"],
+    ["Tick of the robot's hold decision", "40", "25", "lower", "better", "s10_02"],
+  ] },
+  { stage: "Level 2, context knowledge", rows: [
+    ["Ticks to admit a coffee break (median)", "39", "4", "lower", "better", "5 cases"],
+    ["Tasks admitted earlier, human in accord", "reference", "52 of 66", "higher", "better", "66 tasks"],
+    ["Runs that complete earlier, designed runs", "reference", "7 of 22", "higher", "better", "2 later"],
+  ] },
+  { stage: "Level 3, unmodelled", rows: [
+    ["Ticks below min_separation (median)", "5.5", "3 to 4", "lower", "better", "20 scen."],
+  ] },
+  { stage: "Whole chain", rows: [
+    ["Disagreements with the oracle", "", "0", "lower", "as designed", "1070 runs"],
+  ] },
+];
+
+/** A row measured on one scenario: its n names the scenario. */
+const ONE_SCENARIO = /^s\d+_\d+$/;
+
 export function Stage9() {
   return (
-    <SideSlide stage={9} by="part 5" diagram={false} todo={<>
-      The talk stages measured, in both domains: talk stage 2 is the intention-unaware run, talk stages 3 to 6 together
-      the intention-aware run (T-F part 1, analysis/kitting/tf1/REPORT.md and COMPARISON.md; dock loading's
-      measurements). Every number from an actual run. Why: evidence for the mechanisms the talk showed.
-    </>} notes={<>
-      {PLACEHOLDER}
-      <p>Will show: the talk stages as run conditions (the levels of the handoff, removed from the slides in the overall
-        revision). Human-unaware may appear as a mode of the implementation. The oracle (as if Anton could see her
-        intention) is the upper bound only if it is built (TODO-101, recorded, not built).</p>
-      <p><strong>PARKED</strong> (E1): every stage's illustration a moment from a real sim-run, so that evidence
-        accumulates along the talk.</p>
-    </>} />
+    <Slide stage={9} className="results-slide" notes={<>
+      <p><strong>FIRST VERSION</strong> (T-pres, 8 October 2026): Hadi's table of measured results, made in another chat
+        from T-F's analyses, placed exactly as he gave it, in place of the TODO box. ccode has not traced, checked,
+        reworded or regrouped it (Hadi's instruction). Its words are the earlier ones (levels, "prediction", "admit",
+        min_separation), not yet the deck's present terms.</p>
+      <p>Clicks: the first group is shown as the slide opens; each click adds the next group. A row whose n is a
+        scenario (s10_02) is measured on that one scenario; the others over many runs, scenarios or cases.</p>
+      <p>Keep the row where the result is worse (the completion delay): the cost is shown as well.</p>
+    </>}>
+      <StageTitle stage={9} />
+      <table className="results">
+        <thead>
+          <tr><th>Stage</th><th>Measure</th><th className="r-num">Without</th><th className="r-num">With</th>
+            <th>Better is</th><th>Result</th><th>n</th></tr>
+        </thead>
+        {RESULTS.map((g, i) => (
+          <tbody key={g.stage} className={i === 0 ? "" : "fragment"}>
+            {g.rows.map(([measure, without, withIt, betterIs, result, n], j) => (
+              <tr key={measure} className={ONE_SCENARIO.test(n) ? "r-one" : ""}>
+                {j === 0 && <th scope="rowgroup" rowSpan={g.rows.length} className="r-stage">{g.stage}</th>}
+                <td className="r-measure">{measure}</td>
+                <td className={`r-num${/^[\d+.]/.test(without) ? "" : " r-word"}`}>{without}</td>
+                <td className={`r-num r-with${/^[\d+.]/.test(withIt) ? "" : " r-word"}`}>{withIt}</td>
+                <td className="r-better">{betterIs}</td>
+                <td className={`r-result${result.startsWith("worse") ? " r-worse" : ""}`}>{result}</td>
+                <td className="r-n">{n}</td>
+              </tr>
+            ))}
+          </tbody>
+        ))}
+      </table>
+    </Slide>
   );
 }
 
