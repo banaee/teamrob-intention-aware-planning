@@ -16,12 +16,24 @@ import { parseArgs } from "node:util";
 import { chromium } from "playwright-core";
 
 const here = dirname(fileURLToPath(import.meta.url));
+
+/** Waits until the slide has settled: at least `min` ms, then until no replay plays and no view moves (`data-busy`)
+ * and no CSS transition runs (a fade, an arrow drawn), at most 30 s. A page is never captured in the middle of a
+ * transition. */
+async function settle(page, min) {
+  await page.waitForTimeout(min);
+  await page.waitForFunction(() => document.querySelector(".present [data-busy]") === null
+    && document.getAnimations().every((a) => a.playState !== "running"), null, { timeout: 30000, polling: 100 })
+    .catch(() => console.log("[settle] still busy after 30 s; captured as it is"));
+  await page.waitForTimeout(150);
+}
+
 const { values } = parseArgs({
   options: {
     url: { type: "string", default: "http://127.0.0.1:4173" },
     out: { type: "string", default: resolve(here, "../shots") },
     only: { type: "string" },
-    settle: { type: "string", default: "1300" },     // ms after a click: a fade, a view's movement
+    settle: { type: "string", default: "400" },     // ms at least after a click; then until the slide has settled
   },
 });
 const origin = new URL(values.url).origin;
@@ -65,7 +77,7 @@ for (const [width, height] of SIZES) {
     await page.screenshot({ path: file });
     if (at.last) break;
     await page.mouse.click(width / 2, height / 2);
-    await page.waitForTimeout(Number(values.settle));
+    await settle(page, Number(values.settle));
   }
   console.log(`[shots] ${width}x${height}: ${n} steps, written to ${dir}`);
   await page.close();

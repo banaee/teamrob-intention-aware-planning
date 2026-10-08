@@ -5,8 +5,7 @@
 //   npm run preview &   then   npm run pdf -- [--url http://127.0.0.1:4173] [--out pdf/deck_<yyyy-mm-dd-hh-mm>.pdf]
 //
 // --quick (npm run pdf:quick): a fast, rough copy for a quick check, pdf/deck_<yyyy-mm-dd-hh-mm>_quick.pdf: 1280 x 720,
-// JPEG pages, each slide jumped to its last step with a short wait (no click played; a replay shows whatever frame it
-// has reached).
+// JPEG pages, each slide jumped to its last step (no click played), captured once it has settled.
 // --quick --steps (npm run pdf:steps): the same, one page per step (every click of every slide),
 // pdf/deck_<yyyy-mm-dd-hh-mm>_quick_steps.pdf.
 
@@ -18,6 +17,18 @@ import { parseArgs } from "node:util";
 import { chromium } from "playwright-core";
 
 const here = dirname(fileURLToPath(import.meta.url));
+
+/** Waits until the slide has settled: at least `min` ms, then until no replay plays and no view moves (`data-busy`)
+ * and no CSS transition runs (a fade, an arrow drawn), at most 30 s. A page is never captured in the middle of a
+ * transition. */
+async function settle(page, min) {
+  await page.waitForTimeout(min);
+  await page.waitForFunction(() => document.querySelector(".present [data-busy]") === null
+    && document.getAnimations().every((a) => a.playState !== "running"), null, { timeout: 30000, polling: 100 })
+    .catch(() => console.log("[settle] still busy after 30 s; captured as it is"));
+  await page.waitForTimeout(150);
+}
+
 /** The local date and time, yyyy-mm-dd-hh-mm. */
 function stamp() {
   const d = new Date();
@@ -28,7 +39,7 @@ const { values } = parseArgs({
   options: {
     url: { type: "string", default: "http://127.0.0.1:4173" },
     out: { type: "string" },     // default: pdf/deck_<stamp>.pdf, dated so that earlier exports are kept
-    settle: { type: "string", default: "1300" },
+    settle: { type: "string", default: "400" },     // ms at least after a step; then until the slide has settled
     quick: { type: "boolean", default: false },
     steps: { type: "boolean", default: false },
   },
@@ -63,7 +74,7 @@ if (quick) {
     // --steps: every step, from the slide as it opens (fragment -1) to its last; otherwise its last step only
     for (let f = values.steps ? -1 : n - 1; f < n; f++) {
       await page.evaluate(([i, j]) => window.deck.slide(i, 0, j), [h, f]);
-      await page.waitForTimeout(700);
+      await settle(page, Number(values.settle));
       last.set(`${String(h).padStart(3, "0")}.${String(f + 1).padStart(3, "0")}`, await shot());
     }
   }
@@ -78,7 +89,7 @@ if (quick) {
     last.set(key, await shot());
     if (at.end) break;
     await page.mouse.click(W / 2, H / 2);
-    await page.waitForTimeout(Number(values.settle));
+    await settle(page, Number(values.settle));
   }
 }
 
