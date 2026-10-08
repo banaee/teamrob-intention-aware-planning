@@ -55,7 +55,7 @@ working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm ru
   page error, on any request that leaves the local server, or on a speaker note visible on the screen. `--only 1920`
   runs one size.
 - `npm run pdf` (with `npm run preview` running): the deck as a PDF, one page per slide in its final step, at 2560 x
-  1440, into `pdf/deck.pdf` (untracked); no speaker notes. A fallback copy and a handout for review.
+  1440, into `pdf/deck_<yyyymmdd_hhmmss>.pdf` (untracked; earlier exports are kept); no speaker notes. A fallback copy and a handout for review.
 
 ## How it is put together
 

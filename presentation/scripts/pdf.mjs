@@ -2,7 +2,7 @@
 // screenshots taken in the installed Google Chrome as scripts/shots.mjs takes them, at 2560 x 1440; Chrome then prints
 // the pages into one file. The speaker notes are not in it. A fallback copy of the talk, and a handout for review.
 //
-//   npm run preview &   then   npm run pdf -- [--url http://127.0.0.1:4173] [--out pdf/deck.pdf]
+//   npm run preview &   then   npm run pdf -- [--url http://127.0.0.1:4173] [--out pdf/deck_<date>_<time>.pdf]
 
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -12,10 +12,16 @@ import { parseArgs } from "node:util";
 import { chromium } from "playwright-core";
 
 const here = dirname(fileURLToPath(import.meta.url));
+/** The local date and time, yyyymmdd_hhmmss. */
+function stamp() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+}
 const { values } = parseArgs({
   options: {
     url: { type: "string", default: "http://127.0.0.1:4173" },
-    out: { type: "string", default: resolve(here, "../pdf/deck.pdf") },
+    out: { type: "string", default: resolve(here, `../pdf/deck_${stamp()}.pdf`) },   // dated: earlier exports are kept
     settle: { type: "string", default: "1300" },
   },
 });
