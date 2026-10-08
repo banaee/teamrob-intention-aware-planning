@@ -9,10 +9,13 @@ The runs are run_set.sh's: <out_root>/<scenario>/<run>/, the log <run>.log in it
 Columns:
 - run (the run file's name), domain, scenario, layout; human_aware, intention_aware, assignment_knowledge,
   context_knowledge, strategy (the header's; `settings_agree`: R5's reading of the run file gives the same);
+  separation_stop (the header's effective value; added for the demo-day round of T-F, 8 October 2026, where it is a
+  setting of the set, decision 6; R5 sets it off with human_aware off);
 - completion (the world tick after the robot's last release on a task, where the pool completed; `unfinished` when the
   run has no terminal decision within its cap, whatever releases came before; since the comparative report of the
   measurement, 5 October 2026: the column had shown the last release's tick for an unfinished run), terminal (the terminal decision's tick),
-  decisions (fired triggers), hold_ticks, near_encounters (ticks whose continuous [sep] minimum lies below
+  decisions (fired triggers), hold_ticks, stop_ticks (the run's `[stop]` lines: ticks the separation stop refused the
+  robot's step), near_encounters (ticks whose continuous [sep] minimum lies below
   min_separation), viol, recede (a moving robot), stand_passing, stand_beside (a standing robot, the human passing or
   standing; analysis/instruments/common/separation.py), sep_min (the continuous minimum);
 - oracle: compared | none (no table derivable: a script that depends on the robot, or assignment knowledge off in the
@@ -29,9 +32,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "common"))
 import separation
 
 COLUMNS = ["run", "domain", "scenario", "layout", "human_aware", "intention_aware", "assignment_knowledge",
-           "context_knowledge", "strategy", "settings_agree", "completion", "terminal", "decisions", "hold_ticks",
-           "near_encounters", "viol", "recede", "stand_passing", "stand_beside", "sep_min", "oracle", "disagreements",
-           "objects_separate", "reference"]
+           "context_knowledge", "strategy", "separation_stop", "settings_agree", "completion", "terminal", "decisions",
+           "hold_ticks", "stop_ticks", "near_encounters", "viol", "recede", "stand_passing", "stand_beside", "sep_min",
+           "oracle", "disagreements", "objects_separate", "reference"]
 
 
 def row(d: Path, root: Path):
@@ -46,11 +49,15 @@ def row(d: Path, root: Path):
     elif s["condition"] == "human-unaware" and (d / "reference_check.json").exists():   # a script on the robot (step 6)
         reference = "differ" if json.load(open(d / "reference_check.json"))["disagreements"] else "equal"
     h = s["header"]
+    log = d / f"{d.name}.log"
+    header = next(l for l in open(log) if l.startswith("[run] "))
+    stop = header.split("separation_stop=")[1].split()[0]
+    stop_ticks = sum(1 for l in open(log) if l.startswith("[stop] "))
     return dict(run=d.name, domain=s["domain"], scenario=s["scenario"], layout=s["layout"],
                 human_aware=h["human_aware"], intention_aware=h["intention_aware"],
                 assignment_knowledge=h["assignment_knowledge"], context_knowledge=h["context_knowledge"],
-                strategy=h["strategy"], settings_agree=s["agree"], completion=m["completion"] if m["terminal"] is not None else "unfinished", terminal=m["terminal"],
-                decisions=len(m["decisions"]), hold_ticks=m["measures"]["hold_ticks"],
+                strategy=h["strategy"], separation_stop=stop, settings_agree=s["agree"], completion=m["completion"] if m["terminal"] is not None else "unfinished", terminal=m["terminal"],
+                decisions=len(m["decisions"]), hold_ticks=m["measures"]["hold_ticks"], stop_ticks=stop_ticks,
                 near_encounters=m["measures"]["near_encounters"], viol=len(by["viol"]), recede=len(by["recede"]),
                 stand_passing=len(passing), stand_beside=len(beside),
                 sep_min="" if cont is None else f"{cont[0]:.2f}",

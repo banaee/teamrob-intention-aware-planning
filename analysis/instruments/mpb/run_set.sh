@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# run_set.sh <domain> -o <out_root> <run files> — the planning test-bed for a set whose settings live in its run files
+# run_set.sh <domain> [-s <steps>] -o <out_root> <run files> — the planning test-bed for a set whose settings live in its run files
 # (T-F part 1; design_records.md, "T-F part 1: the conditions human-unaware and intention-unaware", I, R9 as amended by
 # A, G). No setting is passed on the command line and none is in a name (I): a run is named by its run file
 # (<name>.yaml, a serial), its outputs in <out_root>/<scenario>/<name>/ with its log and .rec there (<name>.log; K, the
 # measurement of T-F part 1: one folder per scenario, the runs of its conditions inside it by serial); the settings are
 # the run file's, printed in the run's [run] header and written as columns of <out_root>/results.csv (table.py).
-# Per run file: the safety cap (the domain's horizon.py, MPB-5) as the run's steps; the run; the trajectory and its
+# Per run file: the safety cap (the domain's horizon.py, MPB-5) as the run's steps, or with -s one fixed cap for every
+# run (the demo-day round of T-F, decision 5: 2000); the run; the trajectory and its
 # check; the in-process actual (actual.py); the settings (conditions.py: R5's reading of the run file against the
 # header, the condition, whether the objects are separate); human-unaware, the reference run (reference.py), and with a
 # script that depends on the robot its check (reference_check.py; T-K part 1, step 6, point 2); the oracle's table, the
@@ -17,19 +18,20 @@
 set -eo pipefail
 DOMAIN=$1; shift
 PY=~/python-envs/ir-nomesa-env/bin/python; D=analysis/instruments/mpb; IR=analysis/instruments/irb
-DOM=analysis/$DOMAIN/mpb; ROOT=""; RUNS=""
+DOM=analysis/$DOMAIN/mpb; ROOT=""; RUNS=""; CAP=""
 while [ $# -gt 0 ]; do
   case $1 in
     -o) ROOT=$2; shift 2;;
+    -s) CAP=$2; shift 2;;
     *) RUNS="$RUNS $1"; shift;;
   esac
 done
-[ -n "$ROOT" ] && [ -n "$RUNS" ] || { echo "usage: run_set.sh <domain> -o <out_root> <run files>"; exit 2; }
+[ -n "$ROOT" ] && [ -n "$RUNS" ] || { echo "usage: run_set.sh <domain> [-s <steps>] -o <out_root> <run files>"; exit 2; }
 mkdir -p $ROOT
 for RUN in $RUNS; do
   name=$(basename $RUN .yaml); sid=$(awk '/^scenario:/ {print $2}' $RUN)
   OUT=$ROOT/$sid/$name; LOG=$OUT/$name.log; mkdir -p $OUT
-  steps=$(PYTHONHASHSEED=0 $PY $DOM/horizon.py $RUN 2>/dev/null | tail -1)
+  if [ -n "$CAP" ]; then steps=$CAP; else steps=$(PYTHONHASHSEED=0 $PY $DOM/horizon.py $RUN 2>/dev/null | tail -1); fi
   last=$(PYTHONHASHSEED=0 $PY $IR/trajectory.py $RUN --length 2>/dev/null | tail -1)
   PYTHONHASHSEED=0 $PY mesa_sim/run_mesa.py --run $RUN --steps $steps < /dev/null > /dev/null 2>&1
   cp "$(ls -t logs/run_*.log | head -1)" $LOG
