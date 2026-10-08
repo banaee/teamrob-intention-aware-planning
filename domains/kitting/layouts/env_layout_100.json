@@ -4,7 +4,7 @@
     "height": 1000,
     "name": "env_layout_100",
     "units": "cm",
-    "notes": "The IRB's enlarged room (IRB.4b): env_layout_10 unchanged (see its notes) plus a second table and a third shelf. kitting_table_1 at (350, 420) on the north wall, bearing 0 deg from kitting_table_0 (46.3 deg from its nearest target, shelf_2); shelf_3 at (-420, 300) on the west wall, 320 cm above shelf_1, bearing -164.1 deg (30.4 deg from shelf_1, 62.3 deg from coffee_machine_0). The human of the IRB.3b scripts never comes within 221 cm of shelf_3 or 253 cm of kitting_table_1. shelf_3's place was chosen for observability, by a criterion stated before any run: on the walk to item_1, the rival delivery of item_3 is refuted (S < alpha) after the first quarter of the walk and before the arrival; at (-420, -220), 10.4 deg, it was not (the refutation fell after the grasp); (-420, 300) is the first place up the west wall that meets it."
+    "notes": "A busy room, 10 m by 10 m, for a robot with many deliveries (Hadi, 8 October 2026; the demo-day round of T-F, analysis/kitting/tf_demo/). Two kitting tables: kitting_table_0 against the north wall at (5, 450), kitting_table_1 against the south wall at (0, -450). 24 shelves on the four walls: shelf_1 to shelf_8 down the west wall (x = -470, y from 355 to -345), shelf_9 to shelf_16 down the east wall (x = 470, y from 350 to -350), shelf_17 and shelf_18 on the north wall west of kitting_table_0, shelf_19 and shelf_20 east of it, shelf_21 and shelf_22 on the south wall west of kitting_table_1, shelf_23 and shelf_24 east of it. coffee_machine_1 stands free at (-150, -350), north-west of kitting_table_1; ac_switch_0 is in the south-west corner (-490, -490); the landmark corner_SE in the south-east corner (490, -490), the exit walk's target. The four areas are the room's quadrants."
   },
   "areas": [
     {
@@ -60,7 +60,7 @@
         200,
         100
       ],
-      "notes": "Top centre, (0.50 W, 0.08 H). The human starts here."
+      "notes": "The north table, against the north wall at the room's centre line."
     },
     {
       "id": "kitting_table_1",
@@ -73,7 +73,7 @@
         200,
         100
       ],
-      "notes": "IRB.4b: the north wall, east of kitting_table_0; the misdelivery's table (scenario_s09_08). No item is designated to it."
+      "notes": "The south table, against the south wall at the room's centre line, opposite kitting_table_0."
     },
     {
       "id": "shelf_1",
@@ -87,7 +87,7 @@
         60
       ],
       "slots": 2,
-      "notes": "The west shelf, (0.08 W, 0.52 H). Symmetric to shelf_2 about the table's x."
+      "notes": "The west wall, the northernmost of its eight shelves."
     },
     {
       "id": "shelf_2",
@@ -101,7 +101,7 @@
         60
       ],
       "slots": 2,
-      "notes": "The east shelf, (0.92 W, 0.52 H). Symmetric to shelf_1 about the table's x."
+      "notes": "The west wall, second from the north."
     },
     {
       "id": "shelf_3",
@@ -115,7 +115,7 @@
         60
       ],
       "slots": 2,
-      "notes": "IRB.4b: the west wall, 320 cm above shelf_1; from kitting_table_0 its bearing (-164.1 deg) is 30.4 deg from shelf_1's. Placed for observability (the walk to item_1 separates from the walk to item_3 within the walk), not for a belief or finding value."
+      "notes": "The west wall, third from the north."
     },
     {
       "id": "shelf_4",
@@ -129,7 +129,7 @@
         60
       ],
       "slots": 2,
-      "notes": "IRB.4b: the east wall, 320 cm above shelf_2; from kitting_table_0 its bearing (164.1 deg) is 30.4 deg from shelf_2's. Placed for observability (the walk to item_2 separates from the walk to item_4 within the walk), not for a belief or finding value."
+      "notes": "The west wall, fourth from the north, just north of the room's east-west centre line."
     },
     {
       "id": "shelf_5",
@@ -143,7 +143,7 @@
         60
       ],
       "slots": 2,
-      "notes": "IRB.4b: the south wall, centred; from kitting_table_0 its bearing (180 deg) is 30.4 deg from shelf_1's. Placed for observability (the walk to item_1 separates from the walk to item_5 within the walk), not for a belief or finding value."
+      "notes": "The west wall, fifth from the north, just south of the room's east-west centre line."
     },
     {
       "id": "shelf_6",
