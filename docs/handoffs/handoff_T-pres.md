@@ -470,5 +470,9 @@ The talk and the afternoon station should say the same; decide whether the web-u
 - h. [preferred] The slides say "projection", never "prediction". Whether the web-ui's two labels change is still open
   (section 7) and was not part of T-pres part 1.
 
+- i. [preferred] (Hadi, 8 October 2026, a later prompt) Unboxing the blocks replaces "at most one formula" (section 4):
+  a block of the contribution is opened once when it appears and again when a later talk stage extends it, showing its
+  formulation; abstract, no flowchart, no if-then branches. design_records.md, "T-pres, the talk", UNBOXING THE BLOCKS.
+
 Where the rest of that prompt is recorded (the words "talk stage" and "part", the parts 1 to 6 that replace section
 12's plan, the working rule, the deck's design): `docs/design_records.md`, "T-pres, the talk".

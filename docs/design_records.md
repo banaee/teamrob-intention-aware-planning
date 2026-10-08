@@ -5806,3 +5806,47 @@ PART 1, BUILT (ccode, 8 October 2026; d43fbc2, 0270035; Hadi's revision open).
   the web-ui's visual language (the hatched blue stripe, the dashed blue plan, the human orange).
 - Checks: `npm run build` (type check included); `npm run shots` clicks through all 64 steps at both sizes: 0 outside
   requests, 0 page errors, 0 notes on screen; the speaker view opens offline.
+
+UNBOXING THE BLOCKS (Hadi, 8 October 2026, preferred; it replaces the handoff's "at most one formula", section 4). The
+talk's message is how each mechanism works; the diagram shows that a block exists, not what it does. So when a block of
+Hadi's contribution appears, the talk opens it once and shows its formulation; when a later talk stage extends it, the
+talk opens it again and shows what was added. What stays from the handoff: abstract, not as implemented; no flowchart and
+no if-then branches; a short formulation or a small drawing, in the audience's words with the formal line beside it.
+Form: a step on the talk stage's diagram slide, the block opening from its place into a panel and the rest receding; an
+extension opens the same panel with the earlier content receded and the addition distinct, the diagram's language for
+old and new; light motion only. The blocks and talk stages: belief update (3; 4, H grown; 5, the prior opened), support
+(3), confidence check (3; 5, observations still decide; 6, it fits), projection (2 has its own slide; 3, from her
+intention, where "one knowledge, two uses" is said once; 7, from motion as the fallback), realizer (3), task choice (3),
+fit (6; 7, no hypothesis fits). Not unboxed: planner, observe, execute, world state (not the contribution).
+BUILT (ccode, 8 October 2026; cdedb6a; Hadi's review open): `presentation/src/architecture/unboxing.tsx`, one source
+per block (each line with the talk stage that brings it, the formal line taken from the code and the records, the
+sources named in its header); at an extension the earlier lines recede to their formal lines. Talk stages 3 to 7 have
+their first version; the diagram left talk stages 10 to 12.
+
+SIM-RUNS ON SLIDES, FIRST DRAFTS (task B of 8 October 2026, before part 4 is planned; Hadi's review open). Existing
+scenarios and T-F part 1's own run files only (configs/kitting/tf1/measurement/), nothing authored or changed, no
+showcase scenario; recorded at every build through the web-ui's own piece (`presentation/scripts/record_run.py`, the
+list in `scripts/record.mjs`), drawn by the env-pane's own Scene with the floor drawings, one click per stop; no change
+in `webui/`. Each caption states what the run's log shows at its tick. The candidates (kitting; run files under
+configs/kitting/tf1/measurement/<scenario>/):
+
+| talk stage | scenario, layout, run file, ticks | what it shows | draft |
+|---|---|---|---|
+| 1 | scenario_s12_01, env_layout_14, run_057 (human-unaware), 0 to 126 | Anton's two deliveries, plan then execute; the human not drawn | built |
+| 2, Donny enters | none | no existing kitting scenario has the human enter while Anton works: every script starts with her in the room | not built |
+| 2, reactive | scenario_s10_02, env_layout_12, run_006 (intention-unaware), 24 to 52 | the projection from her motion; a hold of 5 ticks at 40 to 44 | built |
+| 2, reactive (second) | scenario_s12_02, env_layout_14, run_062 (intention-unaware), about 110 to 165 | holds of 16 and 32 ticks at 117 to 164 near her stand at the coffee machine, lengthening | not built |
+| 3 | scenario_s10_02, env_layout_12, run_008, 0 to 24 | deliver item 1 trusted at 8 (0.78, supported; 0.71 at 6); a hold of 5 ticks against her task's path | built |
+| 3 (second) | scenario_s12_01, env_layout_14, run_060, 0 to 20 | her task trusted at 8 and Anton switches to its other task (task choice) | not built |
+| 4 | scenario_s12_02, env_layout_14, run_064, 60 to 112 | the coffee break trusted at 93 (0.79); a hold of 18 ticks at 93 to 110 around her break | built |
+| 4, a reorder | none found among the runs checked | no checked run shows a reorder caused by a trusted break, only holds | not built |
+| 5 | scenario_s12_04, env_layout_14, run_707, 60 to 90 (scenario_s12_02 with break time from 63) | the coffee break trusted at 69, 24 ticks earlier than at 93 without the fact; the same hold | built |
+| 6 | scenario_s10_03, env_layout_12, run_012, 40 to 125 | the coffee break cut into her carry at 46; trust withdrawn at 55, the projection from motion; the break trusted at 76; resumption at 107; deliver item 1 trusted again at 120 | built |
+| 7 | scenario_s10_07, env_layout_12, run_028, 40 to 125 | a 60-tick stand cut into her carry at 46 (unmodelled); unexplained from 62 (16 ticks of standing); the fallback; she walks on at 107; adequate again at 120 | built |
+BUILT (ccode, 8 October 2026; 213368c; Hadi's review open): the seven drafts marked built above, on the slides of talk
+stages 1 to 7, the TODO boxes' text in the notes. Talk stage 2's "Donny enters" keeps its TODO box. A replay's canvas is
+kept once shown: the env-pane's Scene places the agents' labels as DOM elements beside its canvas, and removing the
+canvas while the deck runs throws (a React removeChild error); so up to seven WebGL contexts stay open after every
+replay has been seen (part 6 checks it on the hall's laptop). Each recording writes the usual log pair to `logs/`.
+Checks: the build; the click-through, 99 steps at 1920 x 1080 and 2560 x 1440, 0 outside requests, 0 page errors, 0 notes
+on screen.
