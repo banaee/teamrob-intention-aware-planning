@@ -5867,7 +5867,8 @@ configs/kitting/tf1/measurement/<scenario>/):
 | 6 | scenario_s10_03, env_layout_12, run_012, 40 to 125 | the coffee break cut into her carry at 46; trust withdrawn at 55, the projection from motion; the break trusted at 76; resumption at 107; deliver item 1 trusted again at 120 | built |
 | 7 | scenario_s10_07, env_layout_12, run_028, 40 to 125 | a 60-tick stand cut into her carry at 46 (unmodelled); unexplained from 62 (16 ticks of standing); the fallback; she walks on at 107; adequate again at 120 | built |
 BUILT (ccode, 8 October 2026; 213368c; Hadi's review open): the seven drafts marked built above, on the slides of talk
-stages 1 to 7, the TODO boxes' text in the notes. Talk stage 2's "Donny enters" keeps its TODO box. A replay's canvas is
+stages 1 to 7, the TODO boxes' text in the notes. Talk stage 2's "Donny enters" keeps its TODO box (the slide removed in
+tpres-v4). A replay's canvas is
 kept once shown: the env-pane's Scene places the agents' labels as DOM elements beside its canvas, and removing the
 canvas while the deck runs throws (a React removeChild error); so up to seven WebGL contexts stay open after every
 replay has been seen (part 6 checks it on the hall's laptop). Each recording writes the usual log pair to `logs/`.
@@ -5933,7 +5934,7 @@ BUILT (ccode, 8 October 2026; d61c73c the web-ui's change, 74e7bfd, 8ab4a71, b13
 | talk stage | replay | what it shows | criterion |
 |---|---|---|---|
 | 1 | scenario_s12_02, env_layout_14, run_061 (human-unaware), 0 to 136 | two deliveries; between the walk to the item and the walk to its table Anton turns 87 and 101 degrees | met |
-| 2, Donny enters | none | no scenario has her enter the room; three walk her to a door and back, with no hold; a start moved to door_N gives no hold | not met; TODO box stays |
+| 2, Donny enters | none | no scenario has her enter the room; three walk her to a door and back, with no hold; a start moved to door_N gives no hold | not met; the slide removed by Hadi (tpres-v4), no mark |
 | 2, reactive | scenario_s10_02, env_layout_12, run_006 (intention-unaware), 24 to 52 | a hold of 5 ticks at 40 on the projection from her motion | met (short); longer: run_446 (24 ticks), run_050 |
 | 3 | scenario_s12_01, env_layout_14, run_060, 0 to 62 | her delivery of item 1 trusted at 8 (0.78); Anton switches from item 7 to item 13 | met; the switch shows from the carry on |
 | 4 | scenario_s24_14, env_layout_07, run_264, 85 to 150 | the coffee break trusted at 116 (0.78); Anton switches from item 56 to item 54 | met; Anton walks about 55 cm behind her at 90 to 114 |
@@ -5982,6 +5983,9 @@ other, the old talk stage 6 has no replay that shows fit changing what Anton doe
 - The old talk stage 6's case is one step of talk stage 6, not a talk stage, and has no replay: she turns mid-way to
   something Anton knows (a coffee break), the belief moves to that hypothesis and Anton trusts it; she turns to something
   Anton has no model of, and no hypothesis fits.
+  (Amended, Hadi, 8 October 2026, tpres-v4: the step is removed from the slides; talk stage 6 shows unmodelled
+  behaviour only, and the switch to a known behaviour is one line of the stage's speaker notes. HADI'S SCENARIOS FOR THE
+  REPLAYS below.)
 - Then the unmodelled case as before: her behaviour is unexplained, Anton knows that it does not know, the projection
   from her motion returns as the fallback (the callback to talk stage 2), and when she returns to modelled behaviour
   Anton trusts her task again; the resumption is shown in this run.
@@ -6019,3 +6023,35 @@ The first group shows as the slide opens, each later group on a click (talk stag
 steps); the two numbers of a row large; a row whose n is a scenario (s10_02) set apart by a dashed rule and an italic n;
 "worse, 1%" in weight and a colour, the word carrying it. Checks: the build; the click-through, 100 steps at both
 sizes, 0 outside requests, 0 page errors, 0 notes on screen.
+
+HADI'S SCENARIOS FOR THE REPLAYS (Hadi, 8 October 2026, preferred; recorded by ccode the same day; the round tagged
+tpres-v4). Hadi designed and chose the scenarios for the replays himself (NEW SCENARIOS FOR THE REPLAYS above, in his own
+hand; committed by him, 458b436, 96e5a64, c7d69e3); they are used exactly as they are. Each replay has its own run file
+under `configs/kitting/tpres/`, outside every measured set, with the run options of the replay it replaces where Hadi
+stated none; its log pair and per-tick figure are kept in `presentation/runs/` (untracked, as analysis/ keeps its data).
+Talk stage 3 keeps T-F part 1's run_060. Talk stages 4 and 5 replay one scenario without and with context knowledge,
+over the same ticks, so that the tick at which the coffee break is trusted compares like with like. With them, two
+slides leave the deck (Hadi, the same day): "She turns mid-way" at talk stage 6 (the stage shows unmodelled behaviour
+only, with his scenario as its one example; the switch to a known behaviour is one line of the stage's notes; the
+handoff's addition l, amended) and "Donny enters" at talk stage 2, with its TODO box and its mark "not settled" (talk
+stage 2 keeps its transition, the audience question, the drawing of the projection from her motion, the reactive
+robot's replay and the architecture).
+
+| talk stage | run file (configs/kitting/tpres/) | ticks | what the log shows | the stage's mechanism changes what Anton does |
+|---|---|---|---|---|
+| 1 | stage1_s301_01.yaml: scenario_s301_01, env_layout_14, human-unaware (no human in the scenario) | 0 to 150, about 14 ticks a second | deliver item 1 chosen 0, picked up 32, placed 64; deliver item 2 chosen 67, picked up 97, placed 145 | yes (plan, then execute) |
+| 2 | stage2_s302_02.yaml: scenario_s302_02, env_layout_12, intention-unaware | 0 to 26 | decisions at 0, 2, 6, 14, 23, 25 as the projection from her motion runs out; every hold 0; 626 cm apart at 0, 428 cm at 26; their closest 60.31 cm at 42, outside the range | no: no hold anywhere in the run; marked not settled |
+| 4 | stage4_s304_14_ck_off.yaml: scenario_s304_14, env_layout_07, context knowledge off | 85 to 150 | second coffee break from 90; deliver item 56 chosen 97; the break trusted 106 (0.76); Anton switches to item 54, item 56 needing a hold of 26 ticks; closest 96.48 cm (89) | yes (the switch) |
+| 5 | stage5_s304_14_ck_on.yaml: the same scenario, context knowledge on | 85 to 150 | no context fact in force; the coffee break recent from her first break (completed 51), suppressed until 141; at 106 it stands at 0.37 behind switching on the A/C (0.46); trusted 116 (0.78); the same switch 10 ticks later; closest 96.48 cm (89) | yes, but later, not earlier: marked not settled (the stage's columns say earlier) |
+| 6 | stage6_s111_02.yaml: scenario_s111_02, env_layout_12 | 0 to 70 | her script unmodelled throughout (door_N, a stand of 60 seconds at spot_E from 26 to 57, corner_SE); deliver item 12 leads at 0.98, not trusted: no support to 9, unexplained from 10; the projection from her motion throughout; holds 2 (14), 2 (20), 2 (25), 4 (27), 8 (31), 16 (39), 32 (55 to 86); closest 50.44 cm (24, 56) | yes (holds against the fallback); no trusted intention withdrawn and no return to modelled behaviour in the range; the 32-tick hold runs on after she walks off at 57 |
+
+The coffee break trusted, talk stage 4 (off) against talk stage 5 (on): 106 against 116; the period 85 to 150 covers
+both, not widened.
+BUILT (ccode, 8 October 2026; Hadi's review open; tagged tpres-v4). `presentation/scripts/record.mjs` (the runs),
+`src/slides/replays.tsx` (stops and captions from the logs), `src/scene/RunReplay.tsx` (`tickMs`, a replay's own pace),
+`src/slides/stage1.tsx`, `stage2.tsx`, `later.tsx`, `index.ts`, `deck.css` (the two slides removed; the marks "not
+settled" on talk stages 2 and 5; talk stage 6's mark removed). The figure instrument
+(`analysis/instruments/mpb/figure_of_log.py`) draws no figure for talk stage 1's run: it assumes a human in the
+scenario. Clicks per talk stage: 0 18, 1 11, 2 14, 3 14, 4 9, 5 11, 6 14, 7 1, 8 1, 9 5, 10 1, 11 1; 99 in all (100
+steps). Checks: the build; the click-through, 100 steps at 1920 x 1080 and 2560 x 1440, 0 outside requests, 0 page
+errors, 0 notes on screen.

@@ -505,6 +505,11 @@ The talk and the afternoon station should say the same; decide whether the web-u
     the unmodelled case. Time and depth (section 4): talk stages 3 and 6.
   - 7 Recap: the complete architecture. 8 The lift truck's turn. 9 Results. 10 Limits and outlook. 11 The afternoon:
     the web-ui station.
+  (Amended, Hadi, 8 October 2026, tpres-v4: talk stage 6 shows unmodelled behaviour only, with Hadi's scenario
+  scenario_s111_02 as its one example: the transition, the replay, the architecture where fit appears; the switch to a
+  known behaviour is on no slide, one line of the stage's speaker notes. Talk stage 2 has no slide "Donny enters": its
+  transition, the audience question, the drawing of the projection from her motion, the reactive robot's replay, the
+  architecture. design_records.md, "T-pres, the talk", HADI'S SCENARIOS FOR THE REPLAYS.)
   The talk's title: "Intention-aware adaptive planning in human-robot teams". The names and lines are those of
   `presentation/src/talk.ts`. design_records.md, "T-pres, the talk", THE MERGE OF TALK STAGES 6 AND 7.
   The other preferences of 8 October 2026 that changed this file stand in j (plain terms, one per concept; the transition
