@@ -47,6 +47,7 @@ for (;;) {
     h: window.deck.getIndices().h,
     end: window.deck.isLastSlide() && !window.deck.availableFragments().next,
   }));
+  if (!last.has(at.h)) console.log(`[pdf] slide ${at.h + 1}`);     // progress: the export takes a few minutes
   last.set(at.h, await page.screenshot({ type: "png" }));
   if (at.end) break;
   await page.mouse.click(W / 2, H / 2);
