@@ -784,7 +784,7 @@ class SimModel(model.Model):
 
     def _check_destinations(self, scenario: ScenarioConfig, robot_cfg, agent_cfgs: Dict) -> None:
         """
-        The tasks the robot's mind holds agree with the layout's destinations
+        The tasks the robot's mind holds agree with the setup's destinations
         (T-B1a), checked where its task model is built: its own assigned tasks,
         its plans, and the assigned tasks of the agent it observes, which it may
         be told. The human's script is not checked: it may send an object

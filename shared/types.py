@@ -327,7 +327,7 @@ class WorldState:
     object_home_container: Dict[str, str] = field(default_factory=dict)     # {item_id: container_id} — static per scenario, set once at load, 
                                                                             # never updated as item moves (unlike object_locations/object_areas)
     object_destination: Dict[str, str] = field(default_factory=dict)        # {item_id: destination_id} — static per scenario, set once at load
-                                                                            # from the layout's "destination" (kitting: the item's designated table);
+                                                                            # from the setup's "destination" (kitting: the item's designated table);
                                                                             # read through the planner's derived-var lookup "destination_of"
     object_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {obj_id: (x, y)} — env objects + items, for IR direction reasoning
     fixed_object_positions: Dict[str, Tuple[float, float]] = field(default_factory=dict)  # {obj_id: (x, y)} — the fixed objects only (T-D P):
@@ -685,7 +685,7 @@ def destination_derivations(schema: "TaskSchema") -> List[Tuple[str, str]]:
 class Departure:
     """
     A stated determined binding that is not the station's (T-H4): `var` is
-    bound to `stated` where the layout designates `designated` for its source
+    bound to `stated` where the setup designates `designated` for its source
     object. The binding-level deviation of a delivery to another table
     (deliver_item(item_1, table=kitting_table_2)): the task is the same task
     (same_task), performed with a binding the station does not give.
@@ -702,7 +702,7 @@ def destination_departures(task: TaskInstance, destination_by_id: Dict[str, str]
     """
     The task's departures from the station: each var it binds that the schema
     otherwise resolves through "destination_of", bound to something other than
-    the destination the layout declares for its source object, in declaration
+    the destination the setup declares for its source object, in declaration
     order. An unbound determined parameter follows from the lookup and departs
     from nothing. Raises ValueError when the source object has no designated
     destination (the loader requires one for every object of such a type).
@@ -717,7 +717,7 @@ def destination_departures(task: TaskInstance, destination_by_id: Dict[str, str]
         if designated is None:
             raise ValueError(
                 f"{task_instance_key(task)}: {var_name} is bound to '{bound[var_name]}', "
-                f"but the layout designates no destination for {source_var}='{source}'"
+                f"but the setup designates no destination for {source_var}='{source}'"
             )
         if bound[var_name] != designated:
             departures.append(Departure(Var(var_name), Const(designated), Const(bound[var_name])))
@@ -727,7 +727,7 @@ def destination_departures(task: TaskInstance, destination_by_id: Dict[str, str]
 def check_task_destinations(task: TaskInstance, destination_by_id: Dict[str, str]) -> None:
     """
     An ASSIGNED task that binds a var the schema otherwise resolves through
-    "destination_of" must bind the destination the layout declares for its
+    "destination_of" must bind the destination the setup declares for its
     source object (T-B1a): assigned_tasks are the assigned tasks, the reference
     the robot's mind holds, so they describe the station, not a deviation. Raises
     ValueError naming the task, the source object and both values: a departure
@@ -740,7 +740,7 @@ def check_task_destinations(task: TaskInstance, destination_by_id: Dict[str, str
         source_var = source_of[d.var.name]
         raise ValueError(
             f"{task_instance_key(task)}: {d.var.name} is bound to '{d.stated.value}', "
-            f"but the layout designates '{d.designated.value}' for {source_var}='{bound[source_var]}'"
+            f"but the setup designates '{d.designated.value}' for {source_var}='{bound[source_var]}'"
         )
 
 

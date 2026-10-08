@@ -204,7 +204,7 @@ def test_departures_and_the_destination_check():
     assert destination_departures(deliver_item("item_0", table="kitting_table_0"), station) == ()
     assert destination_departures(deliver_item("item_0", table="kitting_table_1"), station) == \
         (Departure(Var("?kitting_table"), Const("kitting_table_0"), Const("kitting_table_1")),)
-    with pytest.raises(ValueError, match=r"\?kitting_table is bound to 'kitting_table_1', but the layout designates "
+    with pytest.raises(ValueError, match=r"\?kitting_table is bound to 'kitting_table_1', but the setup designates "
                                          r"'kitting_table_0' for \?item='item_0'"):
         check_task_destinations(deliver_item("item_0", table="kitting_table_1"), station)
 
