@@ -11,7 +11,11 @@ import kitting from "../../data/kitting_env_layout_01.json";
 import { useShown } from "../Deck";
 import { AgentsInRoom, type Recorded } from "../scene/AgentsInRoom";
 import { QUESTION_TEXT, QUESTIONS, TALK_TITLE } from "../talk";
-import { ArchitectureView, Slide, Todo } from "./kit";
+import fatemeh from "../../photos/faces/fatemeh.png";
+import franziska from "../../photos/faces/franziska.png";
+import hadi from "../../photos/faces/hadi.png";
+import stephanie from "../../photos/faces/stephanie.png";
+import { ArchitectureView, Slide } from "./kit";
 
 // The JSON's enumerations are read as strings; the recording wrote the web-ui's messages (LayoutView, Appearance).
 export const KITTING = kitting as unknown as Recorded;
@@ -116,18 +120,34 @@ export function ProblemSlide() {
   );
 }
 
+/** The team: four faces close together in the middle (Hadi north, Franziska west, Stephanie east, Fatemeh south), each
+ * cropped to the face, round, in grayscale (scripts/crop_faces.py, from presentation/photos/), the first names under
+ * them, and under the panel the synergy of SP3 and SP4. */
+const TEAM = [
+  { name: "Hadi", face: hadi, place: "north" },
+  { name: "Franziska", face: franziska, place: "west" },
+  { name: "Stephanie", face: stephanie, place: "east" },
+  { name: "Fatemeh", face: fatemeh, place: "south" },
+] as const;
+
 export function TeamSlide() {
   return (
-    <Slide stage={0} notes={<>
+    <Slide stage={0} className="team-slide" notes={<>
       <p>Hadi's work is SP4, intention recognition, done as a synergy with SP3, the planning side of the framework.</p>
       <p>Most of what follows was done from July to October 2026.</p>
     </>}>
       <h1 className="slide-head">The team</h1>
-      <p className="slide-lead">TeamRob SP4, intention recognition, together with SP3, planning</p>
-      <Todo by="Hadi" className="todo-large">
-        Photos and names of Hadi and the team, as Hadi supplies them. Why: the audience meets the people behind the
-        work before the work.
-      </Todo>
+      <div className="team">
+        <div className="team-panel">
+          {TEAM.map((m) => (
+            <figure key={m.name} className={`team-member team-${m.place}`}>
+              <img src={m.face} alt={m.name} />
+              <figcaption>{m.name}</figcaption>
+            </figure>
+          ))}
+        </div>
+        <p className="team-caption">SP3 and SP4 synergy</p>
+      </div>
     </Slide>
   );
 }

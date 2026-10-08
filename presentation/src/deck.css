@@ -169,6 +169,26 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
   color: var(--color-inkSoft); z-index: 5; }
 .unsettled-head { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink); }
 
+/* ---- The team: four faces in a close diamond in the middle, the caption under it ----------------------------------
+   --face is a face's diameter; the west and east faces sit 1.06 diameters from the centre, the north and south ones
+   1.06 diameters above and below it, so that the four stay close and the names fit between them. */
+
+.team { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  --face: calc(220 * var(--u)); }
+.team-panel { position: relative; width: calc(var(--face) * 3.12); height: calc(var(--face) * 3.12 + 40 * var(--u)); }
+.team-member { position: absolute; margin: 0; width: var(--face); display: flex; flex-direction: column;
+  align-items: center; transform: translate(-50%, -50%); }
+.team-member img { width: var(--face); height: var(--face); border-radius: 50%; display: block;
+  box-shadow: 0 0 0 calc(3 * var(--u)) var(--color-floor), 0 0 0 calc(4.5 * var(--u)) var(--color-lineFaint); }
+.team-member figcaption { position: absolute; top: calc(100% + 8 * var(--u)); font-size: calc(26 * var(--u));
+  color: var(--color-ink); white-space: nowrap; }
+.team-north { left: 50%; top: calc(var(--face) * 0.5); }
+.team-west { left: calc(var(--face) * 0.5); top: calc(var(--face) * 1.56); }
+.team-east { left: calc(var(--face) * 2.62); top: calc(var(--face) * 1.56); }
+.team-south { left: 50%; top: calc(var(--face) * 2.62); }
+.team-caption { margin-top: calc(28 * var(--u)); font-size: calc(36 * var(--u)); font-weight: var(--weight-medium);
+  color: var(--color-inkSoft); }
+
 /* ---- The question to the audience, the turning point ------------------------------------------------------------ */
 
 .question-slide, .turning-slide { justify-content: center; padding-left: calc(160 * var(--u)); }
