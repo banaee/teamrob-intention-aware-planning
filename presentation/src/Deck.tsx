@@ -94,3 +94,18 @@ export function useNear(section: RefObject<HTMLElement | null>): boolean {
   }, [deck, section]);
   return near;
 }
+
+/** How many of a slide's elements matching `selector` are shown fragments now (the steps a slide has taken). */
+export function useVisibleCount(section: RefObject<HTMLElement | null>, selector: string): number {
+  const deck = useContext(DeckContext);
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (deck === null) return;
+    const update = () => setCount(section.current?.querySelectorAll(`${selector}.visible`).length ?? 0);
+    const events = ["fragmentshown", "fragmenthidden", "slidechanged"];
+    for (const e of events) deck.on(e, update);
+    update();
+    return () => { for (const e of events) deck.off(e, update); };
+  }, [deck, section, selector]);
+  return count;
+}

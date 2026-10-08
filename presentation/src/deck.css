@@ -205,3 +205,38 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .side-slide .side { display: flex; gap: calc(48 * var(--u)); flex: 1; min-height: 0; margin-top: calc(40 * var(--u)); }
 .side-slide .todo { flex: 1; align-self: flex-start; }
 .side-slide .side-arch { flex: 1.4; display: flex; flex-direction: column; min-height: 0; }
+
+/* ---- A block opened (architecture/unboxing.tsx) ------------------------------------------------------------------ */
+
+.arch-box { position: relative; }
+.ub-slot { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 450ms ease; }
+.ub-slot.ub-on { opacity: 1; }
+.unboxed {
+  position: absolute; top: 2%; width: 50%; max-height: 96%; box-sizing: border-box; overflow: hidden;
+  padding: calc(30 * var(--u)) calc(40 * var(--u)); border-radius: calc(18 * var(--u));
+  background: var(--color-surface); border: calc(2.5 * var(--u)) solid var(--color-ink);
+  box-shadow: 0 calc(12 * var(--u)) calc(40 * var(--u)) rgba(30, 34, 48, 0.12);
+  transform: translateY(calc(10 * var(--u))); transition: transform 450ms ease;
+}
+.ub-on .unboxed { transform: none; }
+.unboxed-right { right: 1%; }
+.unboxed-left { left: 1%; }
+.ub-head { display: flex; align-items: baseline; gap: calc(14 * var(--u)); margin-bottom: calc(18 * var(--u)); }
+.ub-name { font-size: calc(38 * var(--u)); font-weight: var(--weight-medium); }
+.ub-code { font-family: var(--font-mono); font-size: calc(20 * var(--u)); color: var(--color-inkFaint); }
+.ub-line { margin-top: calc(16 * var(--u)); transition: opacity 450ms ease; }
+.ub-words { font-size: calc(26 * var(--u)); line-height: 1.35; color: var(--color-ink); }
+.ub-formal { margin-top: calc(6 * var(--u)); font-size: calc(25 * var(--u)); line-height: 1.5; color: var(--color-inkSoft);
+  padding-left: calc(18 * var(--u)); border-left: calc(3 * var(--u)) solid var(--color-lineFaint); }
+.ub-old { opacity: 0.4; }
+.ub-old .ub-words { font-size: calc(22 * var(--u)); }
+.ub-old.ub-line { margin-top: calc(8 * var(--u)); }
+.ub-new .ub-words { font-weight: var(--weight-medium); }
+.ub-new .ub-formal { border-left-color: var(--color-ink); color: var(--color-ink); }
+.ub-out { margin-top: calc(22 * var(--u)); padding-top: calc(6 * var(--u)); border-top: calc(1.5 * var(--u)) solid var(--color-lineFaint); }
+.mv { font-style: italic; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 0.2em; }
+.frac-num { padding: 0 0.2em; border-bottom: calc(1.5 * var(--u)) solid currentColor; }
+.frac-den { padding: 0 0.2em; }
+.ub-formal sub, .ub-formal sup { font-size: 0.7em; }
+.side-plain .todo-large { margin-top: 0; }

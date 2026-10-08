@@ -7,7 +7,9 @@
 import { createContext, type ReactNode, type RefObject, useContext, useRef } from "react";
 
 import { Architecture, type Colouring } from "../architecture/Architecture";
-import { useNear, useShown } from "../Deck";
+import { type Unboxable, Unboxed } from "../architecture/unboxing";
+import { ELEMENTS } from "../architecture/model";
+import { useNear, useShown, useVisibleCount } from "../Deck";
 import { footerText, LEVELS, QUESTION_HEADER, QUESTIONS, STAGES, type TalkStage } from "../talk";
 
 const SlideContext = createContext<RefObject<HTMLElement | null> | null>(null);
@@ -101,20 +103,33 @@ export function LevelTitle({ level }: { level: 1 | 2 | 3 }) {
 
 /** The architecture at a talk stage. With `step`, the slide opens on the state before the talk stage and a click adds
  * what it adds (at talk stage 0, the three questions over the empty frames); without, it shows the talk stage's state
- * at once. */
-export function ArchitectureView({ stage, step = true, colouring = "new", questionTags = false, title }: {
-  stage: TalkStage; step?: boolean; colouring?: Colouring; questionTags?: boolean; title: string;
+ * at once. Then, one click each: a `caption`, and the blocks of `opens` in their order, each opened from its place into
+ * a panel (unboxing.tsx) while the rest of the diagram recedes. */
+export function ArchitectureView({ stage, step = true, colouring = "new", questionTags = false, title, caption, opens = [] }: {
+  stage: TalkStage; step?: boolean; colouring?: Colouring; questionTags?: boolean; title: string; caption?: string;
+  opens?: Unboxable[];
 }) {
   const [marker, shown] = useStep();
   const near = useSlideNear();
+  const section = useContext(SlideContext)!;
+  const opened = useVisibleCount(section, ".step-open");
+  const focus = opened === 0 ? null : opens[opened - 1];
+  const x = focus === null ? 0 : ELEMENTS.find((e) => e.id === focus)!.box.x;
   return (
     <>
       {title !== "" && <h1 className="arch-title">{title}</h1>}
       <div className="arch-box">
         {near && <Architecture stage={stage} revealed={step && stage > 0 ? shown : true} colouring={colouring}
-                               questionTags={questionTags} tagsShown={step ? shown : true} />}
+                               questionTags={questionTags} tagsShown={step ? shown : true} focus={focus} />}
+        {near && opens.map((b) => (
+          <div key={b} className={`ub-slot${b === focus ? " ub-on" : ""}`}>
+            <Unboxed block={b} stage={stage} side={x < 1000 ? "right" : "left"} />
+          </div>
+        ))}
       </div>
       {step && <StepMarker r={marker} />}
+      {caption !== undefined && <p className="arch-caption fragment">{caption}</p>}
+      {opens.map((b) => <span key={b} className="fragment step-marker step-open" aria-hidden />)}
     </>
   );
 }

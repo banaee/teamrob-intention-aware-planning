@@ -61,8 +61,6 @@ export function Stage2Card() {
     <Slide stage={2} notes={<>
       <p>Anton knows nothing about her intentions; its belief is empty. What it can do: see where she moves, project
         that motion ahead, and hold where its own path would come too close.</p>
-      <p>The talk says once, here or at talk stage 3: the task knowledge Anton plans its own work with is the same
-        knowledge it will use to read Donny (handoff, addition a).</p>
     </>}>
       <StageCard stage={2} />
     </Slide>

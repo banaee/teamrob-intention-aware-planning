@@ -121,3 +121,10 @@
 .colouring-questions .q-decide .el-mechanism { background: var(--q-decide-tint); }
 .colouring-questions .q-decide .el-component > .el-head .el-label { color: var(--q-decide); }
 .q-tag { transition: opacity 600ms ease; }
+
+/* ---- A block opened (unboxing.tsx): it stays, the rest recedes ----------------------------------------------- */
+
+.architecture .react-flow__node, .architecture .react-flow__edge, .architecture .arrow-label { transition: opacity 450ms ease; }
+.focusing .react-flow__node:not(.focused), .focusing .react-flow__edge, .focusing .arrow-label { opacity: 0.14 !important; }
+.focusing .react-flow__node.focused .el { opacity: 1 !important; border-width: 3px; border-color: var(--color-ink);
+  box-shadow: 0 0 0 6px var(--color-floor), 0 0 0 8px var(--color-line); }

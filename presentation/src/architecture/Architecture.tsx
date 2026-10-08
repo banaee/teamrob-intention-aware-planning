@@ -29,6 +29,8 @@ interface Props {
   colouring?: Colouring;
   questionTags?: boolean;
   tagsShown?: boolean;
+  /** The block opened (unboxing.tsx): it stays, the rest recedes. */
+  focus?: string | null;
 }
 
 export function Architecture(props: Props) {
@@ -41,7 +43,7 @@ export function Architecture(props: Props) {
 
 const PAD = 8;    // the canvas's margin around the model, in the model's unit
 
-function Diagram({ stage, revealed, colouring = "new", questionTags = false, tagsShown = true }: Props) {
+function Diagram({ stage, revealed, colouring = "new", questionTags = false, tagsShown = true, focus = null }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   useLayoutEffect(() => {
@@ -55,8 +57,8 @@ function Diagram({ stage, revealed, colouring = "new", questionTags = false, tag
     x: (size.w - DESIGN.w * zoom) / 2, y: (size.h - DESIGN.h * zoom) / 2, zoom,
   };
 
-  const nodes = useMemo(() => buildNodes(stage, revealed, colouring, questionTags, tagsShown),
-    [stage, revealed, colouring, questionTags, tagsShown]);
+  const nodes = useMemo(() => buildNodes(stage, revealed, colouring, questionTags, tagsShown, focus),
+    [stage, revealed, colouring, questionTags, tagsShown, focus]);
   const edges = useMemo(() => buildEdges(stage, revealed, colouring), [stage, revealed, colouring]);
   // Something is new only once the talk stage's additions are shown, and only if the talk stage adds or removes
   // anything (talk stage 7 adds nothing); then the rest recedes.
@@ -65,7 +67,8 @@ function Diagram({ stage, revealed, colouring = "new", questionTags = false, tag
   const hasNew = revealed && stage > 0 && changes && colouring === "new";
 
   return (
-    <div className={`architecture colouring-${colouring}${hasNew ? " has-new" : ""}`} ref={box}>
+    <div className={`architecture colouring-${colouring}${hasNew ? " has-new" : ""}${focus !== null ? " focusing" : ""}`}
+         ref={box}>
       {size !== null && (
         <ReactFlow nodes={nodes} edges={edges} nodeTypes={NODE_TYPES} edgeTypes={EDGE_TYPES} viewport={viewport}
                    onViewportChange={() => {}} nodesDraggable={false} nodesConnectable={false}
@@ -109,7 +112,7 @@ function handlesOf(element: Element): HandleSpec[] {
 }
 
 function buildNodes(stage: TalkStage, revealed: boolean, colouring: Colouring, tags: boolean,
-                    tagsShown: boolean): (ElementNode | TagNode)[] {
+                    tagsShown: boolean, focus: string | null): (ElementNode | TagNode)[] {
   const byId = new Map(ELEMENTS.map((e) => [e.id, e]));
   const nodes: (ElementNode | TagNode)[] = ELEMENTS.map((element) => {
     const parent = element.parent === null ? null : byId.get(element.parent)!;
@@ -125,7 +128,8 @@ function buildNodes(stage: TalkStage, revealed: boolean, colouring: Colouring, t
       selectable: false,
       data: { element, presence: grown(presence(element.stage, null, stage, revealed), element.sub, stage, revealed),
               stage, revealed, handles: handlesOf(element) },
-      className: colouring === "questions" && element.question !== null ? `q-${element.question}` : undefined,
+      className: [colouring === "questions" && element.question !== null ? `q-${element.question}` : "",
+        element.id === focus ? "focused" : ""].join(" "),
     };
   });
   if (tags) {
