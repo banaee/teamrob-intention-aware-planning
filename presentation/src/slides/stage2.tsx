@@ -1,9 +1,8 @@
 /**
  * Talk stage 2, a human in the shared space (handoff_T-pres.md, sections 4, 5, 9; the name of the overall revision):
- * Anton knows nothing about her intentions, it believes nothing; it projects her motion and holds to keep the minimum
- * separation: the reactive robot. The planner
- * stays; what changes is the projection it receives. Then the turning point: what if Anton knows something about her
- * behaviour? A first version for Hadi's revision.
+ * the robot knows nothing about her intentions, it believes nothing; it projects her motion and holds to keep the
+ * minimum separation: the reactive robot. The planner stays; what changes is the projection it receives. Then the
+ * turning point: what if the robot knows something about her behaviour? A first version for Hadi's revision.
  *
  * The drawing of the projection from motion is an abstraction in the web-ui's visual language (the robot's
  * projection of the human a wide hatched blue stripe, the robot's plan a dashed blue line, the human orange), so that
@@ -11,14 +10,14 @@
  * projection**, T-D P4): the last displacement continued for as many ticks as the current straight run has lasted.
  */
 
-import { ArchitectureView, Slide, StepMarker, TransitionSlide, Unsettled, useStep } from "./kit";
+import { ArchitectureView, Slide, StepMarker, TransitionSlide, useStep } from "./kit";
 import { ReplayReactive } from "./replays";
 
 export function Stage2Transition() {
   return (
     <TransitionSlide stage={2} notes={<>
-      <p>Donny enters the shared space. Anton knows nothing about her intentions and believes nothing about them: it
-        reacts to her motion.</p>
+      <p>A human enters the shared space. The robot knows nothing about her intentions and believes nothing about them:
+        it reacts to her motion.</p>
       <p><strong>OPTIONAL</strong> (2024 callback): Hadi's October 2024 deck and the HHAI/CHAI 2024 poster contrasted an
         "intrinsic reaction" (the robot halts to avoid a collision) with an "enhanced reaction" (it recognises the
         intention and adapts its plan). Talk stage 2 is the intrinsic reaction; talk stages 3 to 6 the enhanced one.</p>
@@ -33,11 +32,11 @@ export function AudienceQuestionSlide() {
         simplest robot, which knows nothing about her.</p>
       <p>Wording: the handoff's candidate.</p>
       <p><strong>PARKED</strong> (handoff 11): the comparison with centralised multi-agent planning, candidate place at
-        the moment Donny enters (its slide removed, tpres-v4). Agreed wording: a central planner can command robots;
-        nobody can command a human, whose current intention is not communicated and whose behaviour is only partly
+        the moment the human enters (its slide removed, tpres-v4). Agreed wording: a central planner can command robots;
+        nobody can command a human, whose current intention the robot is not told and whose behaviour is only partly
         modelled. A different setting, not a weaker approach.</p>
     </>}>
-      <p className="ask">What would Anton need to know to work beside her?</p>
+      <p className="ask">What would the robot need to know to work beside her?</p>
     </Slide>
   );
 }
@@ -46,10 +45,10 @@ export function AudienceQuestionSlide() {
 const W = 1100;
 const H = 600;
 const TRAIL = [[150, 470], [215, 437], [280, 404], [345, 371]] as const;
-const DONNY = [410, 338] as const;
+const HUMAN = [410, 338] as const;
 const AHEAD = [670, 206] as const;        // as many steps ahead as were observed in a straight run
-const ANTON = [860, 470] as const;
-const ANTON_GOAL = [470, 110] as const;
+const ROBOT = [860, 470] as const;
+const ROBOT_GOAL = [470, 110] as const;
 
 export function ProjectionSlide() {
   const [seen, seenShown] = useStep();
@@ -57,11 +56,11 @@ export function ProjectionSlide() {
   const [held, heldShown] = useStep();
   return (
     <Slide stage={2} notes={<>
-      <p>Click 1: Anton sees where she moves, step by step.</p>
-      <p>Click 2: the projection from her motion: Anton continues her last motion, for as long as it has seen her move
+      <p>Click 1: the robot sees where she moves, step by step.</p>
+      <p>Click 2: the projection from her motion: the robot continues her last motion, for as long as it has seen her move
         that way (a straight run of k ticks is projected k ticks ahead; a stand, as long as she has stood). It claims
         nothing about what she intends.</p>
-      <p>Click 3: where Anton's path would come closer than the minimum separation to her projected path, it holds, then
+      <p>Click 3: where the robot's path would come closer than the minimum separation to her projected path, it holds, then
         goes on.</p>
       <p>This is the reactive robot. The planner stays; what changes is the projection it receives. The same drawing
         is on the floor of the web-ui this afternoon: the robot's plan a dashed blue line, its projection of her a wide
@@ -70,7 +69,7 @@ export function ProjectionSlide() {
       <h1 className="slide-head">Projection from her motion</h1>
       <div className="projection">
         <svg className="projection-drawing" viewBox={`0 0 ${W} ${H}`} role="img"
-             aria-label="Donny's observed steps, the projection from her motion, and Anton holding">
+             aria-label="The human's observed steps, the projection from her motion, and the robot holding">
           <defs>
             <pattern id="hatch-motion" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
               <rect width="14" height="14" className="hatch-ground" />
@@ -82,24 +81,24 @@ export function ProjectionSlide() {
             {TRAIL.map(([x, y]) => <circle key={x} cx={x} cy={y} r="7" className="trail" />)}
           </g>
           <g className={`appear${projectedShown ? " on" : ""}`}>
-            <line x1={DONNY[0]} y1={DONNY[1]} x2={AHEAD[0]} y2={AHEAD[1]} className="stripe" />
+            <line x1={HUMAN[0]} y1={HUMAN[1]} x2={AHEAD[0]} y2={AHEAD[1]} className="stripe" />
             <text x={AHEAD[0] + 30} y={AHEAD[1] - 20} className="drawing-label drawing-label-robot">projection from her motion</text>
           </g>
           <g className={`appear${heldShown ? " on" : ""}`}>
-            <line x1={ANTON[0]} y1={ANTON[1]} x2={ANTON_GOAL[0]} y2={ANTON_GOAL[1]} className="plan" />
-            <circle cx={ANTON_GOAL[0]} cy={ANTON_GOAL[1]} r="7" className="plan-end" />
-            <text x={ANTON[0] - 120} y={ANTON[1] + 92} className="drawing-label drawing-label-robot">holds, then goes on</text>
-            <circle cx={ANTON[0]} cy={ANTON[1]} r="44" className="hold-ring" />
+            <line x1={ROBOT[0]} y1={ROBOT[1]} x2={ROBOT_GOAL[0]} y2={ROBOT_GOAL[1]} className="plan" />
+            <circle cx={ROBOT_GOAL[0]} cy={ROBOT_GOAL[1]} r="7" className="plan-end" />
+            <text x={ROBOT[0] - 120} y={ROBOT[1] + 92} className="drawing-label drawing-label-robot">holds, then goes on</text>
+            <circle cx={ROBOT[0]} cy={ROBOT[1]} r="44" className="hold-ring" />
           </g>
-          <circle cx={DONNY[0]} cy={DONNY[1]} r="30" className="agent-ring agent-ring-human" />
-          <circle cx={DONNY[0]} cy={DONNY[1]} r="13" className="agent agent-human" />
-          <text x={DONNY[0] - 30} y={DONNY[1] + 60} className="drawing-label drawing-label-human">Donny</text>
-          <circle cx={ANTON[0]} cy={ANTON[1]} r="30" className="agent-ring agent-ring-robot" />
-          <circle cx={ANTON[0]} cy={ANTON[1]} r="13" className="agent agent-robot" />
-          <text x={ANTON[0] + 54} y={ANTON[1] + 9} className="drawing-label drawing-label-robot">Anton</text>
+          <circle cx={HUMAN[0]} cy={HUMAN[1]} r="30" className="agent-ring agent-ring-human" />
+          <circle cx={HUMAN[0]} cy={HUMAN[1]} r="13" className="agent agent-human" />
+          <text x={HUMAN[0] - 62} y={HUMAN[1] + 60} className="drawing-label drawing-label-human">the human</text>
+          <circle cx={ROBOT[0]} cy={ROBOT[1]} r="30" className="agent-ring agent-ring-robot" />
+          <circle cx={ROBOT[0]} cy={ROBOT[1]} r="13" className="agent agent-robot" />
+          <text x={ROBOT[0] + 54} y={ROBOT[1] + 9} className="drawing-label drawing-label-robot">the robot</text>
         </svg>
         <div className="projection-text">
-          <p className={`appear${seenShown ? " on" : ""}`}>Anton sees where she moves.</p>
+          <p className={`appear${seenShown ? " on" : ""}`}>The robot sees where she moves.</p>
           <p className={`appear${projectedShown ? " on" : ""}`}>It continues her motion, for as long as it has seen it.</p>
           <p className={`appear${heldShown ? " on" : ""}`}>Where its path would come closer than the minimum separation, it
             holds.</p>
@@ -115,25 +114,22 @@ export function ProjectionSlide() {
 export function ReactiveRunSlide() {
   return (
     <Slide stage={2} className="replay-slide" notes={<>
-      <p>The reactive robot in a real sim-run: Anton holds to keep the minimum separation from her projected path. One
-        click per stop. Beside the scene, Anton's mind: no hypotheses, the projection from her motion, its hold.</p>
-      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026): kitting scenario_s302_02 on env_layout_12, run file
-        configs/kitting/tpres/stage2_s302_02.yaml (intention-unaware, as the replay it replaced), ticks 0 to 26. Anton
-        decides again at 2, 6, 14, 23 and 25 as each projection from her motion runs out; she picks up item 1 at 24.</p>
-      <p><strong>NOT SETTLED</strong>: in this run Anton never holds (every candidate's hold is 0). Within ticks 0 to 26
-        the two stay 428 cm apart or more; their paths pass closest at tick 42, 60.31 cm apart, beyond the minimum
-        separation (50 cm). The replay does not show the reactive robot's hold that this slide is about.</p>
+      <p>The reactive robot in a real sim-run: the robot holds to keep the minimum separation from her projected path.
+        One click per stop. Beside the scene, the robot's mind: no hypotheses, the projection from her motion, its
+        hold.</p>
+      <p><strong>THE COPY</strong> (tpres-v5, 8 October 2026): kitting scenario_s305_01 on env_layout_12, a copy of Hadi's
+        scenario_s302_02 with the robot starting at (300, 60) instead of (390, 160); run file
+        configs/kitting/tpres/stage2_s305_01.yaml (intention-unaware), ticks 0 to 44. In scenario_s302_02 no hold is
+        decided anywhere in the run (the two pass 60.31 cm apart at tick 42). In the copy her carry from shelf_1 and the
+        robot's from shelf_5 meet at the room's crossing: at 34 the robot holds 7 ticks (34 to 40) against the
+        projection from her motion; it goes on behind her, closest 58.26 cm at 42. The robot's start was chosen from a
+        grid of starts (the longest hold of the grid); what it then does is the framework's own result.</p>
       <p><strong>OPEN</strong> (handoff 5, 11): a screenshot of Fatemeh's PRIEST trajectory adaptation (ROS side) may
         acknowledge her work here, labelled as such; Hadi fixes its wording. It would need its own slide or a corner of
         this one.</p>
       <p>In the results this is the intention-unaware run: the same planner, fed only with the projection from her
         motion.</p>
-      <p><strong>TODO (part 4)</strong>, the box this draft stands in: Anton holding near Donny, replayed from a recorded
-        sim-run of an existing kitting scenario with the robot intention-unaware, in the env-pane's look: the hatched
-        blue stripe, the dashed blue plan, the hold. Stepped by clicks around the hold.</p>
     </>}>
-      <Unsettled>Anton never holds in this run: their paths pass 60 cm apart at tick 42, beyond the minimum
-        separation.</Unsettled>
       <h1 className="slide-head">The reactive robot</h1>
       <ReplayReactive />
       <p className="slide-foot-line">The planner stays; what changes is the projection it receives.</p>
@@ -144,10 +140,10 @@ export function ReactiveRunSlide() {
 export function Stage2Architecture() {
   return (
     <Slide stage={2} className="arch-slide" notes={<>
-      <p>Click: with Donny in the room, the world state holds her motion. The projection turns it into her path; the
+      <p>Click: with the human in the room, the world state holds her motion. The projection turns it into her path; the
         realizer takes the planner's plan and her path, and decides the next action and the hold. The direct arrow from
         the planner to execute gives way to the realizer's.</p>
-      <p>Recognition is still absent: Anton believes nothing about her.</p>
+      <p>Recognition is still absent: the robot believes nothing about her.</p>
     </>}>
       <ArchitectureView stage={2} title="The architecture so far" />
     </Slide>
@@ -157,13 +153,13 @@ export function Stage2Architecture() {
 export function TurningPointSlide() {
   return (
     <Slide stage={2} className="turning-slide" notes={<>
-      <p>The challenge: Anton keeps the minimum separation, but it only reacts to her present motion. The solution the
-        rest of the talk builds: let Anton know something about her behaviour.</p>
+      <p>The challenge: the robot keeps the minimum separation, but it only reacts to her present motion. The solution
+        the rest of the talk builds: let the robot know something about her behaviour.</p>
       <p>A challenge followed by a solution, never a list of failures.</p>
     </>}>
-      <p className="turning-challenge">Anton keeps the minimum separation from her. It reacts only to her present
+      <p className="turning-challenge">The robot keeps the minimum separation from her. It reacts only to her present
         motion.</p>
-      <p className="turning-solution fragment">What if Anton knows something about her behaviour?</p>
+      <p className="turning-solution fragment">What if the robot knows something about her behaviour?</p>
     </Slide>
   );
 }

@@ -8,12 +8,12 @@
  * stop at a calm pace, the agents gliding between ticks as the web-ui's play does, and going back jumps. The tick
  * shown stands in a corner, in ticks.
  *
- * `hideHumans`: the human is not drawn, nor her path (talk stage 1, Anton alone: a human-unaware sim-run, in which the
+ * `hideHumans`: the human is not drawn, nor her path (talk stage 1, the robot alone: a human-unaware sim-run, in which the
  * robot's mind receives no human; flagged in the report).
  *
- * `mind`: what Anton's mind holds at the tick, beside the scene (MindPanel.tsx; the overall revision, point F).
+ * `mind`: what the robot's mind holds at the tick, beside the scene (MindPanel.tsx; the overall revision, point F).
  * `tickNote`: the first replay says once what a tick is. The agents' id labels (the env-pane's pills, "robot_0") are
- * hidden on slides by the deck's stylesheet: the slides name them Anton and Donny.
+ * hidden on slides by the deck's stylesheet: the slides call them the robot and the human.
  *
  * The canvas renders only while its slide is the current one (R3F's frameloop "never" otherwise), so that the replays
  * kept mounted do not load the page while another slide runs; while the replay plays toward a stop it marks itself

@@ -10,7 +10,9 @@ The scenes draw with the web-ui page's own code (`webui/page/src`), imported dir
 look reaches the slides after one build; `webui/` is never changed for the deck (the areas' names left the env-pane's
 floor by Hadi's decision of 8 October 2026, in the web-ui and on the slides alike). The type's family, weights and colours
 are the web-ui's theme (`webui/page/src/theme.ts`); the three questions' colours (`src/look.ts`) and all sizes are the
-deck's own. "Anton" and "Donny" are display text only.
+deck's own. The slides name no one: "the robot" and "the human", the human referred back to as "she" (tpres-v5). They show
+no code of the architecture (L1, C4, B4.1 and so on): those stay internal labels in `src/architecture/model.ts` and the
+handoff (tpres-v5).
 
 ## Start the deck
 
@@ -41,12 +43,13 @@ that feeds the web-ui (`mesa_sim/webui_adapter.py`; `scripts/record_view.py`) in
 every time, from the original files (`scripts/record.mjs`). The old recording is deleted first; if the recording cannot
 run, the build stops with a message and nothing is built.
 
-The sim-runs replayed on slides are recorded the same way, from existing run files (T-F part 1's, under
-`configs/kitting/tf1/measurement/`): `scripts/record_run.py` builds and steps the run file's sim-run through
+The sim-runs replayed on slides are recorded the same way, from their run files (T-F part 1's run_060; the others under
+`configs/kitting/tpres/`: Hadi's scenarios, and since tpres-v5 two copies of them under new ids, scenario_s305_01 and
+scenario_s306_01, outside every measured set): `scripts/record_run.py` builds and steps the run file's sim-run through
 `MesaSimulator`, as the web-ui does, and keeps the tick updates of the ticks a slide replays, cut to what it draws, in
 `data/run_<name>.json` (untracked; the list is `RUNS` in `scripts/record.mjs`). Each recording also writes the usual log
 pair to `logs/`, as every sim-run does. A slide replays one with `src/scene/RunReplay.tsx` (the env-pane's own Scene and
-floor drawings), one click per stop, with Anton's mind at the tick beside the scene (`src/scene/MindPanel.tsx`: the live
+floor drawings), one click per stop, with the robot's mind at the tick beside the scene (`src/scene/MindPanel.tsx`: the live
 hypotheses as bars, θ and the trusted intention marked, and the parts a talk stage is about; a temporary version, in
 the look of the web-ui's robot panel, of what that panel's components would draw if they were exported). The agents'
 id labels ("robot_0") are hidden on slides by the deck's stylesheet.
@@ -75,7 +78,10 @@ working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm ru
   the slides (the overall revision, 8 October 2026).
 - `src/architecture/unboxing.tsx`: what a block does, opened from its place: at most one formal line and two short
   sentences (the belief as Bayes; support, fit and the confidence check as conditions), or a few lines of pseudocode
-  (the realizer, task choice).
+  (the realizer, task choice). Every formal line and the pseudocode are typeset in TeX style by KaTeX (`src/tex.tsx`,
+  pinned; its fonts bundled into the build, nothing loaded from outside).
+- `src/scene/Ensemble.tsx`: the last slide's four figures (the kitting worker, the kitting robot, the lift truck, the
+  dock worker), the env-pane's own figures under the deck's own frontal camera.
 - `src/architecture/`: the architecture diagram (the handoff's section 6). `model.ts` holds the elements with their kinds,
   the talk stage at which each appears, the arrows with their keywords and the talk stages at which they appear or give
   way, and the positions; `Architecture.tsx` draws it with React Flow (`@xyflow/react`, pinned, bundled into the build).

@@ -10,8 +10,8 @@ import { ReplayAlone } from "./replays";
 export function Stage1Transition() {
   return (
     <TransitionSlide stage={1} notes={<>
-      <p>Seven steps, each one making the situation harder; the list on the left comes back at the start of each.</p>
-      <p>First, Anton alone, no human in the room. It knows its own tasks; it plans, then executes. Nothing to believe
+      <p>Six steps, each one making the situation harder; the list on the left comes back at the start of each.</p>
+      <p>First, the robot alone, no human in the room. It knows its own tasks; it plans, then executes. Nothing to believe
         yet: nobody else is there. Light stage: keep it short.</p>
     </>} />
   );
@@ -27,14 +27,14 @@ const ACTIONS = ["go to the item", "pick it up", "go to its table", "place it"];
 export function DecompositionSlide() {
   return (
     <Slide stage={1} notes={<>
-      <p>Anton's task knowledge, as kitting really has it. Its tasks: deliver item 1, 2, 3 to the kitting table.</p>
-      <p>A task has ways of being done (methods), and the situation picks one: the usual way; or, if Anton already holds
+      <p>The robot's task knowledge, as kitting really has it. Its tasks: deliver item 1, 2, 3 to the kitting table.</p>
+      <p>A task has ways of being done (methods), and the situation picks one: the usual way; or, if the robot already holds
         the item, go straight to the table; or, if it holds another item, return that one first.</p>
       <p>Each way is a list of actions: go to the item, pick it up, go to its table, place it. Below the actions are the
         body's micro-actions (a step, a grasp, a release), which the talk does not show.</p>
-      <p>Keep this knowledge in mind: at talk stage 3 the same knowledge reads Donny.</p>
+      <p>Keep this knowledge in mind: at talk stage 3 the same knowledge reads the human.</p>
     </>}>
-      <h1 className="slide-head">Anton knows its own tasks</h1>
+      <h1 className="slide-head">The robot knows its own tasks</h1>
       <div className="tree">
         <div className="tree-row">
           <div className="tree-label">Its tasks</div>
@@ -68,11 +68,11 @@ export function DecompositionSlide() {
 export function PlanExecuteSlide() {
   return (
     <Slide stage={1} className="replay-slide" notes={<>
-      <p>Anton chooses a task, its planner breaks it down into actions, and its body executes them one at a time. When the
+      <p>The robot chooses a task, its planner breaks it down into actions, and its body executes them one at a time. When the
         task is done, it chooses the next. One click per stop of the replay.</p>
       <p>Say it once, here: the counter in the corner counts ticks; one tick is one time step of the simulation. Every
         duration in the talk is in ticks.</p>
-      <p>Beside the scene, Anton's mind: for now only its task.</p>
+      <p>Beside the scene, the robot's mind: for now only its task.</p>
       <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026): kitting scenario_s301_01 on env_layout_14, no human
         in it, run file configs/kitting/tpres/stage1_s301_01.yaml (human-unaware, as the replay it replaced), ticks 0 to
         150, played fast (about 14 ticks a second). Deliver item 1 chosen at 0, picked up at 32, placed at 64; deliver
@@ -87,9 +87,9 @@ export function PlanExecuteSlide() {
 export function Stage1Architecture() {
   return (
     <Slide stage={1} className="arch-slide" notes={<>
-      <p>Click: what Anton needs to work alone. Its task knowledge (C1, Anton's tasks); in the mind only the planner;
+      <p>Click: what the robot needs to work alone. Its task knowledge (the robot's tasks); in the mind only the planner;
         the body observes the world into a world state and executes the planner's next action.</p>
-      <p>The world reaches Anton only through its body: sense, and act.</p>
+      <p>The world reaches the robot only through its body: sense, and act.</p>
     </>}>
       <ArchitectureView stage={1} title="The architecture so far" />
     </Slide>

@@ -291,28 +291,30 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .unboxed-left { left: 1%; }
 .ub-head { display: flex; align-items: baseline; gap: calc(14 * var(--u)); margin-bottom: calc(10 * var(--u)); }
 .ub-name { font-size: calc(44 * var(--u)); font-weight: var(--weight-medium); }
-.ub-code-name { font-family: var(--font-mono); font-size: calc(20 * var(--u)); color: var(--color-inkFaint); }
 .ub-item { margin-top: calc(18 * var(--u)); transition: opacity 450ms ease; }
 .ub-words, .ub-lead, .ub-cond { font-size: calc(34 * var(--u)); line-height: 1.3; color: var(--color-ink); }
 .ub-cond { margin-top: calc(6 * var(--u)); padding-left: calc(30 * var(--u)); position: relative; }
 .ub-cond::before { content: "·"; position: absolute; left: calc(8 * var(--u)); color: var(--color-inkSoft); }
 .ub-formal { font-size: calc(38 * var(--u)); line-height: 1.4; color: var(--color-ink); padding-left: calc(20 * var(--u));
   border-left: calc(4 * var(--u)) solid var(--color-lineFaint); }
-.ub-code { margin-bottom: 0; font-family: var(--font-mono); font-size: calc(25 * var(--u)); line-height: 1.5;
-  color: var(--color-ink); white-space: pre; padding: calc(14 * var(--u)) calc(20 * var(--u));
-  background: var(--color-page); border-radius: calc(10 * var(--u)); }
+.ub-code { margin-bottom: 0; font-size: calc(27 * var(--u)); line-height: 1.55; color: var(--color-ink);
+  padding: calc(14 * var(--u)) calc(22 * var(--u)); background: var(--color-page); border-radius: calc(10 * var(--u)); }
+.ub-code-line { white-space: nowrap; }
 .ub-old { opacity: 0.38; }
 .ub-old.ub-words, .ub-old.ub-cond, .ub-old.ub-lead { font-size: calc(28 * var(--u)); }
 .ub-new.ub-words, .ub-new.ub-cond { font-weight: var(--weight-medium); }
 .ub-new.ub-formal { border-left-color: var(--color-ink); }
 .ub-new.ub-formal:has(.add) { color: var(--color-inkFaint); }
-.ub-formal .add { color: var(--color-ink); font-weight: var(--weight-medium); }
-.ub-formal:not(.ub-new) .add { color: inherit; font-weight: inherit; }
+.ub-formal .add { color: var(--color-ink); }
+.ub-formal:not(.ub-new) .add { color: inherit; }
 .ub-out { margin-top: calc(22 * var(--u)); padding-top: calc(4 * var(--u)); border-top: calc(1.5 * var(--u)) solid var(--color-lineFaint); }
-.mv { font-style: italic; }
+/* Typeset mathematics (src/tex.tsx, KaTeX): its own fonts; a symbol in a sentence a little larger than the text, as
+   in TeX; a formal line at the line's size; the pseudocode's text in KaTeX's roman. */
+.tex .katex { font-size: 1.1em; }
+.ub-formal .tex .katex, .ub-code .tex .katex { font-size: 1em; }
 .side-plain .todo-large { margin-top: 0; }
 
-/* ---- A replayed sim-run (scene/RunReplay.tsx), Anton's mind beside it (scene/MindPanel.tsx) ------------------- */
+/* ---- A replayed sim-run (scene/RunReplay.tsx), the robot's mind beside it (scene/MindPanel.tsx) ------------------- */
 
 .replay { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; }
 .replay-slide .replay { margin-top: calc(16 * var(--u)); }
@@ -326,7 +328,7 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .replay-tick small { display: block; font-family: var(--font); font-size: calc(19 * var(--u)); color: var(--color-inkFaint); }
 .replay-caption { min-height: 2.7em; margin-top: calc(10 * var(--u)); font-size: calc(30 * var(--u)); line-height: 1.35; }
 .replay-slide .slide-foot-line { margin-top: calc(6 * var(--u)); font-size: calc(28 * var(--u)); }
-/* The env-pane's id labels ("robot_0", "human_0"): the slides name the agents Anton and Donny. */
+/* The env-pane's id labels ("robot_0", "human_0"): the slides call the agents the robot and the human. */
 .replay-scene .scene-pill-anchor, .scene-canvas .scene-pill-anchor { display: none; }
 
 .mind { flex: 0 0 calc(560 * var(--u)); box-sizing: border-box; align-self: flex-start; max-height: 100%; overflow: hidden;
@@ -366,8 +368,8 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .mind-row.is-trusted .mind-value { color: var(--color-robot); font-weight: var(--weight-medium); }
 .mind-row.is-dead .mind-label { color: var(--color-inkFaint); }
 .mind-none { margin-top: calc(8 * var(--u)); font-size: calc(22 * var(--u)); color: var(--color-inkSoft); }
-.mind-finding { margin-top: calc(10 * var(--u)); font-size: calc(23 * var(--u)); font-weight: var(--weight-medium);
-  color: var(--color-stateAbandoned); }
+.mind-finding { margin-top: calc(14 * var(--u)); font-size: calc(34 * var(--u)); line-height: 1.2;
+  font-weight: var(--weight-medium); color: var(--color-stateAbandoned); }   /* large (Hadi, tpres-v5): the point of talk stage 6 */
 .mind .mark-yes, .mind .mark-adequate { color: var(--color-stateCompleted); }
 .mind .mark-inadequate { color: var(--color-stateAbandoned); }
 .mind .mark-faint, .mind .mark-no_observation { color: var(--color-inkFaint); }
@@ -377,3 +379,44 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .review-address { position: fixed; left: calc(14 * var(--u)); top: calc(12 * var(--u)); z-index: 50;
   padding: calc(2 * var(--u)) calc(12 * var(--u)); border-radius: calc(8 * var(--u)); background: var(--color-ink);
   color: var(--color-floor); font-family: var(--font-mono); font-size: calc(22 * var(--u)); pointer-events: none; }
+
+/* ---- The results (later.tsx, ResultsSlide; tpres-v5): Hadi's table, one slide per group, readable from the back of
+   a hall at 1920 x 1080: the measure 38, the values 64, the column labels 24 (in --u). Each value has its bar under
+   it, the two bars of a row on one scale; without in a quiet grey, with in the robot's blue. A row measured on one
+   scenario carries its n in italic; "worse" is set apart by weight and an amber, the word carrying it. */
+
+.results-head { display: flex; align-items: baseline; justify-content: space-between; gap: calc(40 * var(--u)); }
+.results-group { font-size: calc(40 * var(--u)); color: var(--color-inkSoft); }
+.results { margin-top: calc(56 * var(--u)); display: flex; flex-direction: column; }
+.r-row { display: grid; align-items: center; column-gap: calc(36 * var(--u));
+  grid-template-columns: minmax(0, 1fr) calc(290 * var(--u)) calc(290 * var(--u)) calc(140 * var(--u))
+    calc(200 * var(--u)) calc(190 * var(--u));
+  padding: calc(30 * var(--u)) 0; border-top: calc(1.5 * var(--u)) solid var(--color-lineFaint); }
+.r-labels { padding: 0 0 calc(12 * var(--u)); border-top: none; font-size: calc(24 * var(--u)); color: var(--color-inkFaint);
+  letter-spacing: 0.02em; }
+.r-measure { font-size: calc(38 * var(--u)); line-height: 1.25; color: var(--color-ink); }
+.r-value { display: flex; flex-direction: column; gap: calc(12 * var(--u)); }
+.r-num { font-size: calc(64 * var(--u)); font-weight: var(--weight-medium); line-height: 1; font-variant-numeric: tabular-nums; }
+.r-word { font-size: calc(32 * var(--u)); line-height: 1.2; font-style: italic; color: var(--color-inkSoft); }
+.r-without .r-num { color: var(--color-inkSoft); }
+.r-with .r-num { color: var(--color-ink); }
+.rbar { position: relative; display: block; height: calc(16 * var(--u)); border-radius: calc(8 * var(--u));
+  background: var(--color-page); overflow: hidden; }
+.rbar-fill, .rbar-span { position: absolute; top: 0; bottom: 0; left: 0; border-radius: calc(8 * var(--u)); }
+.rbar-without .rbar-fill { background: var(--color-inkFaint); }
+.rbar-with .rbar-fill { background: var(--color-robot); }
+.rbar-span { background: var(--color-robotLight); border-radius: 0 calc(8 * var(--u)) calc(8 * var(--u)) 0; }
+.r-better { font-size: calc(32 * var(--u)); color: var(--color-inkSoft); }
+.r-result { font-size: calc(36 * var(--u)); font-weight: var(--weight-medium); color: var(--color-ink); }
+.r-worse { color: var(--color-past); font-weight: var(--weight-bold, 700); }
+.r-n { font-size: calc(30 * var(--u)); color: var(--color-inkSoft); }
+.r-group { margin-top: calc(34 * var(--u)); padding-bottom: calc(6 * var(--u)); font-size: calc(32 * var(--u));
+  color: var(--color-inkSoft); }
+.r-one .r-n { font-style: italic; }
+
+/* ---- The end (later.tsx, ThankYouSlide; scene/Ensemble.tsx): "Thank you" over the four figures ------------------- */
+
+.thanks-slide { align-items: center; }
+.thanks-head { margin-top: calc(70 * var(--u)); font-size: calc(110 * var(--u)); font-weight: var(--weight-medium);
+  line-height: 1.1; }
+.ensemble { flex: 1; min-height: 0; width: calc(1100 * var(--u)); margin-bottom: calc(30 * var(--u)); pointer-events: none; }

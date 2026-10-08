@@ -1,7 +1,8 @@
 /**
- * Talk stage 0, the opening (handoff_T-pres.md, section 5): Anton and the lift truck as actors that use the same mind,
- * the lift truck waiting for its turn; Donny; the problem; Hadi and the team; the robot's mind and its three questions.
- * A first version for Hadi's revision. "Anton" and "Donny" are display text only.
+ * Talk stage 0, the opening (handoff_T-pres.md, section 5): the robot and the lift truck as actors that use the same
+ * mind, the lift truck waiting for its turn; the human; the problem; Hadi and the team; the robot's mind and its three
+ * questions. A first version for Hadi's revision. No names (Hadi, tpres-v5): a robot and a human, then "the robot" and
+ * "the human", the human referred back to as "she" throughout the deck.
  */
 
 import { useRef } from "react";
@@ -22,8 +23,8 @@ export const KITTING = kitting as unknown as Recorded;
 const DOCK = dock as unknown as Recorded;
 
 // Free places on the floor of kitting's env_layout_01, with nothing between them and the tilted view's camera.
-export const ANTON = { who: "robot" as const, x: 150, y: 100 };
-export const DONNY = { who: "human" as const, x: -160, y: -40 };
+export const ROBOT = { who: "robot" as const, x: 150, y: 100 };
+export const HUMAN = { who: "human" as const, x: -160, y: -40 };
 // The lift truck on dock_loading's dock platform (env_layout_03: outside the gate, beside the truck), facing the hall.
 const LIFT_TRUCK = { who: "robot" as const, x: 260, y: -370, facing: { x: 0, y: 1 } };
 
@@ -43,37 +44,37 @@ export function TitleSlide() {
 }
 
 /** The trial slide, kept: the robot alone, then the robot in kitting's room. */
-export function AntonSlide() {
+export function RobotSlide() {
   const second = useRef<HTMLHeadingElement>(null);
   const inRoom = useShown(second);
   return (
     <Slide stage={0} className="scene-slide" notes={<>
-      <p>Anton, the kitting robot: it brings items from the shelves to the kitting table.</p>
+      <p>The kitting robot: it brings items from the shelves to the kitting table.</p>
       <p>The room is kitting's env_layout_01, drawn by the web-ui's own code: what the audience sees this afternoon.</p>
     </>}>
-      <h1 className="scene-line">This is Anton, a robot.</h1>
-      <h1 className="scene-line fragment" ref={second}>Anton is in a factory setup.</h1>
-      <AgentsInRoom recorded={KITTING} figures={[ANTON]} inRoom={inRoom} />
+      <h1 className="scene-line">This is a robot.</h1>
+      <h1 className="scene-line fragment" ref={second}>The robot is in a factory setup.</h1>
+      <AgentsInRoom recorded={KITTING} figures={[ROBOT]} inRoom={inRoom} />
     </Slide>
   );
 }
 
-/** Anton and the lift truck: two robots that use the same mind; the lift truck waits for its turn. */
+/** The robot and the lift truck: two robots that use the same mind; the lift truck waits for its turn. */
 export function ActorsSlide() {
   const second = useRef<HTMLParagraphElement>(null);
   return (
     <Slide stage={0} className="actors-slide" notes={<>
-      <p>Anton has a colleague: the lift truck at the dock (dock loading, defined with Scania). It uses the same mind
-        as Anton. Today it waits for its turn; it comes back before the results (talk stage 8).</p>
-      <p><strong>OPEN</strong>: the lift truck's name and the dock worker's, and the wording of its return.</p>
+      <p>The robot has a colleague: the lift truck at the dock (dock loading, defined with Scania). It uses the same mind
+        as the kitting robot. Today it waits for its turn; it comes back before the results.</p>
+      <p><strong>OPEN</strong>: the wording of its return.</p>
       <p><strong>OPTIONAL</strong> (handoff 9): the lift truck stays small and idle in a corner of the stage slides,
         still waiting.</p>
     </>}>
       <h1 className="scene-line">Two robots with the same mind.</h1>
       <div className="actors">
         <figure className="actor">
-          <div className="actor-scene"><AgentsInRoom recorded={KITTING} figures={[ANTON]} inRoom /></div>
-          <figcaption><span className="dot dot-robot" />Anton, kitting</figcaption>
+          <div className="actor-scene"><AgentsInRoom recorded={KITTING} figures={[ROBOT]} inRoom /></div>
+          <figcaption><span className="dot dot-robot" />The robot, kitting</figcaption>
         </figure>
         <figure className="actor">
           <div className="actor-scene"><AgentsInRoom recorded={DOCK} figures={[LIFT_TRUCK]} inRoom /></div>
@@ -85,18 +86,19 @@ export function ActorsSlide() {
   );
 }
 
-/** Donny: the human who shares the space with Anton. */
-export function DonnySlide() {
+/** The human who shares the space with the robot. */
+export function HumanSlide() {
   const second = useRef<HTMLHeadingElement>(null);
   const inRoom = useShown(second);
   return (
     <Slide stage={0} className="scene-slide" notes={<>
-      <p>Donny works in the same room. Blue is always Anton, orange always Donny, as in the web-ui this afternoon.</p>
-      <p>Anton cannot see what Donny intends; it sees only what she does.</p>
+      <p>A human works in the same room. Blue is always the robot, orange always the human, as in the web-ui this
+        afternoon.</p>
+      <p>The robot cannot see what she intends; it sees only what she does.</p>
     </>}>
-      <h1 className="scene-line">This is Donny.</h1>
-      <h1 className="scene-line fragment" ref={second}>Donny shares the space with Anton.</h1>
-      <AgentsInRoom recorded={KITTING} figures={[DONNY, ANTON]} inRoom={inRoom} />
+      <h1 className="scene-line">This is a human.</h1>
+      <h1 className="scene-line fragment" ref={second}>She shares the space with the robot.</h1>
+      <AgentsInRoom recorded={KITTING} figures={[HUMAN, ROBOT]} inRoom={inRoom} />
     </Slide>
   );
 }
@@ -156,12 +158,12 @@ export function TeamSlide() {
 export function QuestionsSlide() {
   return (
     <Slide stage={0} notes={<>
-      <p>Anton answers three questions. They are the columns of every talk stage that follows; the talk stages grow in
+      <p>The robot answers three questions. They are the columns of every talk stage that follows; the talk stages grow in
         complexity, one at a time.</p>
       <p>What I know: knowledge representation. What I believe: intention recognition. What I decide: adaptive
         planning.</p>
     </>}>
-      <h1 className="slide-head">Anton answers three questions</h1>
+      <h1 className="slide-head">The robot answers three questions</h1>
       <div className="questions">
         {QUESTIONS.map((q) => (
           <div key={q} className={`question fragment column-${q}`}>
@@ -178,13 +180,13 @@ export function QuestionsSlide() {
 export function ArchitectureFrameSlide() {
   return (
     <Slide stage={0} className="arch-slide" notes={<>
-      <p>This is Anton's architecture, still empty; it is filled one talk stage at a time: what it is given (knowledge,
+      <p>This is the robot's architecture, still empty; it is filled one talk stage at a time: what it is given (knowledge,
         left), its mind (what it believes, what it decides), its body, and the world, which it reaches only through its
         body.</p>
       <p>Click: the three questions over the regions they will fill.</p>
       <p>Suggestion by ccode: the empty frames here, so that the diagram is introduced once and then only grows.</p>
     </>}>
-      <ArchitectureView stage={0} questionTags title="Anton's architecture" />
+      <ArchitectureView stage={0} questionTags title="The robot's architecture" />
     </Slide>
   );
 }

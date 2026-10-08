@@ -1,5 +1,5 @@
 /**
- * What Anton's mind holds at the replayed tick, beside the scene (the overall revision of 8 October 2026, point F): first
+ * What the robot's mind holds at the replayed tick, beside the scene (the overall revision of 8 October 2026, point F): first
  * the live hypotheses as a bar chart whose bars rise and fall per tick, θ marked on each bar and the trusted intention
  * marked; further parts where a talk stage is about them (support, fit, the hold, the projection of her, the context).
  *
@@ -72,8 +72,8 @@ export function MindPanel({ recorded, shown, parts }: { recorded: RecordedRun; s
   const raised = belief?.levels.filter((l) => l.level !== "ordinary") ?? [];
 
   return (
-    <aside className="mind" aria-label="What Anton's mind holds at this tick">
-      <h2 className="mind-title"><span className="mind-dot" />Anton's mind</h2>
+    <aside className="mind" aria-label="What the robot's mind holds at this tick">
+      <h2 className="mind-title"><span className="mind-dot" />The robot's mind</h2>
       <dl className="mind-facts">
         <div><dt>its task</dt><dd>{finished ? "all done" : task === null ? "–" : taskName(task)}</dd></div>
         {parts.hold && (
@@ -96,7 +96,7 @@ export function MindPanel({ recorded, shown, parts }: { recorded: RecordedRun; s
             {parts.support && <span className="mind-mark">support</span>}
             {parts.fit && <span className="mind-mark">fits</span>}
           </div>
-          {belief === null ? <p className="mind-none">none: Anton knows nothing about her intentions</p>
+          {belief === null ? <p className="mind-none">none: the robot knows nothing about her intentions</p>
             : rows.map((key) => {
               const h = live.get(key) ?? null;
               const colour = colourOf(colours, key);

@@ -1,32 +1,33 @@
 /**
  * Talk stages 3 to 11. Talk stages 3 to 6 (the overall revision of 8 October 2026): each opens with its transition
- * slide (the six talk stages, the starting one with its three columns), then a replayed sim-run with Anton's mind
+ * slide (the six talk stages, the starting one with its three columns), then a replayed sim-run with the robot's mind
  * beside it, then the architecture, a click adding what the talk stage adds and one click per block it opens or extends
- * (architecture/unboxing.tsx). Talk stage 6 is the merge of the same day (the old talk stages 6, switch and resumption,
- * and 7, unmodelled behaviour, both resting on fit); since tpres-v4 it shows unmodelled behaviour only, the switch to a
- * known behaviour one line of its notes. Talk stages 7, 8, 10 and 11 stay placeholders (parts 3 and 5); 9 holds Hadi's
- * results table. A replay that does not yet meet its criterion (the
- * mechanism visibly changes what Anton does) carries the mark "not settled".
+ * (architecture/unboxing.tsx). Talk stage 5 replays one situation twice, without and with context knowledge (tpres-v5).
+ * Talk stage 6 is the merge of the same day (the old talk stages 6, switch and resumption, and 7, unmodelled behaviour,
+ * both resting on fit); since tpres-v4 it shows unmodelled behaviour only, the switch to a known behaviour one line of its
+ * notes. After them (tpres-v5: no number on any of them): the recap, the lift truck (a placeholder), the results (Hadi's
+ * table, on four slides), the afternoon (a placeholder), and "Thank you". A slide never states what its replay
+ * does not show (Hadi, tpres-v5).
  */
 
 import type { ReactNode } from "react";
 
 import type { Unboxable } from "../architecture/unboxing";
+import { Ensemble } from "../scene/Ensemble";
 import { STAGES, type TalkStage } from "../talk";
-import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide, Unsettled } from "./kit";
-import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplayTrusted } from "./replays";
+import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide } from "./kit";
+import { ReplayBreak, ReplayStand, ReplayTrusted, ReplayWithContext, ReplayWithoutContext } from "./replays";
 
-/** A talk stage's replayed sim-run, with Anton's mind beside it. `todo`: what the TODO box this replay stands in asked
- * for (in the notes); `unsettled`: a visible mark where the replay does not yet meet its criterion. */
-function ReplaySlide({ stage, title, notes, todo, unsettled, children }: {
-  stage: TalkStage; title: string; notes: ReactNode; todo: ReactNode; unsettled?: ReactNode; children: ReactNode;
+/** A talk stage's replayed sim-run, with the robot's mind beside it. `todo`: what the TODO box this replay stands in
+ * asked for (in the notes). */
+function ReplaySlide({ stage, title, notes, todo, children }: {
+  stage: TalkStage; title: string; notes: ReactNode; todo: ReactNode; children: ReactNode;
 }) {
   return (
     <Slide stage={stage} className="replay-slide" notes={<>
       {notes}
       <p><strong>TODO (part 4)</strong>, the box this draft stands in: {todo}</p>
     </>}>
-      {unsettled !== undefined && <Unsettled>{unsettled}</Unsettled>}
       <h1 className="slide-head">{title}</h1>
       {children}
     </Slide>
@@ -45,16 +46,16 @@ function ArchSlide({ stage, notes, caption, opens }: {
 
 const FIRST = <p><strong>FIRST VERSION</strong> (T-pres, 8 October 2026; revised the same day), for Hadi's revision.</p>;
 const PLACEHOLDER = <p><strong>PLACEHOLDER</strong> (T-pres part 1): the content is built in a later part.</p>;
-const MIND = <p>Beside the scene, Anton's mind at the tick, as the robot panel at the station shows it: the hypotheses
-  as bars (θ the thin line on each), the trusted intention marked; its task, its hold, which projection of her it
-  uses.</p>;
+const MIND = <p>Beside the scene, the robot's mind at the tick, as the robot panel at the station shows it: the
+  hypotheses as bars (θ the thin line on each), the trusted intention marked; its task, its hold, which projection of
+  her it uses.</p>;
 
 // ---- 3 Assigned tasks --------------------------------------------------------------------------------------------
 
 export function Stage3Transition() {
   return (
     <TransitionSlide stage={3} notes={<>
-      <p>Anton now knows her task list: the tasks she is assigned. What it believes: which of her tasks she is doing.
+      <p>The robot now knows her task list: the tasks she is assigned. What it believes: which of her tasks she is doing.
         What it decides: its own next task and hold, against where her task will take her.</p>
       <p>The heaviest stage: most of the time goes here.</p>
     </>} />
@@ -65,16 +66,16 @@ export function Stage3Replay() {
   return (
     <ReplaySlide stage={3} title="Assigned tasks: a sim-run" todo={<>
       A recorded sim-run in the web-ui's look: the belief over her tasks rising as she walks, the confidence check
-      passing, the projection from her intention on the floor (a filled blue stripe), and Anton's hold or task choice
-      against it. Why: this is where recognition first changes what Anton does.
+      passing, the projection from her intention on the floor (a filled blue stripe), and the robot's hold or task
+      choice against it. Why: this is where recognition first changes what the robot does.
     </>} notes={<>
       {FIRST}
       <p><strong>DRAFT</strong> (the second search, 8 October 2026): kitting scenario_s12_01 on env_layout_14, T-F part
-        1's run_060 (intention-aware), ticks 0 to 62. Her delivery of item 1 trusted at 8 (0.78), and Anton switches
-        from item 7 to item 13: task choice changes what Anton does. In the intention-unaware run_058 Anton carries item 7
-        across her route, with holds at 40 (5 ticks), 103 (4) and 113 (1). Weakness: item 7's and item 13's shelves are
-        close on one approach line, so the switch shows from the carry on (tick 29). The earlier draft, run_008 of
-        scenario_s10_02, held 5 ticks far from her. One click per stop.</p>
+        1's run_060 (intention-aware), ticks 0 to 62. Her delivery of item 1 trusted at 8 (0.78), and the robot switches
+        from item 7 to item 13: task choice changes what the robot does. In the intention-unaware run_058 the robot
+        carries item 7 across her route, with holds at 40 (5 ticks), 103 (4) and 113 (1). Weakness: item 7's and item
+        13's shelves are close on one approach line, so the switch shows from the carry on (tick 29). The earlier draft,
+        run_008 of scenario_s10_02, held 5 ticks far from her. One click per stop.</p>
       {MIND}
     </>}>
       <ReplayTrusted />
@@ -90,12 +91,12 @@ export function Stage3Architecture() {
         gains her task list; the world state gives her actions to recognition. The arrow "trusted intention, or none"
         is the visual centre: where recognition affects planning. Task choice takes the realizer's cost; the realizer's
         direct arrow to execute gives way.</p>
-      <p>Click 2, belief update: Bayes. The hypotheses H are her assigned tasks; o is what Anton has seen her do. Taken
-        off the panel: the likelihood P(o | h) is a product over the actions of h, one factor L(x) = 2 / (1 + e^(βx)) per
-        action, x her extra path beyond the shortest way to the action's target plus her standing beyond what the
-        action takes (β = 0.01 per cm). The prior is equal for now; talk stage 5 opens it.</p>
+      <p>Click 2, belief update: Bayes. The hypotheses H are her assigned tasks; o is what the robot has seen her do.
+        Taken off the panel: the likelihood P(o | h) is a product over the actions of h, one factor L(x) = 2 / (1 +
+        e^(βx)) per action, x her extra path beyond the shortest way to the action's target plus her standing beyond what
+        the action takes (β = 0.01 per cm). The prior is equal for now; talk stage 5 opens it.</p>
       <p>Click 3, support: a belief needs support from what she actually does. Knowing which task is probable does not
-        say when she starts. A wait has only the second source (a completion Anton saw).</p>
+        say when she starts. A wait has only the second source (a completion the robot saw).</p>
       <p>Click 4, confidence check: the leader is trusted when it is strong enough (θ = 0.75) and supported; out comes
         the trusted intention, or none. In the code the check also reads fit from here on; the talk adds it at talk
         stage 6. In the code the check is the meta-planner's gate; the talk places it in recognition, because everything
@@ -103,9 +104,9 @@ export function Stage3Architecture() {
       <p>Click 5, projection: from her intention, her path is the plan of the trusted task, broken down into actions from
         where she is now: where she will be, and when. Say it here, once: one knowledge, two uses; the AAAI paper's first
         contribution in one sentence, and why talk stage 1 was not wasted.</p>
-      <p>Click 6, realizer: per task of Anton's plan, in order, the smallest hold in whole ticks such that Anton's moving
-        path never comes closer than the minimum separation (50 cm in the simulation) to her projected path; a later
-        task's hold counts from the holds before it. Cost: the plan's duration plus its holds.</p>
+      <p>Click 6, realizer: per task of the robot's plan, in order, the smallest hold in whole ticks such that the
+        robot's moving path never comes closer than the minimum separation (50 cm in the simulation) to her projected
+        path; a later task's hold counts from the holds before it. Cost: the plan's duration plus its holds.</p>
       <p>Click 7, task choice: each candidate (one task under single_task, or an order of all remaining tasks under
         full_reorder) realized, the cheapest chosen. Only the first hold is carried out; the rest is lookahead, decided
         again later.</p>
@@ -118,8 +119,8 @@ export function Stage3Architecture() {
 export function Stage4Transition() {
   return (
     <TransitionSlide stage={4} notes={<>
-      <p>Anton also knows what people foreseeably do besides their tasks: a coffee break, switching on the A/C. A coffee
-        break is modelled behaviour, foreseen. Words: "foreseeable behaviours"; never a deviation.</p>
+      <p>The robot also knows what people foreseeably do besides their tasks: a coffee break, switching on the A/C. A
+        coffee break is modelled behaviour, foreseen. Words: "foreseeable behaviours"; never a deviation.</p>
     </>} />
   );
 }
@@ -131,12 +132,12 @@ export function Stage4Replay() {
       reorder caused by the trusted break. Why: one later stage should show planning change, not only recognition.
     </>} notes={<>
       {FIRST}
-      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026): kitting scenario_s304_14 on env_layout_07,
-        context knowledge off, run file configs/kitting/tpres/stage4_s304_14_ck_off.yaml, ticks 85 to 150. Her second
-        coffee break starts at 90; Anton chooses deliver item 56 at 97; the break is trusted at 106 (0.76), and Anton
-        switches to deliver item 54: item 56, realized against her break, would need a hold of 26 ticks. No hold carried
-        out; closest 96.48 cm (tick 89). Talk stage 5 replays the same scenario with context knowledge on. One click per
-        stop.</p>
+      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026; from tick 70 since tpres-v5): kitting
+        scenario_s304_14 on env_layout_07, context knowledge off, run file configs/kitting/tpres/stage4_s304_14_ck_off.yaml,
+        ticks 70 to 150. At 70 the robot carries item 55 and her delivery of item 52 is trusted (since 63). Her second
+        coffee break starts at 90; the robot chooses deliver item 56 at 97; the break is trusted at 106 (0.76), and the
+        robot switches to deliver item 54: item 56, realized against her break, would need a hold of 26 ticks. No hold
+        carried out; closest 96.48 cm (tick 89). One click per stop.</p>
       {MIND}
     </>}>
       <ReplayBreak />
@@ -160,37 +161,57 @@ export function Stage4Architecture() {
 export function Stage5Transition() {
   return (
     <TransitionSlide stage={5} notes={<>
-      <p>Context: facts of the situation (break time, a warm room, a break just taken) set how likely Anton considers
-        each foreseeable behaviour before it sees her move. Her observed movement still decides.</p>
+      <p>Context: facts of the situation (break time, a warm room, a break just taken) set how likely the robot
+        considers each foreseeable behaviour before it sees her move. Her observed movement still decides.</p>
     </>} />
   );
 }
 
-export function Stage5Replay() {
+const STAGE5_TODO = <>
+  A recorded sim-run with a context fact in force (break time), the same script with and without it if one exists:
+  the prior favouring the coffee break, its trust coming earlier, her movement still deciding. Why: the audience sees
+  the situation make the robot adapt earlier.
+</>;
+
+const STAGE5_RUN = <p><strong>THE PAIR</strong> (tpres-v5, 8 October 2026; Hadi asked for one situation without and with
+  context knowledge): kitting scenario_s306_01 on env_layout_07, a copy of Hadi's scenario_s304_14 without the first
+  coffee break, the robot starting at (-750, -200) instead of (-750, 400), break_time in force from 50 to 120 (her break
+  58 to 118); run files configs/kitting/tpres/stage5_s306_01_ck_off.yaml and _ck_on.yaml; both replayed over ticks 50
+  to 85. The two runs are the same up to tick 67. Without context knowledge the coffee break is trusted at 74 (0.76);
+  with it at 59 (0.76), 15 ticks earlier. At 68 the robot, without context knowledge, chooses deliver item 56 (its shelf
+  behind the coffee machine; cost 82.52 against item 55's 94.51) and switches to item 55 at 74, when item 56 would need a
+  hold of 24 ticks; with context knowledge it chooses item 55 at once, at 69. Hadi's scenario_s304_14 with context
+  knowledge on (the replay of tpres-v4) showed the opposite case, trust delayed by a recent break: it leaves the
+  deck.</p>;
+
+export function Stage5ReplayWithout() {
   return (
-    <ReplaySlide stage={5} title="Context: a sim-run"
-                 unsettled="Here context makes the break trusted later (116 against 106): just after a break, another is less likely. The stage says earlier."
-                 todo={<>
-      A recorded sim-run with a context fact in force (break time), the same script with and without it if one exists:
-      the prior favouring the coffee break, its trust coming earlier, her movement still deciding. Why: the audience
-      sees the situation make Anton adapt earlier.
-    </>} notes={<>
+    <ReplaySlide stage={5} title="Context: without context knowledge" todo={STAGE5_TODO} notes={<>
       {FIRST}
-      <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026): the same scenario_s304_14 as talk stage 4, context
-        knowledge on, run file configs/kitting/tpres/stage5_s304_14_ck_on.yaml, the same ticks 85 to 150, so that the two
-        replays show one situation without and with context knowledge. The coffee break trusted at 116 (0.78), against
-        106 without (talk stage 4); the same switch, from item 56 to item 54, 10 ticks later. No timeline: no context fact
-        is in force; her first break, completed at 51, makes the coffee break recent, its level suppressed until 141. At
-        106 the coffee break stands at 0.37, behind switching on the A/C at 0.46. Closest 96.48 cm (tick 89).</p>
-      <p><strong>NOT SETTLED</strong>: here context knowledge makes the break trusted later, not earlier: the talk
-        stage's columns say "Anton adapts its plan earlier". What the run shows is true of the framework (just after a
-        break, another is less likely); whether the stage shows this case or one with a fact in force is Hadi's.</p>
-      <p>Measured (T-F part 1, COMPARISON.md, step 3b): with a fact in force, a fact in accord with her task speeds its
-        trust, one not in accord delays it, with little change in completion. A number on a slide comes from an actual
-        run.</p>
+      {STAGE5_RUN}
+      <p>First the situation without context knowledge: the coffee break is trusted only at 74, and the robot first
+        takes the item whose shelf lies on her way, then switches. One click per stop.</p>
       {MIND}
     </>}>
-      <ReplayBreakTime />
+      <ReplayWithoutContext />
+    </ReplaySlide>
+  );
+}
+
+export function Stage5ReplayWith() {
+  return (
+    <ReplaySlide stage={5} title="Context: with context knowledge" todo={STAGE5_TODO} notes={<>
+      {FIRST}
+      {STAGE5_RUN}
+      <p>The same situation with context knowledge: break time raises the coffee break's prior; her movement still
+        decides (at 50 her delivery leads at 1.00). Trusted at 59, and at 69 the robot takes the right task at once.</p>
+      <p>Measured (T-F part 1, COMPARISON.md, step 3b): with a fact in force, a fact in accord with her task speeds its
+        trust, one not in accord delays it, with little change in completion. The other side, said only here: just after
+        a break, another is less likely (Hadi's scenario_s304_14: trusted at 116 with context knowledge against 106
+        without).</p>
+      {MIND}
+    </>}>
+      <ReplayWithContext />
     </ReplaySlide>
   );
 }
@@ -205,7 +226,7 @@ export function Stage5Architecture() {
         favouring fact (break time: coffee break 2; a warm room: the A/C 0.5), lowered to 0.005 just after it happened.
         The likelihood is untouched: it holds no context.</p>
       <p>Click 3, confidence check: one condition added, observations still decide. Context may make the trust come
-        earlier; it never makes Anton trust a hypothesis that her movement alone ranks below another (the evidence
+        earlier; it never makes the robot trust a hypothesis that her movement alone ranks below another (the evidence
         rank).</p>
     </>} />
   );
@@ -216,14 +237,16 @@ export function Stage5Architecture() {
 export function Stage6Transition() {
   return (
     <TransitionSlide stage={6} notes={<>
-      <p>One mechanism carries this talk stage: fit. Anton checks whether the intention it trusts still fits what she
-        does; when it stops fitting, Anton stops trusting it.</p>
-      <p>If she turns mid-way to something Anton knows, a coffee break, the belief moves to it and Anton trusts it (said
-        only here, on no slide).</p>
+      <p>One mechanism carries this talk stage: fit. The robot checks whether its hypotheses fit what she does; when none
+        does, her behaviour is unexplained.</p>
+      <p>Said only here, on no slide (the run of this stage shows neither; tpres-v5): when the trusted intention stops
+        fitting, the robot stops trusting it; when she returns to a modelled behaviour, her task is trusted again.</p>
+      <p>If she turns mid-way to something the robot knows, a coffee break, the belief moves to it and the robot trusts
+        it (said only here, on no slide).</p>
       <p>She does something the robot has no model of: unmodelled behaviour, the only deviation in the glossary's sense
-        (a part of what she does that Anton's task model lacks). This talk stage is the one place the talk says
+        (a part of what she does that the robot's task model lacks). This talk stage is the one place the talk says
         "deviation", and only for the unmodelled case. It may say here why common sense would call a coffee break a
-        deviation and the framework does not: the coffee break is foreseen, in Anton's model.</p>
+        deviation and the framework does not: the coffee break is foreseen, in the robot's model.</p>
       <p>(The merge of 8 October 2026: the old talk stages 6, switch and resumption, and 7, unmodelled behaviour, are
         this one talk stage, since both rest on fit; since tpres-v4 it shows only unmodelled behaviour.)</p>
     </>} />
@@ -235,20 +258,21 @@ export function Stage6Replay() {
     <ReplaySlide stage={6} title="Unmodelled behaviour: a sim-run"
                  todo={<>
       A recorded sim-run with unmodelled behaviour: no hypothesis fits, the projection from her motion takes over as the
-      fallback. Why: the hardest case, and the one in which fit changes what Anton does.
+      fallback. Why: the hardest case, and the one in which fit changes what the robot does.
     </>} notes={<>
       {FIRST}
       <p><strong>HADI'S SCENARIO</strong> (tpres-v4, 8 October 2026), the stage's one example: kitting scenario_s111_02 on
-        env_layout_12, run file configs/kitting/tpres/stage6_s111_02.yaml, ticks 0 to 70. Her whole script is unmodelled:
-        a walk to the north door, a stand of 60 seconds at spot_E (standing from 26 to 57), a walk to the south-east
-        corner. Her assigned delivery of item 12 leads the belief at 0.98 but is never trusted: no support up to tick 9,
-        and from 10 no hypothesis fits (unexplained). Anton uses the projection from her motion throughout: holds of 2
-        ticks at 14, 20 and 25, then 4 at 27, 8 at 31, 16 at 39 and 32 at 55 (to 86) while she stands, the projection of
-        a stand reaching as far as she has stood; closest 50.44 cm (ticks 24 and 56). One click per stop.</p>
+        env_layout_12, run file configs/kitting/tpres/stage6_s111_02.yaml, ticks 0 to 39 (tpres-v5: the replay ends while
+        she stands). Her whole script is unmodelled: a walk to the north door, a stand of 60 seconds at spot_E (standing
+        from 26 to 57), a walk to the south-east corner. Her assigned delivery of item 12 leads the belief but is never
+        trusted: no support up to tick 9, and from 10 no hypothesis fits (unexplained). The robot uses the projection
+        from her motion throughout: holds of 2 ticks at 14, 20 and 25, then 4 at 27, 8 at 31 and 16 at 39 while she
+        stands, the projection of a stand reaching as far as she has stood. One click per stop.</p>
       <p>Not in this run: a trusted intention withdrawn (nothing was trusted before her behaviour became unexplained;
         before tick 10 the refusal was for lack of support, with the same projection from her motion), and her return
-        to a modelled behaviour with her task trusted again (her script ends unmodelled; within the range nothing is
-        trusted again). The hold of 32 ticks decided at 55 runs on after she walks off at 57.</p>
+        to a modelled behaviour with her task trusted again (her script ends unmodelled). Beyond the replay, the robot
+        decides a hold of 32 ticks at 55, which runs on after she walks off at 57; closest 50.44 cm (ticks 24 and
+        56).</p>
       {MIND}
     </>}>
       <ReplayStand />
@@ -259,15 +283,15 @@ export function Stage6Replay() {
 export function Stage6Architecture() {
   return (
     <ArchSlide stage={6} opens={["B42", "B44", "B51"]}
-               caption="The reactive robot's projection from her motion is now Anton's fallback."
+               caption="The reactive robot's projection from her motion is now the robot's fallback."
                notes={<>
       {FIRST}
       <p>Click 1: fit appears, going into the confidence check. New at this talk stage.</p>
       <p>Click 2, fit: for each hypothesis, how much later than its plan she would finish its current action, from her
         extra path and her extra standing. Taken off the panel: it fits unless that delay is surprising at a test level
         of 5 % (in kitting about 334 cm off the way, or 17 ticks of standing beyond the action). When the trusted
-        intention stops fitting, Anton stops trusting it (withdrawing a trusted intention, one sentence) and plans again.
-        When no hypothesis fits, her behaviour is unexplained: Anton knows that it does not know.</p>
+        intention stops fitting, the robot stops trusting it (withdrawing a trusted intention, one sentence) and plans
+        again. When no hypothesis fits, her behaviour is unexplained: the robot knows that it does not know.</p>
       <p>Click 3, confidence check: the condition "it fits" added. In the code it is read from talk stage 3 on; the talk
         introduces it here, where it changes the outcome.</p>
       <p>Click 4, projection: with no trusted intention, the projection from her motion, the reactive robot's only option
@@ -278,18 +302,18 @@ export function Stage6Architecture() {
   );
 }
 
-// ---- After the six talk stages -------------------------------------------------------------------------------------
+// ---- After the six talk stages: no number on any slide (tpres-v5) -------------------------------------------------
 
-export function Stage7Recap() {
+export function RecapSlide() {
   return (
     <Slide stage={7} className="arch-slide" notes={<>
       {PLACEHOLDER}
-      <p>Will show: the complete architecture, coloured by the three questions: what Anton knows (the knowledge
+      <p>Will show: the complete architecture, coloured by the three questions: what the robot knows (the knowledge
         column), what it believes (recognition), what it decides (adaptive planning). Its own content is part 3's.</p>
       <p><strong>OPEN</strong> (handoff 11): the explicit list of contributions the talk claims, marking what is new
         since June; settled after the architecture's content is final.</p>
     </>}>
-      <ArchitectureView stage={7} step={false} colouring="questions" title={`7 ${STAGES[7].title}`} />
+      <ArchitectureView stage={7} step={false} colouring="questions" title={STAGES[7].title} />
     </Slide>
   );
 }
@@ -308,7 +332,7 @@ function SideSlide({ stage, todo, by, notes, diagram }: {
   );
 }
 
-export function Stage8() {
+export function LiftTruckSlide() {
   return (
     <SideSlide stage={8} by="part 3" diagram todo={<>
       The lift truck's turn: the same mind in dock loading, its room drawn by the web-ui's own code and, from part 4, a
@@ -316,18 +340,24 @@ export function Stage8() {
     </>} notes={<>
       {PLACEHOLDER}
       <p>Will say: the lift truck, waiting since the opening, gets its turn: the same mind in dock loading (defined with
-        Scania). Nothing of the mind is written for one domain; the domain's knowledge is given, as Anton's was.</p>
-      <p><strong>OPEN</strong>: the wording ("Anton changes jobs", or similar), the lift truck's and the dock worker's
-        names.</p>
+        Scania). Nothing of the mind is written for one domain; the domain's knowledge is given, as the kitting robot's
+        was.</p>
+      <p><strong>OPEN</strong>: the wording of its return ("the robot changes jobs", or similar).</p>
     </>} />
   );
 }
 
-/** Hadi's table of measured results (8 October 2026, made in another chat from T-F's analyses), on the slide exactly as
- * he gave it: its columns, labels, numbers and words; neither traced nor reworded here, by his instruction. Laid out
- * by ccode: the first group shown as the slide opens, each later group on a click; the two numbers of a row large;
- * a row measured on one scenario (its n a scenario's id) set apart from the rows measured over many. */
-const RESULTS: { stage: string; rows: [string, string, string, string, string, string][] }[] = [
+// ---- The results: Hadi's table, on four slides (tpres-v5) ---------------------------------------------------------
+
+/** Hadi's table of measured results (8 October 2026, made in another chat from T-F's analyses), exactly as he gave it:
+ * its columns, labels, numbers and words; neither traced nor reworded here, by his instruction. One slide per group of
+ * rows, the two groups of one row each on one slide (tpres-v5: the single table was too small to read in a hall), each
+ * row in large type with the two values drawn
+ * as a pair of bars on one scale (a count "of" a total as a share of it, a range "to" with its span); a word (no
+ * task known, reference) is shown as the word, without a bar. A row measured on one scenario (its n a scenario's id) is
+ * marked. The bars are plain HTML and CSS: no library. */
+type Row = [measure: string, without: string, withIt: string, betterIs: string, result: string, n: string];
+const RESULTS: { stage: string; rows: Row[] }[] = [
   { stage: "Level 1, prediction from motion", rows: [
     ["Violation ticks", "137", "14", "lower", "better", "128 scen."],
     ["Closest distance (cm)", "18.5", "52.2", "higher", "better", "s10_02"],
@@ -350,74 +380,141 @@ const RESULTS: { stage: string; rows: [string, string, string, string, string, s
   ] },
 ];
 
-/** A row measured on one scenario: its n names the scenario. */
+/** A value of the table read for its bar: a number, a count of a total, a range, or a word (no bar). */
+type Value = { kind: "number"; v: number } | { kind: "share"; v: number; of: number }
+  | { kind: "range"; lo: number; hi: number } | { kind: "word" };
+
+function valueOf(text: string): Value {
+  let m = /^([+-]?\d+(?:\.\d+)?)$/.exec(text);
+  if (m !== null) return { kind: "number", v: Number(m[1]) };
+  m = /^(\d+) of (\d+)$/.exec(text);
+  if (m !== null) return { kind: "share", v: Number(m[1]), of: Number(m[2]) };
+  m = /^(\d+(?:\.\d+)?) to (\d+(?:\.\d+)?)$/.exec(text);
+  if (m !== null) return { kind: "range", lo: Number(m[1]), hi: Number(m[2]) };
+  return { kind: "word" };
+}
+
+/** The scale of a row's bars: the larger of its two values (a share has its own total). */
+function scaleOf(a: Value, b: Value): number {
+  const top = (x: Value) => (x.kind === "number" ? Math.abs(x.v) : x.kind === "range" ? x.hi : 0);
+  return Math.max(top(a), top(b));
+}
+
+function Bar({ value, scale, side }: { value: Value; scale: number; side: "without" | "with" }) {
+  if (value.kind === "word") return null;
+  const pct = (x: number, of: number) => `${of === 0 ? 0 : (100 * x) / of}%`;
+  return (
+    <span className={`rbar rbar-${side}`} aria-hidden>
+      {value.kind === "number" && <span className="rbar-fill" style={{ width: pct(Math.abs(value.v), scale) }} />}
+      {value.kind === "share" && <span className="rbar-fill" style={{ width: pct(value.v, value.of) }} />}
+      {value.kind === "range" && <>
+        <span className="rbar-fill" style={{ width: pct(value.lo, scale) }} />
+        <span className="rbar-span" style={{ left: pct(value.lo, scale), width: pct(value.hi - value.lo, scale) }} />
+      </>}
+    </span>
+  );
+}
+
 const ONE_SCENARIO = /^s\d+_\d+$/;
 
-export function Stage9() {
+/** The groups each results slide shows: one group per slide, the two groups of one row each together. */
+const RESULT_SLIDES: number[][] = [[0], [1], [2], [3, 4]];
+
+function ResultRow({ row }: { row: Row }) {
+  const [measure, without, withIt, betterIs, result, n] = row;
+  const a = valueOf(without);
+  const b = valueOf(withIt);
+  const scale = scaleOf(a, b);
+  return (
+    <div className={`r-row${ONE_SCENARIO.test(n) ? " r-one" : ""}`} role="row">
+      <span className="r-measure" role="cell">{measure}</span>
+      <span className="r-value r-without" role="cell">
+        <span className={a.kind === "word" ? "r-word" : "r-num"}>{without === "" ? "–" : without}</span>
+        <Bar value={a} scale={scale} side="without" />
+      </span>
+      <span className="r-value r-with" role="cell">
+        <span className={b.kind === "word" ? "r-word" : "r-num"}>{withIt}</span>
+        <Bar value={b} scale={scale} side="with" />
+      </span>
+      <span className="r-better" role="cell">{betterIs}</span>
+      <span className={`r-result${result.startsWith("worse") ? " r-worse" : ""}`} role="cell">{result}</span>
+      <span className="r-n" role="cell">{n}</span>
+    </div>
+  );
+}
+
+function ResultsSlide({ groups }: { groups: number[] }) {
+  const gs = groups.map((i) => RESULTS[i]);
+  const names = gs.map((g) => g.stage).join("; ");
   return (
     <Slide stage={9} className="results-slide" notes={<>
-      <p><strong>FIRST VERSION</strong> (T-pres, 8 October 2026): Hadi's table of measured results, made in another chat
-        from T-F's analyses, placed exactly as he gave it, in place of the TODO box. ccode has not traced, checked,
+      <p><strong>FIRST VERSION</strong> (T-pres, 8 October 2026; on four slides since tpres-v5): Hadi's table of measured
+        results, made in another chat from T-F's analyses, placed exactly as he gave it. ccode has not traced, checked,
         reworded or regrouped it (Hadi's instruction). Its words are the earlier ones (levels, "prediction", "admit",
         min_separation), not yet the deck's present terms.</p>
-      <p>Clicks: the first group is shown as the slide opens; each click adds the next group. A row whose n is a
-        scenario (s10_02) is measured on that one scenario; the others over many runs, scenarios or cases.</p>
-      <p>Keep the row where the result is worse (the completion delay): the cost is shown as well.</p>
+      <p>{names}. Each row: the measure; without and with, as numbers and as a pair of bars on one scale (a count of a
+        total as its share); which direction is better; the result; n. A row whose n is a scenario (s10_02) is measured
+        on that one scenario; the others over many runs, scenarios or cases.</p>
+      {groups.includes(0) && <p>Keep the row where the result is worse (the completion delay): the cost is shown as
+        well.</p>}
     </>}>
-      <StageTitle stage={9} />
-      <table className="results">
-        <thead>
-          <tr><th>Stage</th><th>Measure</th><th className="r-num">Without</th><th className="r-num">With</th>
-            <th>Better is</th><th>Result</th><th>n</th></tr>
-        </thead>
-        {RESULTS.map((g, i) => (
-          <tbody key={g.stage} className={i === 0 ? "" : "fragment"}>
-            {g.rows.map(([measure, without, withIt, betterIs, result, n], j) => (
-              <tr key={measure} className={ONE_SCENARIO.test(n) ? "r-one" : ""}>
-                {j === 0 && <th scope="rowgroup" rowSpan={g.rows.length} className="r-stage">{g.stage}</th>}
-                <td className="r-measure">{measure}</td>
-                <td className={`r-num${/^[\d+.]/.test(without) ? "" : " r-word"}`}>{without}</td>
-                <td className={`r-num r-with${/^[\d+.]/.test(withIt) ? "" : " r-word"}`}>{withIt}</td>
-                <td className="r-better">{betterIs}</td>
-                <td className={`r-result${result.startsWith("worse") ? " r-worse" : ""}`}>{result}</td>
-                <td className="r-n">{n}</td>
-              </tr>
-            ))}
-          </tbody>
+      <div className="results-head">
+        <StageTitle stage={9} />
+        {gs.length === 1 && <p className="results-group">{gs[0].stage}</p>}
+      </div>
+      <div className="results" role="table" aria-label={`Results: ${names}`}>
+        <div className="r-row r-labels" role="row">
+          <span role="columnheader">Measure</span><span role="columnheader">Without</span>
+          <span role="columnheader">With</span><span role="columnheader">Better is</span>
+          <span role="columnheader">Result</span><span role="columnheader">n</span>
+        </div>
+        {gs.map((g) => (
+          <div key={g.stage} role="rowgroup">
+            {gs.length > 1 && <p className="r-group" role="row">{g.stage}</p>}
+            {g.rows.map((r) => <ResultRow key={r[0]} row={r} />)}
+          </div>
         ))}
-      </table>
+      </div>
     </Slide>
   );
 }
 
-export function Stage10() {
+export const ResultsSlides = RESULT_SLIDES.map((groups, i) => {
+  const S = () => <ResultsSlide groups={groups} />;
+  S.displayName = `Results${i + 1}`;
+  return S;
+});
+
+// ---- The afternoon, and the end -----------------------------------------------------------------------------------
+
+export function AfternoonSlide() {
   return (
     <SideSlide stage={10} by="part 5" diagram={false} todo={<>
-      Limits and outlook, as Hadi chooses them. Why: an industrial audience needs to know what the framework does not do
-      yet.
-    </>} notes={<>
-      {PLACEHOLDER}
-      <p>Candidates from the records, for Hadi to choose: the framework does no perception (the simulator hands over
-        her micro-actions); paths are assumed straight; communication (Hadi plans a minimal signal before demo day;
-        "communication: none" in the diagram changes when it is built); degrees of context (T-K part 2); the execution
-        on ROS (T-S, future work).</p>
-    </>} />
-  );
-}
-
-export function Stage11() {
-  return (
-    <SideSlide stage={11} by="part 5" diagram={false} todo={<>
       The afternoon station: the web-ui, with a screenshot (Hadi or part 4) labelled with what the audience learned to
       read in the talk: the env-pane, the robot's panel (intention recognition, planning), the human's panel. Why: the
       talk is the entry point to the station.
     </>} notes={<>
       {PLACEHOLDER}
-      <p>Will say: come to the station this afternoon. The same names and drawings as in the talk: blue Anton, orange
-        Donny, the dashed blue plan, the blue stripe of Anton's projection of her (filled from her intention, hatched
-        from her motion), and the robot panel's bars of the hypotheses, as beside every replay.</p>
+      <p>Will say: come to the station this afternoon. The same names and drawings as in the talk: blue the robot, orange
+        the human, the dashed blue plan, the blue stripe of the robot's projection of her (filled from her intention,
+        hatched from her motion), and the robot panel's bars of the hypotheses, as beside every replay.</p>
       <p><strong>OPEN</strong> (handoff 7): whether the web-ui's two labels "Prediction from intention" and "Prediction
         from motion" change; the slides say "projection".</p>
     </>} />
+  );
+}
+
+/** The last slide (Hadi, tpres-v5): "Thank you", with the kitting robot, the lift truck and the two humans (the kitting
+ * worker and the dock worker) standing together, drawn by the web-ui's own figures (scene/Ensemble.tsx). */
+export function ThankYouSlide() {
+  return (
+    <Slide stage={11} footer={false} className="thanks-slide" notes={<>
+      <p>Thank you. Questions (about 5 minutes).</p>
+      <p>The four figures are the web-ui's own: the kitting worker and the kitting robot, the lift truck and the dock
+        worker, as at the station this afternoon.</p>
+    </>}>
+      <h1 className="thanks-head">Thank you</h1>
+      <Ensemble />
+    </Slide>
   );
 }

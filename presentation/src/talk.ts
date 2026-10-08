@@ -2,7 +2,8 @@
  * The talk's skeleton (docs/handoffs/handoff_T-pres.md, section 5; preferred, 8 October 2026; revised 8 October 2026,
  * the overall revision: the levels removed, each talk stage opened by a transition slide, the names Hadi gave; and the
  * merge of the same day: the old talk stages 6, switch and resumption, and 7, unmodelled behaviour, are one talk stage
- * 6, since both rest on fit): the talk stages 0 to 11 as rows, the robot's three questions as columns. A "talk stage" is a row of the talk; a
+ * 6, since both rest on fit; and the round of tpres-v5: "limits and outlook" removed, the afternoon talk stage 10, the
+ * closing "Thank you" talk stage 11): the talk stages 0 to 11 as rows, the robot's three questions as columns. A "talk stage" is a row of the talk; a
  * "part" is a unit of work on the deck (design_records.md, "T-pres, the talk"). The slides read their titles, keywords
  * and footers from here, so that a change of wording is made once.
  *
@@ -80,7 +81,7 @@ export const STAGES: Record<TalkStage, StageRow> = {
     columns: {
       know: ["Foreseeable behaviours"],
       believe: ["More hypotheses: her assigned tasks and the foreseeable behaviours"],
-      decide: ["Anton adapts its plan to her coffee break"],
+      decide: ["The robot adapts its plan to her coffee break"],
     },
   },
   5: {
@@ -88,26 +89,31 @@ export const STAGES: Record<TalkStage, StageRow> = {
     columns: {
       know: ["Context"],
       believe: ["The prior depends on the context", "Her observed movement still decides"],
-      decide: ["Anton adapts its plan earlier"],
+      decide: ["The robot adapts its plan earlier"],
     },
   },
   6: {
     stage: 6, title: "Unmodelled behaviour", line: "she does something the robot has no model of",
     columns: {
       know: ["Where its model ends"],
-      believe: ["Fit: does the trusted intention still fit what she does?", "No hypothesis fits: Anton knows that it does not know"],
-      decide: ["Anton stops trusting it", "Projection from her motion, now as the fallback",
-        "When she returns to a modelled behaviour, her task is trusted again"],
+      believe: ["Fit: does a hypothesis fit what she does?", "No hypothesis fits: the robot knows that it does not know"],
+      decide: ["Projection from her motion, now as the fallback"],
     },
   },
   7: { stage: 7, title: "Recap: the complete architecture", line: "", columns: {} },
   8: { stage: 8, title: "The lift truck's turn", line: "", columns: {} },
   9: { stage: 9, title: "Results", line: "", columns: {} },
-  10: { stage: 10, title: "Limits and outlook", line: "", columns: {} },
-  11: { stage: 11, title: "The afternoon: the web-ui station", line: "", columns: {} },
+  10: { stage: 10, title: "The afternoon: the web-ui station", line: "", columns: {} },
+  11: { stage: 11, title: "Thank you", line: "", columns: {} },
 };
+
+/** Whether a talk stage carries its number on the slides: only the six stages of situations do (Hadi, 8 October 2026,
+ * tpres-v5); the opening, the recap, the lift truck, the results, the afternoon and the end carry none. */
+export function numbered(stage: TalkStage): boolean {
+  return stage >= 1 && stage <= 6;
+}
 
 /** The footer of a slide: where in the talk it stands. */
 export function footerText(stage: TalkStage): string {
-  return stage === 0 ? "Opening" : `${stage} ${STAGES[stage].title}`;
+  return numbered(stage) ? `${stage} ${STAGES[stage].title}` : STAGES[stage].title;
 }

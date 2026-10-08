@@ -10,7 +10,7 @@ import { Architecture, type Colouring } from "../architecture/Architecture";
 import { type Unboxable, Unboxed } from "../architecture/unboxing";
 import { ELEMENTS } from "../architecture/model";
 import { useCurrent, useNear, useShown, useSlideNumber, useVisibleCount } from "../Deck";
-import { BUILT_STAGES, footerText, QUESTION_HEADER, QUESTIONS, STAGES, type TalkStage } from "../talk";
+import { BUILT_STAGES, footerText, numbered, QUESTION_HEADER, QUESTIONS, STAGES, type TalkStage } from "../talk";
 
 const SlideContext = createContext<RefObject<HTMLElement | null> | null>(null);
 
@@ -86,7 +86,7 @@ export function Unsettled({ children }: { children: ReactNode }) {
 
 export function StageTitle({ stage }: { stage: TalkStage }) {
   return (
-    <h1 className="stage-title"><span className="stage-n">{stage}</span>{STAGES[stage].title}</h1>
+    <h1 className="stage-title">{numbered(stage) && <span className="stage-n">{stage}</span>}{STAGES[stage].title}</h1>
   );
 }
 
