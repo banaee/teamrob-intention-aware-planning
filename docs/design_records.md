@@ -5930,3 +5930,29 @@ BUILT (ccode, 8 October 2026; d61c73c the web-ui's change, 74e7bfd, 8ab4a71, b13
   12 one each; 103 in all.
 - Checks: the build (type check included); vitest 56 and the build of `webui/page`; the click-through, 104 steps at
   1920 x 1080 and 2560 x 1440, 0 outside requests, 0 page errors, 0 notes on screen; `npm run pdf:steps`, 104 pages.
+
+TWO REVIEW TOOLS (Hadi, 8 October 2026, preferred; built by ccode the same day, b95dec1, 1dce812).
+- The review mode: the key A shows the address of the slide and its step in the top-left corner, "slide.step" (the
+  slide from 1, the step from 0 as the slide opens); off at every start, never for the talk. The steps PDF shows it on
+  every page; the review sheet uses the same address. Reason: Hadi names a slide and a step exactly in his comments.
+- `presentation/replays_review.csv`, the review sheet of the replays: one row per replay place of talk stages 1 to 7,
+  the places without a replay included; per fact Hadi may change a pair of columns, "current" (from the scenarios, the
+  run files and the run logs) and "change" (his); single columns with the slide address of each stop, the mechanism,
+  what the run shows with its key ticks, what is weak, the other runs considered and the proposals; three columns for
+  Hadi (what the replay should show, his decision, notes). UTF-8 with a byte-order mark, every field quoted, line breaks
+  inside a cell. Committed as generated, so that his edits show as a difference. Reason: he leads the design of
+  scenarios and needs the facts of each run in one place to decide. A working document between Hadi and ccode: the deck
+  does not read it, and nothing reads it automatically.
+- Not filled: the "she enters" row has no run, so its run facts are dashes; the proposal for talk stage 6 is a sketch
+  only, not a placed scenario.
+
+NEW SCENARIOS FOR THE REPLAYS (Hadi, 8 October 2026, preferred). It sets aside the earlier preference "existing
+scenarios only, nothing authored" for the replays (handoff, section 14, addition e; SIM-RUNS ON SLIDES, FIRST DRAFTS;
+THE OVERALL REVISION, the replay criterion's "ccode authors nothing"). The flow, once Hadi hands back the filled review
+sheet: ccode reads his "change" and decision columns; where he asks for a changed setup or scenario, ccode makes it as a
+copy under new ids in a range of its own (Hadi suggests 300), with its own run file outside the measured set; the
+measured scenarios stay untouched; ccode runs it, keeps its log, and records it the way the current replays are recorded;
+the slide then replays that recording, with stops and captions written from the run's log; ccode reports per row whether
+the run shows what he asked for. Anton is never scripted: a change can set where Anton starts and which tasks it has,
+and what Donny does; what Anton then does is the framework's own result. The flow starts only when Hadi hands the filled
+sheet back.

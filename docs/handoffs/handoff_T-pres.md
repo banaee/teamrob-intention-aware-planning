@@ -479,6 +479,11 @@ The talk and the afternoon station should say the same; decide whether the web-u
   stages' names; the opened blocks simpler (at most one formal line and two short sentences), the realizer and task
   choice as pseudocode (setting aside "no if-then" for these two); Anton's mind beside each replay; no area names in the
   env-pane; one criterion for every replay. design_records.md, "T-pres, the talk", THE OVERALL REVISION.
+- k. [preferred] (Hadi, 8 October 2026) New scenarios for the replays: it sets aside addition e's "existing scenarios
+  and recorded sim-runs only, nothing authored". A changed setup or scenario Hadi asks for in the review sheet
+  (`presentation/replays_review.csv`) is made as a copy under new ids in a range of its own, with its own run file
+  outside the measured set; Anton is never scripted. design_records.md, "T-pres, the talk", NEW SCENARIOS FOR THE
+  REPLAYS.
 
 Where the rest of that prompt is recorded (the words "talk stage" and "part", the parts 1 to 6 that replace section
 12's plan, the working rule, the deck's design): `docs/design_records.md`, "T-pres, the talk".

@@ -96,3 +96,6 @@ working environment). On another machine: `TEAMROB_PYTHON=/path/to/python npm ru
 - `vite.config.ts`: `dedupe` makes the web-ui's modules use the deck's own React, three and R3F (one copy of each).
 
 A TODO box on a slide says what is to be shown there and why, and which part (or Hadi) fills it.
+
+`replays_review.csv`: the review sheet of the replays, a working document between Hadi and ccode (design_records.md,
+"T-pres, the talk", TWO REVIEW TOOLS). The deck does not read it.
