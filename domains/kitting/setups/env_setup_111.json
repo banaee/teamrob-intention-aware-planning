@@ -1,0 +1,59 @@
+{
+  "env_objects": [
+    {
+      "id": "item_8",
+      "type": "item",
+      "subtype": "part_H",
+      "initial_container": "shelf_3",
+      "destination": "kitting_table_3",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_9",
+      "type": "item",
+      "subtype": "part_I",
+      "initial_container": "shelf_6",
+      "destination": "kitting_table_2",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_10",
+      "type": "item",
+      "subtype": "part_J",
+      "initial_container": "shelf_4",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_11",
+      "type": "item",
+      "subtype": "part_K",
+      "initial_container": "shelf_7",
+      "destination": "kitting_table_1",
+      "size": [
+        25,
+        25
+      ]
+    },
+    {
+      "id": "item_12",
+      "type": "item",
+      "subtype": "part_L",
+      "initial_container": "shelf_1",
+      "destination": "kitting_table_0",
+      "size": [
+        25,
+        25
+      ]
+    }
+  ]
+}
