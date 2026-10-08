@@ -1,0 +1,17 @@
+# The demo-day round of T-F (not a baseline): scenario_s103_07, intention-aware, context knowledge on, separation stop off.
+# Run: analysis/instruments/mpb/run_set.sh kitting -s 2000 -o analysis/kitting/tf_demo/runs <this file>
+
+domain: kitting
+layout: env_layout_100
+setup: env_setup_103
+scenario: scenario_s103_07
+steps: 2000
+human_aware: true
+intention_aware: true
+assignment_knowledge: true
+context_knowledge: true
+strategy: single_task
+gate_strategy: none
+cost_strategy: realized
+separation_stop: false
+test_level: 0.05
