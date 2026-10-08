@@ -1,8 +1,11 @@
 # The deck: dependencies, build output, the recordings (made by every build, scripts/record.mjs), the logs and figures of
-# the replays' runs (runs/, kept on disk as analysis/ keeps its data) and screenshots stay out of git
+# the replays' runs (runs/, kept on disk as analysis/ keeps its data), the team's photos and their crops (photos/; Hadi,
+# 8 October 2026: photos of people stay out of the repository; scripts/crop_faces.py makes the crops) and screenshots
+# stay out of git
 node_modules/
 dist/
 data/
 shots/
 pdf/
 runs/
+photos/
