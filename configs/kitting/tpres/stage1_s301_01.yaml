@@ -1,0 +1,17 @@
+# T-pres, a replay of the deck (not a baseline, outside every measured set): scenario_s301_01, Hadi's scenario for talk stage 1, the robot alone; the options of the replay it replaces (T-F part 1's run_061, human-unaware).
+# Run: PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run <this file>; recorded for the slide by presentation/scripts/record.mjs.
+
+domain: kitting
+layout: env_layout_14
+setup: env_setup_301
+scenario: scenario_s301_01
+steps: 300
+human_aware: false
+intention_aware: true
+assignment_knowledge: true
+context_knowledge: true
+strategy: single_task
+gate_strategy: none
+cost_strategy: realized
+separation_stop: false
+test_level: 0.05
