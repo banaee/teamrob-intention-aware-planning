@@ -12,7 +12,7 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const VIEWS = [["kitting", "env_layout_01"]];     // [domain, layout], one per data file a slide reads
+const VIEWS = [["kitting", "env_layout_01"], ["dock_loading", "env_layout_03"]];   // [domain, layout], one per data file
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, "../..");

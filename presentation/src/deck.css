@@ -1,6 +1,7 @@
-/* The deck's stylesheet. Colours, family and weights are the web-ui's theme (applyTheme's variables); sizes are the
-   deck's own, in --u: 1/1920 of the widest 16:9 stage that fits the screen, so that 1920 x 1080 and 2560 x 1440 show the
-   same slide, every length scaled and nothing transformed. */
+/* The deck's stylesheet. Colours, family and weights are the web-ui's theme (applyTheme's variables), the questions'
+   colours the deck's own (look.ts); sizes are the deck's own, in --u: 1/1920 of the widest 16:9 stage that fits the
+   screen, so that 1920 x 1080 and 2560 x 1440 show the same slide, every length scaled and nothing transformed.
+   Calm by design (Hadi, 8 October 2026, preferred): few effects, each one helping the audience follow a change. */
 
 :root { --u: min(100vw / 1920, 100vh / 1080); }
 
@@ -21,6 +22,7 @@ body, .reveal-viewport {      /* reveal's viewport class sets its own ground and
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: left;
 }
 
 .reveal .slides > section { width: 100%; height: 100%; }
@@ -34,19 +36,172 @@ body, .reveal-viewport {      /* reveal's viewport class sets its own ground and
   margin: 0 auto;
   width: calc(1920 * var(--u));
   height: calc(1080 * var(--u));
-  padding: calc(96 * var(--u)) calc(128 * var(--u));
+  padding: calc(80 * var(--u)) calc(120 * var(--u)) calc(96 * var(--u));
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
-/* Slide 1: the lines above the figure. */
-.s01-text {
-  margin: 0;
-  font-size: calc(72 * var(--u));
-  font-weight: var(--weight-medium);
-  line-height: 1.2;
+h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
+
+/* reveal's fragments: a calm fade only. */
+.reveal .fragment { transition: opacity 450ms ease; }
+.reveal .fragment.visible { transition: opacity 450ms ease; }
+.step-marker { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* An element that a step shows, inside a drawing (not a reveal fragment). */
+.appear { opacity: 0; transition: opacity 500ms ease; }
+.appear.on { opacity: 1; }
+
+/* The footer: where in the talk a slide stands. */
+.footer {
+  position: absolute; left: calc(120 * var(--u)); bottom: calc(36 * var(--u));
+  font-size: calc(18 * var(--u)); color: var(--color-inkFaint); letter-spacing: 0.01em;
 }
 
+/* ---- Text ------------------------------------------------------------------------------------------------------ */
+
+.slide-head { font-size: calc(56 * var(--u)); font-weight: var(--weight-medium); line-height: 1.15; }
+.slide-lead { margin-top: calc(18 * var(--u)); font-size: calc(32 * var(--u)); color: var(--color-inkSoft); }
+.slide-foot-line { margin-top: auto; font-size: calc(34 * var(--u)); color: var(--color-inkSoft); }
+.dot { display: inline-block; width: calc(16 * var(--u)); height: calc(16 * var(--u)); border-radius: 50%;
+  margin-right: calc(12 * var(--u)); vertical-align: middle; }
+.dot-robot { background: var(--color-robot); }
+.dot-human { background: var(--color-human); }
+
+/* ---- The title slide ------------------------------------------------------------------------------------------- */
+
+.title-slide { justify-content: center; padding-left: calc(160 * var(--u)); }
+.title-kicker { font-size: calc(28 * var(--u)); color: var(--color-inkFaint); letter-spacing: 0.04em; }
+.title-main { margin-top: calc(24 * var(--u)); font-size: calc(96 * var(--u)); font-weight: var(--weight-medium);
+  line-height: 1.05; }
+.title-sub { margin-top: calc(28 * var(--u)); font-size: calc(40 * var(--u)); color: var(--color-inkSoft); max-width: 70%; }
+.title-who { margin-top: calc(72 * var(--u)); font-size: calc(26 * var(--u)); color: var(--color-inkSoft); }
+
+/* ---- Scenes ---------------------------------------------------------------------------------------------------- */
+
+.scene-slide { align-items: center; }
+.scene-line { margin: 0; font-size: calc(64 * var(--u)); font-weight: var(--weight-medium); line-height: 1.2; }
 /* A 3D scene's canvas: it takes no pointer (a click goes to the deck, a drag never turns the view). */
 .scene-canvas { width: 100%; flex: 1; min-height: 0; pointer-events: none; }
+.scene-note { margin-top: calc(16 * var(--u)); font-size: calc(36 * var(--u)); color: var(--color-inkSoft); text-align: center; }
+
+.actors-slide { align-items: center; }
+.actors { display: flex; gap: calc(60 * var(--u)); width: 100%; flex: 1; min-height: 0; margin-top: calc(24 * var(--u)); }
+.actor { flex: 1; margin: 0; display: flex; flex-direction: column; min-height: 0; }
+.actor-scene { flex: 1; min-height: 0; display: flex; }
+.actor figcaption { text-align: center; font-size: calc(30 * var(--u)); color: var(--color-inkSoft); }
+
+/* ---- The problem, the questions -------------------------------------------------------------------------------- */
+
+.problem-slide { justify-content: center; align-items: center; }
+.problem-head { font-size: calc(72 * var(--u)); font-weight: var(--weight-medium); }
+.problem-words { display: flex; gap: calc(80 * var(--u)); margin-top: calc(72 * var(--u)); font-size: calc(52 * var(--u));
+  color: var(--color-inkSoft); }
+
+.questions { display: flex; gap: calc(48 * var(--u)); margin-top: calc(96 * var(--u)); }
+.question { flex: 1; padding-top: calc(28 * var(--u)); border-top: calc(6 * var(--u)) solid currentColor; }
+.question h2 { font-size: calc(48 * var(--u)); font-weight: var(--weight-medium); }
+.question p { margin-top: calc(16 * var(--u)); font-size: calc(30 * var(--u)); color: var(--color-inkSoft); }
+.column-know { color: var(--q-know); }
+.column-believe { color: var(--q-believe); }
+.column-decide { color: var(--q-decide); }
+
+/* ---- A talk stage's card --------------------------------------------------------------------------------------- */
+
+.stage-title { font-size: calc(60 * var(--u)); font-weight: var(--weight-medium); line-height: 1.15; display: flex;
+  align-items: baseline; gap: calc(28 * var(--u)); }
+.stage-n { font-size: calc(44 * var(--u)); color: var(--color-inkFaint); font-family: var(--font-mono); }
+.columns { display: flex; gap: calc(48 * var(--u)); margin-top: calc(56 * var(--u)); }
+.column { flex: 1; padding-top: calc(20 * var(--u)); border-top: calc(5 * var(--u)) solid currentColor; }
+.column-head { font-size: calc(30 * var(--u)); font-weight: var(--weight-medium); }
+.column ul { margin-top: calc(18 * var(--u)); padding-left: 0; list-style: none; }
+.column li { color: var(--color-ink); font-size: calc(32 * var(--u)); line-height: 1.3; margin-bottom: calc(12 * var(--u)); }
+.column-empty { margin-top: calc(18 * var(--u)); font-size: calc(32 * var(--u)); color: var(--color-lineFaint); }
+.card-slide .todo-card { margin-top: auto; margin-bottom: calc(24 * var(--u)); }
+
+/* ---- Levels, the question to the audience, the turning point ----------------------------------------------------- */
+
+.level-slide, .question-slide, .turning-slide { justify-content: center; padding-left: calc(160 * var(--u)); }
+.level-n { font-size: calc(30 * var(--u)); color: var(--color-inkFaint); letter-spacing: 0.06em; text-transform: uppercase; }
+.level-title { margin-top: calc(18 * var(--u)); font-size: calc(84 * var(--u)); font-weight: var(--weight-medium); }
+.level-sub { margin-top: calc(24 * var(--u)); font-size: calc(40 * var(--u)); color: var(--color-inkSoft); }
+.ask { font-size: calc(72 * var(--u)); font-weight: var(--weight-medium); line-height: 1.2; max-width: 80%; }
+.turning-challenge { font-size: calc(48 * var(--u)); color: var(--color-inkSoft); line-height: 1.3; max-width: 80%; }
+.turning-solution { margin-top: calc(56 * var(--u)); font-size: calc(72 * var(--u)); font-weight: var(--weight-medium);
+  line-height: 1.2; max-width: 85%; }
+
+/* ---- TODO boxes ------------------------------------------------------------------------------------------------ */
+
+.todo {
+  box-sizing: border-box; border: calc(2 * var(--u)) dashed var(--color-line); border-radius: calc(14 * var(--u));
+  padding: calc(20 * var(--u)) calc(28 * var(--u)); background: var(--color-page);
+}
+.todo-head { font-family: var(--font-mono); font-size: calc(20 * var(--u)); color: var(--color-inkSoft);
+  letter-spacing: 0.04em; }
+.todo-body { margin-top: calc(8 * var(--u)); font-size: calc(24 * var(--u)); line-height: 1.4; color: var(--color-inkSoft); }
+.todo-large { margin-top: calc(48 * var(--u)); flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.todo-large .todo-body { font-size: calc(30 * var(--u)); max-width: 80%; }
+
+.two-col { display: flex; gap: calc(56 * var(--u)); margin-top: calc(56 * var(--u)); align-items: flex-start; }
+.two-col > * { flex: 1; }
+.two-col-wide > :first-child { flex: 1.6; }
+
+/* ---- Talk stage 1: the decomposition, plan and execute ------------------------------------------------------------ */
+
+.tree { display: flex; flex-direction: column; justify-content: center; gap: calc(64 * var(--u)); flex: 1;
+  padding-bottom: calc(80 * var(--u)); }
+.tree-row { display: flex; align-items: center; gap: calc(40 * var(--u)); }
+.tree-row + .tree-row { position: relative; }
+.tree-row + .tree-row::before {     /* a short line from the row above */
+  content: ""; position: absolute; left: calc(578 * var(--u)); top: calc(-56 * var(--u)); height: calc(48 * var(--u));
+  border-left: calc(2 * var(--u)) solid var(--color-lineFaint);
+}
+.tree-label { flex: none; width: calc(300 * var(--u)); font-size: calc(30 * var(--u)); color: var(--color-inkSoft); }
+.tree-label small { display: block; font-size: calc(22 * var(--u)); color: var(--color-inkFaint); }
+.tree-items { display: flex; flex-wrap: wrap; gap: calc(20 * var(--u)); align-items: center; }
+.chip {
+  display: inline-block; padding: calc(10 * var(--u)) calc(24 * var(--u)); border-radius: calc(12 * var(--u));
+  border: calc(1.5 * var(--u)) solid var(--color-line); background: var(--color-surface); font-size: calc(30 * var(--u));
+}
+.chip-on { border-width: calc(2.5 * var(--u)); border-color: var(--color-ink); }
+.chip-faint { color: var(--color-inkSoft); border-color: var(--color-lineFaint); }
+.chip-action { background: var(--color-faceLight); }
+.action-step { display: inline-flex; align-items: center; gap: calc(14 * var(--u)); }
+.action-arrow { font-size: calc(30 * var(--u)); color: var(--color-inkFaint); }
+
+.steps-list { padding-left: calc(44 * var(--u)); font-size: calc(40 * var(--u)); line-height: 1.6; }
+
+/* ---- Talk stage 2: the projection from motion --------------------------------------------------------------------- */
+
+.projection { display: flex; gap: calc(48 * var(--u)); margin-top: calc(40 * var(--u)); flex: 1; min-height: 0;
+  align-items: center; }
+.projection-drawing { flex: 1.7; height: 100%; min-width: 0; }
+.projection-text { flex: 1; display: flex; flex-direction: column; gap: calc(36 * var(--u)); font-size: calc(36 * var(--u));
+  line-height: 1.3; }
+.projection-drawing .room { fill: var(--color-surface); stroke: var(--color-lineFaint); stroke-width: 2; }
+.projection-drawing .trail { fill: var(--color-humanLight); stroke: var(--color-human); stroke-width: 2; }
+.projection-drawing .stripe { stroke: url(#hatch-motion); stroke-width: 56; stroke-linecap: round; }
+.projection-drawing .hatch-ground { fill: var(--color-robot); fill-opacity: 0.05; }
+.projection-drawing .hatch-line { stroke: var(--color-robot); stroke-opacity: 0.42; stroke-width: 3; }
+.projection-drawing .plan { stroke: var(--color-robot); stroke-width: 3; stroke-dasharray: 14 9; }
+.projection-drawing .plan-end { fill: var(--color-robot); stroke: var(--color-surface); stroke-width: 3; }
+.projection-drawing .hold-ring { fill: none; stroke: var(--color-robotDark); stroke-width: 3; stroke-dasharray: 4 6; }
+.projection-drawing .agent-ring-human { fill: var(--color-humanLight); fill-opacity: 0.35; }
+.projection-drawing .agent-ring-robot { fill: var(--color-robotLight); fill-opacity: 0.35; }
+.projection-drawing .agent-human { fill: var(--color-human); }
+.projection-drawing .agent-robot { fill: var(--color-robot); }
+.projection-drawing .drawing-label { font-family: var(--font); font-size: 28px; }
+.projection-drawing .drawing-label-human { fill: var(--color-humanDark); }
+.projection-drawing .drawing-label-robot { fill: var(--color-robotDark); }
+
+/* ---- The architecture ------------------------------------------------------------------------------------------ */
+
+.arch-slide { padding-top: calc(56 * var(--u)); }
+.arch-title { font-size: calc(40 * var(--u)); font-weight: var(--weight-medium); color: var(--color-inkSoft); }
+.arch-box { flex: 1; min-height: 0; margin-top: calc(16 * var(--u)); }
+.arch-caption { position: absolute; right: calc(120 * var(--u)); bottom: calc(36 * var(--u)); font-size: calc(26 * var(--u));
+  color: var(--color-ink); }
+
+.side-slide .side { display: flex; gap: calc(48 * var(--u)); flex: 1; min-height: 0; margin-top: calc(40 * var(--u)); }
+.side-slide .todo { flex: 1; align-self: flex-start; }
+.side-slide .side-arch { flex: 1.4; display: flex; flex-direction: column; min-height: 0; }
