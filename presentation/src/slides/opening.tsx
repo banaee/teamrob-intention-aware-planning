@@ -35,7 +35,6 @@ export function TitleSlide() {
     </>}>
       <p className="title-kicker">TeamRob final demo day</p>
       <h1 className="title-main">{TALK_TITLE}</h1>
-      <p className="title-sub">A robot recognises which task a person does, and adapts its own plan</p>
       <p className="title-who">Hadi Banaee · TeamRob SP4, intention recognition, with SP3, planning</p>
     </Slide>
   );
