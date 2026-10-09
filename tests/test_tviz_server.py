@@ -78,14 +78,16 @@ def _headless(args):
 
 class _Server:
     """The web-ui's server as its own process, from the start's own reading of the command line (read_start), the page
-    not served (an API-only server: the test reads no page)."""
+    not served (an API-only server) unless `page` names a folder to serve as the built page."""
 
-    def __init__(self, args, prelude=""):
+    def __init__(self, args, prelude="", page=None):
         with socket.socket() as s:
             s.bind(("127.0.0.1", 0))
             self.port = s.getsockname()[1]
+        page_arg = "None" if page is None else "__import__('pathlib').Path(%r)" % str(page)
         code = (prelude + "from mesa_sim.run_webui import read_start; from webui.server import serve; "
-                "simulator, port = read_start(%r); serve(simulator, port, None)" % ([*args, "--port", str(self.port)],))
+                "simulator, port = read_start(%r); serve(simulator, port, %s)"
+                % ([*args, "--port", str(self.port)], page_arg))
         self.process = subprocess.Popen([PYTHON, "-c", code], cwd=ROOT, env=_env(), stderr=subprocess.PIPE)
         for _ in range(200):
             try:
@@ -120,8 +122,8 @@ class _Server:
 def server():
     started = []
 
-    def start(*args, prelude=""):
-        started.append(_Server(args, prelude))
+    def start(*args, prelude="", page=None):
+        started.append(_Server(args, prelude, page))
         return started[-1]
     yield start
     for s in started:
@@ -335,6 +337,19 @@ def test_finished_at_is_the_point_the_log_pair_shows(new_files, layout, scenario
     assert seen[-1] == point
     if point is not None:       # None before the point, the point from it on
         assert seen[:point] == [None] * point and set(seen[point:]) == {point}
+
+
+def test_the_page_is_served_so_that_the_browser_asks_again_on_every_load(server, tmp_path):
+    # A cached page older than the build would draw new data with old code (found 9 October 2026); no-cache makes the
+    # browser revalidate, and an unchanged file is answered 304.
+    (tmp_path / "index.html").write_text("<!doctype html><title>page</title>")
+    s = server(page=tmp_path)
+    with urllib.request.urlopen("http://127.0.0.1:%d/" % s.port) as answer:
+        assert answer.headers["Cache-Control"] == "no-cache"
+        etag = answer.headers["ETag"]
+    with pytest.raises(urllib.error.HTTPError) as unchanged:
+        urllib.request.urlopen(urllib.request.Request("http://127.0.0.1:%d/" % s.port, headers={"If-None-Match": etag}))
+    assert unchanged.value.code == 304
 
 
 # =============================================================================

@@ -274,6 +274,18 @@ async def _body(request: Request, kind):
         return Response(content=str(e), status_code=400, media_type="text/plain")
 
 
+class _PageFiles(StaticFiles):
+    """The built page's files, each answered with `Cache-Control: no-cache`: the browser asks again on every load (a
+    304 when nothing changed), so a page rebuilt since the browser last loaded it is never run from its cache. Without
+    the header a browser may reuse a cached index.html, and the older bundle it names, for hours after a rebuild and
+    across starts on the same address (found 9 October 2026: the old bundle drew the new appearance data)."""
+
+    def file_response(self, *args, **kwargs) -> Response:
+        response = super().file_response(*args, **kwargs)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 def create_app(server: WebUiServer, page: Optional[Path]) -> Starlette:
     """The application: the requests under /api/, and the built page at / when `page` names its folder."""
     routes = [
@@ -285,7 +297,7 @@ def create_app(server: WebUiServer, page: Optional[Path]) -> Starlette:
         Route("/api/current", server.current, methods=["GET"]),
     ]
     if page is not None:
-        routes.append(Mount("/", app=StaticFiles(directory=str(page), html=True)))
+        routes.append(Mount("/", app=_PageFiles(directory=str(page), html=True)))
     return Starlette(routes=routes, middleware=[Middleware(GZipMiddleware, minimum_size=GZIP_MINIMUM)],
                      lifespan=server.lifespan)
 
