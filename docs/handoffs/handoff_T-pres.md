@@ -526,6 +526,11 @@ The talk and the afternoon station should say the same; decide whether the web-u
   of Hadi's scenarios under new ids (scenario_s305_01, scenario_s306_01). The talk stages now: 0 opening, 1 to 6 as in
   l, 7 the recap, 8 the lift truck, 9 the results, 10 the afternoon, 11 "Thank you". design_records.md, "T-pres, the
   talk", THE ROUND OF TPRES-V5.
+- n. [preferred] (Hadi, 9 October 2026) A scenario Hadi names for a slide is never replaced by another; if its run does
+  not show what the slide says, the slide's words change, or ccode reports. Talk stages 4 and 5 replay his
+  scenario_s304_14 exactly, context knowledge off and on, ticks 70 to 150; addition m's copy scenario_s306_01 is
+  removed; no plot of the timeline (env_setup_304 states none). design_records.md, "T-pres, the talk", TALK STAGES 4 AND
+  5 ON HADI'S SCENARIO.
 
 Where the rest of that prompt is recorded (the words "talk stage" and "part", the parts 1 to 6 that replace section
 12's plan, the working rule, the deck's design): `docs/design_records.md`, "T-pres, the talk".

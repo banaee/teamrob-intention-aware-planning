@@ -6151,7 +6151,39 @@ f7d5eaf the slides; Hadi's review open; the tag tpres-v5 is Hadi's to set).
   "Fit: does a hypothesis fit what she does?". The opened blocks keep the general statements of fit and of the
   projection (they describe the mechanism, not a run). The marks "not settled" on talk stages 2 and 5 are removed; no
   slide carries one now. The new runs' log pairs and per-tick figures are kept in `presentation/runs/` (untracked).
+  (Superseded for talk stage 5, Hadi, 9 October 2026: the copy scenario_s306_01 was not what he asked; talk stage 5
+  replays his scenario_s304_14 again. TALK STAGES 4 AND 5 ON HADI'S SCENARIO below.)
 - Clicks per talk stage (each slide's entering click and its steps): 0 18, 1 11, 2 15, 3 14, 4 9, 5 14, 6 12, the recap
   1, the lift truck 1, the results 4, the afternoon 1, "Thank you" 1; 100 in all (101 steps).
 - Checks: the build (type check included); the click-through, 101 steps at 1920 x 1080 and 2560 x 1440, 0 outside
   requests, 0 page errors, 0 notes on screen; the tests of scenario discovery and loading (15 passed).
+
+TALK STAGES 4 AND 5 ON HADI'S SCENARIO (Hadi, 9 October 2026, preferred; recorded by ccode the same day). In the round
+of tpres-v5 talk stage 5's replay was changed away from the scenario Hadi gave; that was not what he asked. Both replays
+are his, exactly, and nothing replaces them: talk stage 4, kitting / env_layout_07 / env_setup_304 / scenario_s304_14,
+context knowledge off; talk stage 5, the same, context knowledge on; both from tick 70 to tick 150. No plot of the
+timeline: env_setup_304 states no timeline (Hadi saw it himself; a plot drafted in this round was dropped before it was
+committed). The slides show the two replays and do not comment on the change in the robot's switch between them.
+THE RULE (Hadi, 9 October 2026, preferred, standing for T-pres): a scenario Hadi names for a slide is never replaced by
+another. If its run does not show what the slide says, the slide's words change, or ccode reports. (Talk stage 2 still
+replays scenario_s305_01, the copy of tpres-v5; it was made under that round's instruction and is not changed here.)
+BUILT (ccode, 9 October 2026; Hadi's review open).
+- `presentation/scripts/record.mjs`: talk stage 5 records configs/kitting/tpres/stage5_s304_14_ck_on.yaml, ticks 70 to
+  150 (talk stage 4: stage4_s304_14_ck_off.yaml, 70 to 150, unchanged). `src/slides/replays.tsx`: talk stage 5's stops
+  70, 90, 97, 106, 116, 150, each caption from the run's log only (at 70 her delivery of item 52 trusted, since 60; at
+  90 she walks to the coffee machine and the robot reads her next delivery, item 53, 0.97, not trusted; at 97 deliver
+  item 56 chosen; at 106 the coffee break at 0.37 behind switching on the A/C at 0.46; at 116 the coffee break trusted,
+  0.78, and the robot switches to deliver item 54, item 56 needing a hold of 26 ticks). `src/slides/later.tsx`: one
+  replay slide at talk stage 5 ("Context: a sim-run"); the facts of both runs in its notes. `src/talk.ts`: talk stage
+  5's decide column "The robot adapts its plan when the break is trusted" in place of "earlier", a first version for
+  Hadi.
+- From the logs, for Hadi: the coffee break is trusted, and the robot switches from item 56 to item 54, at 106 with
+  context knowledge off and at 116 with it on. With it on the coffee break is lowered from 51 to 138 (her first break,
+  observed complete at 49, makes it recent); no context fact is in force on any tick.
+- Removed: scenario_s306_01 with env_setup_306 and its two run files (git rm), their logs and figures in
+  `presentation/runs/` and their recordings in `presentation/data/` (untracked, deleted). Kept: scenario_s305_01,
+  env_setup_305 and stage2_s305_01.yaml (talk stage 2).
+- Clicks per talk stage: 0 18, 1 11, 2 15, 3 14, 4 9, 5 11, 6 12, the recap 1, the lift truck 1, the results 4, the
+  afternoon 1, "Thank you" 1; 97 in all (98 steps).
+- Checks: the build (type check included); the click-through, 98 steps at 1920 x 1080 and 2560 x 1440, 0 outside
+  requests, 0 page errors, 0 notes on screen.
