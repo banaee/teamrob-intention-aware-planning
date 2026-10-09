@@ -1,8 +1,8 @@
 /**
  * The sim-runs replayed on slides, recorded at every build (scripts/record.mjs, RUNS). Talk stage 3's is T-F part 1's
  * run_060; the others are Hadi's scenarios for the talk (tpres-v4, 8 October 2026) or, where his scenario did not show
- * the stage's mechanism, copies of them under new ids with the change named (tpres-v5: scenario_s305_01 for talk stage
- * 2, scenario_s306_01 for talk stage 5), each run from its own run file under configs/kitting/tpres/, outside every
+ * the stage's mechanism, a copy of one under a new id with the change named (tpres-v5: scenario_s305_01 for talk stage
+ * 2), each run from its own run file under configs/kitting/tpres/, outside every
  * measured set; its log pair and figure are kept in presentation/runs/ (untracked). Each stop is a tick and a caption;
  * every caption states only what the run's log shows at that tick (the recognizer's leader and its belief, the gate,
  * the decision, the hold, the human's record), in the talk's words: a slide never states what its replay does not show
@@ -14,8 +14,7 @@ import s1 from "../../data/run_stage1_alone.json";
 import s2 from "../../data/run_stage2_reactive.json";
 import s3 from "../../data/run_stage3_switch.json";
 import s4 from "../../data/run_stage4_break.json";
-import s5with from "../../data/run_stage5_with.json";
-import s5without from "../../data/run_stage5_without.json";
+import s5 from "../../data/run_stage5_context.json";
 import s6 from "../../data/run_stage6_unmodelled.json";
 import { type RecordedRun, ReplayView, type Stop } from "../scene/RunReplay";
 
@@ -72,7 +71,7 @@ export function ReplayTrusted() {
  * knowledge off), ticks 70 to 150 (Hadi, tpres-v5): at 70 the robot carries item 55 (decided at 63, her delivery of item
  * 52 trusted then, 0.80; 0.97 at 70); she delivers item 52 at 90 and starts her second coffee break; the robot chooses
  * deliver item 56 at 97; the break trusted at 106 (0.76), and the robot switches to deliver item 54, item 56 realized
- * with a hold of 26 ticks; the break ends at 150. */
+ * with a hold of 26 ticks; the break ends at 150. Talk stage 5 replays the same scenario with context knowledge on. */
 export function ReplayBreak() {
   const stops: Stop[] = [
     { tick: 70, caption: "The robot carries item 55 to the table. She carries item 52 there too; her delivery is trusted: the projection from her intention." },
@@ -84,35 +83,24 @@ export function ReplayBreak() {
   return <ReplayView recorded={run(s4)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
 
-/** Talk stage 5, one situation without and with context knowledge: scenario_s306_01 on env_layout_07, a copy of Hadi's
- * scenario_s304_14 without the first coffee break, the robot starting at (-750, -200), break_time in force from 50 to
- * 120 (configs/kitting/tpres/stage5_s306_01_ck_off.yaml and _ck_on.yaml), ticks 50 to 85. The two runs are the same to
- * tick 67. She delivers item 52 at 58 and walks to the coffee machine; the robot delivers item 54 at 68.
- * Without context knowledge: the coffee break at 0.36 at 58; at 68 (0.64, not trusted) the robot chooses deliver item 56,
- * whose shelf is behind the coffee machine (cost 82.52 against item 55's 94.51, no hold), and walks south toward her
- * from (-21, 30) to (-18, -70) by 73; trusted at 74 (0.76): item 56 would need a hold of 24 ticks, the robot switches to
- * deliver item 55 and turns back (at (-16, 70) by 80).
- * With context knowledge: break time raises the coffee break (prior 0.66 from 50); trusted at 59 (0.76); at 69 the robot
- * chooses deliver item 55 at once, item 56 needing a hold of 24 ticks, and walks north (at (-15, 270) by 80). */
-export function ReplayWithoutContext() {
+/** Talk stage 5: Hadi's scenario_s304_14, the same as talk stage 4, with context knowledge on
+ * (configs/kitting/tpres/stage5_s304_14_ck_on.yaml), the same ticks 70 to 150 (Hadi, tpres-v6: his scenario exactly).
+ * No timeline: no context fact is in force. Her first coffee break, observed complete at 49, makes the coffee break
+ * recent: lowered from 51 to 138 ([IR-context]). At 70 her delivery of item 52 is trusted (since 60; 0.99). At 90 she
+ * delivers item 52 and walks to the coffee machine; the robot's belief reads her next delivery, item 53 (0.97), not
+ * trusted (no observation, then no support). At 97 the robot chooses deliver item 56. At 106 the coffee break stands at
+ * 0.37 behind switching on the A/C at 0.46 ([IR-dist]). Trusted at 116 (0.78): item 56 would need a hold of 26 ticks,
+ * and the robot switches to deliver item 54. */
+export function ReplayBreakTime() {
   const stops: Stop[] = [
-    { tick: 50, caption: "Without context knowledge. She carries item 52 to the table; the robot carries item 54 there too." },
-    { tick: 58, caption: "She has delivered item 52 and walks to the coffee machine. The coffee break leads at 0.36: not trusted." },
-    { tick: 68, caption: "Item 54 delivered. Still not trusted (0.64): the robot chooses deliver item 56, whose shelf is behind the coffee machine." },
-    { tick: 74, caption: "0.76: the coffee break is trusted. Against her break, item 56 would need a hold of 24 ticks: the robot switches to deliver item 55 and turns back." },
-    { tick: 85, caption: "The robot is on its way to item 55, after a detour of 100 cm toward her." },
+    { tick: 70, caption: "The same shift, now with context knowledge. The robot carries item 55; her delivery of item 52 is trusted." },
+    { tick: 90, caption: "She walks to the coffee machine again. Just after her first break, the context makes another one less likely: the robot reads her next delivery." },
+    { tick: 97, caption: "Item 55 delivered: the robot chooses deliver item 56." },
+    { tick: 106, caption: "The coffee break stands at 0.37, behind switching on the A/C: not trusted." },
+    { tick: 116, caption: "0.78, and it has support: the coffee break is trusted. Item 56 would need a hold of 26 ticks: the robot switches to deliver item 54." },
+    { tick: 150, caption: "Her break is over and she goes on with item 53; the robot is on item 54." },
   ];
-  return <ReplayView recorded={run(s5without)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
-}
-
-export function ReplayWithContext() {
-  const stops: Stop[] = [
-    { tick: 50, caption: "The same situation, with context knowledge. It is break time: the context raises the coffee break's prior. Her movement still leads: her delivery of item 52." },
-    { tick: 59, caption: "She has delivered item 52 and walks to the coffee machine. 0.76, and it has support: the coffee break is trusted, 15 ticks earlier." },
-    { tick: 69, caption: "Item 54 delivered. Against her break, item 56 would need a hold of 24 ticks: the robot chooses deliver item 55 at once." },
-    { tick: 85, caption: "The robot is on its way to item 55, without the detour toward her." },
-  ];
-  return <ReplayView recorded={run(s5with)} stops={stops}
+  return <ReplayView recorded={run(s5)} stops={stops}
                      mind={{ belief: true, hold: true, projection: true, context: true }} />;
 }
 

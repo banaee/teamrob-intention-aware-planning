@@ -44,8 +44,7 @@ export const SLIDES: ComponentType[] = [
   later.Stage4Architecture,
   // 5 Context
   later.Stage5Transition,
-  later.Stage5ReplayWithout,
-  later.Stage5ReplayWith,
+  later.Stage5Replay,
   later.Stage5Architecture,
   // 6 Unmodelled behaviour
   later.Stage6Transition,

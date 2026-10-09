@@ -2,7 +2,8 @@
  * Talk stages 3 to 11. Talk stages 3 to 6 (the overall revision of 8 October 2026): each opens with its transition
  * slide (the six talk stages, the starting one with its three columns), then a replayed sim-run with the robot's mind
  * beside it, then the architecture, a click adding what the talk stage adds and one click per block it opens or extends
- * (architecture/unboxing.tsx). Talk stage 5 replays one situation twice, without and with context knowledge (tpres-v5).
+ * (architecture/unboxing.tsx). Talk stage 5 replays Hadi's scenario of talk stage 4 with context knowledge on, a plot of
+ * the timeline under the robot's mind (tpres-v6).
  * Talk stage 6 is the merge of the same day (the old talk stages 6, switch and resumption, and 7, unmodelled behaviour,
  * both resting on fit); since tpres-v4 it shows unmodelled behaviour only, the switch to a known behaviour one line of its
  * notes. After them (tpres-v5: no number on any of them): the recap, the lift truck (a placeholder), the results (Hadi's
@@ -16,7 +17,7 @@ import type { Unboxable } from "../architecture/unboxing";
 import { Ensemble } from "../scene/Ensemble";
 import { STAGES, type TalkStage } from "../talk";
 import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide } from "./kit";
-import { ReplayBreak, ReplayStand, ReplayTrusted, ReplayWithContext, ReplayWithoutContext } from "./replays";
+import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplayTrusted } from "./replays";
 
 /** A talk stage's replayed sim-run, with the robot's mind beside it. `todo`: what the TODO box this replay stands in
  * asked for (in the notes). */
@@ -163,55 +164,29 @@ export function Stage5Transition() {
     <TransitionSlide stage={5} notes={<>
       <p>Context: facts of the situation (break time, a warm room, a break just taken) set how likely the robot
         considers each foreseeable behaviour before it sees her move. Her observed movement still decides.</p>
+      <p><strong>FIRST VERSION OF THE WORDING</strong> (tpres-v6, 9 October 2026), for Hadi: "the robot adapts its plan
+        when the break is trusted" in place of "earlier".</p>
     </>} />
   );
 }
 
-const STAGE5_TODO = <>
-  A recorded sim-run with a context fact in force (break time), the same script with and without it if one exists:
-  the prior favouring the coffee break, its trust coming earlier, her movement still deciding. Why: the audience sees
-  the situation make the robot adapt earlier.
-</>;
-
-const STAGE5_RUN = <p><strong>THE PAIR</strong> (tpres-v5, 8 October 2026; Hadi asked for one situation without and with
-  context knowledge): kitting scenario_s306_01 on env_layout_07, a copy of Hadi's scenario_s304_14 without the first
-  coffee break, the robot starting at (-750, -200) instead of (-750, 400), break_time in force from 50 to 120 (her break
-  58 to 118); run files configs/kitting/tpres/stage5_s306_01_ck_off.yaml and _ck_on.yaml; both replayed over ticks 50
-  to 85. The two runs are the same up to tick 67. Without context knowledge the coffee break is trusted at 74 (0.76);
-  with it at 59 (0.76), 15 ticks earlier. At 68 the robot, without context knowledge, chooses deliver item 56 (its shelf
-  behind the coffee machine; cost 82.52 against item 55's 94.51) and switches to item 55 at 74, when item 56 would need a
-  hold of 24 ticks; with context knowledge it chooses item 55 at once, at 69. Hadi's scenario_s304_14 with context
-  knowledge on (the replay of tpres-v4) showed the opposite case, trust delayed by a recent break: it leaves the
-  deck.</p>;
-
-export function Stage5ReplayWithout() {
+export function Stage5Replay() {
   return (
-    <ReplaySlide stage={5} title="Context: without context knowledge" todo={STAGE5_TODO} notes={<>
-      {FIRST}
-      {STAGE5_RUN}
-      <p>First the situation without context knowledge: the coffee break is trusted only at 74, and the robot first
-        takes the item whose shelf lies on her way, then switches. One click per stop.</p>
+    <ReplaySlide stage={5} title="Context: a sim-run" todo={<>
+      A recorded sim-run with a context fact in force (break time), the same script with and without it if one exists:
+      the prior favouring the coffee break, her movement still deciding.
+    </>} notes={<>
+      <p><strong>FIRST VERSION OF THE WORDING</strong> (tpres-v6, 9 October 2026), for Hadi.</p>
+      <p><strong>HADI'S SCENARIO</strong>, exactly as he gave it: kitting scenario_s304_14 on env_layout_07
+        (env_setup_304), context knowledge on, run file configs/kitting/tpres/stage5_s304_14_ck_on.yaml, ticks 70 to 150,
+        the same scenario and period as talk stage 4 (context knowledge off). One click per stop.</p>
+      <p>From the two runs' logs, for Hadi (on no slide): the coffee break is trusted at 116 here and at 106 in talk
+        stage 4's run, and the robot's switch from item 56 to item 54 (item 56 would need a hold of 26 ticks) comes at
+        the same ticks. Here the coffee break is lowered from tick 51 to 138, her first break observed complete at 49; this
+        run has no timeline, so no context fact is in force on any tick.</p>
       {MIND}
     </>}>
-      <ReplayWithoutContext />
-    </ReplaySlide>
-  );
-}
-
-export function Stage5ReplayWith() {
-  return (
-    <ReplaySlide stage={5} title="Context: with context knowledge" todo={STAGE5_TODO} notes={<>
-      {FIRST}
-      {STAGE5_RUN}
-      <p>The same situation with context knowledge: break time raises the coffee break's prior; her movement still
-        decides (at 50 her delivery leads at 1.00). Trusted at 59, and at 69 the robot takes the right task at once.</p>
-      <p>Measured (T-F part 1, COMPARISON.md, step 3b): with a fact in force, a fact in accord with her task speeds its
-        trust, one not in accord delays it, with little change in completion. The other side, said only here: just after
-        a break, another is less likely (Hadi's scenario_s304_14: trusted at 116 with context knowledge against 106
-        without).</p>
-      {MIND}
-    </>}>
-      <ReplayWithContext />
+      <ReplayBreakTime />
     </ReplaySlide>
   );
 }
@@ -226,8 +201,8 @@ export function Stage5Architecture() {
         favouring fact (break time: coffee break 2; a warm room: the A/C 0.5), lowered to 0.005 just after it happened.
         The likelihood is untouched: it holds no context.</p>
       <p>Click 3, confidence check: one condition added, observations still decide. Context may make the trust come
-        earlier; it never makes the robot trust a hypothesis that her movement alone ranks below another (the evidence
-        rank).</p>
+        earlier or later; it never makes the robot trust a hypothesis that her movement alone ranks below another (the
+        evidence rank).</p>
     </>} />
   );
 }

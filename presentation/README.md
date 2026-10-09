@@ -44,8 +44,8 @@ every time, from the original files (`scripts/record.mjs`). The old recording is
 run, the build stops with a message and nothing is built.
 
 The sim-runs replayed on slides are recorded the same way, from their run files (T-F part 1's run_060; the others under
-`configs/kitting/tpres/`: Hadi's scenarios, and since tpres-v5 two copies of them under new ids, scenario_s305_01 and
-scenario_s306_01, outside every measured set): `scripts/record_run.py` builds and steps the run file's sim-run through
+`configs/kitting/tpres/`: Hadi's scenarios, and since tpres-v5 one copy under a new id, scenario_s305_01, outside every
+measured set; a scenario Hadi names for a slide is never replaced by another, tpres-v6): `scripts/record_run.py` builds and steps the run file's sim-run through
 `MesaSimulator`, as the web-ui does, and keeps the tick updates of the ticks a slide replays, cut to what it draws, in
 `data/run_<name>.json` (untracked; the list is `RUNS` in `scripts/record.mjs`). Each recording also writes the usual log
 pair to `logs/`, as every sim-run does. A slide replays one with `src/scene/RunReplay.tsx` (the env-pane's own Scene and

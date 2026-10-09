@@ -89,7 +89,7 @@ export const STAGES: Record<TalkStage, StageRow> = {
     columns: {
       know: ["Context"],
       believe: ["The prior depends on the context", "Her observed movement still decides"],
-      decide: ["The robot adapts its plan earlier"],
+      decide: ["The robot adapts its plan when the break is trusted"],
     },
   },
   6: {
