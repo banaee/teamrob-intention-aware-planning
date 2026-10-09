@@ -6187,3 +6187,25 @@ BUILT (ccode, 9 October 2026; Hadi's review open).
   afternoon 1, "Thank you" 1; 97 in all (98 steps).
 - Checks: the build (type check included); the click-through, 98 steps at 1920 x 1080 and 2560 x 1440, 0 outside
   requests, 0 page errors, 0 notes on screen.
+
+THE POLISHING ROUND OF TPRES-V6 (Hadi, 9 October 2026, preferred; recorded by ccode the same day). Hadi's items, done as
+he wrote them. Words: "trust" leaves the deck; the hypothesis robot plans against is "recognised" ("the coffee break is
+recognised", "recognised intention, or none"); "fits / does not fit" stays; "adequate" is not used. Less text about
+support and about recognised or not; "robot" without "the" where it reads well; no "sim-run" on a slide; shorter
+lines. The realizer's approach is named "Spatio-temporal conflict resolution". The terms now:
+
+| on the slides | meaning | in the repo |
+|---|---|---|
+| recognised (intention, or none) | the hypothesis robot plans against | the admitted hypothesis |
+| fits / does not fit | her behaviour is plausible under a hypothesis | hypothesis adequacy |
+| spatio-temporal conflict resolution | the realizer's approach: per task the smallest hold that keeps the minimum separation | `realize()`, the minimal-shift search |
+
+Built: the replays' lines as a list under the scene, grey, each black and bold when its click comes; "one tick: one time
+step" removed; new blocks in the diagram with a thicker border; slide 3's lift-truck line removed; slide 7's sub-lines
+larger; slide 11's card lists the robot's tasks with their steps, bold as reached; slide 21 (support two items, the
+confidence check not opened, the projection shorter, the realizer named with compact pseudocode, task choice with hold,
+switch, reorder in bold); slides 28 and 31 (now 27 and 30) without the confidence check's step, 31's fit and projection
+shorter; slide 30 (now 29) marks item 12 on the floor, drawn by the deck. No mark of incompleteness on any slide or note
+except the TODO boxes of the lift truck and the afternoon (Hadi). Clicks per talk stage: 0 17, 1 11, 2 15, 3 13, 4 9,
+5 10, 6 11, the recap 1, the lift truck 1, the results 4, the afternoon 1, "Thank you" 1; 93 in all (94 steps).
+Checks: the build; the click-through, 0 outside requests, 0 page errors, 0 notes on screen.
