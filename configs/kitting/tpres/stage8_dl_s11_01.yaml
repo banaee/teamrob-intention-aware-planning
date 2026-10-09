@@ -1,0 +1,17 @@
+# T-pres, a replay of the deck (not a baseline, outside every measured set): dock_loading scenario_s11_01, Hadi's scenario for the lift truck's slide; intention-aware, the defaults otherwise.
+# Run: PYTHONHASHSEED=0 python mesa_sim/run_mesa.py --run <this file>; recorded for the slide by presentation/scripts/record.mjs.
+
+domain: dock_loading
+layout: env_layout_05
+setup: env_setup_11
+scenario: scenario_s11_01
+steps: 300
+human_aware: true
+intention_aware: true
+assignment_knowledge: true
+context_knowledge: true
+strategy: single_task
+gate_strategy: none
+cost_strategy: realized
+separation_stop: false
+test_level: 0.05
