@@ -10,8 +10,8 @@
  * changes.
  */
 
-import { Canvas, useThree } from "@react-three/fiber";
-import { useLayoutEffect } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import * as THREE from "three";
 
 import { FigureForm, ringRadius } from "../../../webui/page/src/env-pane/figures";
@@ -54,13 +54,39 @@ export function Ensemble() {
         <Canvas orthographic flat dpr={[1, 2]} gl={{ antialias: true }} frameloop={current ? "always" : "never"}>
           <PixelRatio />
           <FitCamera />
-          {PLACED.map((f, i) => (
-            <FigureForm key={i} figure={f.look[f.who].figure} h={f.look[f.who].height} paint={paints[f.who]}
-                        stance={{ x: f.x, y: f.y, facing: TOWARD_VIEWER }} />
-          ))}
+          <Turning current={current} />
         </Canvas>
       )}
     </div>
+  );
+}
+
+/** One turn in this many seconds, all four alike (Hadi, tpres-v7). */
+const TURN_S = 9;
+
+/** The four, each turning slowly around its own vertical axis on its spot, from facing the viewers; the turn starts
+ * again from there each time the slide opens, and runs only while it is shown (the canvas renders only then). */
+function Turning({ current }: { current: boolean }) {
+  const groups = useRef<(THREE.Group | null)[]>([]);
+  const start = useRef<number | null>(null);
+  useEffect(() => { if (current) start.current = null; }, [current]);
+  useFrame((state) => {
+    if (start.current === null) start.current = state.clock.elapsedTime;
+    const angle = ((state.clock.elapsedTime - start.current) / TURN_S) * 2 * Math.PI;
+    for (const g of groups.current) if (g !== null) g.rotation.y = angle;
+  });
+  return (
+    <>
+      {PLACED.map((f, i) => {
+        const [px, py, pz] = at(f.x, f.y);
+        return (
+          <group key={i} position={[px, py, pz]} ref={(g) => { groups.current[i] = g; }}>
+            <FigureForm figure={f.look[f.who].figure} h={f.look[f.who].height} paint={paints[f.who]}
+                        stance={{ x: 0, y: 0, facing: TOWARD_VIEWER }} />
+          </group>
+        );
+      })}
+    </>
   );
 }
 
