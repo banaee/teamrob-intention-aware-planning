@@ -30,7 +30,7 @@ export const SLIDES: ComponentType[] = [
   // 2 A human in the shared space; the question that leads to talk stage 3
   stage2.Stage2Transition,
   stage2.AudienceQuestionSlide,
-  stage2.ProjectionSlide,
+  // stage2.ProjectionSlide: skipped from the talk (Hadi, 9 October 2026); kept in stage2.tsx
   stage2.ReactiveRunSlide,
   stage2.Stage2Architecture,
   stage2.TurningPointSlide,
