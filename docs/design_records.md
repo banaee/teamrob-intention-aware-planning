@@ -6055,3 +6055,77 @@ settled" on talk stages 2 and 5; talk stage 6's mark removed). The figure instru
 scenario. Clicks per talk stage: 0 18, 1 11, 2 14, 3 14, 4 9, 5 11, 6 14, 7 1, 8 1, 9 5, 10 1, 11 1; 99 in all (100
 steps). Checks: the build; the click-through, 100 steps at 1920 x 1080 and 2560 x 1440, 0 outside requests, 0 page
 errors, 0 notes on screen.
+
+THE ROUND OF TPRES-V5 (Hadi, 8 October 2026, preferred; recorded by ccode the same day). His changes, each with its
+reason where he gave one:
+1. No communication: every mention leaves the deck (the world strip's label, the lines on slides and in the notes).
+2. No names: "Anton" is "the robot" and "Donny" "the human", everywhere; the opening introduces a robot and a human, not
+   named characters; one way of referring back to the human throughout. Reason: the names add a layer the audience does
+   not need. ccode's choice for referring back: "she" (her motion, her task list), as the deck already did, so that the
+   diagram's keywords and the columns stay short; the first mention on a slide says "the human".
+3. Formulas in proper mathematical typesetting: TeX style with a mathematical font, by a typesetting library, for every
+   formal line in the opened blocks and elsewhere.
+4. The two replays of scenario_s304_14 (talk stages 4 and 5) start at tick 70, not 85; stops and captions from the logs.
+   (Item 9 below replaced talk stage 5's replay, so the new start applies to talk stage 4.)
+5. Numbers belong only to the six stages of situations (1 The robot alone to 6 Unmodelled behaviour); the recap, the
+   lift truck, the results and the slides after them carry none, in titles, footers or anywhere else.
+6. The results slide is redesigned to be clear from the back of a hall at 1920 x 1080, its content exactly Hadi's table
+   (the same rows, numbers and words); the form is ccode's.
+7. The slide "Limits and outlook" is removed.
+8. A last slide, "Thank you", with the kitting robot, the lift truck and the two humans (the kitting worker and the dock
+   worker) standing together and facing the viewers, drawn by the web-ui's own figures; a needed change in webui/ is not
+   made.
+9. (A later message of the same round, replacing "the three 'not settled' marks are left as they are".) ccode resolves
+   the three replays marked "not settled" itself, with one rule for all three: a slide never states what its replay does
+   not show. Hadi's scenario files stay untouched; a changed scenario is a copy under a new id with its own run file.
+   Talk stage 2: the range of his scenario that shows the robot holding against the projection from her motion, or the
+   best way with what exists. Talk stage 5: one situation without and with context knowledge in which context makes the
+   behaviour more likely and the robot adapts earlier (for example a copy of his scenario with break time in force and
+   without the earlier break), or lines that say what the run shows. Talk stage 6: his scenario and the robot's mind card
+   kept, "unexplained" shown large (the important thing on the slide); the lines on a withdrawn trust and a return to
+   modelled behaviour, which the run does not show, move to the notes; the replay ends where it serves the point.
+10. (A later message of the same round.) No code of the architecture on any slide: no L1, L2, C1 to C5, B4.1 and the
+   like, BL2.1 and the like, in the diagram, the opened blocks' titles, the recap or anywhere else; the names stay. The
+   codes may remain in the code and in the handoff as internal labels.
+BUILT (ccode, 8 October 2026; d5ff3e8 the copies and their run files, b8d95b6 the diagram and the opened blocks,
+f7d5eaf the slides; Hadi's review open; the tag tpres-v5 is Hadi's to set).
+- 1, 2, 10: `src/architecture/model.ts` (the world strip "the room, objects, the human"; "the robot's tasks"; the codes
+  kept as fields), `Architecture.tsx` and `unboxing.tsx` (no code drawn), every slide, caption, note and the mind card
+  ("The robot's mind"); code names `RobotSlide`, `HumanSlide`. The agreed wording on the centralised planner (a parked
+  note at talk stage 2) now reads "whose current intention the robot is not told".
+- 3: KaTeX 0.19.0, pinned and bundled with its fonts (`src/tex.tsx`; nothing loaded from outside). The belief update's
+  three formal lines, the projection's formal line, θ in the confidence check and the symbols in the panels' sentences
+  are typeset; the realizer's and task choice's pseudocode is typeset as an algorithm (bold "for each", italic
+  variables, ←). The speaker notes stay plain text (the speaker view loads no KaTeX styles).
+- 5: `talk.ts`, `numbered()`: a number only on talk stages 1 to 6 (footer, title); the slide numbers in the corner are
+  page numbers and stay. Talk stages now: 7 the recap, 8 the lift truck, 9 the results, 10 the afternoon, 11 "Thank you"
+  (internal numbers, on no slide).
+- 6: four slides (Level 1; Level 2, recognition; Level 2, context knowledge; Level 3 and the whole chain, the two groups
+  of one row each together): per row the measure (38 units of 1920), without and with as large numbers (64) each with a
+  bar under it, the two bars on one scale (a count "of" a total as its share, "3 to 4" as a range), better is, the result
+  ("worse, 1%" in amber and bold), n (italic for a scenario). No library: plain HTML and CSS. The empty "without" cell of
+  the whole chain shows a dash. The earlier table had lost its styles (none in `deck.css`), hence its size.
+- 8: `src/scene/Ensemble.tsx`: the env-pane's own figures (FigureForm) in kitting's and dock_loading's appearances, left
+  to right the kitting worker, the kitting robot, the lift truck, the dock worker, on no floor, under the deck's own
+  orthographic camera from the south at 16° (the web-ui's camera has only its tilted and top presets, which framed the
+  four small). The person and the cube-head robot are round, with no front; the lift truck faces the camera. No change
+  in webui/.
+- 9 and 4, the replays (one rule: a caption states only what its run's log shows):
+
+| talk stage | run file (configs/kitting/tpres/) | ticks | what the log shows |
+|---|---|---|---|
+| 2 | stage2_s305_01.yaml: scenario_s305_01 (env_setup_305), a copy of scenario_s302_02 with the robot starting at (300, 60) instead of (390, 160); intention-unaware | 0 to 44 | scenario_s302_02 decides no hold anywhere in its run (every hold 0; closest 60.31 cm at 42), so no range of it shows one. In the copy her carry and the robot's meet at the room's crossing: a hold of 7 ticks at 34 to 40 against the projection from her motion; closest 58.26 cm at 42. The start chosen from a grid of 30 starts run with the override scenario.robot_0.start_position (the longest hold, 7 ticks; holds of 1 to 7 ticks in 20 of them) |
+| 4 | stage4_s304_14_ck_off.yaml (unchanged) | 70 to 150 | at 70 the robot carries item 55, her delivery of item 52 trusted (since 63; 0.97 at 70); then as before: break from 90, item 56 chosen 97, the break trusted 106 (0.76), the switch to item 54 |
+| 5 | stage5_s306_01_ck_off.yaml and _ck_on.yaml: scenario_s306_01 (env_setup_306), a copy of scenario_s304_14 without the first coffee break, the robot starting at (-750, -200) instead of (-750, 400), break_time in force 50 to 120 (her break 58 to 118); two slides, without and with context knowledge | 50 to 85 | the two runs alike to 67. Without: the coffee break trusted at 74 (0.76); at 68 (0.64) the robot chooses item 56, its shelf behind the coffee machine (82.52 against item 55's 94.51), walks 100 cm south toward her, and at 74 switches to item 55 (item 56 would need a hold of 24 ticks) and turns back. With: break time raises the coffee break (prior 0.66 from 50; at 50 her delivery leads at 1.00); trusted at 59 (0.76); at 69 the robot chooses item 55 at once (item 56 a hold of 24). The window placed from the run with context knowledge off; the start from a grid of 10 starts run with the override, the one where the robot's next choice falls between the two ticks of trust |
+| 6 | stage6_s111_02.yaml (unchanged) | 0 to 39 | as before to 39: unexplained from 10, the fallback, holds 2, 2, 2, 4, 8 and 16 ticks; the range ends while she stands (the hold of 32 ticks decided at 55 runs on after she walks off at 57) |
+
+  Talk stage 5's earlier replay (scenario_s304_14 with context knowledge on, the trust delayed by a recent break) leaves
+  the slides; the case is one line of the notes. Talk stage 6's transition no longer lists "the robot stops trusting it"
+  and "when she returns to a modelled behaviour, her task is trusted again" (both in its notes); the believe column reads
+  "Fit: does a hypothesis fit what she does?". The opened blocks keep the general statements of fit and of the
+  projection (they describe the mechanism, not a run). The marks "not settled" on talk stages 2 and 5 are removed; no
+  slide carries one now. The new runs' log pairs and per-tick figures are kept in `presentation/runs/` (untracked).
+- Clicks per talk stage (each slide's entering click and its steps): 0 18, 1 11, 2 15, 3 14, 4 9, 5 14, 6 12, the recap
+  1, the lift truck 1, the results 4, the afternoon 1, "Thank you" 1; 100 in all (101 steps).
+- Checks: the build (type check included); the click-through, 101 steps at 1920 x 1080 and 2560 x 1440, 0 outside
+  requests, 0 page errors, 0 notes on screen; the tests of scenario discovery and loading (15 passed).

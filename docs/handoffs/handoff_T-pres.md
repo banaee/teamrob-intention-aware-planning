@@ -516,5 +516,16 @@ The talk and the afternoon station should say the same; decide whether the web-u
   slides; the simpler panels; pseudocode for the realizer and task choice; Anton's mind beside each replay) and k
   (scenarios authored for the talk as copies under new ids in a range of their own, with their own run files).
 
+- m. [preferred] (Hadi, 8 October 2026, the round of tpres-v5) No communication on the deck (the world strip and every
+  line); no names: "the robot" and "the human" for Anton and Donny everywhere (sections 7 and 9 keep the names as
+  history), the human referred back to as "she"; no code of the architecture (L1, C4, B4.1, BL2.1 and the like) on any
+  slide, the codes internal labels of section 6 only; formulas typeset in TeX style; numbers only on talk stages 1 to 6;
+  the results on slides readable from the back of a hall, Hadi's table unchanged; "Limits and outlook" removed (section
+  5's talk stage 11, addition l's 10); a last slide "Thank you" with the two robots and the two humans; the three
+  replays marked "not settled" resolved under one rule, a slide never states what its replay does not show, with copies
+  of Hadi's scenarios under new ids (scenario_s305_01, scenario_s306_01). The talk stages now: 0 opening, 1 to 6 as in
+  l, 7 the recap, 8 the lift truck, 9 the results, 10 the afternoon, 11 "Thank you". design_records.md, "T-pres, the
+  talk", THE ROUND OF TPRES-V5.
+
 Where the rest of that prompt is recorded (the words "talk stage" and "part", the parts 1 to 6 that replace section
 12's plan, the working rule, the deck's design): `docs/design_records.md`, "T-pres, the talk".
