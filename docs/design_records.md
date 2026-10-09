@@ -5746,6 +5746,25 @@ BUILT (ccode, 8 October 2026): `webui/page/src/env-pane/Scene.tsx`, `AreaMark` d
 of the id's text removed); `theme.scene.areaLabel` removed with its only reader. Checks: vitest 56; the build and type
 check.
 
+THE SCENE'S CLEANING (Hadi, 9 October 2026, preferred; five requests, each with its reason): kitting's shelves flat on
+the floor, since an agent's straight walk passes through a 3D shelf; pallets in three looks, dry, frozen and empty, which a
+screen-user could not tell apart; an empty pallet about half as high; every pallet drawn at 66% of each side, a display
+size only; the forklift at 3/4 of its size. The kitting table unchanged.
+BUILT (ccode, 9 October 2026): the shelf takes the `pad` form, height 0, in kitting's appearance data (the form of
+dock_loading's bays; the items stay at their display places on it); `rack` stays in the vocabulary, unused. The scene
+appearance gained a tint per movable look, from a closed set named by colour (`Tint`: ink, tan, slate, pale_wood; the
+values in `theme.ts`, so the scene's colours stay the theme's), a type's tint per subtype (`subtype_tints`; a look by
+state's own tint wins whatever the subtype) and `footprint_scale` (the drawn share of each side; the display places'
+grid is made from the drawn sizes, so two pallets in a bay stand side by side instead of in two layers). dock_loading:
+dry tan, frozen slate, empty pale wood at height 7 (was 14), full 40 unchanged; a full pallet's skid lowered to 7 to match
+(its load taller, the total kept); scale 0.66; the forklift's height 97.5 (was 130), every part a share of it. A carried
+object on the forklift now turns with it and sits with its back edge against the mast (before, it stayed unturned and
+overlapped the mast when the forklift faced north). Checks: the build and type check; vitest 59 (the tint and the drawn
+footprint added); `tests/test_tviz_*.py`; one sim-run per domain played in Chrome (dock_loading scenario_s07_02 to tick
+115, a carried pallet facing north and east; kitting scenario_s01_01 to tick 8), no console error. Only the web-ui reads
+the appearance data: headless unchanged. The deck (`presentation/`) draws with this code from recorded data that lacks
+the new fields; its data is recorded again before its next build.
+
 ## T-pres, the talk
 
 WHAT IT IS (Hadi, 8 October 2026, preferred; recorded by ccode the same day). T-pres is the name for all work on the
