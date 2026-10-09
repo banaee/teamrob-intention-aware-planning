@@ -54,7 +54,7 @@ export const SLIDES: ComponentType[] = [
   // Hadi's table), the afternoon, the end
   later.RecapSlide,
   later.LiftTruckSlide,
-  ...later.ResultsSlides,
+  later.ResultsSlide,
   later.AfternoonSlide,
   later.ThankYouSlide,
 ];

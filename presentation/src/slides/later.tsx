@@ -14,10 +14,11 @@
 import type { ReactNode } from "react";
 
 import type { Unboxable } from "../architecture/unboxing";
+import webuiShot from "../../web-ui-screenshot.png";
 import { Ensemble } from "../scene/Ensemble";
 import { STAGES, type TalkStage } from "../talk";
-import { ArchitectureView, Slide, StageTitle, Todo, TransitionSlide } from "./kit";
-import { ReplayBreak, ReplayBreakTime, ReplayStand, ReplayRecognised } from "./replays";
+import { ArchitectureView, Slide, StageTitle, TransitionSlide } from "./kit";
+import { ReplayBreak, ReplayBreakTime, ReplayDock, ReplayRecognised, ReplayStand } from "./replays";
 
 /** A talk stage's replayed run, with the robot's mind beside it. */
 function ReplaySlide({ stage, title, notes, children }: {
@@ -43,7 +44,6 @@ function ArchSlide({ stage, notes, caption, opens }: {
   );
 }
 
-const PLACEHOLDER = <p><strong>PLACEHOLDER</strong> (T-pres part 1): the content is built in a later part.</p>;
 const MIND = <p>Beside the scene, the robot's mind at the tick, as the robot panel at the station shows it: the
   hypotheses as bars (θ the thin line on each), the recognised intention marked; its task, its hold, which projection of
   her it uses.</p>;
@@ -263,32 +263,16 @@ export function RecapSlide() {
   );
 }
 
-function SideSlide({ stage, todo, by, notes, diagram }: {
-  stage: TalkStage; todo: ReactNode; by: string; notes: ReactNode; diagram: boolean;
-}) {
-  return (
-    <Slide stage={stage} className={`side-slide${diagram ? "" : " side-plain"}`} notes={notes}>
-      <StageTitle stage={stage} />
-      <div className="side">
-        <Todo by={by} className={diagram ? "" : "todo-large"}>{todo}</Todo>
-        {diagram && <div className="side-arch"><ArchitectureView stage={stage} step={false} title="" /></div>}
-      </div>
-    </Slide>
-  );
-}
-
 export function LiftTruckSlide() {
   return (
-    <SideSlide stage={8} by="part 3" diagram todo={<>
-      The lift truck's turn: the same mind in dock loading, its room drawn by the web-ui's own code and, from part 4, a
-      recorded dock_loading run. Why: the second domain shows that the mind does not depend on kitting.
-    </>} notes={<>
-      {PLACEHOLDER}
-      <p>Will say: the lift truck, waiting since the opening, gets its turn: the same mind in dock loading (defined with
-        Scania). Nothing of the mind is written for one domain; the domain's knowledge is given, as the kitting robot's
-        was.</p>
-      <p><strong>OPEN</strong>: the wording of its return ("the robot changes jobs", or similar).</p>
-    </>} />
+    <Slide stage={8} className="replay-slide" notes={<>
+      <p>The lift truck, waiting since the opening, gets its turn: the same mind in dock loading (defined with Scania).
+        Hadi's scenario dock_loading scenario_s11_01 on env_layout_05, ticks 50 to 120, intention-aware. One click per
+        stop.</p>
+    </>}>
+      <h1 className="slide-head">{STAGES[8].title}</h1>
+      <ReplayDock />
+    </Slide>
   );
 }
 
@@ -301,28 +285,13 @@ export function LiftTruckSlide() {
  * as a pair of bars on one scale (a count "of" a total as a share of it, a range "to" with its span); a word (no
  * task known, reference) is shown as the word, without a bar. A row measured on one scenario (its n a scenario's id) is
  * marked. The bars are plain HTML and CSS: no library. */
-type Row = [measure: string, without: string, withIt: string, betterIs: string, result: string, n: string];
-const RESULTS: { stage: string; rows: Row[] }[] = [
-  { stage: "Level 1, prediction from motion", rows: [
-    ["Violation ticks", "137", "14", "lower", "better", "128 scen."],
-    ["Closest distance (cm)", "18.5", "52.2", "higher", "better", "s10_02"],
-    ["Completion delay (ticks, mean)", "0", "+5.8", "lower", "worse, 1%", "128 scen."],
-  ] },
-  { stage: "Level 2, recognition", rows: [
-    ["Task known before the human arrives (ticks, median)", "no task known", "41", "higher", "better", "102 arrivals"],
-    ["Tick of the robot's hold decision", "40", "25", "lower", "better", "s10_02"],
-  ] },
-  { stage: "Level 2, context knowledge", rows: [
-    ["Ticks to admit a coffee break (median)", "39", "4", "lower", "better", "5 cases"],
-    ["Tasks admitted earlier, human in accord", "reference", "52 of 66", "higher", "better", "66 tasks"],
-    ["Runs that complete earlier, designed runs", "reference", "7 of 22", "higher", "better", "2 later"],
-  ] },
-  { stage: "Level 3, unmodelled", rows: [
-    ["Ticks below min_separation (median)", "5.5", "3 to 4", "lower", "better", "20 scen."],
-  ] },
-  { stage: "Whole chain", rows: [
-    ["Disagreements with the oracle", "", "0", "lower", "as designed", "1070 runs"],
-  ] },
+type Row = [layer: string, measure: string, without: string, withIt: string, betterIs: string, result: string, n: string];
+const RESULTS: Row[] = [
+  ["Level 1, prediction from motion", "Violation ticks", "137", "14", "lower", "better", "128 scen."],
+  ["Level 1, prediction from motion", "Completion delay (ticks, mean)", "0", "+5.8", "lower", "worse, 1%", "128 scen."],
+  ["Level 2, recognition", "Task known before the human arrives (ticks, median)", "no task known", "41", "higher", "better", "102 arrivals"],
+  ["Level 2, context knowledge", "Ticks to admit a coffee break (median)", "39", "4", "lower", "better", "5 cases"],
+  ["Level 3, unmodelled", "Ticks below min_separation (median)", "5.5", "3 to 4", "lower", "better", "20 scen."],
 ];
 
 /** A value of the table read for its bar: a number, a count of a total, a range, or a word (no bar). */
@@ -360,21 +329,18 @@ function Bar({ value, scale, side }: { value: Value; scale: number; side: "witho
   );
 }
 
-const ONE_SCENARIO = /^s\d+_\d+$/;
-
-/** The groups each results slide shows: one group per slide, the two groups of one row each together. */
-const RESULT_SLIDES: number[][] = [[0], [1], [2], [3, 4]];
 
 function ResultRow({ row }: { row: Row }) {
-  const [measure, without, withIt, betterIs, result, n] = row;
+  const [layer, measure, without, withIt, betterIs, result, n] = row;
   const a = valueOf(without);
   const b = valueOf(withIt);
   const scale = scaleOf(a, b);
   return (
-    <div className={`r-row${ONE_SCENARIO.test(n) ? " r-one" : ""}`} role="row">
+    <div className="r-row" role="row">
+      <span className="r-layer" role="cell">{layer}</span>
       <span className="r-measure" role="cell">{measure}</span>
       <span className="r-value r-without" role="cell">
-        <span className={a.kind === "word" ? "r-word" : "r-num"}>{without === "" ? "–" : without}</span>
+        <span className={a.kind === "word" ? "r-word" : "r-num"}>{without}</span>
         <Bar value={a} scale={scale} side="without" />
       </span>
       <span className="r-value r-with" role="cell">
@@ -388,61 +354,38 @@ function ResultRow({ row }: { row: Row }) {
   );
 }
 
-function ResultsSlide({ groups }: { groups: number[] }) {
-  const gs = groups.map((i) => RESULTS[i]);
-  const names = gs.map((g) => g.stage).join("; ");
+export function ResultsSlide() {
   return (
     <Slide stage={9} className="results-slide" notes={<>
-      <p>Hadi's table of measured results, made in another chat from T-F's analyses, placed exactly as he gave it.</p>
-      <p>{names}. Each row: the measure; without and with, as numbers and as a pair of bars on one scale (a count of a
-        total as its share); which direction is better; the result; n. A row whose n is a scenario (s10_02) is measured
-        on that one scenario; the others over many runs, scenarios or cases.</p>
-      {groups.includes(0) && <p>Keep the row where the result is worse (the completion delay): the cost is shown as
-        well.</p>}
+      <p>Hadi's table of measured results, made in another chat from T-F's analyses: the rows he kept (tpres-v7), his
+        labels and numbers exactly. Each row: the layer, the measure; without and with, as numbers and as a pair of bars
+        on one scale; which direction is better; the result; n.</p>
+      <p>Keep the row where the result is worse (the completion delay): the cost is shown as well.</p>
     </>}>
-      <div className="results-head">
-        <StageTitle stage={9} />
-        {gs.length === 1 && <p className="results-group">{gs[0].stage}</p>}
-      </div>
-      <div className="results" role="table" aria-label={`Results: ${names}`}>
+      <StageTitle stage={9} />
+      <div className="results results-one" role="table" aria-label="Results">
         <div className="r-row r-labels" role="row">
-          <span role="columnheader">Measure</span><span role="columnheader">Without</span>
-          <span role="columnheader">With</span><span role="columnheader">Better is</span>
-          <span role="columnheader">Result</span><span role="columnheader">n</span>
+          <span role="columnheader">Layer</span><span role="columnheader">Measure</span>
+          <span role="columnheader">Without</span><span role="columnheader">With</span>
+          <span role="columnheader">Better is</span><span role="columnheader">Result</span>
+          <span role="columnheader">n</span>
         </div>
-        {gs.map((g) => (
-          <div key={g.stage} role="rowgroup">
-            {gs.length > 1 && <p className="r-group" role="row">{g.stage}</p>}
-            {g.rows.map((r) => <ResultRow key={r[0]} row={r} />)}
-          </div>
-        ))}
+        {RESULTS.map((r) => <ResultRow key={r[1]} row={r} />)}
       </div>
     </Slide>
   );
 }
 
-export const ResultsSlides = RESULT_SLIDES.map((groups, i) => {
-  const S = () => <ResultsSlide groups={groups} />;
-  S.displayName = `Results${i + 1}`;
-  return S;
-});
-
 // ---- The afternoon, and the end -----------------------------------------------------------------------------------
 
 export function AfternoonSlide() {
   return (
-    <SideSlide stage={10} by="part 5" diagram={false} todo={<>
-      The afternoon station: the web-ui, with a screenshot (Hadi or part 4) labelled with what the audience learned to
-      read in the talk: the env-pane, the robot's panel (intention recognition, planning), the human's panel. Why: the
-      talk is the entry point to the station.
-    </>} notes={<>
-      {PLACEHOLDER}
-      <p>Will say: come to the station this afternoon. The same names and drawings as in the talk: blue the robot, orange
-        the human, the dashed blue plan, the blue stripe of the robot's projection of her (filled from her intention,
-        hatched from her motion), and the robot panel's bars of the hypotheses, as beside every replay.</p>
-      <p><strong>OPEN</strong> (handoff 7): whether the web-ui's two labels "Prediction from intention" and "Prediction
-        from motion" change; the slides say "projection".</p>
-    </>} />
+    <Slide stage={10} className="shot-slide" notes={<>
+      <p>Come to the station this afternoon: the web-ui, with the same names and drawings as in the talk.</p>
+    </>}>
+      <StageTitle stage={10} />
+      <img className="shot" src={webuiShot} alt="The web-ui" />
+    </Slide>
   );
 }
 

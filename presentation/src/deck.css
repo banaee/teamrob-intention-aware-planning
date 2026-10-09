@@ -444,3 +444,21 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .thanks-head { margin-top: calc(70 * var(--u)); font-size: calc(110 * var(--u)); font-weight: var(--weight-medium);
   line-height: 1.1; }
 .ensemble { flex: 1; min-height: 0; width: calc(1100 * var(--u)); margin-bottom: calc(30 * var(--u)); pointer-events: none; }
+
+/* ---- tpres-v7: the results on one slide (a grey first column, the layer; smaller type), and the afternoon's screenshot */
+
+.results-one { margin-top: calc(28 * var(--u)); }
+.results-one .r-row { grid-template-columns: calc(250 * var(--u)) minmax(0, 1fr) calc(230 * var(--u)) calc(230 * var(--u))
+    calc(110 * var(--u)) calc(160 * var(--u)) calc(150 * var(--u));
+  column-gap: calc(26 * var(--u)); padding: calc(18 * var(--u)) 0; }
+.results-one .r-labels { padding: 0 0 calc(8 * var(--u)); font-size: calc(20 * var(--u)); }
+.results-one .r-layer { font-size: calc(22 * var(--u)); line-height: 1.25; color: var(--color-inkFaint); }
+.results-one .r-measure { font-size: calc(28 * var(--u)); }
+.results-one .r-num { font-size: calc(46 * var(--u)); }
+.results-one .r-word { font-size: calc(26 * var(--u)); }
+.results-one .rbar { height: calc(12 * var(--u)); }
+.results-one .r-better { font-size: calc(24 * var(--u)); }
+.results-one .r-result { font-size: calc(28 * var(--u)); }
+.results-one .r-n { font-size: calc(22 * var(--u)); }
+.shot-slide .shot { margin-top: calc(24 * var(--u)); flex: 1; min-height: 0; width: 100%; object-fit: contain;
+  object-position: center top; }

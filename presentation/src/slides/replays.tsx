@@ -16,6 +16,7 @@ import s3 from "../../data/run_stage3_switch.json";
 import s4 from "../../data/run_stage4_break.json";
 import s5 from "../../data/run_stage5_context.json";
 import s6 from "../../data/run_stage6_unmodelled.json";
+import s8 from "../../data/run_stage8_dock.json";
 import { type RecordedRun, ReplayView, type Stop } from "../scene/RunReplay";
 
 const run = (r: unknown) => r as RecordedRun;   // the JSON's enumerations are read as strings
@@ -122,4 +123,18 @@ export function ReplayStand() {
   return <ReplayView recorded={run(s6)} stops={stops}
                      mind={{ belief: true, fit: true, hold: true, projection: true }}
                      mark={{ object: "item_12", label: "item 12" }} />;
+}
+
+/** The lift truck's turn: Hadi's dock_loading scenario_s11_01 on env_layout_05 (configs/kitting/tpres/stage8_dl_s11_01.yaml,
+ * intention-aware, the defaults otherwise), ticks 50 to 120: her scan of pallet 0 recognised from 48; pallet 5 delivered
+ * and the return of pallet 6 chosen at 60; her scan of pallet 2 entered and recognised at 68; at 120 an office break
+ * leads (0.80), not recognised. No hold in the run. */
+export function ReplayDock() {
+  const stops: Stop[] = [
+    { tick: 50, caption: "The lift truck delivers pallet 5. Her scan of pallet 0 is recognised." },
+    { tick: 60, caption: "Pallet 5 delivered: robot chooses to return pallet 6." },
+    { tick: 68, caption: "She moves on to pallet 2: her scan of pallet 2 is recognised." },
+    { tick: 120, caption: "An office break leads at 0.80: not recognised." },
+  ];
+  return <ReplayView recorded={run(s8)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }

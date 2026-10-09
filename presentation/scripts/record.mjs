@@ -25,6 +25,7 @@ const RUNS = [
   ["stage4_break", `${TPRES}/stage4_s304_14_ck_off.yaml`, 70, 150],        // context knowledge off
   ["stage5_context", `${TPRES}/stage5_s304_14_ck_on.yaml`, 70, 150],      // the same scenario, context knowledge on
   ["stage6_unmodelled", `${TPRES}/stage6_s111_02.yaml`, 0, 39],
+  ["stage8_dock", `${TPRES}/stage8_dl_s11_01.yaml`, 50, 120],              // dock_loading, Hadi's scenario_s11_01
 ];
 
 const here = dirname(fileURLToPath(import.meta.url));
