@@ -1,6 +1,6 @@
 {
   "fixed": {
-    "shelf":          {"shape": "rack",      "height": 150, "presence": "background"},
+    "shelf":          {"shape": "pad",       "height": 0,   "presence": "background"},
     "kitting_table":  {"shape": "counter",   "height": 85,  "presence": "background"},
     "coffee_machine": {"shape": "appliance", "height": 95,  "presence": "active"},
     "ac_switch":      {"shape": "panel",     "height": 130, "presence": "active"},

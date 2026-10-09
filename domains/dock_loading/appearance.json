@@ -12,9 +12,10 @@
     "landmark":         {"shape": "marker",    "height": 60,  "presence": "background"}
   },
   "movable": {
-    "pallet": {"shape": "loaded_skid", "height": 40,
-               "states": [{"state": "is_empty", "look": {"shape": "skid", "height": 14}}]}
+    "pallet": {"shape": "loaded_skid", "height": 40, "footprint_scale": 0.66,
+               "subtype_tints": {"dry": "tan", "frozen": "slate"},
+               "states": [{"state": "is_empty", "look": {"shape": "skid", "height": 7, "tint": "pale_wood"}}]}
   },
   "human": {"figure": "person", "height": 150},
-  "robot": {"figure": "lift_vehicle", "height": 130}
+  "robot": {"figure": "lift_vehicle", "height": 97.5}
 }
