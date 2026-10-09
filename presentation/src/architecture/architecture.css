@@ -70,8 +70,9 @@
 
 .presence-absent, .presence-leaving { opacity: 0; }
 .has-new .el.presence-old:not(.el-layer):not(.el-column):not(.el-world) { opacity: 0.45; }
-.el.presence-new.el-mechanism, .el.presence-new.el-component { border-width: 2.5px; border-color: var(--color-ink); }
-.el.presence-new .el-shape path { stroke: var(--color-ink); stroke-width: 2.5px; }
+/* A block a click adds (tpres-v6: a bit thicker boundary, on its final background). */
+.el.presence-new.el-mechanism, .el.presence-new.el-component { border-width: 3.5px; border-color: var(--color-ink); }
+.el.presence-new .el-shape path { stroke: var(--color-ink); stroke-width: 3.5px; }
 
 /* ---- Arrows -------------------------------------------------------------------------------------------------- */
 

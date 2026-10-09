@@ -11,7 +11,7 @@
  *
  * Positions are in the diagram's own unit, a canvas of DESIGN.w x DESIGN.h that the page scales to the slide. The
  * arrangement: knowledge in a left column (C1, C2, C3, the AAAI order); the mind beside it, recognition (C4) left and
- * adaptive planning (C5) right, the arrow "trusted intention" between them at the centre; the body below; the world a
+ * adaptive planning (C5) right, the arrow "recognised intention" between them at the centre; the body below; the world a
  * strip at the bottom, reached only through the body (sense, act).
  */
 
@@ -77,7 +77,7 @@ export const ELEMENTS: Element[] = [
 
   // Knowledge (given).
   el({ id: "C1", code: "C1", label: "team task knowledge", kind: "knowledge", stage: 1, parent: "K", question: "know",
-       sub: [{ text: "the robot's tasks", stage: 1 }, { text: "her task list", stage: 3 }],
+       sub: [{ text: "robot's tasks", stage: 1 }, { text: "her task list", stage: 3 }],
        box: { x: 20, y: 60, w: 250, h: 110 } }),
   el({ id: "C2", code: "C2", label: "knowledge about the human", kind: "knowledge", stage: 4, parent: "K",
        question: "know", sub: [{ text: "foreseeable behaviours", stage: 4 }], box: { x: 20, y: 205, w: 250, h: 110 } }),
@@ -132,7 +132,7 @@ export const ARROWS: Arrow[] = [
           labelOffset: { dx: 50, dy: 0 } }),
   arrow({ id: "fills", from: end("BL21", "right"), to: end("WS", "left"), label: [], stage: 1 }),
   arrow({ id: "tasks", from: end("C1", "right"), to: end("L1", "left", 40 / 640),
-          label: [{ text: "the robot's tasks", stage: 1 }, { text: "her task list", stage: 3 }], stage: 1,
+          label: [{ text: "robot's tasks", stage: 1 }, { text: "her task list", stage: 3 }], stage: 1,
           labelOffset: { dx: 200, dy: -38 } }),
   arrow({ id: "room", from: end("WS", "top", onWorldState(950)), to: end("C5", "bottom", 0.5), label: kw("room", 1),
           stage: 1, labelOffset: { dx: 150, dy: 0 } }),
@@ -156,7 +156,7 @@ export const ARROWS: Arrow[] = [
           labelOffset: { dx: 0, dy: 26 } }),
   arrow({ id: "support", from: end("B43", "right"), to: end("B44", "top"), label: kw("support", 3), stage: 3,
           labelOffset: { dx: 0, dy: -26 } }),
-  arrow({ id: "trusted", from: end("B44", "right"), to: end("B51", "left"), label: kw("trusted intention, or none", 3),
+  arrow({ id: "trusted", from: end("B44", "right"), to: end("B51", "left"), label: kw("recognised intention, or none", 3),
           stage: 3, centre: true, labelOffset: { dx: 0, dy: -46 }, labelWidth: 190 }),
   arrow({ id: "cost", from: end("B53", "bottom"), to: end("B54", "top"), label: kw("cost", 3), stage: 3,
           labelOffset: { dx: 46, dy: 0 } }),

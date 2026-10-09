@@ -31,8 +31,6 @@ const LIFT_TRUCK = { who: "robot" as const, x: 260, y: -370, facing: { x: 0, y: 
 export function TitleSlide() {
   return (
     <Slide stage={0} footer={false} className="title-slide" notes={<>
-      <p>The title is Hadi's (8 October 2026, preferred, a first version). The line under it is ccode's, written in the
-        talk's terms: <strong>NOT SETTLED</strong>, for Hadi.</p>
       <p>About 30 minutes plus 5 of questions. Time is budgeted per section only (for example 5 + 7 + 7 + 8 + 3).</p>
     </>}>
       <p className="title-kicker">TeamRob final demo day</p>
@@ -53,7 +51,7 @@ export function RobotSlide() {
       <p>The room is kitting's env_layout_01, drawn by the web-ui's own code: what the audience sees this afternoon.</p>
     </>}>
       <h1 className="scene-line">This is a robot.</h1>
-      <h1 className="scene-line fragment" ref={second}>The robot is in a factory setup.</h1>
+      <h1 className="scene-line fragment" ref={second}>Robot is in a factory setup.</h1>
       <AgentsInRoom recorded={KITTING} figures={[ROBOT]} inRoom={inRoom} />
     </Slide>
   );
@@ -61,12 +59,10 @@ export function RobotSlide() {
 
 /** The robot and the lift truck: two robots that use the same mind; the lift truck waits for its turn. */
 export function ActorsSlide() {
-  const second = useRef<HTMLParagraphElement>(null);
   return (
     <Slide stage={0} className="actors-slide" notes={<>
       <p>The robot has a colleague: the lift truck at the dock (dock loading, defined with Scania). It uses the same mind
         as the kitting robot. Today it waits for its turn; it comes back before the results.</p>
-      <p><strong>OPEN</strong>: the wording of its return.</p>
       <p><strong>OPTIONAL</strong> (handoff 9): the lift truck stays small and idle in a corner of the stage slides,
         still waiting.</p>
     </>}>
@@ -74,14 +70,13 @@ export function ActorsSlide() {
       <div className="actors">
         <figure className="actor">
           <div className="actor-scene"><AgentsInRoom recorded={KITTING} figures={[ROBOT]} inRoom /></div>
-          <figcaption><span className="dot dot-robot" />The robot, kitting</figcaption>
+          <figcaption><span className="dot dot-robot" />Robot, kitting</figcaption>
         </figure>
         <figure className="actor">
           <div className="actor-scene"><AgentsInRoom recorded={DOCK} figures={[LIFT_TRUCK]} inRoom /></div>
           <figcaption><span className="dot dot-robot" />The lift truck, dock loading</figcaption>
         </figure>
       </div>
-      <p className="scene-note fragment" ref={second}>The lift truck waits for its turn.</p>
     </Slide>
   );
 }
@@ -108,9 +103,6 @@ export function ProblemSlide() {
     <Slide stage={0} className="problem-slide" notes={<>
       <p>The problem: a human and a robot share one workspace. They should work together, get the work done, and stay
         safe.</p>
-      <p><strong>OPEN</strong> (handoff 11): the opening's problem sentence; it may need the tension "stopping is safe,
-        but it is not teamwork".</p>
-      <p><strong>PARKED</strong> (E2): one measured headline sentence from T-F part 1 here.</p>
     </>}>
       <h1 className="problem-head">Human-robot teaming</h1>
       <div className="problem-words">
@@ -163,7 +155,7 @@ export function QuestionsSlide() {
       <p>What I know: knowledge representation. What I believe: intention recognition. What I decide: adaptive
         planning.</p>
     </>}>
-      <h1 className="slide-head">The robot answers three questions</h1>
+      <h1 className="slide-head">Robot answers three questions</h1>
       <div className="questions">
         {QUESTIONS.map((q) => (
           <div key={q} className={`question fragment column-${q}`}>
@@ -186,7 +178,7 @@ export function ArchitectureFrameSlide() {
       <p>Click: the three questions over the regions they will fill.</p>
       <p>Suggestion by ccode: the empty frames here, so that the diagram is introduced once and then only grows.</p>
     </>}>
-      <ArchitectureView stage={0} questionTags title="The robot's architecture" />
+      <ArchitectureView stage={0} questionTags title="Robot's architecture" />
     </Slide>
   );
 }

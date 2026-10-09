@@ -34,7 +34,7 @@ export function DecompositionSlide() {
         body's micro-actions (a step, a grasp, a release), which the talk does not show.</p>
       <p>Keep this knowledge in mind: at talk stage 3 the same knowledge reads the human.</p>
     </>}>
-      <h1 className="slide-head">The robot knows its own tasks</h1>
+      <h1 className="slide-head">Robot knows its own tasks</h1>
       <div className="tree">
         <div className="tree-row">
           <div className="tree-label">Its tasks</div>

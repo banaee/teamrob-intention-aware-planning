@@ -4,7 +4,7 @@
  * the stage's mechanism, a copy of one under a new id with the change named (tpres-v5: scenario_s305_01 for talk stage
  * 2), each run from its own run file under configs/kitting/tpres/, outside every
  * measured set; its log pair and figure are kept in presentation/runs/ (untracked). Each stop is a tick and a caption;
- * every caption states only what the run's log shows at that tick (the recognizer's leader and its belief, the gate,
+ * every line states only what the run's log shows at that tick (the recognizer's leader and its belief, the gate,
  * the decision, the hold, the human's record), in the talk's words: a slide never states what its replay does not show
  * (Hadi, tpres-v5). Beside each scene, the robot's mind at the tick (scene/MindPanel.tsx), the parts each talk stage is
  * about.
@@ -26,13 +26,13 @@ const run = (r: unknown) => r as RecordedRun;   // the JSON's enumerations are r
  * picks it up at 97, places it at 145. */
 export function ReplayAlone() {
   const stops: Stop[] = [
-    { tick: 0, caption: "The robot chooses a task, deliver item 1, and plans its actions: the dashed line." },
-    { tick: 32, caption: "It picks up item 1; what is left of its plan leads to the table." },
-    { tick: 67, caption: "Item 1 delivered: it chooses the next task, deliver item 2." },
+    { tick: 0, caption: "Robot chooses deliver item 1 and plans its actions: the dashed line." },
+    { tick: 32, caption: "It picks up item 1; the rest of its plan leads to the table." },
+    { tick: 67, caption: "Item 1 delivered: robot chooses deliver item 2." },
     { tick: 97, caption: "It picks up item 2." },
     { tick: 150, caption: "Both delivered." },
   ];
-  return <ReplayView recorded={run(s1)} stops={stops} hideHumans mind={{}} tickNote tickMs={70} />;
+  return <ReplayView recorded={run(s1)} stops={stops} hideHumans mind={{ tasks: true }} tickMs={70} />;
 }
 
 /** Talk stage 2: scenario_s305_01 on env_layout_12 (configs/kitting/tpres/stage2_s305_01.yaml, intention-unaware), a
@@ -43,42 +43,42 @@ export function ReplayAlone() {
  * minimum separation 50 cm). */
 export function ReplayReactive() {
   const stops: Stop[] = [
-    { tick: 0, caption: "The robot knows nothing of her task: it projects her motion (the hatched blue stripe) and sets off to deliver item 7." },
-    { tick: 24, caption: "She picks up item 1 and turns toward her table; the robot carries item 7 toward its own." },
-    { tick: 34, caption: "Its path would come closer than the minimum separation to the projection of her motion: the robot holds, 7 ticks." },
+    { tick: 0, caption: "Robot knows nothing of her task: it projects her motion (hatched blue) and sets off for item 7." },
+    { tick: 24, caption: "She picks up item 1; robot carries item 7 toward its table." },
+    { tick: 34, caption: "Its path would come too close to the projection of her motion: robot holds 7 ticks." },
     { tick: 40, caption: "She crosses its path; the hold ends." },
-    { tick: 44, caption: "The robot goes on behind her. Closest: 58 cm, at tick 42, beyond the minimum separation of 50 cm." },
+    { tick: 44, caption: "Robot goes on behind her. Closest: 58 cm at tick 42 (minimum 50 cm)." },
   ];
   return <ReplayView recorded={run(s2)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
 
-/** Talk stage 3: scenario_s12_01 on env_layout_14 (T-F part 1's run_060): her delivery of item 1 trusted at tick 8, and
+/** Talk stage 3: scenario_s12_01 on env_layout_14 (T-F part 1's run_060): her delivery of item 1 recognised at tick 8, and
  * the robot switches from deliver item 7 to deliver item 13 (task choice); in the intention-unaware run_058 the robot
  * carries item 7 across her route, with holds. */
-export function ReplayTrusted() {
+export function ReplayRecognised() {
   const stops: Stop[] = [
-    { tick: 0, caption: "She starts work. The robot chooses deliver item 7; it does not yet know which of her tasks she does." },
-    { tick: 6, caption: "Her delivery of item 1 leads with a belief of 0.71: below 0.75, not trusted yet." },
-    { tick: 8, caption: "0.78, and it has support: trusted. Realized against her projected path, deliver item 13 is now cheaper: the robot switches to it." },
+    { tick: 0, caption: "She starts work. Robot chooses deliver item 7; it does not yet know her task." },
+    { tick: 6, caption: "Her delivery of item 1 leads at 0.71: below 0.75, not yet recognised." },
+    { tick: 8, caption: "0.78: recognised. Against her projected path, item 13 is now cheaper: robot switches to it." },
     { tick: 29, caption: "It picks up item 13." },
     { tick: 62, caption: "Item 13 delivered, far from her path. Item 7 comes next." },
   ];
   return <ReplayView recorded={run(s3)} stops={stops}
-                     mind={{ belief: true, support: true, hold: true, projection: true }} />;
+                     mind={{ belief: true, hold: true, projection: true }} />;
 }
 
 /** Talk stage 4: Hadi's scenario_s304_14 on env_layout_07 (configs/kitting/tpres/stage4_s304_14_ck_off.yaml, context
  * knowledge off), ticks 70 to 150 (Hadi, tpres-v5): at 70 the robot carries item 55 (decided at 63, her delivery of item
- * 52 trusted then, 0.80; 0.97 at 70); she delivers item 52 at 90 and starts her second coffee break; the robot chooses
- * deliver item 56 at 97; the break trusted at 106 (0.76), and the robot switches to deliver item 54, item 56 realized
+ * 52 recognised then, 0.80; 0.97 at 70); she delivers item 52 at 90 and starts her second coffee break; the robot chooses
+ * deliver item 56 at 97; the break recognised at 106 (0.76), and the robot switches to deliver item 54, item 56 realized
  * with a hold of 26 ticks; the break ends at 150. Talk stage 5 replays the same scenario with context knowledge on. */
 export function ReplayBreak() {
   const stops: Stop[] = [
-    { tick: 70, caption: "The robot carries item 55 to the table. She carries item 52 there too; her delivery is trusted: the projection from her intention." },
-    { tick: 90, caption: "She has delivered item 52 and walks to the coffee machine: her second coffee break." },
-    { tick: 97, caption: "Item 55 delivered: the robot chooses deliver item 56." },
-    { tick: 106, caption: "0.76, and it has support: the coffee break is trusted. Against her break, item 56 would need a hold of 26 ticks: the robot switches to deliver item 54." },
-    { tick: 150, caption: "Her break is over and she goes on with item 53; the robot is on item 54, item 56 comes after." },
+    { tick: 70, caption: "Robot carries item 55; she carries item 52 to the table. Her delivery is recognised." },
+    { tick: 90, caption: "She has delivered item 52 and walks to the coffee machine: her second break." },
+    { tick: 97, caption: "Item 55 delivered: robot chooses deliver item 56." },
+    { tick: 106, caption: "0.76: the coffee break is recognised. Item 56 would need a hold of 26 ticks: robot switches to item 54." },
+    { tick: 150, caption: "Her break is over; she goes on with item 53. Robot is on item 54." },
   ];
   return <ReplayView recorded={run(s4)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
@@ -86,19 +86,19 @@ export function ReplayBreak() {
 /** Talk stage 5: Hadi's scenario_s304_14, the same as talk stage 4, with context knowledge on
  * (configs/kitting/tpres/stage5_s304_14_ck_on.yaml), the same ticks 70 to 150 (Hadi, tpres-v6: his scenario exactly).
  * No timeline: no context fact is in force. Her first coffee break, observed complete at 49, makes the coffee break
- * recent: lowered from 51 to 138 ([IR-context]). At 70 her delivery of item 52 is trusted (since 60; 0.99). At 90 she
+ * recent: lowered from 51 to 138 ([IR-context]). At 70 her delivery of item 52 is recognised (since 60; 0.99). At 90 she
  * delivers item 52 and walks to the coffee machine; the robot's belief reads her next delivery, item 53 (0.97), not
- * trusted (no observation, then no support). At 97 the robot chooses deliver item 56. At 106 the coffee break stands at
+ * recognised (no observation, then no support). At 97 the robot chooses deliver item 56. At 106 the coffee break stands at
  * 0.37 behind switching on the A/C at 0.46 ([IR-dist]). Trusted at 116 (0.78): item 56 would need a hold of 26 ticks,
  * and the robot switches to deliver item 54. */
 export function ReplayBreakTime() {
   const stops: Stop[] = [
-    { tick: 70, caption: "The same shift, now with context knowledge. The robot carries item 55; her delivery of item 52 is trusted." },
-    { tick: 90, caption: "She walks to the coffee machine again. Just after her first break, the context makes another one less likely: the robot reads her next delivery." },
-    { tick: 97, caption: "Item 55 delivered: the robot chooses deliver item 56." },
-    { tick: 106, caption: "The coffee break stands at 0.37, behind switching on the A/C: not trusted." },
-    { tick: 116, caption: "0.78, and it has support: the coffee break is trusted. Item 56 would need a hold of 26 ticks: the robot switches to deliver item 54." },
-    { tick: 150, caption: "Her break is over and she goes on with item 53; the robot is on item 54." },
+    { tick: 70, caption: "The same shift, with context knowledge. Robot carries item 55; her delivery of item 52 is recognised." },
+    { tick: 90, caption: "She walks to the coffee machine again. Just after her first break, another is less likely: robot reads her next delivery." },
+    { tick: 97, caption: "Item 55 delivered: robot chooses deliver item 56." },
+    { tick: 106, caption: "The coffee break stands at 0.37, behind switching on the A/C: not recognised." },
+    { tick: 116, caption: "0.78: the coffee break is recognised. Item 56 would need a hold of 26 ticks: robot switches to item 54." },
+    { tick: 150, caption: "Her break is over; she goes on with item 53. Robot is on item 54." },
   ];
   return <ReplayView recorded={run(s5)} stops={stops}
                      mind={{ belief: true, hold: true, projection: true, context: true }} />;
@@ -108,17 +108,18 @@ export function ReplayBreakTime() {
  * T-F part 1's run_028), ticks 0 to 39 (tpres-v5: the range ends while she stands; the hold of 32 ticks decided at 55
  * runs on after she walks off at 57, and does not serve the point). Her script is unmodelled throughout: a walk to
  * door_N, a stand of 60 seconds at spot_E (standing from 26 to 57), a walk to corner_SE. Her assigned delivery of item 12
- * leads but is not trusted: no support to 9, no fit from 10 (unexplained, every live hypothesis inadequate). The
+ * leads but is not recognised: no support to 9, no fit from 10 (unexplained, every live hypothesis inadequate). The
  * projection from her motion all along; holds of 2 ticks at 14, 20 and 25, then 4 at 27, 8 at 31 and 16 at 39 while
  * she stands. */
 export function ReplayStand() {
   const stops: Stop[] = [
-    { tick: 0, caption: "She walks to the north door. Her delivery of item 12 leads the belief, but has no support: not trusted." },
-    { tick: 10, caption: "Her walk fits none of the robot's hypotheses: her behaviour is unexplained. The robot knows that it does not know." },
+    { tick: 0, caption: "She walks to the north door. Her delivery of item 12 leads, but is not recognised." },
+    { tick: 10, caption: "Her walk fits none of the hypotheses: unexplained. Robot knows that it does not know." },
     { tick: 14, caption: "It falls back on the projection from her motion, as the reactive robot did: a hold of 2 ticks." },
-    { tick: 26, caption: "She stands at a spot by the east wall: something the robot has no model of." },
-    { tick: 39, caption: "The longer she stands, the further the projection of her stand reaches: the robot's holds grow, 4, 8, now 16 ticks." },
+    { tick: 26, caption: "She stands by the east wall: something robot has no model of." },
+    { tick: 39, caption: "The longer she stands, the further the projection of her stand reaches: holds of 4, 8, now 16 ticks." },
   ];
   return <ReplayView recorded={run(s6)} stops={stops}
-                     mind={{ belief: true, fit: true, hold: true, projection: true }} />;
+                     mind={{ belief: true, fit: true, hold: true, projection: true }}
+                     mark={{ object: "item_12", label: "item 12" }} />;
 }

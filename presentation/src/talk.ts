@@ -58,7 +58,7 @@ export const STAGES: Record<TalkStage, StageRow> = {
   },
   2: {
     stage: 2, title: "A human in the shared space",
-    line: "the robot knows nothing about her; it reacts to her motion",
+    line: "robot knows nothing about her; it reacts to her motion",
     columns: {
       know: ["Nothing about her intentions"],
       believe: ["Nothing"],
@@ -67,11 +67,10 @@ export const STAGES: Record<TalkStage, StageRow> = {
   },
   3: {
     stage: 3, title: "Assigned tasks",
-    line: "the robot knows her task list and recognises which task she does",
+    line: "robot knows her task list and recognises which task she does",
     columns: {
       know: ["Her task list"],
-      believe: ["Hypotheses: her assigned tasks", "Belief update", "Support from her movement",
-        "Confidence check: a trusted intention, or none"],
+      believe: ["Hypotheses: her assigned tasks", "Belief update", "Support from her movement"],
       decide: ["Projection from her intention", "Realizer: the holds", "Task choice: a switch or a reorder"],
     },
   },
@@ -81,7 +80,7 @@ export const STAGES: Record<TalkStage, StageRow> = {
     columns: {
       know: ["Foreseeable behaviours"],
       believe: ["More hypotheses: her assigned tasks and the foreseeable behaviours"],
-      decide: ["The robot adapts its plan to her coffee break"],
+      decide: ["Robot adapts its plan to her coffee break"],
     },
   },
   5: {
@@ -89,14 +88,14 @@ export const STAGES: Record<TalkStage, StageRow> = {
     columns: {
       know: ["Context"],
       believe: ["The prior depends on the context", "Her observed movement still decides"],
-      decide: ["The robot adapts its plan when the break is trusted"],
+      decide: ["Robot adapts its plan when the break is recognised"],
     },
   },
   6: {
     stage: 6, title: "Unmodelled behaviour", line: "she does something the robot has no model of",
     columns: {
       know: ["Where its model ends"],
-      believe: ["Fit: does a hypothesis fit what she does?", "No hypothesis fits: the robot knows that it does not know"],
+      believe: ["Fit: does a hypothesis fit what she does?", "No hypothesis fits: robot knows that it does not know"],
       decide: ["Projection from her motion, now as the fallback"],
     },
   },

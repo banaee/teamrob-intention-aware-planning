@@ -24,6 +24,8 @@ import type { RecordedRun } from "./RunReplay";
 
 /** The parts of the mind a slide shows: the hypotheses' chart is the default where the robot recognises. */
 export interface MindParts {
+  /** All the robot's tasks with their steps, a step bold once reached (talk stage 1, Hadi, tpres-v6). */
+  tasks?: boolean;
   belief?: boolean;
   support?: boolean;
   fit?: boolean;
@@ -55,6 +57,15 @@ function hypothesisName(hypotheses: readonly Hypothesis[], key: string): string 
   return h === undefined ? key : talkName(h.task, h.bindings);
 }
 
+/** A kitting task's steps in the talk's words (as the slide of the robot's task knowledge names them), and which one
+ * the body's action at its plan's cursor is: a walk to a table is the third, any other walk the first. Display text. */
+const STEPS = ["go to the item", "pick it up", "go to its table", "place it"];
+function stepOf(action: string, target: string | undefined): number {
+  if (action === "pick_up") return 1;
+  if (action === "place") return 3;
+  return target !== undefined && target.startsWith("kitting_table") ? 2 : 0;
+}
+
 const ADEQUACY: Record<Adequacy, string> = { adequate: "✓", inadequate: "✗", no_observation: "·" };
 
 export function MindPanel({ recorded, shown, parts }: { recorded: RecordedRun; shown: number; parts: MindParts }) {
@@ -73,9 +84,10 @@ export function MindPanel({ recorded, shown, parts }: { recorded: RecordedRun; s
 
   return (
     <aside className="mind" aria-label="What the robot's mind holds at this tick">
-      <h2 className="mind-title"><span className="mind-dot" />The robot's mind</h2>
+      <h2 className="mind-title"><span className="mind-dot" />Robot's mind</h2>
+      {parts.tasks && <TaskList recorded={recorded} ticks={ticks} />}
       <dl className="mind-facts">
-        <div><dt>its task</dt><dd>{finished ? "all done" : task === null ? "–" : taskName(task)}</dd></div>
+        {!parts.tasks && <div><dt>its task</dt><dd>{finished ? "all done" : task === null ? "–" : taskName(task)}</dd></div>}
         {parts.hold && (
           <div><dt>hold</dt><dd className={hold === null ? "" : "mind-hold"}>
             {hold === null ? "–" : `${hold.stood} of ${hold.planned} ticks`}</dd></div>
@@ -96,7 +108,7 @@ export function MindPanel({ recorded, shown, parts }: { recorded: RecordedRun; s
             {parts.support && <span className="mind-mark">support</span>}
             {parts.fit && <span className="mind-mark">fits</span>}
           </div>
-          {belief === null ? <p className="mind-none">none: the robot knows nothing about her intentions</p>
+          {belief === null ? <p className="mind-none">none: robot knows nothing about her intentions</p>
             : rows.map((key) => {
               const h = live.get(key) ?? null;
               const colour = colourOf(colours, key);
@@ -104,7 +116,7 @@ export function MindPanel({ recorded, shown, parts }: { recorded: RecordedRun; s
                 <div key={key} className={`mind-row${h === null ? " is-dead" : ""}${key === trusted ? " is-trusted" : ""}`}>
                   <span className="mind-label">
                     <i className="mind-swatch" style={{ background: colour }} />{hypothesisName(robot.hypotheses, key)}
-                    {key === trusted && <span className="mind-trusted">trusted</span>}
+                    {key === trusted && <span className="mind-trusted">recognised</span>}
                   </span>
                   <span className="mind-bar" aria-hidden>
                     <span style={{ width: `${h === null ? 0 : 100 * h.belief}%`, background: colour }} />
@@ -124,5 +136,34 @@ export function MindPanel({ recorded, shown, parts }: { recorded: RecordedRun; s
         </div>
       )}
     </aside>
+  );
+}
+
+/** All the robot's own tasks (its assigned pool), in order, each with its steps, grey; a step bold once the running
+ * task reaches it, every step of a task the body ran before (Hadi, tpres-v6). */
+function TaskList({ recorded, ticks }: { recorded: RecordedRun; ticks: TickUpdate[] }) {
+  const robot = recorded.robots[0];
+  const at = (u: TickUpdate) => u.robots.find((r) => r.robot === robot.robot)!.body;
+  const now = at(ticks[ticks.length - 1]);
+  const ran = new Set(ticks.map((u) => at(u).task?.identity).filter((x): x is string => x !== undefined));
+  const action = now.action;
+  const step = action === null || action === undefined ? -1
+    : stepOf(action.action.action, action.action.bindings.find((b) => b.parameter === "?target")?.value);
+  return (
+    <ol className="mind-tasks">
+      {robot.assigned.map((t) => {
+        const current = !now.finished && now.task?.identity === t.identity;
+        const before = !current && ran.has(t.identity);
+        return (
+          <li key={t.identity}>{taskName(t)}
+            <ol className="mind-steps">
+              {STEPS.map((st, i) => (
+                <li key={st} className={before || (current && i <= step) ? "is-reached" : ""}>{st}</li>
+              ))}
+            </ol>
+          </li>
+        );
+      })}
+    </ol>
   );
 }

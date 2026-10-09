@@ -9,7 +9,7 @@ run options passed as the web-ui passes a screen-user's choice.
 
 Writes presentation/data/run_<name>.json: the domain's scene appearance, the run's triple and world (the run
 description's), and the tick updates of ticks <first> to <last>, each cut to what the slide draws (the world, and per
-robot its body, its belief over the live hypotheses, its gate's answer, its last decision and what lies ahead), and the
+robot its body (its task, the action at its plan's cursor, its hold), its belief over the live hypotheses, its gate's answer, its last decision and what lies ahead), and the
 robots' descriptions (their hypotheses and θ), which the robot's mind beside a replay reads. The deck's build runs it
 (scripts/record.mjs) every time, from the original files.
 """
@@ -53,7 +53,7 @@ def cut(update: msg.TickUpdate) -> dict:
         belief = r.belief
         robots.append({
             "robot": r.robot,
-            "body": r.body.model_dump(mode="json", include={"task", "hold", "finished"}),
+            "body": r.body.model_dump(mode="json", include={"task", "action", "hold", "finished"}),
             "belief": None if belief is None else belief.model_dump(mode="json"),
             "gate_answer": r.gate_answer.value,
             "decision": None if r.decision is None else r.decision.model_dump(mode="json"),

@@ -31,10 +31,6 @@ export function AudienceQuestionSlide() {
       <p>The one question to the audience. Let them answer; collect two or three answers, then go on: first, the
         simplest robot, which knows nothing about her.</p>
       <p>Wording: the handoff's candidate.</p>
-      <p><strong>PARKED</strong> (handoff 11): the comparison with centralised multi-agent planning, candidate place at
-        the moment the human enters (its slide removed, tpres-v4). Agreed wording: a central planner can command robots;
-        nobody can command a human, whose current intention the robot is not told and whose behaviour is only partly
-        modelled. A different setting, not a weaker approach.</p>
     </>}>
       <p className="ask">What would the robot need to know to work beside her?</p>
     </Slide>
@@ -95,10 +91,10 @@ export function ProjectionSlide() {
           <text x={HUMAN[0] - 62} y={HUMAN[1] + 60} className="drawing-label drawing-label-human">the human</text>
           <circle cx={ROBOT[0]} cy={ROBOT[1]} r="30" className="agent-ring agent-ring-robot" />
           <circle cx={ROBOT[0]} cy={ROBOT[1]} r="13" className="agent agent-robot" />
-          <text x={ROBOT[0] + 54} y={ROBOT[1] + 9} className="drawing-label drawing-label-robot">the robot</text>
+          <text x={ROBOT[0] + 54} y={ROBOT[1] + 9} className="drawing-label drawing-label-robot">robot</text>
         </svg>
         <div className="projection-text">
-          <p className={`appear${seenShown ? " on" : ""}`}>The robot sees where she moves.</p>
+          <p className={`appear${seenShown ? " on" : ""}`}>Robot sees where she moves.</p>
           <p className={`appear${projectedShown ? " on" : ""}`}>It continues her motion, for as long as it has seen it.</p>
           <p className={`appear${heldShown ? " on" : ""}`}>Where its path would come closer than the minimum separation, it
             holds.</p>
@@ -114,7 +110,7 @@ export function ProjectionSlide() {
 export function ReactiveRunSlide() {
   return (
     <Slide stage={2} className="replay-slide" notes={<>
-      <p>The reactive robot in a real sim-run: the robot holds to keep the minimum separation from her projected path.
+      <p>The reactive robot in a real run: the robot holds to keep the minimum separation from her projected path.
         One click per stop. Beside the scene, the robot's mind: no hypotheses, the projection from her motion, its
         hold.</p>
       <p><strong>THE COPY</strong> (tpres-v5, 8 October 2026): kitting scenario_s305_01 on env_layout_12, a copy of Hadi's
@@ -124,9 +120,6 @@ export function ReactiveRunSlide() {
         robot's from shelf_5 meet at the room's crossing: at 34 the robot holds 7 ticks (34 to 40) against the
         projection from her motion; it goes on behind her, closest 58.26 cm at 42. The robot's start was chosen from a
         grid of starts (the longest hold of the grid); what it then does is the framework's own result.</p>
-      <p><strong>OPEN</strong> (handoff 5, 11): a screenshot of Fatemeh's PRIEST trajectory adaptation (ROS side) may
-        acknowledge her work here, labelled as such; Hadi fixes its wording. It would need its own slide or a corner of
-        this one.</p>
       <p>In the results this is the intention-unaware run: the same planner, fed only with the projection from her
         motion.</p>
     </>}>
@@ -157,7 +150,7 @@ export function TurningPointSlide() {
         the rest of the talk builds: let the robot know something about her behaviour.</p>
       <p>A challenge followed by a solution, never a list of failures.</p>
     </>}>
-      <p className="turning-challenge">The robot keeps the minimum separation from her. It reacts only to her present
+      <p className="turning-challenge">Robot keeps the minimum separation from her. It reacts only to her present
         motion.</p>
       <p className="turning-solution fragment">What if the robot knows something about her behaviour?</p>
     </Slide>

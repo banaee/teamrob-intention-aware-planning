@@ -36,17 +36,20 @@ export type Unboxable = "B41" | "B43" | "B44" | "B51" | "B53" | "B54" | "B42";
 
 /** One item of a panel. `words`: a short sentence (its symbols typeset, `T`); `formal`: the formal line, a TeX string
  * (its new part in \htmlClass{add} where an extension changes it); `lead` and `cond`: a condition's lead and its parts;
- * `code`: pseudocode, one TeX string per line, typeset as an algorithm; `out`: the block's output, set apart below the
- * rest. `until`: the talk stage from which a later item replaces it. */
+ * `code`: pseudocode, one TeX string per line, typeset as an algorithm; `options`: a block's options side by side, each
+ * a bold name and a short gloss; `out`: the block's output, set apart below the rest. `until`: the talk stage from which
+ * a later item replaces it. */
 export interface Item {
   stage: TalkStage;
   until?: TalkStage;
-  kind: "words" | "formal" | "lead" | "cond" | "code" | "out";
+  kind: "words" | "formal" | "lead" | "cond" | "code" | "options" | "out";
   content: ReactNode;
 }
 
 export interface Box {
   name: string;
+  /** The name of the block's approach, under its name (the realizer's, Hadi, tpres-v6). */
+  approach?: string;
   code: string;
   items: Item[];
 }
@@ -74,66 +77,60 @@ export const BOXES: Record<Unboxable, Box> = {
   B43: {
     name: "support", code: "B4.3",
     items: [
-      { stage: 3, kind: "lead", content: <>A hypothesis has support when</> },
-      { stage: 3, kind: "cond", content: <>she moves toward the target of its current action,</> },
-      { stage: 3, kind: "cond", content: <>or the robot has just seen her finish the action before it.</> },
+      { stage: 3, kind: "cond", content: <>She moves toward its next target,</> },
+      { stage: 3, kind: "cond", content: <>or robot saw her finish the step before.</> },
     ],
   },
   B44: {
     name: "confidence check", code: "B4.4",
     items: [
-      { stage: 3, kind: "lead", content: <>The leading hypothesis is trusted when</> },
+      { stage: 3, kind: "lead", content: <>The leading hypothesis is recognised when</> },
       { stage: 3, kind: "cond", content: <>its belief is at least <T>{String.raw`\theta = 0.75`}</T>,</> },
       { stage: 3, kind: "cond", content: <>it has support,</> },
       { stage: 5, kind: "cond", content: <>her movement alone ranks no other hypothesis above it,</> },
       { stage: 6, kind: "cond", content: <>it fits.</> },
-      { stage: 3, kind: "out", content: <>Out: the trusted intention, or none.</> },
+      { stage: 3, kind: "out", content: <>Out: the recognised intention, or none.</> },
     ],
   },
   B51: {
     name: "projection", code: "B5.1",
     items: [
       { stage: 2, kind: "words", content: <>From her motion: her present motion, continued.</> },
-      { stage: 3, kind: "words", content: <>From her intention: the robot plans her trusted task with the same task
-          knowledge it plans its own work with.</> },
-      { stage: 3, kind: "formal", content: String.raw`\text{her path} = \operatorname{plan}(\text{trusted intention})` },
-      { stage: 6, kind: "words", content: <>No trusted intention: the projection from her motion is the fallback, until a
-          hypothesis is trusted again.</> },
+      { stage: 3, kind: "words", content: <>From her intention: robot plans her task with its own task knowledge.</> },
+      { stage: 3, kind: "formal", content: String.raw`\text{her path} = \operatorname{plan}(\text{recognised intention})` },
+      { stage: 6, kind: "words", content: <>No hypothesis fits, so no recognised intention: the projection from her motion
+          is the fallback.</> },
     ],
   },
   B53: {
-    name: "realizer", code: "B5.3",
+    name: "realizer", approach: "Spatio-temporal conflict resolution", code: "B5.3",
     items: [
       { stage: 3, kind: "code", content: [
-        String.raw`\textbf{for each}\ \text{task of the robot's plan, in order:}`,
-        String.raw`\quad \mathit{hold} \leftarrow \text{the smallest hold, in ticks, such that}`,
-        String.raw`\qquad\qquad \text{the robot's path keeps the minimum separation}`,
-        String.raw`\qquad\qquad \text{from her projected path}`,
-        String.raw`\mathit{cost} \leftarrow \text{the plan's duration} + \text{its holds}`,
+        String.raw`\textbf{for each}\ \text{task } k \text{ of the plan:}`,
+        String.raw`\quad \delta_k \leftarrow \min\,\{\delta \ge 0 : \operatorname{dist}(\text{robot},\ \text{her path}) \ge d_{\min}\}`,
+        String.raw`\mathit{cost} \leftarrow T + \textstyle\sum_k \delta_k`,
       ] },
-      { stage: 3, kind: "words", content: <>Standing still never comes too close: a hold always exists.</> },
+      { stage: 3, kind: "words", content: <><T>{String.raw`\delta_k`}</T>: a hold in ticks; <T>{String.raw`d_{\min}`}</T>: the
+          minimum separation; <T>T</T>: the plan's duration.</> },
     ],
   },
   B54: {
     name: "task choice", code: "B5.4",
     items: [
-      { stage: 3, kind: "code", content: [
-        String.raw`\textbf{for each}\ \text{candidate (a task, or an order of tasks):}`,
-        String.raw`\quad \mathit{cost} \leftarrow \operatorname{realizer}(\text{candidate},\ \text{her projected path})`,
-        String.raw`\text{take the cheapest candidate}`,
-        String.raw`\text{carry out its first hold and its first task}`,
+      { stage: 3, kind: "words", content: <>Against her projected path, robot takes the cheapest of its options:</> },
+      { stage: 3, kind: "options", content: [
+        ["hold", "wait, then go on"],
+        ["switch", "take another task"],
+        ["reorder", "change the order"],
       ] },
-      { stage: 3, kind: "words", content: <>A switch or a reorder comes from here. The robot decides again at the next
-          change.</> },
+      { stage: 3, kind: "words", content: <>It decides again at the next change.</> },
     ],
   },
   B42: {
     name: "fit", code: "B4.2",
     items: [
-      { stage: 6, kind: "words", content: <>A hypothesis fits while her detours and her standing delay its current action
-          no more than is plausible.</> },
-      { stage: 6, kind: "out", content: <>When the trusted intention stops fitting, the robot stops trusting it.</> },
-      { stage: 6, kind: "out", content: <>No hypothesis fits: her behaviour is unexplained.</> },
+      { stage: 6, kind: "cond", content: <>A hypothesis fits while her detours and her standing stay plausible for it.</> },
+      { stage: 6, kind: "cond", content: <>No hypothesis fits: her behaviour is unexplained.</> },
     ],
   },
 };
@@ -156,6 +153,14 @@ export function Unboxed({ block, stage, side }: { block: Unboxable; stage: TalkS
             {(i.content as string[]).map((line, j) => <div key={j} className="ub-code-line"><Tex>{line}</Tex></div>)}
           </div>
         );
+      case "options":
+        return (
+          <div key={k} className={`ub-item ub-options${cls}`}>
+            {(i.content as [string, string][]).map(([name, gloss]) => (
+              <div key={name} className="ub-option"><strong>{name}</strong><span>{gloss}</span></div>
+            ))}
+          </div>
+        );
       case "cond":
         return <p key={k} className={`ub-item ub-cond${cls}`}>{i.content}</p>;
       case "lead":
@@ -169,6 +174,7 @@ export function Unboxed({ block, stage, side }: { block: Unboxable; stage: TalkS
   return (
     <div className={`unboxed unboxed-${side}`}>
       <div className="ub-head"><span className="ub-name">{box.name}</span></div>
+      {box.approach !== undefined && <p className="ub-approach">{box.approach}</p>}
       {body.map(item)}
       {outs.length > 0 && <div className="ub-out">{outs.map(item)}</div>}
     </div>
