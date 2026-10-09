@@ -9,6 +9,8 @@ import { useRef } from "react";
 
 import dock from "../../data/dock_loading_env_layout_03.json";
 import kitting from "../../data/kitting_env_layout_01.json";
+import oruLogo from "../../logos/Oru_logo_ENG_rgb.png";
+import teamrobLogo from "../../logos/teamrob-logo.png";
 import { useShown } from "../Deck";
 import { AgentsInRoom, type Recorded } from "../scene/AgentsInRoom";
 import { QUESTION_TEXT, QUESTIONS, TALK_TITLE } from "../talk";
@@ -36,6 +38,10 @@ export function TitleSlide() {
       <p className="title-kicker">TeamRob final demo day</p>
       <h1 className="title-main">{TALK_TITLE}</h1>
       <p className="title-who">Hadi Banaee · TeamRob SP4, intention recognition, with SP3, planning</p>
+      <div className="title-logos">
+        <img src={teamrobLogo} alt="TeamRob" />
+        <img src={oruLogo} alt="Örebro University" />
+      </div>
     </Slide>
   );
 }

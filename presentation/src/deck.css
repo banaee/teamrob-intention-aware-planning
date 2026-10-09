@@ -462,3 +462,8 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 .results-one .r-n { font-size: calc(22 * var(--u)); }
 .shot-slide .shot { margin-top: calc(24 * var(--u)); flex: 1; min-height: 0; width: 100%; object-fit: contain;
   object-position: center top; }
+
+/* The title slide's two logos (Hadi): small, side by side, at the bottom centre. */
+.title-logos { position: absolute; left: 0; right: 0; bottom: calc(56 * var(--u)); display: flex; justify-content: center;
+  align-items: center; gap: calc(56 * var(--u)); }
+.title-logos img { height: calc(72 * var(--u)); width: auto; display: block; }
