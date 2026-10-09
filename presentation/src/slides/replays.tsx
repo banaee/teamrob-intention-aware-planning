@@ -27,9 +27,9 @@ const run = (r: unknown) => r as RecordedRun;   // the JSON's enumerations are r
  * picks it up at 97, places it at 145. */
 export function ReplayAlone() {
   const stops: Stop[] = [
-    { tick: 0, caption: "Robot chooses deliver item 1 and plans its actions: the dashed line." },
-    { tick: 32, caption: "It picks up item 1; the rest of its plan leads to the table." },
-    { tick: 67, caption: "Item 1 delivered: robot chooses deliver item 2." },
+    { tick: 0, caption: "Robot chooses item 1 and plans its actions (dashed)." },
+    { tick: 32, caption: "It picks up item 1." },
+    { tick: 67, caption: "Item 1 delivered; robot chooses item 2." },
     { tick: 97, caption: "It picks up item 2." },
     { tick: 150, caption: "Both delivered." },
   ];
@@ -44,11 +44,11 @@ export function ReplayAlone() {
  * minimum separation 50 cm). */
 export function ReplayReactive() {
   const stops: Stop[] = [
-    { tick: 0, caption: "Robot knows nothing of her task: it projects her motion (hatched blue) and sets off for item 7." },
-    { tick: 24, caption: "She picks up item 1; robot carries item 7 toward its table." },
-    { tick: 34, caption: "Its path would come too close to the projection of her motion: robot holds 7 ticks." },
-    { tick: 40, caption: "She crosses its path; the hold ends." },
-    { tick: 44, caption: "Robot goes on behind her. Closest: 58 cm at tick 42 (minimum 50 cm)." },
+    { tick: 0, caption: "Robot projects her motion (hatched blue) and sets off for item 7." },
+    { tick: 24, caption: "She picks up item 1; robot carries item 7." },
+    { tick: 34, caption: "Too close to her projected motion: robot holds 7 ticks." },
+    { tick: 40, caption: "She crosses; the hold ends." },
+    { tick: 44, caption: "Robot goes on behind her; closest 58 cm (minimum 50)." },
   ];
   return <ReplayView recorded={run(s2)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
@@ -58,11 +58,11 @@ export function ReplayReactive() {
  * carries item 7 across her route, with holds. */
 export function ReplayRecognised() {
   const stops: Stop[] = [
-    { tick: 0, caption: "She starts work. Robot chooses deliver item 7; it does not yet know her task." },
-    { tick: 6, caption: "Her delivery of item 1 leads at 0.71: below 0.75, not yet recognised." },
-    { tick: 8, caption: "0.78: recognised. Against her projected path, item 13 is now cheaper: robot switches to it." },
+    { tick: 0, caption: "Robot chooses item 7; her task is not yet known." },
+    { tick: 6, caption: "Her delivery of item 1 leads at 0.71: not yet recognised." },
+    { tick: 8, caption: "0.78: recognised. Item 13 is now cheaper: robot switches." },
     { tick: 29, caption: "It picks up item 13." },
-    { tick: 62, caption: "Item 13 delivered, far from her path. Item 7 comes next." },
+    { tick: 62, caption: "Item 13 delivered, far from her path." },
   ];
   return <ReplayView recorded={run(s3)} stops={stops}
                      mind={{ belief: true, hold: true, projection: true }} />;
@@ -75,11 +75,11 @@ export function ReplayRecognised() {
  * with a hold of 26 ticks; the break ends at 150. Talk stage 5 replays the same scenario with context knowledge on. */
 export function ReplayBreak() {
   const stops: Stop[] = [
-    { tick: 70, caption: "Robot carries item 55; she carries item 52 to the table. Her delivery is recognised." },
-    { tick: 90, caption: "She has delivered item 52 and walks to the coffee machine: her second break." },
-    { tick: 97, caption: "Item 55 delivered: robot chooses deliver item 56." },
-    { tick: 106, caption: "0.76: the coffee break is recognised. Item 56 would need a hold of 26 ticks: robot switches to item 54." },
-    { tick: 150, caption: "Her break is over; she goes on with item 53. Robot is on item 54." },
+    { tick: 70, caption: "Robot carries item 55; her delivery of item 52 is recognised." },
+    { tick: 90, caption: "She walks to the coffee machine: her second break." },
+    { tick: 97, caption: "Item 55 delivered; robot chooses item 56." },
+    { tick: 106, caption: "0.76: coffee break recognised. Item 56 would need a 26-tick hold: robot switches to item 54." },
+    { tick: 150, caption: "Her break is over; robot is on item 54." },
   ];
   return <ReplayView recorded={run(s4)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;
 }
@@ -94,12 +94,12 @@ export function ReplayBreak() {
  * and the robot switches to deliver item 54. */
 export function ReplayBreakTime() {
   const stops: Stop[] = [
-    { tick: 70, caption: "The same shift, with context knowledge. Robot carries item 55; her delivery of item 52 is recognised." },
-    { tick: 90, caption: "She walks to the coffee machine again. Just after her first break, another is less likely: robot reads her next delivery." },
-    { tick: 97, caption: "Item 55 delivered: robot chooses deliver item 56." },
-    { tick: 106, caption: "The coffee break stands at 0.37, behind switching on the A/C: not recognised." },
-    { tick: 116, caption: "0.78: the coffee break is recognised. Item 56 would need a hold of 26 ticks: robot switches to item 54." },
-    { tick: 150, caption: "Her break is over; she goes on with item 53. Robot is on item 54." },
+    { tick: 70, caption: "Same shift, with context knowledge. Her delivery of item 52 is recognised." },
+    { tick: 90, caption: "She walks to the coffee machine; just after a break, another is less likely." },
+    { tick: 97, caption: "Item 55 delivered; robot chooses item 56." },
+    { tick: 106, caption: "Coffee break at 0.37, behind the A/C: not recognised." },
+    { tick: 116, caption: "0.78: coffee break recognised. Item 56 would need a 26-tick hold: robot switches to item 54." },
+    { tick: 150, caption: "Her break is over; robot is on item 54." },
   ];
   return <ReplayView recorded={run(s5)} stops={stops}
                      mind={{ belief: true, hold: true, projection: true, context: true }} />;
@@ -114,26 +114,26 @@ export function ReplayBreakTime() {
  * she stands. */
 export function ReplayStand() {
   const stops: Stop[] = [
-    { tick: 0, caption: "She walks to the north door. Her delivery of item 12 leads, but is not recognised." },
-    { tick: 10, caption: "Her walk fits none of the hypotheses: unexplained. Robot knows that it does not know." },
-    { tick: 14, caption: "It falls back on the projection from her motion, as the reactive robot did: a hold of 2 ticks." },
-    { tick: 26, caption: "She stands by the east wall: something robot has no model of." },
-    { tick: 39, caption: "The longer she stands, the further the projection of her stand reaches: holds of 4, 8, now 16 ticks." },
+    { tick: 0, caption: "She walks to the north door; her delivery of item 12 leads, not recognised." },
+    { tick: 10, caption: "No hypothesis fits: unexplained. Robot knows that it does not know." },
+    { tick: 14, caption: "It falls back on the projection from her motion: a 2-tick hold." },
+    { tick: 26, caption: "She stands by the east wall: nothing robot has a model of." },
+    { tick: 39, caption: "The longer she stands, the longer the holds: 4, 8, now 16 ticks." },
   ];
   return <ReplayView recorded={run(s6)} stops={stops}
                      mind={{ belief: true, fit: true, hold: true, projection: true }}
                      mark={{ object: "item_12", label: "item 12" }} />;
 }
 
-/** The lift truck's turn: Hadi's dock_loading scenario_s11_01 on env_layout_05 (configs/kitting/tpres/stage8_dl_s11_01.yaml,
+/** The lift truck's turn: Hadi's dock_loading scenario_s11_01 on env_layout_05 (configs/dock_loading/tpres/stage8_dl_s11_01.yaml,
  * intention-aware, the defaults otherwise), ticks 50 to 120: her scan of pallet 0 recognised from 48; pallet 5 delivered
  * and the return of pallet 6 chosen at 60; her scan of pallet 2 entered and recognised at 68; at 120 an office break
  * leads (0.80), not recognised. No hold in the run. */
 export function ReplayDock() {
   const stops: Stop[] = [
-    { tick: 50, caption: "The lift truck delivers pallet 5. Her scan of pallet 0 is recognised." },
-    { tick: 60, caption: "Pallet 5 delivered: robot chooses to return pallet 6." },
-    { tick: 68, caption: "She moves on to pallet 2: her scan of pallet 2 is recognised." },
+    { tick: 50, caption: "Robot's task: deliver pallet 5." },
+    { tick: 60, caption: "Pallet 5 delivered; robot chooses to return pallet 6." },
+    { tick: 68, caption: "She moves to pallet 2: that scan is recognised." },
     { tick: 120, caption: "An office break leads at 0.80: not recognised." },
   ];
   return <ReplayView recorded={run(s8)} stops={stops} mind={{ belief: true, hold: true, projection: true }} />;

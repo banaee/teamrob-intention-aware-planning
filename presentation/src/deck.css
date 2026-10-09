@@ -323,7 +323,7 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 /* ---- A replayed sim-run (scene/RunReplay.tsx), the robot's mind beside it (scene/MindPanel.tsx) ------------------- */
 
 .replay { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; }
-.replay-slide .replay { margin-top: calc(16 * var(--u)); }
+.replay-slide .replay { margin-top: calc(4 * var(--u)); }
 .replay-main { display: flex; gap: calc(36 * var(--u)); flex: 1; min-height: 0; }
 .replay-left { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; }
 .replay-scene { position: relative; flex: 1; min-height: 0; min-width: 0; pointer-events: none; }
@@ -334,8 +334,8 @@ h1, h2, p, ul, ol { margin: 0; font-weight: inherit; }
 }
 /* The lines of a replay (tpres-v6): all there from the start, one per line, grey; each black and bold once its click
    comes. */
-.replay-lines { list-style: none; margin: calc(12 * var(--u)) 0 0; padding: 0; display: flex; flex-direction: column;
-  gap: calc(6 * var(--u)); font-size: calc(25 * var(--u)); line-height: 1.3; color: var(--color-labelFaint); }
+.replay-lines { list-style: none; margin: calc(6 * var(--u)) 0 0; padding: 0; display: flex; flex-direction: column;
+  gap: calc(2 * var(--u)); font-size: calc(20 * var(--u)); line-height: 1.25; color: var(--color-labelFaint); }
 .replay-lines li { transition: color 300ms ease; }
 .replay-lines .is-reached { color: var(--color-ink); font-weight: var(--weight-medium); }
 .replay-slide .slide-foot-line { margin-top: calc(6 * var(--u)); font-size: calc(28 * var(--u)); }

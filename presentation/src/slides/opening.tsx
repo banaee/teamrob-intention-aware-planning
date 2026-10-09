@@ -66,7 +66,7 @@ export function ActorsSlide() {
       <p><strong>OPTIONAL</strong> (handoff 9): the lift truck stays small and idle in a corner of the stage slides,
         still waiting.</p>
     </>}>
-      <h1 className="scene-line">Two robots with the same mind.</h1>
+      <h1 className="scene-line">Two robots: same architecture of mind</h1>
       <div className="actors">
         <figure className="actor">
           <div className="actor-scene"><AgentsInRoom recorded={KITTING} figures={[ROBOT]} inRoom /></div>

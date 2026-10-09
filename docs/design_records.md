@@ -6213,7 +6213,7 @@ Checks: the build; the click-through, 0 outside requests, 0 page errors, 0 notes
 THREE SLIDES OF TPRES-V7 (Hadi, 9 October 2026, preferred; recorded by ccode the same day). The results on one slide:
 the five rows Hadi kept, his labels and numbers, the layer a grey first column, the same style in smaller type. The lift
 truck's slide replays Hadi's dock_loading scenario_s11_01 on env_layout_05 (env_setup_11), ticks 50 to 120, run file
-configs/kitting/tpres/stage8_dl_s11_01.yaml (intention-aware, assignment and context knowledge on, single_task, as
+configs/dock_loading/tpres/stage8_dl_s11_01.yaml (intention-aware, assignment and context knowledge on, single_task, as
 cchat assumed: Hadi stated no options): her scan of pallet 0 recognised from 48; pallet 5 delivered and the return of
 pallet 6 chosen at 60; her scan of pallet 2 recognised at 68; at 120 an office break leads at 0.80, not recognised; no
 hold. The afternoon's slide shows Hadi's screenshot of the web-ui (presentation/web-ui-screenshot.png). Clicks: the lift
