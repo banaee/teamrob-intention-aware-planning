@@ -33,12 +33,12 @@ import type {
 import { theme } from "../theme";
 import { heldBy, statesHeld } from "./look";
 import { type Place, type PlaceBook, placeGrid, slotOf } from "./places";
-import { carryHeight, carryOffset, FigureForm, ringRadius } from "./figures";
+import { carryHeight, carryPose, FigureForm, ringRadius } from "./figures";
 import type { Ahead, PathsShown } from "./paths";
 import { Paths } from "./Paths";
 import { FixedForm, MovableForm, restHeight } from "./forms";
-import { fixedLook, movableLook } from "./look";
-import { at, Block, type Paint, paints, SoftShadow } from "./solids";
+import { drawnSize, fixedLook, movableLook } from "./look";
+import { at, Block, type Paint, paints, SoftShadow, tintPaints } from "./solids";
 
 const FLOOR_DEPTH = 12;
 const AREA_INSET = 10;
@@ -93,12 +93,12 @@ export function Scene({ room, moment, book, appearance, glideMs, ahead, shown }:
     </group>
   ), [world, appearance, held]);
 
-  // The run's largest movable extents, the grid of each fixed object (fixed for the sim-run), and the height of one
-  // layer of objects: the tallest look a movable object of the run may take.
-  const largest = useMemo(() => ({
-    x: Math.max(1, ...world.movable_objects.map((o) => o.size.x)),
-    y: Math.max(1, ...world.movable_objects.map((o) => o.size.y)),
-  }), [world]);
+  // The run's largest drawn movable extents, the grid of each fixed object (fixed for the sim-run), and the height of
+  // one layer of objects: the tallest look a movable object of the run may take.
+  const largest = useMemo(() => {
+    const drawn = world.movable_objects.map((o) => drawnSize(appearance, o.type, o.size));
+    return { x: Math.max(1, ...drawn.map((d) => d.x)), y: Math.max(1, ...drawn.map((d) => d.y)) };
+  }, [world, appearance]);
   const grids = useMemo(() => new Map<string, Place[]>(), [world, largest]);
   const gridOf = (f: FixedObject) => {
     if (!grids.has(f.id)) {
@@ -131,10 +131,11 @@ export function Scene({ room, moment, book, appearance, glideMs, ahead, shown }:
         const base = restHeight(holderLook.shape, holderLook.height);
         return contents.movable_objects.map((id, i) => {
           const o = movableById.get(id)!;
-          const look = movableLook(appearance, o.type, heldBy(held, o.id));
+          const look = movableLook(appearance, o.type, heldBy(held, o.id), o.subtype);
+          const size = drawnSize(appearance, o.type, o.size);
           const slot = slotOf(grid, numbers?.get(id) ?? i);
-          return <MovableForm key={o.id} shape={look.shape} x={slot.x} y={slot.y} sx={o.size.x} sy={o.size.y}
-                              h={look.height} base={base + slot.layer * layerHeight} paint={paints.movable} />;
+          return <MovableForm key={o.id} shape={look.shape} x={slot.x} y={slot.y} sx={size.x} sy={size.y}
+                              h={look.height} base={base + slot.layer * layerHeight} paint={tintPaints[look.tint]} />;
         });
       })}
 
@@ -144,15 +145,20 @@ export function Scene({ room, moment, book, appearance, glideMs, ahead, shown }:
           // Drawn at the group's origin; the group carries the agent to its position.
           const stance = { x: 0, y: 0, facing: a.last_motion };
           const carried = moment.carried.filter((c) => c.agent === a.id).map((c) => movableById.get(c.movable_object)!);
-          const hold = carryOffset(figure.figure, figure.height, a.last_motion);
           return (
             <Gliding key={`${room.key} ${a.id}`} x={a.position.x} y={a.position.y} glideMs={glideMs}>
               <FigureForm figure={figure.figure} h={figure.height} stance={stance} paint={paint} />
               {carried.map((o) => {
-                const look = movableLook(appearance, o.type, heldBy(held, o.id));
-                return <MovableForm key={o.id} shape={look.shape} x={hold.x} y={hold.y}
-                                    sx={o.size.x} sy={o.size.y} h={look.height}
-                                    base={carryHeight(figure.figure, figure.height)} paint={paints.movable} />;
+                const look = movableLook(appearance, o.type, heldBy(held, o.id), o.subtype);
+                const size = drawnSize(appearance, o.type, o.size);
+                const hold = carryPose(figure.figure, figure.height, a.last_motion, size.y);
+                // Turned with the figure about the point it is held at.
+                return (
+                  <group key={o.id} position={at(hold.x, hold.y)} rotation={[0, hold.angle, 0]}>
+                    <MovableForm shape={look.shape} x={0} y={0} sx={size.x} sy={size.y} h={look.height}
+                                 base={carryHeight(figure.figure, figure.height)} paint={tintPaints[look.tint]} />
+                  </group>
+                );
               })}
               <Pill position={at(0, 0, figure.height)} text={a.id} dot={colour} />
             </Gliding>

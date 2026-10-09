@@ -1510,11 +1510,15 @@
         },
         "shape": {
           "$ref": "#/$defs/MovableShape"
+        },
+        "tint": {
+          "$ref": "#/$defs/Tint"
         }
       },
       "required": [
         "height",
-        "shape"
+        "shape",
+        "tint"
       ],
       "title": "MovableLook",
       "type": "object"
@@ -1597,8 +1601,13 @@
     },
     "MovableTypeLook": {
       "additionalProperties": false,
-      "description": "A movable object type's look, and its looks by state in order (the first whose state holds is drawn).",
+      "description": "A movable object type's look, and its looks by state in order (the first whose state holds is drawn); its tint\nper subtype, for an object no look by state holds for (another subtype, or none: the type's tint); the share of\neach side of its objects' footprint that is drawn.",
       "properties": {
+        "footprint_scale": {
+          "exclusiveMinimum": 0.0,
+          "maximum": 1.0,
+          "type": "number"
+        },
         "height": {
           "type": "number"
         },
@@ -1610,12 +1619,24 @@
             "$ref": "#/$defs/MovableStateLook"
           },
           "type": "array"
+        },
+        "subtype_tints": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Tint"
+          },
+          "type": "object"
+        },
+        "tint": {
+          "$ref": "#/$defs/Tint"
         }
       },
       "required": [
+        "footprint_scale",
         "height",
         "shape",
-        "states"
+        "states",
+        "subtype_tints",
+        "tint"
       ],
       "title": "MovableTypeLook",
       "type": "object"
@@ -3043,6 +3064,17 @@
       ],
       "title": "TimelineWindow",
       "type": "object"
+    },
+    "Tint": {
+      "description": "The tints of a movable object; their values are the theme's.",
+      "enum": [
+        "ink",
+        "tan",
+        "slate",
+        "pale_wood"
+      ],
+      "title": "Tint",
+      "type": "string"
     },
     "TriggerKind": {
       "enum": [

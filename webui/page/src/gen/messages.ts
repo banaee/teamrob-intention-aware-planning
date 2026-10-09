@@ -31,6 +31,13 @@ export type ShapeKind =
  */
 export type MovableShape = "crate" | "skid" | "loaded_skid";
 /**
+ * The tints of a movable object; their values are the theme's.
+ *
+ * This interface was referenced by `WebUiMessages`'s JSON-Schema
+ * via the `definition` "Tint".
+ */
+export type Tint = "ink" | "tan" | "slate" | "pale_wood";
+/**
  * The figures of the agents.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
@@ -298,6 +305,7 @@ export interface FixedLook {
 export interface MovableLook {
   height: number;
   shape: MovableShape;
+  tint: Tint;
 }
 /**
  * A fixed object type's look, and its looks by state in order (the first whose state holds is drawn).
@@ -330,15 +338,22 @@ export interface FigureLook {
   height: number;
 }
 /**
- * A movable object type's look, and its looks by state in order (the first whose state holds is drawn).
+ * A movable object type's look, and its looks by state in order (the first whose state holds is drawn); its tint
+ * per subtype, for an object no look by state holds for (another subtype, or none: the type's tint); the share of
+ * each side of its objects' footprint that is drawn.
  *
  * This interface was referenced by `WebUiMessages`'s JSON-Schema
  * via the `definition` "MovableTypeLook".
  */
 export interface MovableTypeLook {
+  footprint_scale: number;
   height: number;
   shape: MovableShape;
   states: MovableStateLook[];
+  subtype_tints: {
+    [k: string]: Tint;
+  };
+  tint: Tint;
 }
 /**
  * The look of a movable object while `state` holds for it.

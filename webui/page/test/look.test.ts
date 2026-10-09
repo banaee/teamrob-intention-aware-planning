@@ -6,7 +6,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Appearance } from "../src/gen/messages";
-import { fixedLook, heldBy, movableLook, statesHeld } from "../src/env-pane/look";
+import { drawnSize, fixedLook, heldBy, movableLook, statesHeld } from "../src/env-pane/look";
 
 const appearance = {
   fixed: {
@@ -14,12 +14,13 @@ const appearance = {
              states: [{ state: "raised", look: { shape: "barrier", height: 8, presence: "background" } }] },
   },
   movable: {
-    load: { shape: "loaded_skid", height: 40, states: [
-      { state: "bare", look: { shape: "skid", height: 14 } },
-      { state: "marked", look: { shape: "crate", height: 20 } }] },
+    load: { shape: "loaded_skid", height: 40, tint: "ink", footprint_scale: 0.5,
+            subtype_tints: { warm_kind: "tan", cool_kind: "slate" }, states: [
+      { state: "bare", look: { shape: "skid", height: 14, tint: "pale_wood" } },
+      { state: "marked", look: { shape: "crate", height: 20, tint: "ink" } }] },
   },
   default_fixed: { shape: "block", height: 60, presence: "background" },
-  default_movable: { shape: "crate", height: 20 },
+  default_movable: { shape: "crate", height: 20, tint: "ink" },
 } as unknown as Appearance;
 
 describe("the look by state", () => {
@@ -37,5 +38,25 @@ describe("the look by state", () => {
     expect(fixedLook(appearance, "frame", heldBy(held, "frame_2")).height).toBe(130);
     expect(movableLook(appearance, "load", heldBy(held, "load_3")).shape).toBe("loaded_skid");
     expect(fixedLook(appearance, "unknown", heldBy(held, "frame_1"))).toEqual(appearance.default_fixed);
+  });
+});
+
+describe("the tint and the drawn footprint", () => {
+  const held = statesHeld([{ state: "bare", object: "load_1" }]);
+
+  it("takes the type's tint for the subtype, the type's tint for another subtype or none", () => {
+    expect(movableLook(appearance, "load", heldBy(held, "load_2"), "warm_kind").tint).toBe("tan");
+    expect(movableLook(appearance, "load", heldBy(held, "load_2"), "cool_kind").tint).toBe("slate");
+    expect(movableLook(appearance, "load", heldBy(held, "load_2"), "other_kind").tint).toBe("ink");
+    expect(movableLook(appearance, "load", heldBy(held, "load_2"), null).tint).toBe("ink");
+  });
+
+  it("takes a look by state's tint whatever the subtype", () => {
+    expect(movableLook(appearance, "load", heldBy(held, "load_1"), "warm_kind").tint).toBe("pale_wood");
+  });
+
+  it("draws the footprint at the type's share, a type with no entry at its size", () => {
+    expect(drawnSize(appearance, "load", { x: 80, y: 120 })).toEqual({ x: 40, y: 60 });
+    expect(drawnSize(appearance, "unknown", { x: 80, y: 120 })).toEqual({ x: 80, y: 120 });
   });
 });

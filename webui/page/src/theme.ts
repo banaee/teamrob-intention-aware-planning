@@ -32,6 +32,20 @@ export const theme = {
     movableLight: "#383D4F",
     movableShade: "#2A2E3C",
     movableLine: "#E9EBF2",   // their edges, light on dark
+    // A movable object's other tints (webui/appearance.py, Tint; the scene's cleaning of 9 October 2026): two muted mid
+    // tones, one warm and one cool, and a very light wood, clearly lighter than both. None near the agents' colours.
+    tanTop: "#CDB28E",
+    tanLight: "#B89A73",
+    tanShade: "#9E825E",
+    tanLine: "#5E4A33",
+    slateTop: "#A9B6BD",
+    slateLight: "#8C9AA2",
+    slateShade: "#738189",
+    slateLine: "#3C474E",
+    paleWoodTop: "#F3EADA",
+    paleWoodLight: "#E8DAC2",
+    paleWoodShade: "#D8C6A6",
+    paleWoodLine: "#9C8762",
     robot: "#3B5BDB",
     robotLight: "#A7B8F5",
     robotDark: "#2A44B0",

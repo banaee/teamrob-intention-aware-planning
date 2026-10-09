@@ -10,6 +10,7 @@ import { Edges } from "@react-three/drei";
 import { useMemo } from "react";
 import * as THREE from "three";
 
+import type { Tint } from "../gen/messages";
 import { theme } from "../theme";
 import { illustration, type Tone } from "./material";
 
@@ -55,6 +56,19 @@ export const paints = {
     lineWidth: theme.line.agent,
   },
 } satisfies Record<string, Paint>;
+
+function tinted(top: string, light: string, shade: string, line: string): Paint {
+  return { tone: { top, light, shade, hatch: null }, line, lineWidth: theme.line.movable };
+}
+
+/** A movable object's paint by its tint (webui/appearance.py, Tint): `ink` is `paints.movable`. */
+export const tintPaints: Record<Tint, Paint> = {
+  ink: paints.movable,
+  tan: tinted(theme.color.tanTop, theme.color.tanLight, theme.color.tanShade, theme.color.tanLine),
+  slate: tinted(theme.color.slateTop, theme.color.slateLight, theme.color.slateShade, theme.color.slateLine),
+  pale_wood: tinted(theme.color.paleWoodTop, theme.color.paleWoodLight, theme.color.paleWoodShade,
+                    theme.color.paleWoodLine),
+};
 
 /** A thin member (a post, a leg, a stem) drawn as one stroke: its faces in its outline's colour, no outline. */
 export function stroke(paint: Paint): Paint {

@@ -231,7 +231,8 @@ export function MovableForm({ shape, x, y, sx, sy, h, base, paint }: {
   }
 }
 
-const LOW_SKID = 14;      // the height of a loaded skid's skid, in the layout's unit
+const LOW_SKID = 7;       // the height of a loaded skid's skid, in the layout's unit: as high as a bare skid in the
+                          // domains' data (the scene's cleaning of 9 October 2026)
 
 /** A low slatted platform: three runners and a deck. */
 function Skid({ x, y, sx, sy, h, base, paint }: {

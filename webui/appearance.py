@@ -26,11 +26,20 @@ PRESENCE:
     world fact. Deriving it from a run's bindings was measured in 0.3 and found unstable (docs/design_records.md,
     "T-viz, the web-ui", 0.3).
 
+TINTS AND THE DRAWN FOOTPRINT (T-viz, the scene's cleaning of 9 October 2026):
+    A movable object is drawn in a tint, one of a closed set named by colour (Tint), never by a domain's subtype; the
+    values are the page's theme's (webui/page/src/theme.ts), so the scene takes its colours from the theme alone. A
+    movable object type's entry may map a subtype to a tint (`subtype_tints`); a look by state names its own tint and
+    wins, whatever the subtype. An entry's `footprint_scale` draws its objects smaller than their size (a share of each
+    side): a display size only, the world's size unchanged.
+
 UNITS:
     Heights in the layout's unit, like the sizes of the run description.
 """
 
 from enum import Enum
+
+from pydantic import Field
 
 from webui.message_base import Message
 
@@ -63,6 +72,14 @@ class Figure(str, Enum):
     LIFT_VEHICLE = "lift_vehicle"          # a body, a mast and two forks
 
 
+class Tint(str, Enum):
+    """The tints of a movable object; their values are the theme's."""
+    INK = "ink"                # solid ink: what can change stands out (T-viz 0.3)
+    TAN = "tan"                # a warm mid tone
+    SLATE = "slate"            # a cool mid tone
+    PALE_WOOD = "pale_wood"    # a very light wood, lighter than both
+
+
 class Presence(str, Enum):
     BACKGROUND = "background"
     ACTIVE = "active"
@@ -77,6 +94,7 @@ class FixedLook(Message):
 class MovableLook(Message):
     shape: MovableShape
     height: float
+    tint: Tint = Tint.INK
 
 
 class FixedStateLook(Message):
@@ -97,8 +115,12 @@ class MovableStateLook(Message):
 
 
 class MovableTypeLook(MovableLook):
-    """A movable object type's look, and its looks by state in order (the first whose state holds is drawn)."""
+    """A movable object type's look, and its looks by state in order (the first whose state holds is drawn); its tint
+    per subtype, for an object no look by state holds for (another subtype, or none: the type's tint); the share of
+    each side of its objects' footprint that is drawn."""
     states: tuple[MovableStateLook, ...] = ()
+    subtype_tints: dict[str, Tint] = {}
+    footprint_scale: float = Field(1.0, gt=0.0, le=1.0)
 
 
 class FigureLook(Message):

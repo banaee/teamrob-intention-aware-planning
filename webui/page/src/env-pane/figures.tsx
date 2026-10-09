@@ -28,11 +28,20 @@ export function carryHeight(figure: Figure, h: number): number {
   }
 }
 
-/** Where a figure holds what it carries, relative to its standing point (the lift vehicle: on its forks). */
-export function carryOffset(figure: Figure, h: number, facing: Direction | null): { x: number; y: number } {
+/** Where a figure holds what it carries, relative to its standing point, and the turn of what it holds (radians about
+ * the vertical, as `facingAngle`). The lift vehicle holds it on its forks, turned with the vehicle, its back edge against
+ * the mast's front (`depth`: its drawn extent along the forks); the others hold it before them, unturned. */
+export function carryPose(figure: Figure, h: number, facing: Direction | null,
+                          depth: number): { x: number; y: number; angle: number } {
   const f = facing ?? { x: 0, y: 1 };
-  const reach = figure === "lift_vehicle" ? 0.62 * h : 0.22 * h;
-  return { x: f.x * reach, y: f.y * reach };
+  if (figure !== "lift_vehicle") return { x: f.x * 0.22 * h, y: f.y * 0.22 * h, angle: 0 };
+  const reach = (MAST_Y + MAST / 2) * h + depth / 2;
+  return { x: f.x * reach, y: f.y * reach, angle: facingAngle(f) };
+}
+
+/** The turn about the vertical that brings a form facing the layout's +y to face `f`. */
+export function facingAngle(f: Direction): number {
+  return Math.atan2(-f.x, f.y);
 }
 
 /** The radius of the faint ring a figure stands on. */
@@ -89,19 +98,21 @@ function CubeHeadRobot({ h, s, paint }: { h: number; s: Stance; paint: Paint }) 
   );
 }
 
+const MAST_Y = 0.22;   // the lift vehicle's mast: its centre ahead of the standing point, as a share of the height
+const MAST = 0.05;     // its posts' side, as a share of the height
+
 /** A low body with a cab, a mast and two forks, facing its direction of motion. */
 function LiftVehicle({ h, s, paint }: { h: number; s: Stance; paint: Paint }) {
-  const f = s.facing ?? { x: 0, y: 1 };
-  const angle = Math.atan2(-f.x, f.y);    // turns the forms below, which face the layout's +y, toward f
+  const angle = facingAngle(s.facing ?? { x: 0, y: 1 });   // turns the forms below, which face the layout's +y
   const [px, py, pz] = at(s.x, s.y);
   return (
     <group position={[px, py, pz]} rotation={[0, angle, 0]}>
       <Block x={0} y={-0.12 * h} sx={0.5 * h} sy={0.62 * h} h={0.28 * h} base={0.06 * h} paint={paint} />
       <Block x={0} y={-0.24 * h} sx={0.42 * h} sy={0.3 * h} h={0.26 * h} base={0.34 * h} paint={paint} />
       {[-1, 1].map((side) => (
-        <Block key={side} x={side * 0.17 * h} y={0.22 * h} sx={0.05 * h} sy={0.05 * h} h={h} paint={paint} />
+        <Block key={side} x={side * 0.17 * h} y={MAST_Y * h} sx={MAST * h} sy={MAST * h} h={h} paint={paint} />
       ))}
-      <Block x={0} y={0.22 * h} sx={0.4 * h} sy={0.04 * h} h={0.05 * h} base={0.9 * h} paint={paint} />
+      <Block x={0} y={MAST_Y * h} sx={0.4 * h} sy={0.04 * h} h={0.05 * h} base={0.9 * h} paint={paint} />
       {[-1, 1].map((side) => (
         <Block key={side} x={side * 0.12 * h} y={0.52 * h} sx={0.06 * h} sy={0.56 * h} h={0.03 * h} base={0.04 * h}
                paint={paint} />
