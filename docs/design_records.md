@@ -5764,6 +5764,13 @@ footprint added); `tests/test_tviz_*.py`; one sim-run per domain played in Chrom
 115, a carried pallet facing north and east; kitting scenario_s01_01 to tick 8), no console error. Only the web-ui reads
 the appearance data: headless unchanged. The deck (`presentation/`) draws with this code from recorded data that lacks
 the new fields; its data is recorded again before its next build.
+FOUND (ccode, 9 October 2026, from Hadi's screenshot: dark pallets stacked in the bays): his browser ran the page's
+bundle from before the round, from its cache, against the new appearance data (the flat shelves and the smaller forklift
+came through, the tints and the drawn footprint did not); the server sent the page with no Cache-Control, so a browser
+may reuse a cached index.html, and the bundle it names, for hours across rebuilds and starts on the same address. A start
+on another port showed the new look at once. FIXED: `webui/server.py` serves every file of the built page with
+`Cache-Control: no-cache` (revalidated on every load, 304 when unchanged); test in `tests/test_tviz_server.py`. Looked at
+through `./web-ui.sh` in both domains (dock_loading scenario_s08_01: dry, frozen and empty pallets in view).
 
 ## T-pres, the talk
 
